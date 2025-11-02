@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Home, Calendar, Key, Building2 } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 type OnboardingProps = {
   onComplete: (info: MovingInfo) => void;
@@ -81,13 +82,13 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 </div>
                 <h2 className="text-xl font-semibold">Huidig adres</h2>
               </div>
-              <Input
+              <AddressAutocomplete
+                label=""
                 placeholder="Bijv. Kerkstraat 12, Amsterdam"
                 value={formData.oldAddress}
-                onChange={(e) =>
-                  setFormData({ ...formData, oldAddress: e.target.value })
+                onChange={(address) =>
+                  setFormData({ ...formData, oldAddress: address })
                 }
-                className="text-base"
               />
             </div>
           )}
@@ -100,13 +101,13 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 </div>
                 <h2 className="text-xl font-semibold">Nieuw adres</h2>
               </div>
-              <Input
+              <AddressAutocomplete
+                label=""
                 placeholder="Bijv. Dorpsplein 5, Utrecht"
                 value={formData.newAddress}
-                onChange={(e) =>
-                  setFormData({ ...formData, newAddress: e.target.value })
+                onChange={(address) =>
+                  setFormData({ ...formData, newAddress: address })
                 }
-                className="text-base"
               />
             </div>
           )}
