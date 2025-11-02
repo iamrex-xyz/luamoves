@@ -1,12 +1,49 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Onboarding } from "@/components/Onboarding";
+import { Dashboard } from "@/components/Dashboard";
+import { TaskList } from "@/components/TaskList";
+import { Timeline } from "@/components/Timeline";
+
+export type MovingInfo = {
+  oldAddress: string;
+  newAddress: string;
+  movingDate: string;
+  type: "buy" | "rent";
+};
 
 const Index = () => {
+  const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
+  const [currentView, setCurrentView] = useState<"onboarding" | "dashboard" | "tasks" | "timeline">("onboarding");
+
+  const handleComplete = (info: MovingInfo) => {
+    setMovingInfo(info);
+    setCurrentView("dashboard");
+  };
+
+  if (currentView === "onboarding") {
+    return <Onboarding onComplete={handleComplete} />;
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
+      {currentView === "dashboard" && movingInfo && (
+        <Dashboard 
+          movingInfo={movingInfo} 
+          onNavigate={setCurrentView}
+        />
+      )}
+      {currentView === "tasks" && movingInfo && (
+        <TaskList 
+          movingInfo={movingInfo}
+          onNavigate={setCurrentView}
+        />
+      )}
+      {currentView === "timeline" && movingInfo && (
+        <Timeline 
+          movingInfo={movingInfo}
+          onNavigate={setCurrentView}
+        />
+      )}
     </div>
   );
 };
