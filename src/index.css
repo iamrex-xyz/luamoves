@@ -8,40 +8,47 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 30 20% 98%;
-    --foreground: 220 20% 20%;
+    --background: 210 25% 98%;
+    --foreground: 215 20% 25%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 20%;
+    --card-foreground: 215 20% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 20%;
+    --popover-foreground: 215 20% 25%;
 
-    --primary: 200 70% 50%;
+    --primary: 195 85% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 40% 92%;
-    --secondary-foreground: 220 20% 20%;
+    --secondary: 210 20% 93%;
+    --secondary-foreground: 215 20% 25%;
 
-    --muted: 30 25% 95%;
-    --muted-foreground: 220 15% 45%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 50%;
 
-    --accent: 140 35% 55%;
+    --accent: 165 60% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 20% 88%;
-    --input: 30 20% 88%;
-    --ring: 200 70% 50%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 195 85% 45%;
 
     --radius: 0.75rem;
     
-    /* Custom design tokens */
-    --success: 140 35% 55%;
-    --warning: 35 90% 60%;
-    --info: 200 70% 50%;
+    /* Custom design tokens - Neuropsychology-based */
+    --success: 150 65% 42%;
+    --warning: 35 85% 58%;
+    --info: 195 85% 45%;
+    
+    /* Progress colors for motivation */
+    --progress-start: 200 60% 85%;
+    --progress-low: 195 70% 65%;
+    --progress-medium: 195 80% 50%;
+    --progress-high: 190 85% 40%;
+    --progress-complete: 150 65% 42%;
     
     /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(200 70% 50%), hsl(200 70% 65%));
@@ -72,33 +79,40 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 220 25% 12%;
-    --foreground: 30 20% 95%;
+    --background: 215 30% 12%;
+    --foreground: 210 25% 95%;
 
-    --card: 220 25% 15%;
-    --card-foreground: 30 20% 95%;
+    --card: 215 28% 16%;
+    --card-foreground: 210 25% 95%;
 
-    --popover: 220 25% 15%;
-    --popover-foreground: 30 20% 95%;
+    --popover: 215 28% 16%;
+    --popover-foreground: 210 25% 95%;
 
-    --primary: 200 70% 55%;
+    --primary: 195 80% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 20%;
-    --secondary-foreground: 30 20% 95%;
+    --secondary: 215 25% 22%;
+    --secondary-foreground: 210 25% 95%;
 
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 15% 60%;
+    --muted: 215 25% 20%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 140 35% 50%;
+    --accent: 165 55% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 70% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 20% 22%;
-    --input: 220 20% 22%;
-    --ring: 200 70% 55%;
+    --border: 215 25% 24%;
+    --input: 215 25% 24%;
+    --ring: 195 80% 55%;
+    
+    /* Progress colors for motivation - dark mode */
+    --progress-start: 200 50% 35%;
+    --progress-low: 195 60% 45%;
+    --progress-medium: 195 70% 55%;
+    --progress-high: 190 75% 50%;
+    --progress-complete: 150 60% 45%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
