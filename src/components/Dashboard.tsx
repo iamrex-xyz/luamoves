@@ -18,7 +18,7 @@ import {
   Plus,
   ExternalLink,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -30,6 +30,27 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        // Scrolling down
+        setStatsVisible(false);
+      } else {
+        // Scrolling up
+        setStatsVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -179,8 +200,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </Button>
           </div>
 
-          {/* Stats Card */}
-          <div className="pb-6">
+          {/* Stats Card - Collapsible on scroll */}
+          <div 
+            className={`transition-all duration-300 pb-6 ${
+              statsVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pb-0 overflow-hidden'
+            }`}
+          >
             <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-6">
 ...
