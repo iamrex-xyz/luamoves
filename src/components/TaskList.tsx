@@ -48,7 +48,13 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   // Filter taken
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      const statusMatch = filter === "all" || task.status === filter;
+      // Voltooide taken verschijnen alleen bij "Afgerond" filter
+      const statusMatch = 
+        filter === "done" 
+          ? task.status === "done"
+          : filter === "all"
+          ? task.status !== "done"
+          : task.status === filter;
       const categoryMatch = categoryFilter === "all" || task.category === categoryFilter;
       
       // Assignee filter
