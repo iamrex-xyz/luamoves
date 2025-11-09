@@ -208,7 +208,67 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           >
             <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-6">
-...
+                {/* Circular Progress */}
+                <div className="relative flex-shrink-0">
+                  <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      stroke="rgba(255,255,255,0.2)"
+                      strokeWidth="8"
+                      fill="none"
+                    />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="52"
+                      stroke="white"
+                      strokeWidth="8"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 52}`}
+                      strokeDashoffset={`${2 * Math.PI * 52 * (1 - progressPercentage / 100)}`}
+                      strokeLinecap="round"
+                      style={{ transition: "stroke-dashoffset 1s ease-out" }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-3xl md:text-2xl font-bold text-white">
+                      {Math.round(progressPercentage)}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Stats */}
+                <div className="flex-1 space-y-3 text-white">
+                  <div>
+                    <h3 className="text-lg md:text-base font-semibold mb-1">
+                      {progressPercentage >= 75 
+                        ? "Bijna klaar voor je nieuwe thuis!" 
+                        : progressPercentage >= 50 
+                        ? "Ik help je op weg naar je nieuwe start!" 
+                        : progressPercentage >= 25 
+                        ? "Samen maken we het mogelijk!" 
+                        : "Ik neem je alles uit handen!"}
+                    </h3>
+                    <p className="text-white/80 text-sm">
+                      {movingInfo.newAddress}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                    <div className="text-2xl md:text-xl font-bold">
+                      {daysUntilMove === 0 ? "Vandaag" : `${daysUntilMove}`}
+                    </div>
+                    <div className="text-xs text-white/80">
+                      {daysUntilMove === 0 
+                        ? "De grote dag is hier" 
+                        : daysUntilMove === 1 
+                        ? "Nog één dag te gaan" 
+                        : "Dagen tot verhuizing"}
+                    </div>
+                  </div>
+                </div>
               </div>
             </Card>
           </div>
