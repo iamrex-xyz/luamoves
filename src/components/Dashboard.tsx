@@ -18,7 +18,7 @@ import {
   Plus,
   ExternalLink,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -30,6 +30,27 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+        // Scrolling down
+        setHeaderVisible(false);
+      } else {
+        // Scrolling up
+        setHeaderVisible(true);
+      }
+      
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -154,7 +175,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   return (
     <div className="min-h-screen pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-6">
+      <div 
+        className={`bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-6 transition-transform duration-300 sticky top-0 z-10 ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
