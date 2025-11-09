@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Onboarding } from "@/components/Onboarding";
+import { Auth } from "@/components/Auth";
+import { AdditionalInfo } from "@/components/AdditionalInfo";
 import { Dashboard } from "@/components/Dashboard";
 import { TaskList } from "@/components/TaskList";
 import { Timeline } from "@/components/Timeline";
+import { User } from "@supabase/supabase-js";
 
 export type MovingInfo = {
   oldAddress: string;
@@ -13,15 +16,35 @@ export type MovingInfo = {
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
-  const [currentView, setCurrentView] = useState<"onboarding" | "dashboard" | "tasks" | "timeline">("onboarding");
+  const [user, setUser] = useState<User | null>(null);
+  const [currentView, setCurrentView] = useState<
+    "onboarding" | "auth" | "additionalInfo" | "dashboard" | "tasks" | "timeline"
+  >("onboarding");
 
-  const handleComplete = (info: MovingInfo) => {
+  const handleOnboardingComplete = (info: MovingInfo) => {
     setMovingInfo(info);
+    setCurrentView("auth");
+  };
+
+  const handleAuthComplete = (authenticatedUser: User) => {
+    setUser(authenticatedUser);
+    setCurrentView("additionalInfo");
+  };
+
+  const handleAdditionalInfoComplete = () => {
     setCurrentView("dashboard");
   };
 
   if (currentView === "onboarding") {
-    return <Onboarding onComplete={handleComplete} />;
+    return <Onboarding onComplete={handleOnboardingComplete} />;
+  }
+
+  if (currentView === "auth") {
+    return <Auth onComplete={handleAuthComplete} />;
+  }
+
+  if (currentView === "additionalInfo") {
+    return <AdditionalInfo onComplete={handleAdditionalInfoComplete} />;
   }
 
   return (
