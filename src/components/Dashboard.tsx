@@ -147,7 +147,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <Home className="w-7 h-7 md:w-6 md:h-6" />
             </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Charlie</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">Charly</h1>
                 <p className="text-white/80 text-sm md:text-base mt-1">
                   Jouw verhuis concierge
                 </p>
