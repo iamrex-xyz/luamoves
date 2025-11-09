@@ -16,6 +16,7 @@ import {
   Users,
   CheckCircle2,
   Plus,
+  ExternalLink,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -115,7 +116,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </h4>
             {getStatusBadge(task)}
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {task.deadlineLabel}
@@ -131,6 +132,20 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               </span>
             )}
           </div>
+          {task.affiliateLink && task.status !== "done" && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-2 gap-2 h-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.open(task.affiliateLink, "_blank");
+              }}
+            >
+              Direct regelen
+              <ExternalLink className="w-3 h-3" />
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -206,10 +221,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     {progressPercentage >= 75 
                       ? "Bijna klaar voor je nieuwe thuis!" 
                       : progressPercentage >= 50 
-                      ? "Je bent er al bijna!" 
+                      ? "Ik help je op weg naar je nieuwe start!" 
                       : progressPercentage >= 25 
-                      ? "Goed bezig!" 
-                      : "Klaar voor een nieuwe start!"}
+                      ? "Samen maken we het mogelijk!" 
+                      : "Ik neem je alles uit handen!"}
                   </h3>
                   <p className="text-white/80 text-sm">
                     {movingInfo.newAddress}
