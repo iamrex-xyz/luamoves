@@ -8,12 +8,10 @@ import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
-import { AssignTaskDropdown } from "@/components/AssignTaskDropdown";
-import { EditDeadlinePopover } from "@/components/EditDeadlinePopover";
+import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { BottomNav } from "@/components/BottomNav";
 import {
   ArrowLeft,
-  Calendar,
   ExternalLink,
   Filter,
   Clock,
@@ -36,6 +34,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   const [assigneeFilter, setAssigneeFilter] = useState<"all" | "mine" | "others">("all");
   const [showAddTask, setShowAddTask] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -285,71 +284,56 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                     return (
                       <div
                         key={task.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
                           isTaskOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
                         }`}
+                        onClick={() => setSelectedTask(task)}
                       >
                         <Checkbox
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
-                          className="mt-0.5 flex-shrink-0"
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-1"
                         />
-                        <div className="flex-1 min-w-0 space-y-2">
-                          <div className="flex items-start justify-between gap-3">
-                            <h4 className={`font-medium text-sm leading-tight ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
                               {task.title}
                             </h4>
                             <div className="flex-shrink-0">
                               {getStatusBadge(task)}
                             </div>
                           </div>
-                          
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5 flex-shrink-0" />
-                              <span>
-                                {task.deadlineLabel}
-                                {daysUntil === 0 && " (vandaag)"}
-                                {daysUntil === 1 && " (morgen)"}
-                                {daysUntil > 1 && ` (${daysUntil} dagen)`}
-                                {isTaskOverdue && " (verlopen)"}
-                              </span>
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {task.deadlineLabel}
+                              {daysUntil === 0 && " (vandaag)"}
+                              {daysUntil === 1 && " (morgen)"}
+                              {daysUntil > 1 && ` (${daysUntil} dagen)`}
+                              {isTaskOverdue && " (verlopen)"}
                             </span>
                             {task.assignedToEmail && (
-                              <>
-                                <span className="text-muted-foreground/40">•</span>
-                                <span className="flex items-center gap-1.5">
-                                  <User className="w-3.5 h-3.5 flex-shrink-0" />
-                                  <span className="truncate">{task.assignedToEmail}</span>
-                                </span>
-                              </>
+                              <span className="flex items-center gap-1">
+                                <User className="w-3 h-3" />
+                                {task.assignedToEmail}
+                              </span>
                             )}
                           </div>
-                          
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <EditDeadlinePopover
-                              taskId={task.id}
-                              currentDeadline={task.deadline}
-                              onDeadlineChange={refreshTasks}
-                            />
-                            <AssignTaskDropdown
-                              taskId={task.id}
-                              currentAssignedTo={task.assignedTo}
-                              currentAssignedEmail={task.assignedToEmail}
-                              onAssignmentChange={refreshTasks}
-                            />
-                            {task.affiliateLink && task.status !== "done" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-1.5 h-8 text-xs"
-                                onClick={() => window.open(task.affiliateLink, "_blank")}
-                              >
-                                Direct regelen
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                          </div>
+                          {task.affiliateLink && task.status !== "done" && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-2 gap-2 h-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(task.affiliateLink, "_blank");
+                              }}
+                            >
+                              Direct regelen
+                              <ExternalLink className="w-3 h-3" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     );
@@ -370,6 +354,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       <ShareMovingDialog
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
+      />
+      <TaskDetailDialog
+        task={selectedTask}
+        open={!!selectedTask}
+        onOpenChange={(open) => !open && setSelectedTask(null)}
+        onTaskUpdate={refreshTasks}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
