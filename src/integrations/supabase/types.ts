@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       custom_tasks: {
         Row: {
+          assigned_to_email: string | null
           category: string
           created_at: string | null
           deadline: string
@@ -28,6 +29,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to_email?: string | null
           category: string
           created_at?: string | null
           deadline: string
@@ -40,6 +42,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to_email?: string | null
           category?: string
           created_at?: string | null
           deadline?: string
@@ -140,6 +143,7 @@ export type Database = {
       tasks: {
         Row: {
           assigned_to: string | null
+          assigned_to_email: string | null
           created_at: string
           id: string
           status: Database["public"]["Enums"]["task_status"]
@@ -149,6 +153,7 @@ export type Database = {
         }
         Insert: {
           assigned_to?: string | null
+          assigned_to_email?: string | null
           created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["task_status"]
@@ -158,6 +163,7 @@ export type Database = {
         }
         Update: {
           assigned_to?: string | null
+          assigned_to_email?: string | null
           created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["task_status"]
@@ -172,7 +178,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_assignee_email: {
+        Args: { assignee_email_fallback: string; assignee_user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       task_status: "todo" | "in_progress" | "done"

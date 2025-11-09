@@ -31,6 +31,8 @@ export type Task = {
   affiliateLink?: string;
   icon: React.ReactNode;
   priority: number;
+  assignedTo?: string | null;
+  assignedToEmail?: string | null;
 };
 
 export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {

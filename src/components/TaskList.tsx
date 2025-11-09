@@ -8,6 +8,7 @@ import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
+import { AssignTaskDropdown } from "@/components/AssignTaskDropdown";
 import {
   ArrowLeft,
   Calendar,
@@ -29,6 +30,7 @@ type TaskListProps = {
 export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
   const [filter, setFilter] = useState<"all" | "todo" | "in_progress" | "done">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [assigneeFilter, setAssigneeFilter] = useState<"all" | "mine" | "others">("all");
   const [showAddTask, setShowAddTask] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
 
@@ -46,9 +48,18 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
     return tasks.filter((task) => {
       const statusMatch = filter === "all" || task.status === filter;
       const categoryMatch = categoryFilter === "all" || task.category === categoryFilter;
-      return statusMatch && categoryMatch;
+      
+      // Assignee filter
+      let assigneeMatch = true;
+      if (assigneeFilter === "mine") {
+        assigneeMatch = !task.assignedTo && !task.assignedToEmail;
+      } else if (assigneeFilter === "others") {
+        assigneeMatch = !!(task.assignedTo || task.assignedToEmail);
+      }
+      
+      return statusMatch && categoryMatch && assigneeMatch;
     });
-  }, [tasks, filter, categoryFilter]);
+  }, [tasks, filter, categoryFilter, assigneeFilter]);
 
   // Groepeer taken per fase
   const tasksByPhase = useMemo(() => {
@@ -219,6 +230,39 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
               ))}
             </div>
           </div>
+
+          {/* Assignee filter */}
+          <div>
+            <span className="text-sm font-medium text-muted-foreground mb-2 block">
+              Toegewezen aan
+            </span>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              <Button
+                variant={assigneeFilter === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAssigneeFilter("all")}
+                className="min-h-[44px] whitespace-nowrap"
+              >
+                Alle
+              </Button>
+              <Button
+                variant={assigneeFilter === "mine" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAssigneeFilter("mine")}
+                className="min-h-[44px] whitespace-nowrap"
+              >
+                Mijn taken
+              </Button>
+              <Button
+                variant={assigneeFilter === "others" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAssigneeFilter("others")}
+                className="min-h-[44px] whitespace-nowrap"
+              >
+                Toegewezen aan anderen
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -302,6 +346,15 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           <p className="text-sm md:text-[13px] text-muted-foreground mb-3 leading-relaxed">
                             {task.description}
                           </p>
+
+                          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                            <AssignTaskDropdown
+                              taskId={task.id}
+                              currentAssignedTo={task.assignedTo}
+                              currentAssignedEmail={task.assignedToEmail}
+                              onAssignmentChange={refreshTasks}
+                            />
+                          </div>
 
                           <div className="flex items-center justify-between flex-wrap gap-3">
                             <div
