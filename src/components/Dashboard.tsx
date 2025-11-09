@@ -176,8 +176,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
     <div className="min-h-screen pb-20">
       {/* Sticky Header with Charly */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto p-5 md:p-6 pb-0">
-          <div className="flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-5 md:px-6 pt-5 md:pt-6">
+          <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
               <div className="p-2.5 md:p-2 bg-white/10 rounded-lg backdrop-blur">
                 <Home className="w-7 h-7 md:w-6 md:h-6" />
@@ -199,81 +199,19 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <LogOut className="w-6 h-6 md:w-5 md:h-5" />
             </Button>
           </div>
-        </div>
-      </div>
 
-      {/* Stats Card - Scrollable */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
-        <div 
-          className={`max-w-4xl mx-auto px-5 md:px-6 pb-6 transition-all duration-300 ${
-            headerVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'
-          }`}
-        >
-          <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20 mt-5">
-            <div className="flex items-center gap-6">
-              {/* Circular Progress */}
-              <div className="relative flex-shrink-0">
-                <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="52"
-                    stroke="rgba(255,255,255,0.2)"
-                    strokeWidth="8"
-                    fill="none"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="52"
-                    stroke="white"
-                    strokeWidth="8"
-                    fill="none"
-                    strokeDasharray={`${2 * Math.PI * 52}`}
-                    strokeDashoffset={`${2 * Math.PI * 52 * (1 - progressPercentage / 100)}`}
-                    strokeLinecap="round"
-                    style={{ transition: "stroke-dashoffset 1s ease-out" }}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-3xl md:text-2xl font-bold text-white">
-                    {Math.round(progressPercentage)}%
-                  </span>
-                </div>
+          {/* Stats Card - Collapsible */}
+          <div 
+            className={`transition-all duration-300 pb-6 ${
+              headerVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pb-0 overflow-hidden'
+            }`}
+          >
+            <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
+              <div className="flex items-center gap-6">
+...
               </div>
-
-              {/* Stats */}
-              <div className="flex-1 space-y-3 text-white">
-                <div>
-                  <h3 className="text-lg md:text-base font-semibold mb-1">
-                    {progressPercentage >= 75 
-                      ? "Bijna klaar voor je nieuwe thuis!" 
-                      : progressPercentage >= 50 
-                      ? "Ik help je op weg naar je nieuwe start!" 
-                      : progressPercentage >= 25 
-                      ? "Samen maken we het mogelijk!" 
-                      : "Ik neem je alles uit handen!"}
-                  </h3>
-                  <p className="text-white/80 text-sm">
-                    {movingInfo.newAddress}
-                  </p>
-                </div>
-                
-                <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                  <div className="text-2xl md:text-xl font-bold">
-                    {daysUntilMove === 0 ? "Vandaag" : `${daysUntilMove}`}
-                  </div>
-                  <div className="text-xs text-white/80">
-                    {daysUntilMove === 0 
-                      ? "De grote dag is hier" 
-                      : daysUntilMove === 1 
-                      ? "Nog één dag te gaan" 
-                      : "Dagen tot verhuizing"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       </div>
 
