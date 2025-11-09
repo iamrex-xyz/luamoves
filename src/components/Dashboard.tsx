@@ -176,15 +176,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
     <div className="min-h-screen pb-20">
       {/* Sticky Header with Charly */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-5 md:px-6 pt-5 md:pt-6">
-          <div className="flex items-center justify-between mb-5">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6">
+          <div className="flex items-center justify-between mb-4 md:mb-5">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 md:p-2 bg-white/10 rounded-lg backdrop-blur">
-                <Home className="w-7 h-7 md:w-6 md:h-6" />
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
+                <Home className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Charly</h1>
-                <p className="text-white/80 text-sm md:text-base mt-1">
+                <h1 className="text-xl md:text-3xl font-bold">Charly</h1>
+                <p className="text-white/80 text-xs md:text-base">
                   Jouw verhuis concierge
                 </p>
               </div>
@@ -193,24 +193,24 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               variant="ghost"
               size="icon"
               onClick={onLogout}
-              className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+              className="text-white hover:bg-white/10 h-10 w-10"
               title="Uitloggen"
             >
-              <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
 
           {/* Stats Card - Collapsible on scroll */}
           <div 
-            className={`transition-all duration-300 pb-6 ${
+            className={`transition-all duration-300 pb-4 md:pb-6 ${
               statsVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pb-0 overflow-hidden'
             }`}
           >
-            <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
-              <div className="flex items-center gap-6">
+            <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
+              <div className="flex items-center gap-4 md:gap-6">
                 {/* Circular Progress */}
                 <div className="relative flex-shrink-0">
-                  <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
+                  <svg className="w-20 h-20 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
                     <circle
                       cx="60"
                       cy="60"
@@ -233,16 +233,16 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-3xl md:text-2xl font-bold text-white">
+                    <span className="text-xl md:text-2xl font-bold text-white">
                       {Math.round(progressPercentage)}%
                     </span>
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="flex-1 space-y-3 text-white">
+                <div className="flex-1 space-y-2 md:space-y-3 text-white">
                   <div>
-                    <h3 className="text-lg md:text-base font-semibold mb-1">
+                    <h3 className="text-sm md:text-base font-semibold mb-1">
                       {progressPercentage >= 75 
                         ? "Bijna klaar voor je nieuwe thuis!" 
                         : progressPercentage >= 50 
@@ -251,13 +251,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                         ? "Samen maken we het mogelijk!" 
                         : "Ik neem je alles uit handen!"}
                     </h3>
-                    <p className="text-white/80 text-sm">
+                    <p className="text-white/80 text-xs md:text-sm">
                       {movingInfo.newAddress}
                     </p>
                   </div>
                   
-                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <div className="text-2xl md:text-xl font-bold">
+                  <div className="bg-white/10 rounded-lg p-2 md:p-3 backdrop-blur-sm">
+                    <div className="text-xl md:text-xl font-bold">
                       {daysUntilMove === 0 ? "Vandaag" : `${daysUntilMove}`}
                     </div>
                     <div className="text-xs text-white/80">
@@ -276,7 +276,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       </div>
 
       {/* Priority Tasks */}
-      <div className="max-w-4xl mx-auto px-4 space-y-6 mt-6">
+      <div className="max-w-4xl mx-auto px-4 space-y-4 md:space-y-6 mt-4 md:mt-6">
         {isLoading ? (
           <Card className="p-6">
             <p className="text-center text-muted-foreground">Taken laden...</p>
@@ -287,11 +287,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {myTasks.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold">Mijn prioriteiten</h2>
-                    <Badge variant="secondary">{myTasks.length}</Badge>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                  <h2 className="text-lg md:text-xl font-bold">Mijn prioriteiten</h2>
+                  <Badge variant="secondary">{myTasks.length}</Badge>
+                </div>
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -316,8 +316,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {assignedTasks.length > 0 && (
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Users className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-bold">Toegewezen aan anderen</h2>
+                  <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                  <h2 className="text-lg md:text-xl font-bold">Toegewezen aan anderen</h2>
                   <Badge variant="secondary">{assignedTasks.length}</Badge>
                 </div>
                 <Card className="p-4">
@@ -331,10 +331,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             )}
 
             {priorityTasks.length === 0 && (
-              <Card className="p-8 text-center">
-                <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Perfect! Je loopt op schema! 🎉</h3>
-                <p className="text-muted-foreground mb-4">
+              <Card className="p-6 md:p-8 text-center">
+                <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500 mx-auto mb-3" />
+                <h3 className="font-semibold text-base md:text-lg mb-2">Perfect! Je loopt op schema! 🎉</h3>
+                <p className="text-sm md:text-base text-muted-foreground mb-4">
                   Alle dringende taken zijn onder controle. Neem even rust of bekijk wat je nog meer kunt voorbereiden.
                 </p>
                 <div className="flex gap-3 justify-center">
