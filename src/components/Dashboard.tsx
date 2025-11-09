@@ -183,26 +183,24 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             <div className="flex items-center gap-6">
               {/* Circular Progress */}
               <div className="relative flex-shrink-0">
-                <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90">
+                <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
                   <circle
-                    cx="56"
-                    cy="56"
-                    r="50"
-                    className="md:cx-48 md:cy-48 md:r-42"
+                    cx="60"
+                    cy="60"
+                    r="52"
                     stroke="rgba(255,255,255,0.2)"
                     strokeWidth="8"
                     fill="none"
                   />
                   <circle
-                    cx="56"
-                    cy="56"
-                    r="50"
-                    className="md:cx-48 md:cy-48 md:r-42"
+                    cx="60"
+                    cy="60"
+                    r="52"
                     stroke="white"
                     strokeWidth="8"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 50}`}
-                    strokeDashoffset={`${2 * Math.PI * 50 * (1 - progressPercentage / 100)}`}
+                    strokeDasharray={`${2 * Math.PI * 52}`}
+                    strokeDashoffset={`${2 * Math.PI * 52 * (1 - progressPercentage / 100)}`}
                     strokeLinecap="round"
                     style={{ transition: "stroke-dashoffset 1s ease-out" }}
                   />
