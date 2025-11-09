@@ -1,20 +1,23 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
+import { useTasks } from "@/hooks/useTasks";
+import { Task } from "@/lib/taskGenerator";
 import {
   Home,
-  Zap,
-  Wifi,
-  Shield,
-  Mail,
-  Truck,
-  Sparkles,
-  FileText,
   Clock,
   ListChecks,
   LogOut,
+  AlertCircle,
+  User,
+  Users,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
+import { useMemo } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -22,88 +25,110 @@ type DashboardProps = {
   onLogout: () => void;
 };
 
-type Category = {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  total: number;
-  completed: number;
-  color: string;
-};
-
 export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) => {
-  // Mock data - in real app this would come from database
-  const categories: Category[] = [
-    {
-      id: "general",
-      name: "Algemeen",
-      icon: <Home className="w-5 h-5" />,
-      total: 8,
-      completed: 2,
-      color: "bg-primary/10 text-primary",
-    },
-    {
-      id: "utilities",
-      name: "Nutsvoorzieningen",
-      icon: <Zap className="w-5 h-5" />,
-      total: 4,
-      completed: 1,
-      color: "bg-warning/10 text-warning",
-    },
-    {
-      id: "services",
-      name: "Diensten",
-      icon: <Wifi className="w-5 h-5" />,
-      total: 3,
-      completed: 0,
-      color: "bg-info/10 text-info",
-    },
-    {
-      id: "insurance",
-      name: "Verzekeringen",
-      icon: <Shield className="w-5 h-5" />,
-      total: 2,
-      completed: 0,
-      color: "bg-accent/10 text-accent",
-    },
-    {
-      id: "admin",
-      name: "Administratie",
-      icon: <FileText className="w-5 h-5" />,
-      total: 5,
-      completed: 1,
-      color: "bg-secondary text-foreground",
-    },
-  ];
+  const { tasks, isLoading, toggleTaskStatus } = useTasks(movingInfo);
 
-  if (movingInfo.type === "rent") {
-    categories.push({
-      id: "rental",
-      name: "Huur specifiek",
-      icon: <Home className="w-5 h-5" />,
-      total: 4,
-      completed: 0,
-      color: "bg-primary/10 text-primary",
-    });
-  } else {
-    categories.push({
-      id: "purchase",
-      name: "Koop specifiek",
-      icon: <FileText className="w-5 h-5" />,
-      total: 5,
-      completed: 0,
-      color: "bg-primary/10 text-primary",
-    });
-  }
-
-  const totalTasks = categories.reduce((sum, cat) => sum + cat.total, 0);
-  const completedTasks = categories.reduce((sum, cat) => sum + cat.completed, 0);
-  const progressPercentage = (completedTasks / totalTasks) * 100;
+  // Calculate statistics
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(t => t.status === "done").length;
+  const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   const daysUntilMove = Math.ceil(
     (new Date(movingInfo.movingDate).getTime() - new Date().getTime()) /
       (1000 * 60 * 60 * 24)
   );
+
+  // Get priority tasks (upcoming deadlines, not completed)
+  const priorityTasks = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return tasks
+      .filter(task => {
+        if (task.status === "done") return false;
+        const deadline = new Date(task.deadline);
+        deadline.setHours(0, 0, 0, 0);
+        const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+        return daysUntil <= 14; // Next 2 weeks
+      })
+      .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
+      .slice(0, 10);
+  }, [tasks]);
+
+  // Split tasks by assignment
+  const myTasks = useMemo(() => 
+    priorityTasks.filter(task => !task.assignedTo && !task.assignedToEmail),
+    [priorityTasks]
+  );
+
+  const assignedTasks = useMemo(() => 
+    priorityTasks.filter(task => task.assignedTo || task.assignedToEmail),
+    [priorityTasks]
+  );
+
+  const getStatusBadge = (task: Task) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(task.deadline);
+    deadline.setHours(0, 0, 0, 0);
+    const isOverdue = deadline < today;
+
+    if (task.status === "done") {
+      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Voltooid</Badge>;
+    }
+    if (task.status === "in_progress") {
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Bezig</Badge>;
+    }
+    if (isOverdue) {
+      return <Badge variant="destructive">Verlopen</Badge>;
+    }
+    return <Badge variant="outline">Te doen</Badge>;
+  };
+
+  const TaskItem = ({ task }: { task: Task }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(task.deadline);
+    deadline.setHours(0, 0, 0, 0);
+    const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    const isOverdue = deadline < today && task.status !== "done";
+
+    return (
+      <div className={`flex items-start gap-3 p-3 rounded-lg border ${
+        isOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
+      }`}>
+        <Checkbox
+          checked={task.status === "done"}
+          onCheckedChange={() => toggleTaskStatus(task.id)}
+          className="mt-1"
+        />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h4 className={`font-medium text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+              {task.title}
+            </h4>
+            {getStatusBadge(task)}
+          </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {task.deadlineLabel}
+              {daysUntil === 0 && " (vandaag)"}
+              {daysUntil === 1 && " (morgen)"}
+              {daysUntil > 1 && ` (${daysUntil} dagen)`}
+              {isOverdue && " (verlopen)"}
+            </span>
+            {task.assignedToEmail && (
+              <span className="flex items-center gap-1">
+                <User className="w-3 h-3" />
+                {task.assignedToEmail}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen pb-24">
@@ -215,36 +240,64 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-xl md:text-2xl font-bold mb-5">Categorieën</h2>
-        <div className="grid gap-4">
-          {categories.map((category) => (
-            <Card
-              key={category.id}
-              className="p-5 md:p-4 hover:shadow-md transition-shadow cursor-pointer active:scale-[0.98]"
-              onClick={() => onNavigate("tasks")}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`p-3.5 md:p-3 rounded-lg ${category.color}`}>
-                  {category.icon}
+      {/* Priority Tasks */}
+      <div className="max-w-4xl mx-auto px-4 space-y-6">
+        {isLoading ? (
+          <Card className="p-6">
+            <p className="text-center text-muted-foreground">Taken laden...</p>
+          </Card>
+        ) : (
+          <>
+            {/* My Priority Tasks */}
+            {myTasks.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <User className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-bold">Mijn prioriteiten</h2>
+                  <Badge variant="secondary">{myTasks.length}</Badge>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold mb-2 text-base md:text-sm">{category.name}</h3>
-                  <div className="flex items-center gap-3">
-                    <Progress
-                      value={(category.completed / category.total) * 100}
-                      className="flex-1 h-2.5 md:h-2"
-                    />
-                    <span className="text-base md:text-sm text-muted-foreground whitespace-nowrap">
-                      {category.completed}/{category.total}
-                    </span>
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    {myTasks.map((task) => (
+                      <TaskItem key={task.id} task={task} />
+                    ))}
                   </div>
-                </div>
+                </Card>
               </div>
-            </Card>
-          ))}
-        </div>
+            )}
+
+            {/* Assigned Tasks */}
+            {assignedTasks.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-bold">Toegewezen aan anderen</h2>
+                  <Badge variant="secondary">{assignedTasks.length}</Badge>
+                </div>
+                <Card className="p-4">
+                  <div className="space-y-3">
+                    {assignedTasks.map((task) => (
+                      <TaskItem key={task.id} task={task} />
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {priorityTasks.length === 0 && (
+              <Card className="p-8 text-center">
+                <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                <h3 className="font-semibold text-lg mb-2">Geen dringende taken!</h3>
+                <p className="text-muted-foreground mb-4">
+                  Alle taken voor de komende 2 weken zijn voltooid of je hebt nog geen taken.
+                </p>
+                <Button onClick={() => onNavigate("tasks")}>
+                  Bekijk alle taken
+                </Button>
+              </Card>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
