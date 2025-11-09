@@ -10,16 +10,15 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,
+      retry: 1,
     },
   },
 });
 
-const App = () => {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
+      <TooltipProvider delayDuration={200}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
@@ -27,9 +26,11 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <Toaster />
+        <Sonner />
       </TooltipProvider>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
