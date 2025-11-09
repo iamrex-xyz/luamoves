@@ -13,14 +13,16 @@ import {
   Filter,
   Clock,
   Loader2,
+  LogOut,
 } from "lucide-react";
 
 type TaskListProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "timeline") => void;
+  onLogout: () => void;
 };
 
-export const TaskList = ({ movingInfo, onNavigate }: TaskListProps) => {
+export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
   const [filter, setFilter] = useState<"all" | "todo" | "in_progress" | "done">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
@@ -91,15 +93,26 @@ export const TaskList = ({ movingInfo, onNavigate }: TaskListProps) => {
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-8 sticky top-0 z-20 shadow-lg">
         <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate("dashboard")}
-            className="text-white hover:bg-white/10 mb-4 min-h-[44px]"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Terug naar dashboard
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onNavigate("dashboard")}
+              className="text-white hover:bg-white/10 min-h-[44px]"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Terug naar dashboard
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+              title="Uitloggen"
+            >
+              <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+            </Button>
+          </div>
           <h1 className="text-3xl md:text-2xl font-bold mb-2">Jouw checklist</h1>
           <div className="flex items-center gap-2 text-white/90">
             <Clock className="w-5 h-5" />

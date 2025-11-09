@@ -5,18 +5,45 @@ import { Label } from "@/components/ui/label";
 import { Plus, Minus, Users, Baby, PawPrint } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { User } from "@supabase/supabase-js";
 
 interface AdditionalInfoProps {
-  onComplete: () => void;
+  onComplete: (adults: number, children: number, pets: number, phone: string) => void;
+  user: User | null;
 }
 
-export const AdditionalInfo = ({ onComplete }: AdditionalInfoProps) => {
+export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   const [phone, setPhone] = useState("");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [pets, setPets] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profile) {
+        setAdults(profile.adults || 1);
+        setChildren(profile.children || 0);
+        setPets(profile.pets || 0);
+        setPhone(profile.phone || "");
+      }
+      setLoading(false);
+    };
+
+    loadProfile();
+  }, [user]);
 
   const handleIncrement = (setter: (val: number) => void, value: number) => {
     setter(value + 1);
@@ -38,42 +65,19 @@ export const AdditionalInfo = ({ onComplete }: AdditionalInfoProps) => {
       return;
     }
 
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("Geen gebruiker gevonden");
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          phone,
-          adults,
-          children,
-          pets,
-        })
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Gegevens opgeslagen",
-        description: "Je informatie is succesvol opgeslagen",
-      });
-
-      onComplete();
-    } catch (error: any) {
-      toast({
-        title: "Fout bij opslaan",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    onComplete(adults, children, pets, phone);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-5 md:p-6">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Laden...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 md:p-6">

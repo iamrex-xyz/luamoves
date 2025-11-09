@@ -2,11 +2,12 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MovingInfo } from "@/pages/Index";
-import { ArrowLeft, Calendar, CheckCircle2, Circle, Clock } from "lucide-react";
+import { ArrowLeft, Calendar, CheckCircle2, Circle, Clock, LogOut } from "lucide-react";
 
 type TimelineProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "timeline") => void;
+  onLogout: () => void;
 };
 
 type TimelineEvent = {
@@ -18,7 +19,7 @@ type TimelineEvent = {
   tasks: string[];
 };
 
-export const Timeline = ({ movingInfo, onNavigate }: TimelineProps) => {
+export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) => {
   const movingDate = new Date(movingInfo.movingDate);
 
   // Mock timeline data
@@ -100,15 +101,26 @@ export const Timeline = ({ movingInfo, onNavigate }: TimelineProps) => {
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-6 pb-8">
         <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onNavigate("dashboard")}
-            className="text-white hover:bg-white/10 mb-4"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Terug naar overzicht
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onNavigate("dashboard")}
+              className="text-white hover:bg-white/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Terug naar overzicht
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              className="text-white hover:bg-white/10 h-10 w-10"
+              title="Uitloggen"
+            >
+              <LogOut className="w-5 h-5" />
+            </Button>
+          </div>
           <h1 className="text-2xl font-bold mb-2">Tijdlijn</h1>
           <p className="text-white/80">
             Je verhuizing in 6 belangrijke momenten

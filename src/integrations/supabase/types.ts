@@ -20,6 +20,11 @@ export type Database = {
           children: number | null
           created_at: string
           id: string
+          key_handover_date: string | null
+          moving_date: string | null
+          moving_type: string | null
+          new_address: string | null
+          old_address: string | null
           pets: number | null
           phone: string | null
           updated_at: string
@@ -30,6 +35,11 @@ export type Database = {
           children?: number | null
           created_at?: string
           id?: string
+          key_handover_date?: string | null
+          moving_date?: string | null
+          moving_type?: string | null
+          new_address?: string | null
+          old_address?: string | null
           pets?: number | null
           phone?: string | null
           updated_at?: string
@@ -40,6 +50,11 @@ export type Database = {
           children?: number | null
           created_at?: string
           id?: string
+          key_handover_date?: string | null
+          moving_date?: string | null
+          moving_type?: string | null
+          new_address?: string | null
+          old_address?: string | null
           pets?: number | null
           phone?: string | null
           updated_at?: string

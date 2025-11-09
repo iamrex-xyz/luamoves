@@ -13,11 +13,13 @@ import {
   FileText,
   Clock,
   ListChecks,
+  LogOut,
 } from "lucide-react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "timeline") => void;
+  onLogout: () => void;
 };
 
 type Category = {
@@ -29,7 +31,7 @@ type Category = {
   color: string;
 };
 
-export const Dashboard = ({ movingInfo, onNavigate }: DashboardProps) => {
+export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) => {
   // Mock data - in real app this would come from database
   const categories: Category[] = [
     {
@@ -108,16 +110,27 @@ export const Dashboard = ({ movingInfo, onNavigate }: DashboardProps) => {
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-8 md:pb-10">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-5">
+          <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center gap-3">
             <div className="p-2.5 md:p-2 bg-white/10 rounded-lg backdrop-blur">
               <Home className="w-7 h-7 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Jouw verhuizing</h1>
-              <p className="text-white/80 text-sm md:text-base mt-1">
-                {movingInfo.oldAddress} → {movingInfo.newAddress}
-              </p>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold">Jouw verhuizing</h1>
+                <p className="text-white/80 text-sm md:text-base mt-1">
+                  {movingInfo.oldAddress} → {movingInfo.newAddress}
+                </p>
+              </div>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+              title="Uitloggen"
+            >
+              <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+            </Button>
           </div>
 
           <div className="flex items-center gap-2 mb-5 text-sm md:text-base">
