@@ -11,6 +11,7 @@ export type MovingInfo = {
   oldAddress: string;
   newAddress: string;
   movingDate: string;
+  keyHandoverDate?: string; // Sleuteloverdracht datum (vooral voor huurders)
   type: "buy" | "rent";
 };
 

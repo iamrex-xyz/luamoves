@@ -16,11 +16,14 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     oldAddress: "",
     newAddress: "",
     movingDate: "",
+    keyHandoverDate: "",
     type: "rent",
   });
 
+  const totalSteps = formData.type === "rent" ? 5 : 4;
+
   const handleNext = () => {
-    if (step < 4) {
+    if (step < totalSteps) {
       setStep(step + 1);
     } else {
       onComplete(formData);
@@ -41,6 +44,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
         return formData.movingDate.length > 0;
       case 4:
         return true;
+      case 5:
+        return formData.keyHandoverDate ? formData.keyHandoverDate.length > 0 : true;
       default:
         return false;
     }
@@ -59,7 +64,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
         <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            {[1, 2, 3, 4].map((num) => (
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num) => (
               <div
                 key={num}
                 className={`flex-1 h-2 mx-1 rounded-full transition-all ${
@@ -69,7 +74,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             ))}
           </div>
           <p className="text-sm text-muted-foreground text-center">
-            Stap {step} van 4
+            Stap {step} van {totalSteps}
           </p>
         </div>
 
@@ -165,6 +170,29 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
               </div>
             </div>
           )}
+
+          {step === 5 && formData.type === "rent" && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-accent/10">
+                  <Key className="w-5 h-5 text-accent" />
+                </div>
+                <h2 className="text-xl font-semibold">Sleuteloverdracht</h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Wanneer krijg je de sleutels van je nieuwe woning? (meestal voor de verhuisdatum)
+              </p>
+              <Input
+                type="date"
+                value={formData.keyHandoverDate}
+                max={formData.movingDate}
+                onChange={(e) =>
+                  setFormData({ ...formData, keyHandoverDate: e.target.value })
+                }
+                className="text-base"
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 mt-8">
@@ -184,7 +212,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             size="lg"
             className="flex-1 min-h-[48px]"
           >
-            {step === 4 ? "Start mijn verhuizing" : "Volgende"}
+            {step === totalSteps ? "Start mijn verhuizing" : "Volgende"}
           </Button>
         </div>
       </Card>
