@@ -347,16 +347,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             {task.description}
                           </p>
 
-                          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
-                            <AssignTaskDropdown
-                              taskId={task.id}
-                              currentAssignedTo={task.assignedTo}
-                              currentAssignedEmail={task.assignedToEmail}
-                              onAssignmentChange={refreshTasks}
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between flex-wrap gap-3">
+                          <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
                             <div
                               className={`flex items-center gap-2 text-sm md:text-xs ${
                                 isOverdue(task.deadline) && task.status !== "done"
@@ -367,6 +358,15 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               <Calendar className="w-4 h-4" />
                               <span>{task.deadlineLabel}</span>
                             </div>
+                            <AssignTaskDropdown
+                              taskId={task.id}
+                              currentAssignedTo={task.assignedTo}
+                              currentAssignedEmail={task.assignedToEmail}
+                              onAssignmentChange={refreshTasks}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-end flex-wrap gap-3">
                             {task.affiliateLink && task.status !== "done" && (
                               <Button
                                 size="sm"
