@@ -29,7 +29,7 @@ type TaskListProps = {
 };
 
 export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
-  const [filter, setFilter] = useState<"all" | "todo" | "in_progress" | "done">("all");
+  const [filter, setFilter] = useState<"all" | "open" | "done">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [assigneeFilter, setAssigneeFilter] = useState<"all" | "mine" | "others">("all");
   const [showAddTask, setShowAddTask] = useState(false);
@@ -48,13 +48,13 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   // Filter taken
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      // Voltooide taken verschijnen alleen bij "Afgerond" filter
+      // Filter logica voor Alle, Open en Afgerond
       const statusMatch = 
-        filter === "done" 
+        filter === "all" 
+          ? true
+          : filter === "done"
           ? task.status === "done"
-          : filter === "all"
-          ? task.status !== "done"
-          : task.status === filter;
+          : task.status !== "done"; // "open" toont todo + in_progress
       const categoryMatch = categoryFilter === "all" || task.category === categoryFilter;
       
       // Assignee filter
@@ -182,20 +182,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
             Alle ({tasks.length})
           </Button>
           <Button
-            variant={filter === "todo" ? "default" : "outline"}
+            variant={filter === "open" ? "default" : "outline"}
             size="sm"
-            onClick={() => setFilter("todo")}
+            onClick={() => setFilter("open")}
             className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
           >
-            Te doen ({tasks.filter((t) => t.status === "todo").length})
-          </Button>
-          <Button
-            variant={filter === "in_progress" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilter("in_progress")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Bezig ({tasks.filter((t) => t.status === "in_progress").length})
+            Open ({tasks.filter((t) => t.status !== "done").length})
           </Button>
           <Button
             variant={filter === "done" ? "default" : "outline"}
