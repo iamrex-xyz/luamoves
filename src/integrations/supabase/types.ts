@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      moving_collaborators: {
+        Row: {
+          accepted_at: string | null
+          collaborator_email: string
+          collaborator_user_id: string | null
+          created_at: string | null
+          id: string
+          invited_at: string | null
+          owner_user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          collaborator_email: string
+          collaborator_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          owner_user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          collaborator_email?: string
+          collaborator_user_id?: string | null
+          created_at?: string | null
+          id?: string
+          invited_at?: string | null
+          owner_user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           adults: number | null
@@ -70,6 +100,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_to: string | null
           created_at: string
           id: string
           status: Database["public"]["Enums"]["task_status"]
@@ -78,6 +109,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["task_status"]
@@ -86,6 +118,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_to?: string | null
           created_at?: string
           id?: string
           status?: Database["public"]["Enums"]["task_status"]
