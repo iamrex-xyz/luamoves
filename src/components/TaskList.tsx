@@ -110,54 +110,54 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-b from-background to-secondary/20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-8 sticky top-0 z-20 shadow-lg">
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-4 md:p-6 pb-6 md:pb-8 sticky top-0 z-20 shadow-lg">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onNavigate("dashboard")}
-              className="text-white hover:bg-white/10 min-h-[44px]"
+              className="text-white hover:bg-white/10 min-h-[44px] text-xs md:text-sm"
             >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Terug naar dashboard
+              <ArrowLeft className="w-4 h-4 mr-1.5" />
+              Terug
             </Button>
             <div className="flex gap-2">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowShareDialog(true)}
-                className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+                className="text-white hover:bg-white/10 h-10 w-10"
                 title="Verhuizing delen"
               >
-                <Share2 className="w-6 h-6 md:w-5 md:h-5" />
+                <Share2 className="w-5 h-5" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onLogout}
-                className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+                className="text-white hover:bg-white/10 h-10 w-10"
                 title="Uitloggen"
               >
-                <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+                <LogOut className="w-5 h-5" />
               </Button>
             </div>
           </div>
           <div className="flex items-center justify-between mb-2">
-            <h1 className="text-3xl md:text-2xl font-bold">Jouw checklist</h1>
+            <h1 className="text-xl md:text-2xl font-bold">Jouw checklist</h1>
             <Button
               variant="secondary"
               size="sm"
               onClick={() => setShowAddTask(true)}
-              className="gap-2 min-h-[44px]"
+              className="gap-1.5 min-h-[40px] text-xs md:text-sm px-3"
             >
               <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Taak toevoegen</span>
+              <span className="hidden sm:inline">Toevoegen</span>
             </Button>
           </div>
           <div className="flex items-center gap-2 text-white/90">
-            <Clock className="w-5 h-5" />
-            <span className="text-base md:text-sm">
+            <Clock className="w-4 h-4" />
+            <span className="text-sm">
               {daysUntilMove > 0
                 ? `Nog ${daysUntilMove} dagen tot verhuizing`
                 : daysUntilMove === 0
@@ -169,20 +169,20 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       </div>
 
       {/* Filters */}
-      <div className="max-w-4xl mx-auto px-4 py-5 sticky top-[140px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
-        <div className="space-y-3">
+      <div className="max-w-4xl mx-auto px-4 py-3 md:py-4 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
+        <div className="space-y-2.5 md:space-y-3">
           {/* Status filter */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Filter className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">Status</span>
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Status</span>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               <Button
                 variant={filter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilter("all")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Alle ({tasks.length})
               </Button>
@@ -190,7 +190,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                 variant={filter === "todo" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilter("todo")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Te doen ({tasks.filter((t) => t.status === "todo").length})
               </Button>
@@ -198,7 +198,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                 variant={filter === "in_progress" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilter("in_progress")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Bezig ({tasks.filter((t) => t.status === "in_progress").length})
               </Button>
@@ -206,7 +206,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                 variant={filter === "done" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilter("done")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Afgerond ({tasks.filter((t) => t.status === "done").length})
               </Button>
@@ -215,17 +215,17 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
 
           {/* Category filter */}
           <div>
-            <span className="text-sm font-medium text-muted-foreground mb-2 block">
+            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Categorie
             </span>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               {categories.map((cat) => (
                 <Button
                   key={cat}
                   variant={categoryFilter === cat ? "default" : "outline"}
                   size="sm"
                   onClick={() => setCategoryFilter(cat)}
-                  className="min-h-[44px] whitespace-nowrap"
+                  className="min-h-[40px] whitespace-nowrap text-xs px-3"
                 >
                   {cat === "all" ? "Alle" : cat}
                 </Button>
@@ -235,15 +235,15 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
 
           {/* Assignee filter */}
           <div>
-            <span className="text-sm font-medium text-muted-foreground mb-2 block">
+            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Toegewezen aan
             </span>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
               <Button
                 variant={assigneeFilter === "all" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setAssigneeFilter("all")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Alle
               </Button>
@@ -251,7 +251,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                 variant={assigneeFilter === "mine" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setAssigneeFilter("mine")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
                 Mijn taken
               </Button>
@@ -259,9 +259,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                 variant={assigneeFilter === "others" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setAssigneeFilter("others")}
-                className="min-h-[44px] whitespace-nowrap"
+                className="min-h-[40px] whitespace-nowrap text-xs px-3"
               >
-                Toegewezen aan anderen
+                Toegewezen
               </Button>
             </div>
           </div>
@@ -269,7 +269,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       </div>
 
       {/* Tasks grouped by phase */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
         {isLoading ? (
           <Card className="p-12 text-center">
             <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
@@ -282,24 +282,24 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
             </p>
           </Card>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
-                <div className="mb-4 sticky top-[280px] md:top-[260px] bg-background/95 backdrop-blur py-2 z-[5]">
-                  <h2 className="text-xl md:text-lg font-bold text-foreground flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-primary"></span>
+                <div className="mb-3 sticky top-[230px] md:top-[240px] bg-background/95 backdrop-blur py-2 z-[5]">
+                  <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {phase}
                   </h2>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {phaseTasks.length} {phaseTasks.length === 1 ? "taak" : "taken"}
                   </p>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5 md:space-y-3">
                   {phaseTasks.map((task) => (
                     <Card
                       key={task.id}
-                      className={`p-5 md:p-4 transition-all active:scale-[0.98] ${
+                      className={`p-3.5 md:p-4 transition-all active:scale-[0.98] ${
                         task.status === "done" ? "opacity-60" : ""
                       } ${
                         isOverdue(task.deadline) && task.status !== "done"
@@ -307,21 +307,21 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           : ""
                       }`}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-3">
                         <Checkbox
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
-                          className="mt-1.5 min-w-[24px] min-h-[24px]"
+                          className="mt-1 min-w-[20px] min-h-[20px]"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <div className="flex items-start gap-3 flex-1 min-w-0">
-                              <div className="p-2.5 md:p-2 rounded-lg bg-primary/10 text-primary shrink-0">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                              <div className="p-1.5 md:p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                                 {task.icon}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3
-                                  className={`font-semibold text-base md:text-sm mb-1 ${
+                                  className={`font-semibold text-sm mb-1 ${
                                     task.status === "done" ? "line-through" : ""
                                   }`}
                                 >
@@ -329,7 +329,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                                 </h3>
                                 <Badge
                                   variant="outline"
-                                  className="text-xs md:text-[11px]"
+                                  className="text-[10px]"
                                 >
                                   {task.category}
                                 </Badge>
@@ -339,17 +339,17 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               variant="outline"
                               className={`${getStatusColor(
                                 task.status
-                              )} shrink-0 text-xs md:text-[11px]`}
+                              )} shrink-0 text-[10px]`}
                             >
                               {getStatusLabel(task.status)}
                             </Badge>
                           </div>
 
-                          <p className="text-sm md:text-[13px] text-muted-foreground mb-3 leading-relaxed">
+                          <p className="text-xs md:text-[13px] text-muted-foreground mb-2.5 leading-relaxed">
                             {task.description}
                           </p>
 
-                          <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
+                          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                             <EditDeadlinePopover
                               taskId={task.id}
                               currentDeadline={task.deadline}
@@ -363,9 +363,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             />
                           </div>
 
-                          <div className="flex items-center justify-end flex-wrap gap-3">
+                          <div className="flex items-center justify-end flex-wrap gap-2">
                             {isOverdue(task.deadline) && task.status !== "done" && (
-                              <Badge variant="destructive" className="text-xs">
+                              <Badge variant="destructive" className="text-[10px]">
                                 Verlopen
                               </Badge>
                             )}
@@ -373,7 +373,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="gap-2 min-h-[40px] md:min-h-[36px]"
+                                className="gap-1.5 min-h-[36px] text-xs"
                                 onClick={() =>
                                   window.open(task.affiliateLink, "_blank")
                                 }
