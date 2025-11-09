@@ -7,6 +7,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
+import { AddTaskDialog } from "@/components/AddTaskDialog";
 import {
   Home,
   Clock,
@@ -14,6 +15,7 @@ import {
   User,
   Users,
   CheckCircle2,
+  Plus,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -26,6 +28,7 @@ type DashboardProps = {
 export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [showAddTask, setShowAddTask] = useState(false);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -48,10 +51,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         const deadline = new Date(task.deadline);
         deadline.setHours(0, 0, 0, 0);
         const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        return daysUntil <= 14; // Next 2 weeks
+        return daysUntil <= 21; // Next 3 weeks for better overview
       })
       .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
-      .slice(0, 10);
+      .slice(0, 15); // Show more tasks for better overview
   }, [tasks]);
 
   // Split tasks by assignment
@@ -250,10 +253,21 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {/* My Priority Tasks */}
             {myTasks.length > 0 && (
               <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <User className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-bold">Mijn prioriteiten</h2>
-                  <Badge variant="secondary">{myTasks.length}</Badge>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <User className="w-5 h-5 text-primary" />
+                    <h2 className="text-xl font-bold">Mijn prioriteiten</h2>
+                    <Badge variant="secondary">{myTasks.length}</Badge>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setShowAddTask(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Taak toevoegen
+                  </Button>
                 </div>
                 <Card className="p-4">
                   <div className="space-y-3">
@@ -290,14 +304,26 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 <p className="text-muted-foreground mb-4">
                   Alle dringende taken zijn onder controle. Neem even rust of bekijk wat je nog meer kunt voorbereiden.
                 </p>
-                <Button onClick={() => onNavigate("tasks")}>
-                  Bekijk alle taken
-                </Button>
+                <div className="flex gap-3 justify-center">
+                  <Button onClick={() => onNavigate("tasks")} variant="outline">
+                    Bekijk alle taken
+                  </Button>
+                  <Button onClick={() => setShowAddTask(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Taak toevoegen
+                  </Button>
+                </div>
               </Card>
             )}
           </>
         )}
       </div>
+
+      <AddTaskDialog 
+        open={showAddTask} 
+        onOpenChange={setShowAddTask}
+        onTaskAdded={refreshTasks}
+      />
 
       <TaskDetailDialog
         task={selectedTask}
