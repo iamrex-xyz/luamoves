@@ -28,11 +28,12 @@ export type Task = {
   deadlineLabel: string;
   phase: string;
   status: "todo" | "in_progress" | "done";
-  affiliateLink?: string;
   icon: React.ReactNode;
   priority: number;
   assignedTo?: string | null;
   assignedToEmail?: string | null;
+  notes?: string | null;
+  affiliateLink?: string;
 };
 
 export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {

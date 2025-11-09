@@ -6,6 +6,7 @@ import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
 import { BottomNav } from "@/components/BottomNav";
+import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import {
   Home,
   Clock,
@@ -14,7 +15,7 @@ import {
   Users,
   CheckCircle2,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -23,7 +24,8 @@ type DashboardProps = {
 };
 
 export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) => {
-  const { tasks, isLoading, toggleTaskStatus } = useTasks(movingInfo);
+  const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -91,12 +93,16 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
     const isOverdue = deadline < today && task.status !== "done";
 
     return (
-      <div className={`flex items-start gap-3 p-3 rounded-lg border ${
-        isOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
-      }`}>
+      <div 
+        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
+          isOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
+        }`}
+        onClick={() => setSelectedTask(task)}
+      >
         <Checkbox
           checked={task.status === "done"}
           onCheckedChange={() => toggleTaskStatus(task.id)}
+          onClick={(e) => e.stopPropagation()}
           className="mt-1"
         />
         <div className="flex-1 min-w-0">
@@ -292,6 +298,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           </>
         )}
       </div>
+
+      <TaskDetailDialog
+        task={selectedTask}
+        open={!!selectedTask}
+        onOpenChange={(open) => !open && setSelectedTask(null)}
+        onTaskUpdate={refreshTasks}
+      />
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
     </div>

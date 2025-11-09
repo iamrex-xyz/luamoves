@@ -28,7 +28,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
       // Haal opgeslagen task statuses uit database (inclusief assigned info)
       const { data: savedTasks, error } = await supabase
         .from("tasks")
-        .select("*, assigned_to, assigned_to_email")
+        .select("*, assigned_to, assigned_to_email, notes")
         .order("updated_at", { ascending: false });
 
       if (error) throw error;
@@ -68,6 +68,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
           status: (savedTask?.status as "todo" | "in_progress" | "done") || task.status,
           assignedTo: savedTask?.assigned_to || null,
           assignedToEmail: savedTask?.assigned_to_email || null,
+          notes: savedTask?.notes || null,
         };
       });
 
@@ -87,6 +88,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
           priority: 2,
           assignedTo: savedTask?.assigned_to || null,
           assignedToEmail: savedTask?.assigned_to_email || null,
+          notes: savedTask?.notes || null,
         };
       });
 

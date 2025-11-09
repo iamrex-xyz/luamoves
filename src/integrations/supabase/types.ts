@@ -22,6 +22,7 @@ export type Database = {
           deadline: string
           description: string | null
           id: string
+          notes: string | null
           phase: string
           task_id: string
           title: string
@@ -35,6 +36,7 @@ export type Database = {
           deadline: string
           description?: string | null
           id?: string
+          notes?: string | null
           phase?: string
           task_id: string
           title: string
@@ -48,6 +50,7 @@ export type Database = {
           deadline?: string
           description?: string | null
           id?: string
+          notes?: string | null
           phase?: string
           task_id?: string
           title?: string
@@ -176,6 +179,7 @@ export type Database = {
           assigned_to_email: string | null
           created_at: string
           id: string
+          notes: string | null
           status: Database["public"]["Enums"]["task_status"]
           task_id: string
           updated_at: string
@@ -186,6 +190,7 @@ export type Database = {
           assigned_to_email?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_id: string
           updated_at?: string
@@ -196,6 +201,7 @@ export type Database = {
           assigned_to_email?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           status?: Database["public"]["Enums"]["task_status"]
           task_id?: string
           updated_at?: string
