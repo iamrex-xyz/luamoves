@@ -21,6 +21,7 @@ import {
   LogOut,
   Plus,
   Share2,
+  User,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -76,30 +77,23 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   }, [filteredTasks]);
 
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "done":
-        return "bg-accent/10 text-accent border-accent/20";
-      case "in_progress":
-        return "bg-warning/10 text-warning border-warning/20";
-      default:
-        return "bg-muted/50 text-muted-foreground border-muted";
-    }
-  };
+  const getStatusBadge = (task: Task) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const deadline = new Date(task.deadline);
+    deadline.setHours(0, 0, 0, 0);
+    const isTaskOverdue = deadline < today;
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "done":
-        return "✓ Afgerond";
-      case "in_progress":
-        return "⏳ Bezig";
-      default:
-        return "○ Te doen";
+    if (task.status === "done") {
+      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
     }
-  };
-
-  const isOverdue = (deadline: Date) => {
-    return new Date() > deadline;
+    if (task.status === "in_progress") {
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
+    }
+    if (isTaskOverdue) {
+      return <Badge variant="destructive" className="min-w-[75px] justify-center text-xs">Verlopen</Badge>;
+    }
+    return <Badge variant="outline" className="min-w-[75px] justify-center text-xs">Te doen</Badge>;
   };
 
   const daysUntilMove = Math.ceil(
@@ -279,61 +273,52 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                   </p>
                 </div>
 
-                <div className="space-y-2.5 md:space-y-3">
-                  {phaseTasks.map((task) => (
-                    <Card
-                      key={task.id}
-                      className={`p-3.5 md:p-4 transition-all active:scale-[0.98] ${
-                        task.status === "done" ? "opacity-60" : ""
-                      } ${
-                        isOverdue(task.deadline) && task.status !== "done"
-                          ? "border-destructive/50"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
+                <div className="space-y-3">
+                  {phaseTasks.map((task) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const deadline = new Date(task.deadline);
+                    deadline.setHours(0, 0, 0, 0);
+                    const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                    const isTaskOverdue = deadline < today && task.status !== "done";
+
+                    return (
+                      <div
+                        key={task.id}
+                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors hover:bg-muted/50 ${
+                          isTaskOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
+                        }`}
+                      >
                         <Checkbox
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
-                          className="mt-1 min-w-[20px] min-h-[20px]"
+                          className="mt-1"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-2">
-                            <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                              <div className="p-1.5 md:p-2 rounded-lg bg-primary/10 text-primary shrink-0">
-                                {task.icon}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3
-                                  className={`font-semibold text-sm mb-1 ${
-                                    task.status === "done" ? "line-through" : ""
-                                  }`}
-                                >
-                                  {task.title}
-                                </h3>
-                                <Badge
-                                  variant="outline"
-                                  className="text-[10px]"
-                                >
-                                  {task.category}
-                                </Badge>
-                              </div>
+                          <div className="flex items-start justify-between gap-2 mb-1">
+                            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                              {task.title}
+                            </h4>
+                            <div className="flex-shrink-0">
+                              {getStatusBadge(task)}
                             </div>
-                            <Badge
-                              variant="outline"
-                              className={`${getStatusColor(
-                                task.status
-                              )} shrink-0 text-[10px]`}
-                            >
-                              {getStatusLabel(task.status)}
-                            </Badge>
                           </div>
-
-                          <p className="text-xs md:text-[13px] text-muted-foreground mb-2.5 leading-relaxed">
-                            {task.description}
-                          </p>
-
-                          <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap mb-2">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {task.deadlineLabel}
+                              {daysUntil === 0 && " (vandaag)"}
+                              {daysUntil === 1 && " (morgen)"}
+                              {daysUntil > 1 && ` (${daysUntil} dagen)`}
+                              {isTaskOverdue && " (verlopen)"}
+                            </span>
+                            {task.assignedToEmail && (
+                              <span className="flex items-center gap-1">
+                                {task.assignedToEmail}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 flex-wrap">
                             <EditDeadlinePopover
                               taskId={task.id}
                               currentDeadline={task.deadline}
@@ -345,22 +330,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               currentAssignedEmail={task.assignedToEmail}
                               onAssignmentChange={refreshTasks}
                             />
-                          </div>
-
-                          <div className="flex items-center justify-end flex-wrap gap-2">
-                            {isOverdue(task.deadline) && task.status !== "done" && (
-                              <Badge variant="destructive" className="text-[10px]">
-                                Verlopen
-                              </Badge>
-                            )}
                             {task.affiliateLink && task.status !== "done" && (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="gap-1.5 min-h-[36px] text-xs"
-                                onClick={() =>
-                                  window.open(task.affiliateLink, "_blank")
-                                }
+                                className="gap-2 h-8"
+                                onClick={() => window.open(task.affiliateLink, "_blank")}
                               >
                                 Direct regelen
                                 <ExternalLink className="w-3 h-3" />
@@ -369,8 +344,8 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           </div>
                         </div>
                       </div>
-                    </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
