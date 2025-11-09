@@ -133,21 +133,62 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 mb-5 text-sm md:text-base">
-            <Clock className="w-5 h-5 md:w-4 md:h-4" />
-            <span>
-              Nog {daysUntilMove} dagen tot {new Date(movingInfo.movingDate).toLocaleDateString("nl-NL")}
-            </span>
-          </div>
+          <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
+            <div className="flex items-center gap-6">
+              {/* Circular Progress */}
+              <div className="relative flex-shrink-0">
+                <svg className="w-28 h-28 md:w-24 md:h-24 transform -rotate-90">
+                  <circle
+                    cx="56"
+                    cy="56"
+                    r="50"
+                    className="md:cx-48 md:cy-48 md:r-42"
+                    stroke="rgba(255,255,255,0.2)"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="56"
+                    cy="56"
+                    r="50"
+                    className="md:cx-48 md:cy-48 md:r-42"
+                    stroke="white"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 50}`}
+                    strokeDashoffset={`${2 * Math.PI * 50 * (1 - progressPercentage / 100)}`}
+                    strokeLinecap="round"
+                    style={{ transition: "stroke-dashoffset 1s ease-out" }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-3xl md:text-2xl font-bold text-white">
+                    {Math.round(progressPercentage)}%
+                  </span>
+                </div>
+              </div>
 
-          <Card className="p-5 md:p-4 bg-white/10 backdrop-blur border-white/20">
-            <div className="flex items-center justify-between mb-3 text-white">
-              <span className="font-semibold text-base md:text-sm">Totale voortgang</span>
-              <span className="text-3xl md:text-2xl font-bold">
-                {completedTasks}/{totalTasks}
-              </span>
+              {/* Stats */}
+              <div className="flex-1 space-y-3 text-white">
+                <div>
+                  <h3 className="text-lg md:text-base font-semibold mb-1">Jouw voortgang</h3>
+                  <p className="text-white/80 text-sm">
+                    {completedTasks} van {totalTasks} taken voltooid
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                    <div className="text-2xl md:text-xl font-bold">{totalTasks - completedTasks}</div>
+                    <div className="text-xs text-white/80">Te doen</div>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                    <div className="text-2xl md:text-xl font-bold">{daysUntilMove}</div>
+                    <div className="text-xs text-white/80">Dagen resterend</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <Progress value={progressPercentage} className="h-4 md:h-3" />
           </Card>
         </div>
       </div>
