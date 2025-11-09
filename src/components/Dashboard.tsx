@@ -147,9 +147,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <Home className="w-7 h-7 md:w-6 md:h-6" />
             </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Jouw verhuizing</h1>
+                <h1 className="text-2xl md:text-3xl font-bold">Charlie</h1>
                 <p className="text-white/80 text-sm md:text-base mt-1">
-                  {movingInfo.oldAddress} → {movingInfo.newAddress}
+                  Jouw verhuis concierge
                 </p>
               </div>
             </div>
@@ -204,36 +204,28 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 <div>
                   <h3 className="text-lg md:text-base font-semibold mb-1">
                     {progressPercentage >= 75 
-                      ? "🎉 Bijna klaar voor je nieuwe thuis!" 
+                      ? "Bijna klaar voor je nieuwe thuis!" 
                       : progressPercentage >= 50 
-                      ? "💪 Je bent er al bijna!" 
+                      ? "Je bent er al bijna!" 
                       : progressPercentage >= 25 
-                      ? "✨ Goed bezig!" 
-                      : "🏠 Klaar voor een nieuwe start!"}
+                      ? "Goed bezig!" 
+                      : "Klaar voor een nieuwe start!"}
                   </h3>
                   <p className="text-white/80 text-sm">
-                    {completedTasks > 0 
-                      ? `${completedTasks} ${completedTasks === 1 ? 'taak' : 'taken'} afgerond - geweldig werk!`
-                      : "Je avontuur naar je nieuwe thuis begint hier"}
+                    {movingInfo.newAddress}
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <div className="text-2xl md:text-xl font-bold">🎯 {completedTasks}</div>
-                    <div className="text-xs text-white/80">Succesvol voltooid</div>
+                <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                  <div className="text-2xl md:text-xl font-bold">
+                    {daysUntilMove === 0 ? "Vandaag" : `${daysUntilMove}`}
                   </div>
-                  <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <div className="text-2xl md:text-xl font-bold">
-                      {daysUntilMove === 0 ? "🎉 Vandaag!" : `📅 ${daysUntilMove}`}
-                    </div>
-                    <div className="text-xs text-white/80">
-                      {daysUntilMove === 0 
-                        ? "De grote dag is hier!" 
-                        : daysUntilMove === 1 
-                        ? "Nog één dag te gaan!" 
-                        : "Dagen tot je nieuwe thuis"}
-                    </div>
+                  <div className="text-xs text-white/80">
+                    {daysUntilMove === 0 
+                      ? "De grote dag is hier" 
+                      : daysUntilMove === 1 
+                      ? "Nog één dag te gaan" 
+                      : "Dagen tot verhuizing"}
                   </div>
                 </div>
               </div>
