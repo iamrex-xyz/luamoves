@@ -53,8 +53,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
             <Home className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">VerhuisMee</h1>
-          <p className="text-muted-foreground">Jouw slimme verhuisassistent</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2 font-charly">Charly</h1>
+          <p className="text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
         </div>
 
         <div className="mb-6">

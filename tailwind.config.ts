@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        charly: ['Roboto', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
