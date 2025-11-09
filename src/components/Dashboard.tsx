@@ -1,22 +1,18 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
+import { BottomNav } from "@/components/BottomNav";
 import {
   Home,
   Clock,
-  ListChecks,
   LogOut,
-  AlertCircle,
   User,
   Users,
   CheckCircle2,
-  Circle,
-  Settings,
 } from "lucide-react";
 import { useMemo } from "react";
 
@@ -132,9 +128,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   };
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-8 md:pb-10">
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-3">
@@ -219,38 +215,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="max-w-4xl mx-auto px-4 -mt-6 mb-6">
-        <div className="grid grid-cols-3 gap-3">
-          <Button
-            variant="secondary"
-            className="h-auto py-5 md:py-4 flex flex-col gap-2 shadow-md min-h-[100px]"
-            onClick={() => onNavigate("tasks")}
-          >
-            <ListChecks className="w-7 h-7 md:w-6 md:h-6" />
-            <span className="text-base md:text-sm font-semibold">Alle taken</span>
-          </Button>
-          <Button
-            variant="secondary"
-            className="h-auto py-5 md:py-4 flex flex-col gap-2 shadow-md min-h-[100px]"
-            onClick={() => onNavigate("timeline")}
-          >
-            <Clock className="w-7 h-7 md:w-6 md:h-6" />
-            <span className="text-base md:text-sm font-semibold">Tijdlijn</span>
-          </Button>
-          <Button
-            variant="secondary"
-            className="h-auto py-5 md:py-4 flex flex-col gap-2 shadow-md min-h-[100px]"
-            onClick={() => onNavigate("settings")}
-          >
-            <Settings className="w-7 h-7 md:w-6 md:h-6" />
-            <span className="text-base md:text-sm font-semibold">Instellingen</span>
-          </Button>
-        </div>
-      </div>
-
       {/* Priority Tasks */}
-      <div className="max-w-4xl mx-auto px-4 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 space-y-6 mt-6">
         {isLoading ? (
           <Card className="p-6">
             <p className="text-center text-muted-foreground">Taken laden...</p>
@@ -308,6 +274,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           </>
         )}
       </div>
+
+      <BottomNav currentView="dashboard" onNavigate={onNavigate} />
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { AssignTaskDropdown } from "@/components/AssignTaskDropdown";
 import { EditDeadlinePopover } from "@/components/EditDeadlinePopover";
+import { BottomNav } from "@/components/BottomNav";
 import {
   ArrowLeft,
   Calendar,
@@ -107,7 +108,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   );
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-b from-background to-secondary/20">
+    <div className="min-h-screen pb-20 bg-gradient-to-b from-background to-secondary/20">
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-8 sticky top-0 z-20 shadow-lg">
         <div className="max-w-4xl mx-auto">
@@ -403,6 +404,8 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         open={showShareDialog}
         onOpenChange={setShowShareDialog}
       />
+
+      <BottomNav currentView="tasks" onNavigate={onNavigate} />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { BottomNav } from "@/components/BottomNav";
 import {
   ArrowLeft,
   LogOut,
@@ -275,7 +276,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   };
 
   return (
-    <div className="min-h-screen pb-8 bg-muted/30">
+    <div className="min-h-screen pb-20 bg-muted/30">
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-6 pb-8">
         <div className="max-w-4xl mx-auto">
@@ -542,6 +543,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           </div>
         </Card>
       </div>
+
+      <BottomNav currentView="settings" onNavigate={onNavigate} />
     </div>
   );
 };

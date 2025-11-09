@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MovingInfo } from "@/pages/Index";
+import { BottomNav } from "@/components/BottomNav";
 import { ArrowLeft, Calendar, CheckCircle2, Circle, Clock, LogOut } from "lucide-react";
 
 type TimelineProps = {
@@ -97,7 +98,7 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
   };
 
   return (
-    <div className="min-h-screen pb-8">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-6 pb-8">
         <div className="max-w-4xl mx-auto">
@@ -177,6 +178,8 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
           </div>
         </div>
       </div>
+
+      <BottomNav currentView="timeline" onNavigate={onNavigate} />
     </div>
   );
 };
