@@ -103,10 +103,10 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
           >
             <LogOut className="w-5 h-5" />
           </Button>
-          <h1 className="text-3xl md:text-4xl font-bold font-charly tracking-tight">
+          <h1 className="text-2xl md:text-4xl font-bold font-charly tracking-tight">
             Nog een paar gegevens
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground">
+          <p className="text-sm md:text-lg text-muted-foreground">
             Dit helpt ons je beter te begeleiden
           </p>
         </div>

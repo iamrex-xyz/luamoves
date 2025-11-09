@@ -118,7 +118,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-primary/10">
                   <Home className="w-5 h-5 text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold">Huidig adres</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Huidig adres</h2>
               </div>
               <AddressAutocomplete
                 label=""
@@ -137,7 +137,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-accent/10">
                   <Building2 className="w-5 h-5 text-accent" />
                 </div>
-                <h2 className="text-xl font-semibold">Nieuw adres</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Nieuw adres</h2>
               </div>
               <AddressAutocomplete
                 label=""
@@ -156,7 +156,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-info/10">
                   <Calendar className="w-5 h-5 text-info" />
                 </div>
-                <h2 className="text-xl font-semibold">Verhuisdatum</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Verhuisdatum</h2>
               </div>
               <Input
                 type="date"
@@ -175,7 +175,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-warning/10">
                   <Key className="w-5 h-5 text-warning" />
                 </div>
-                <h2 className="text-xl font-semibold">Type woning</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Type woning</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <button
@@ -210,7 +210,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-accent/10">
                   <Key className="w-5 h-5 text-accent" />
                 </div>
-                <h2 className="text-xl font-semibold">Sleuteloverdracht</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Sleuteloverdracht</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Wanneer krijg je de sleutels van je nieuwe woning? (meestal voor de verhuisdatum)
@@ -233,7 +233,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-warning/10">
                   <Building2 className="w-5 h-5 text-warning" />
                 </div>
-                <h2 className="text-xl font-semibold">Ga je verbouwen?</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Ga je verbouwen?</h2>
               </div>
               <div className="space-y-3">
                 <button
@@ -280,7 +280,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 <div className="p-2 rounded-lg bg-info/10">
                   <Users className="w-5 h-5 text-info" />
                 </div>
-                <h2 className="text-xl font-semibold">Hulp nodig?</h2>
+                <h2 className="text-lg md:text-xl font-semibold">Hulp nodig?</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Wil je dat Charly je helpt met het vinden van een gepaste aannemer?

@@ -114,10 +114,10 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
         <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6 shadow-lg">
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold">
+            <h2 className="text-xl md:text-2xl font-semibold">
               {isSignUp ? "Account aanmaken" : "Welkom terug"}
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-sm md:text-base text-muted-foreground">
               {isSignUp
                 ? "Maak een account om te beginnen"
                 : "Log in om verder te gaan met je verhuisplanning"}

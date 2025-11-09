@@ -122,8 +122,8 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Tijdlijn</h1>
-          <p className="text-white/80">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Tijdlijn</h1>
+          <p className="text-sm md:text-base text-white/80">
             Je verhuizing in 6 belangrijke momenten
           </p>
         </div>
@@ -147,8 +147,8 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
                 <Card className={`p-4 border-2 ${getStatusColor(event.status)}`}>
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-bold text-lg mb-1">{event.title}</h3>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <h3 className="font-bold text-base md:text-lg mb-1">{event.title}</h3>
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
                         <Calendar className="w-4 h-4" />
                         <span>{event.date}</span>
                       </div>

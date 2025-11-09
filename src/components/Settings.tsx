@@ -305,8 +305,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <h1 className="text-2xl font-bold mb-2">Instellingen</h1>
-          <p className="text-white/80">
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Instellingen</h1>
+          <p className="text-sm md:text-base text-white/80">
             Beheer je verhuizing en huisgenoten
           </p>
         </div>
@@ -319,7 +319,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <HomeIcon className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Verhuizing details</h2>
+            <h2 className="text-lg md:text-xl font-bold">Verhuizing details</h2>
           </div>
 
           <div className="space-y-4">
@@ -404,7 +404,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <Users className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Huishouden</h2>
+            <h2 className="text-lg md:text-xl font-bold">Huishouden</h2>
           </div>
 
           <div className="space-y-4">
@@ -511,7 +511,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <Users className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-xl font-bold">Huisgenoten & Partners</h2>
+            <h2 className="text-lg md:text-xl font-bold">Huisgenoten & Partners</h2>
           </div>
 
           <div className="space-y-4">
