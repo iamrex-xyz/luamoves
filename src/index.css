@@ -8,119 +8,116 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 25% 98%;
-    --foreground: 215 20% 25%;
+    /* Modern minimal design - warm neutrals */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 20% 25%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 20% 25%;
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 195 85% 45%;
+    --primary: 0 0% 13%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 93%;
-    --secondary-foreground: 215 20% 25%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 15% 50%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 165 60% 45%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 340 8% 95%;
+    --accent-foreground: 0 0% 13%;
 
-    --destructive: 0 70% 55%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 90%;
-    --input: 210 20% 90%;
-    --ring: 195 85% 45%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 13%;
 
     --radius: 0.75rem;
     
-    /* Custom design tokens - Neuropsychology-based */
-    --success: 150 65% 42%;
-    --warning: 35 85% 58%;
-    --info: 195 85% 45%;
+    /* Warm accent colors */
+    --blush: 340 45% 92%;
+    --sand: 35 25% 90%;
+    --warm-gray: 30 5% 50%;
     
-    /* Progress colors for motivation */
-    --progress-start: 200 60% 85%;
-    --progress-low: 195 70% 65%;
-    --progress-medium: 195 80% 50%;
-    --progress-high: 190 85% 40%;
-    --progress-complete: 150 65% 42%;
+    --success: 150 50% 45%;
+    --warning: 35 90% 55%;
+    --info: 210 100% 50%;
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(200 70% 50%), hsl(200 70% 65%));
-    --gradient-calm: linear-gradient(180deg, hsl(30 20% 98%), hsl(200 30% 96%));
+    /* Progress colors */
+    --progress-start: 0 0% 85%;
+    --progress-low: 35 25% 75%;
+    --progress-medium: 340 30% 70%;
+    --progress-high: 340 40% 60%;
+    --progress-complete: 150 50% 45%;
     
-    /* Shadows */
-    --shadow-soft: 0 2px 16px -4px hsl(220 20% 20% / 0.08);
-    --shadow-medium: 0 4px 24px -6px hsl(220 20% 20% / 0.12);
+    /* Subtle shadows */
+    --shadow-soft: 0 1px 3px 0 hsl(0 0% 0% / 0.04);
+    --shadow-medium: 0 2px 8px 0 hsl(0 0% 0% / 0.08);
+    --shadow-large: 0 4px 16px 0 hsl(0 0% 0% / 0.1);
     
-    /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Smooth transitions */
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 13%;
+    --sidebar-primary: 0 0% 13%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 13%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 0% 13%;
   }
 
   .dark {
-    --background: 215 30% 12%;
-    --foreground: 210 25% 95%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
 
-    --card: 215 28% 16%;
-    --card-foreground: 210 25% 95%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 215 28% 16%;
-    --popover-foreground: 210 25% 95%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 195 80% 55%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 7%;
 
-    --secondary: 215 25% 22%;
-    --secondary-foreground: 210 25% 95%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 215 25% 20%;
-    --muted-foreground: 215 15% 65%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 165 55% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 340 8% 15%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 70% 52%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 25% 24%;
-    --input: 215 25% 24%;
-    --ring: 195 80% 55%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 98%;
     
-    /* Progress colors for motivation - dark mode */
-    --progress-start: 200 50% 35%;
-    --progress-low: 195 60% 45%;
-    --progress-medium: 195 70% 55%;
-    --progress-high: 190 75% 50%;
-    --progress-complete: 150 60% 45%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Progress colors - dark */
+    --progress-start: 0 0% 25%;
+    --progress-low: 35 20% 35%;
+    --progress-medium: 340 25% 40%;
+    --progress-high: 340 35% 50%;
+    --progress-complete: 150 45% 50%;
+    
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 0 0% 98%;
   }
 }
 
@@ -130,6 +127,26 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+  
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  button {
+    @apply transition-all duration-200;
   }
 }
