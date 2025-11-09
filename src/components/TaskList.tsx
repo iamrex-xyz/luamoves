@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
+import { AddTaskDialog } from "@/components/AddTaskDialog";
+import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import {
   ArrowLeft,
   Calendar,
@@ -14,6 +16,8 @@ import {
   Clock,
   Loader2,
   LogOut,
+  Plus,
+  Share2,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -25,9 +29,11 @@ type TaskListProps = {
 export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
   const [filter, setFilter] = useState<"all" | "todo" | "in_progress" | "done">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   // Gebruik de custom hook voor task management
-  const { tasks, isLoading, toggleTaskStatus } = useTasks(movingInfo);
+  const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
 
   // Bereken categorieën
   const categories = useMemo(() => {
@@ -103,17 +109,39 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
               <ArrowLeft className="w-5 h-5 mr-2" />
               Terug naar dashboard
             </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowShareDialog(true)}
+                className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+                title="Verhuizing delen"
+              >
+                <Share2 className="w-6 h-6 md:w-5 md:h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onLogout}
+                className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
+                title="Uitloggen"
+              >
+                <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-3xl md:text-2xl font-bold">Jouw checklist</h1>
             <Button
-              variant="ghost"
-              size="icon"
-              onClick={onLogout}
-              className="text-white hover:bg-white/10 h-12 w-12 md:h-10 md:w-10"
-              title="Uitloggen"
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAddTask(true)}
+              className="gap-2 min-h-[44px]"
             >
-              <LogOut className="w-6 h-6 md:w-5 md:h-5" />
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Taak toevoegen</span>
             </Button>
           </div>
-          <h1 className="text-3xl md:text-2xl font-bold mb-2">Jouw checklist</h1>
           <div className="flex items-center gap-2 text-white/90">
             <Clock className="w-5 h-5" />
             <span className="text-base md:text-sm">
@@ -310,6 +338,17 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           </div>
         )}
       </div>
+
+      {/* Dialogs */}
+      <AddTaskDialog 
+        open={showAddTask} 
+        onOpenChange={setShowAddTask}
+        onTaskAdded={refreshTasks}
+      />
+      <ShareMovingDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+      />
     </div>
   );
 };

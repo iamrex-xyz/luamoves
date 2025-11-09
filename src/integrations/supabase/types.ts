@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_tasks: {
+        Row: {
+          category: string
+          created_at: string | null
+          deadline: string
+          description: string | null
+          id: string
+          phase: string
+          task_id: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          deadline: string
+          description?: string | null
+          id?: string
+          phase?: string
+          task_id: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          deadline?: string
+          description?: string | null
+          id?: string
+          phase?: string
+          task_id?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       moving_collaborators: {
         Row: {
           accepted_at: string | null

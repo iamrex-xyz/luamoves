@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createElement } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Task, generateTasksForRenter } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
+import { Package } from "lucide-react";
 
 export const useTasks = (movingInfo: MovingInfo) => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,6 +19,12 @@ export const useTasks = (movingInfo: MovingInfo) => {
     try {
       setIsLoading(true);
 
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       // Haal opgeslagen task statuses uit database
       const { data: savedTasks, error } = await supabase
         .from("tasks")
@@ -25,6 +32,14 @@ export const useTasks = (movingInfo: MovingInfo) => {
         .order("updated_at", { ascending: false });
 
       if (error) throw error;
+
+      // Haal custom tasks op
+      const { data: customTasksData, error: customError } = await supabase
+        .from("custom_tasks")
+        .select("*")
+        .order("deadline", { ascending: true });
+
+      if (customError) throw customError;
 
       // Genereer de complete task list
       const generatedTasks =
@@ -42,7 +57,24 @@ export const useTasks = (movingInfo: MovingInfo) => {
         return task;
       });
 
-      setTasks(mergedTasks);
+      // Add custom tasks
+      const customTasks: Task[] = (customTasksData || []).map((ct) => {
+        const savedTask = savedTasks?.find((st) => st.task_id === ct.task_id);
+        return {
+          id: ct.task_id,
+          title: ct.title,
+          category: ct.category,
+          description: ct.description || "",
+          deadline: new Date(ct.deadline),
+          deadlineLabel: new Date(ct.deadline).toLocaleDateString("nl-NL"),
+          phase: ct.phase,
+          status: (savedTask?.status as "todo" | "in_progress" | "done") || "todo",
+          icon: createElement(Package, { className: "w-4 h-4" }),
+          priority: 2,
+        };
+      });
+
+      setTasks([...mergedTasks, ...customTasks]);
     } catch (error) {
       console.error("Error loading tasks:", error);
       toast({
