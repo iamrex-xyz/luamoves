@@ -111,10 +111,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`font-medium text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
               {task.title}
             </h4>
-            {getStatusBadge(task)}
+            <div className="flex-shrink-0">
+              {getStatusBadge(task)}
+            </div>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1">
@@ -154,7 +156,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   return (
     <div className="min-h-screen pb-20">
       {/* Sticky Header with Charly */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10 shadow-lg">
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6 pb-4 md:pb-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -183,7 +185,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Stats Card - Scrolls naturally with page */}
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 pb-4 md:pb-6">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6">
           <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-4 md:gap-6">
                 {/* Circular Progress */}
