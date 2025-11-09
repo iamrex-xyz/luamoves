@@ -109,8 +109,7 @@ const Index = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
+        .update({
           adults,
           children,
           pets,
@@ -120,7 +119,8 @@ const Index = () => {
           moving_date: movingInfo.movingDate,
           key_handover_date: movingInfo.keyHandoverDate || null,
           moving_type: movingInfo.type,
-        });
+        })
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
