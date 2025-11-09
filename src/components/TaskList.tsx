@@ -4,13 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
-import { generateTasksForRenter, Task } from "@/lib/taskGenerator";
+import { Task } from "@/lib/taskGenerator";
+import { useTasks } from "@/hooks/useTasks";
 import {
   ArrowLeft,
   Calendar,
   ExternalLink,
   Filter,
   Clock,
+  Loader2,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -22,15 +24,8 @@ export const TaskList = ({ movingInfo, onNavigate }: TaskListProps) => {
   const [filter, setFilter] = useState<"all" | "todo" | "in_progress" | "done">("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  // Genereer dynamische taken
-  const generatedTasks = useMemo(() => {
-    if (movingInfo.type === "rent") {
-      return generateTasksForRenter(movingInfo);
-    }
-    return [];
-  }, [movingInfo]);
-
-  const [tasks, setTasks] = useState<Task[]>(generatedTasks);
+  // Gebruik de custom hook voor task management
+  const { tasks, isLoading, toggleTaskStatus } = useTasks(movingInfo);
 
   // Bereken categorieën
   const categories = useMemo(() => {
@@ -59,18 +54,6 @@ export const TaskList = ({ movingInfo, onNavigate }: TaskListProps) => {
     return phases;
   }, [filteredTasks]);
 
-  const toggleTaskStatus = (taskId: string) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              status: task.status === "done" ? "todo" : "done",
-            }
-          : task
-      )
-    );
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -200,7 +183,12 @@ export const TaskList = ({ movingInfo, onNavigate }: TaskListProps) => {
 
       {/* Tasks grouped by phase */}
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {Object.entries(tasksByPhase).length === 0 ? (
+        {isLoading ? (
+          <Card className="p-12 text-center">
+            <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
+            <p className="text-muted-foreground">Taken laden...</p>
+          </Card>
+        ) : Object.entries(tasksByPhase).length === 0 ? (
           <Card className="p-8 text-center">
             <p className="text-muted-foreground">
               Geen taken gevonden voor deze filters.
