@@ -156,7 +156,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   return (
     <div className="min-h-screen pb-20">
       {/* Sticky Header with Charly */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
+      <div className="bg-primary text-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6 pb-4 md:pb-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -184,7 +184,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       </div>
 
       {/* Stats Card - Scrolls naturally with page */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+      <div className="bg-primary text-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-5 pb-4 md:pb-6">
           <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-4 md:gap-6">
