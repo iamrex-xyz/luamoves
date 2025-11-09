@@ -33,6 +33,13 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
       if (error) throw error;
 
+      // Haal custom deadlines op
+      const { data: customDeadlines, error: deadlineError } = await supabase
+        .from("task_deadlines")
+        .select("*");
+
+      if (deadlineError) throw deadlineError;
+
       // Haal custom tasks op
       const { data: customTasksData, error: customError } = await supabase
         .from("custom_tasks")
@@ -45,18 +52,23 @@ export const useTasks = (movingInfo: MovingInfo) => {
       const generatedTasks =
         movingInfo.type === "rent" ? generateTasksForRenter(movingInfo) : [];
 
-      // Merge saved statuses met generated tasks
+      // Merge saved statuses met generated tasks and apply custom deadlines
       const mergedTasks = generatedTasks.map((task) => {
         const savedTask = savedTasks?.find((st) => st.task_id === task.id);
-        if (savedTask) {
-          return {
-            ...task,
-            status: savedTask.status as "todo" | "in_progress" | "done",
-            assignedTo: savedTask.assigned_to || null,
-            assignedToEmail: savedTask.assigned_to_email || null,
-          };
-        }
-        return task;
+        const customDeadline = customDeadlines?.find((cd) => cd.task_id === task.id);
+        
+        const deadline = customDeadline 
+          ? new Date(customDeadline.deadline)
+          : task.deadline;
+
+        return {
+          ...task,
+          deadline,
+          deadlineLabel: deadline.toLocaleDateString("nl-NL"),
+          status: (savedTask?.status as "todo" | "in_progress" | "done") || task.status,
+          assignedTo: savedTask?.assigned_to || null,
+          assignedToEmail: savedTask?.assigned_to_email || null,
+        };
       });
 
       // Add custom tasks

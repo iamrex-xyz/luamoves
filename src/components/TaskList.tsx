@@ -9,6 +9,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { AssignTaskDropdown } from "@/components/AssignTaskDropdown";
+import { EditDeadlinePopover } from "@/components/EditDeadlinePopover";
 import {
   ArrowLeft,
   Calendar,
@@ -348,16 +349,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           </p>
 
                           <div className="flex items-center justify-between flex-wrap gap-3 mb-2">
-                            <div
-                              className={`flex items-center gap-2 text-sm md:text-xs ${
-                                isOverdue(task.deadline) && task.status !== "done"
-                                  ? "text-destructive font-medium"
-                                  : "text-muted-foreground"
-                              }`}
-                            >
-                              <Calendar className="w-4 h-4" />
-                              <span>{task.deadlineLabel}</span>
-                            </div>
+                            <EditDeadlinePopover
+                              taskId={task.id}
+                              currentDeadline={task.deadline}
+                              onDeadlineChange={refreshTasks}
+                            />
                             <AssignTaskDropdown
                               taskId={task.id}
                               currentAssignedTo={task.assignedTo}
@@ -367,6 +363,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           </div>
 
                           <div className="flex items-center justify-end flex-wrap gap-3">
+                            {isOverdue(task.deadline) && task.status !== "done" && (
+                              <Badge variant="destructive" className="text-xs">
+                                Verlopen
+                              </Badge>
+                            )}
                             {task.affiliateLink && task.status !== "done" && (
                               <Button
                                 size="sm"
