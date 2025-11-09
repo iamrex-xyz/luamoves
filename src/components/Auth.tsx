@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 
@@ -10,6 +12,9 @@ interface AuthProps {
 
 export const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,20 +37,61 @@ export const Auth = ({ onComplete }: AuthProps) => {
     return () => subscription.unsubscribe();
   }, [onComplete]);
 
-  const handleGoogleLogin = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Velden vereist",
+        description: "Vul je email en wachtwoord in",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Wachtwoord te kort",
+        description: "Wachtwoord moet minimaal 6 tekens bevatten",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) throw error;
+      
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Account aangemaakt!",
+          description: "Je bent nu ingelogd",
+        });
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Welkom terug!",
+          description: "Je bent succesvol ingelogd",
+        });
+      }
     } catch (error: any) {
       toast({
-        title: "Login mislukt",
+        title: isSignUp ? "Registratie mislukt" : "Login mislukt",
         description: error.message,
         variant: "destructive",
       });
@@ -68,20 +114,58 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
         <div className="bg-card border border-border rounded-2xl p-8 space-y-6 shadow-lg">
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold">Welkom terug</h2>
+            <h2 className="text-2xl font-semibold">
+              {isSignUp ? "Account aanmaken" : "Welkom terug"}
+            </h2>
             <p className="text-muted-foreground">
-              Log in om verder te gaan met je verhuisplanning
+              {isSignUp
+                ? "Maak een account om te beginnen"
+                : "Log in om verder te gaan met je verhuisplanning"}
             </p>
           </div>
 
-          <Button
-            onClick={handleGoogleLogin}
-            disabled={loading}
-            size="lg"
-            className="w-full"
-          >
-            {loading ? "Laden..." : "Doorgaan met Google"}
-          </Button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2 text-left">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="jouw@email.nl"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="space-y-2 text-left">
+              <Label htmlFor="password">Wachtwoord</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <Button type="submit" disabled={loading} size="lg" className="w-full">
+              {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
+            </Button>
+          </form>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              disabled={loading}
+            >
+              {isSignUp
+                ? "Heb je al een account? Log in"
+                : "Nog geen account? Registreer je"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
