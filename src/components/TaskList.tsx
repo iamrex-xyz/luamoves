@@ -168,103 +168,87 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="max-w-4xl mx-auto px-4 py-3 md:py-4 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
-        <div className="space-y-2.5 md:space-y-3">
-          {/* Status filter */}
-          <div>
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs font-medium text-muted-foreground">Status</span>
-            </div>
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-              <Button
-                variant={filter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("all")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Alle ({tasks.length})
-              </Button>
-              <Button
-                variant={filter === "todo" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("todo")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Te doen ({tasks.filter((t) => t.status === "todo").length})
-              </Button>
-              <Button
-                variant={filter === "in_progress" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("in_progress")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Bezig ({tasks.filter((t) => t.status === "in_progress").length})
-              </Button>
-              <Button
-                variant={filter === "done" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilter("done")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Afgerond ({tasks.filter((t) => t.status === "done").length})
-              </Button>
-            </div>
-          </div>
-
-          {/* Category filter */}
-          <div>
-            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
-              Categorie
-            </span>
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-              {categories.map((cat) => (
-                <Button
-                  key={cat}
-                  variant={categoryFilter === cat ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCategoryFilter(cat)}
-                  className="min-h-[40px] whitespace-nowrap text-xs px-3"
-                >
-                  {cat === "all" ? "Alle" : cat}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {/* Assignee filter */}
-          <div>
-            <span className="text-xs font-medium text-muted-foreground mb-1.5 block">
-              Toegewezen aan
-            </span>
-            <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-              <Button
-                variant={assigneeFilter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAssigneeFilter("all")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Alle
-              </Button>
-              <Button
-                variant={assigneeFilter === "mine" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAssigneeFilter("mine")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Mijn taken
-              </Button>
-              <Button
-                variant={assigneeFilter === "others" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setAssigneeFilter("others")}
-                className="min-h-[40px] whitespace-nowrap text-xs px-3"
-              >
-                Toegewezen
-              </Button>
-            </div>
-          </div>
+      {/* Compact Filters */}
+      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+          <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
+          
+          {/* Status filters */}
+          <Button
+            variant={filter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("all")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Alle ({tasks.length})
+          </Button>
+          <Button
+            variant={filter === "todo" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("todo")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Te doen ({tasks.filter((t) => t.status === "todo").length})
+          </Button>
+          <Button
+            variant={filter === "in_progress" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("in_progress")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Bezig ({tasks.filter((t) => t.status === "in_progress").length})
+          </Button>
+          <Button
+            variant={filter === "done" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter("done")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Afgerond ({tasks.filter((t) => t.status === "done").length})
+          </Button>
+          
+          <div className="w-px h-6 bg-border shrink-0" />
+          
+          {/* Category filters */}
+          {categories.slice(0, 4).map((cat) => (
+            <Button
+              key={cat}
+              variant={categoryFilter === cat ? "default" : "outline"}
+              size="sm"
+              onClick={() => setCategoryFilter(cat)}
+              className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+            >
+              {cat === "all" ? "Alle cat." : cat}
+            </Button>
+          ))}
+          
+          <div className="w-px h-6 bg-border shrink-0" />
+          
+          {/* Assignee filters */}
+          <Button
+            variant={assigneeFilter === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setAssigneeFilter("all")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Iedereen
+          </Button>
+          <Button
+            variant={assigneeFilter === "mine" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setAssigneeFilter("mine")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Mijn taken
+          </Button>
+          <Button
+            variant={assigneeFilter === "others" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setAssigneeFilter("others")}
+            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
+          >
+            Toegewezen
+          </Button>
         </div>
       </div>
 
@@ -285,7 +269,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           <div className="space-y-6">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
-                <div className="mb-3 sticky top-[230px] md:top-[240px] bg-background/95 backdrop-blur py-2 z-[5]">
+                <div className="mb-3 sticky top-[165px] md:top-[175px] bg-background/95 backdrop-blur py-2 z-[5]">
                   <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {phase}
