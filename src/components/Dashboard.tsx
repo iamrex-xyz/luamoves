@@ -77,15 +77,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
     const isOverdue = deadline < today;
 
     if (task.status === "done") {
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Voltooid</Badge>;
+      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
     }
     if (task.status === "in_progress") {
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Bezig</Badge>;
+      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
     }
     if (isOverdue) {
-      return <Badge variant="destructive">Verlopen</Badge>;
+      return <Badge variant="destructive" className="min-w-[75px] justify-center text-xs">Verlopen</Badge>;
     }
-    return <Badge variant="outline">Te doen</Badge>;
+    return <Badge variant="outline" className="min-w-[75px] justify-center text-xs">Te doen</Badge>;
   };
 
   const TaskItem = ({ task }: { task: Task }) => {
@@ -266,19 +266,20 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {myTasks.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  <h2 className="text-lg md:text-xl font-bold">Mijn prioriteiten</h2>
-                  <Badge variant="secondary">{myTasks.length}</Badge>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                    <h2 className="text-base md:text-lg font-bold">Mijn prioriteiten</h2>
+                    <Badge variant="secondary" className="text-xs">{myTasks.length}</Badge>
+                  </div>
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setShowAddTask(true)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1.5 h-8 text-xs md:text-sm"
                   >
-                    <Plus className="w-4 h-4" />
-                    Taak toevoegen
+                    <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <span className="hidden md:inline">Taak toevoegen</span>
+                    <span className="md:hidden">Toevoegen</span>
                   </Button>
                 </div>
                 <Card className="p-4">
@@ -296,8 +297,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <div>
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  <h2 className="text-lg md:text-xl font-bold">Toegewezen aan anderen</h2>
-                  <Badge variant="secondary">{assignedTasks.length}</Badge>
+                  <h2 className="text-base md:text-lg font-bold">Toegewezen aan anderen</h2>
+                  <Badge variant="secondary" className="text-xs">{assignedTasks.length}</Badge>
                 </div>
                 <Card className="p-4">
                   <div className="space-y-3">
