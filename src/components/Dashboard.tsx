@@ -18,7 +18,7 @@ import {
   Plus,
   ExternalLink,
 } from "lucide-react";
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -30,27 +30,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
-  const [statsVisible, setStatsVisible] = useState(true);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        // Scrolling down
-        setStatsVisible(false);
-      } else {
-        // Scrolling up
-        setStatsVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Calculate statistics
   const totalTasks = tasks.length;
@@ -175,9 +154,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   return (
     <div className="min-h-screen pb-20">
       {/* Sticky Header with Charly */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6">
-          <div className="flex items-center justify-between mb-4 md:mb-5">
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10 shadow-lg">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6 pb-4 md:pb-5">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
                 <Home className="w-5 h-5 md:w-6 md:h-6" />
@@ -199,18 +178,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
+        </div>
+      </div>
 
-          {/* Stats Card - Collapsible on scroll */}
-          <div 
-            className={`transition-all duration-500 ease-in-out pb-4 md:pb-6 ${
-              statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-            }`}
-            style={{
-              maxHeight: statsVisible ? '400px' : '0',
-              paddingBottom: statsVisible ? undefined : '0'
-            }}
-          >
-            <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
+      {/* Stats Card - Scrolls naturally with page */}
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 pb-4 md:pb-6">
+          <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-4 md:gap-6">
                 {/* Circular Progress */}
                 <div className="relative flex-shrink-0">
@@ -277,7 +251,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </Card>
           </div>
         </div>
-      </div>
 
       {/* Priority Tasks */}
       <div className="max-w-4xl mx-auto px-4 space-y-4 md:space-y-6 mt-4 md:mt-6">
