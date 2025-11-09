@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Users, Baby, PawPrint } from "lucide-react";
+import { Plus, Minus, Users, Baby, PawPrint, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
@@ -19,6 +19,14 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   const [pets, setPets] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Uitgelogd",
+      description: "Je bent succesvol uitgelogd.",
+    });
+  };
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -82,7 +90,16 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 md:p-6">
       <div className="w-full max-w-2xl space-y-6 md:space-y-8">
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-2 relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="absolute right-0 top-0 h-10 w-10"
+            title="Uitloggen"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
           <h1 className="text-3xl md:text-4xl font-bold font-charly tracking-tight">
             Nog een paar gegevens
           </h1>

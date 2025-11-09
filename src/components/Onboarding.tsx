@@ -2,15 +2,18 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Home, Calendar, Key, Building2 } from "lucide-react";
+import { Home, Calendar, Key, Building2, LogOut } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type OnboardingProps = {
   onComplete: (info: MovingInfo) => void;
 };
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<MovingInfo>({
     oldAddress: "",
@@ -21,6 +24,14 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   });
 
   const totalSteps = formData.type === "rent" ? 5 : 4;
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Uitgelogd",
+      description: "Je bent succesvol uitgelogd.",
+    });
+  };
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -54,7 +65,16 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card className="w-full max-w-lg p-6 md:p-8 shadow-lg">
-        <div className="mb-6 md:mb-8 text-center">
+        <div className="mb-6 md:mb-8 text-center relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleLogout}
+            className="absolute right-0 top-0 h-10 w-10"
+            title="Uitloggen"
+          >
+            <LogOut className="w-5 h-5" />
+          </Button>
           <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
             <Home className="w-8 h-8 md:w-10 md:h-10 text-primary" />
           </div>
