@@ -285,39 +285,47 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                     return (
                       <div
                         key={task.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors hover:bg-muted/50 ${
+                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
                           isTaskOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
                         }`}
                       >
                         <Checkbox
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
-                          className="mt-1"
+                          className="mt-0.5 flex-shrink-0"
                         />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-1">
-                            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                        <div className="flex-1 min-w-0 space-y-2">
+                          <div className="flex items-start justify-between gap-3">
+                            <h4 className={`font-medium text-sm leading-tight ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
                               {task.title}
                             </h4>
                             <div className="flex-shrink-0">
                               {getStatusBadge(task)}
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap mb-2">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {task.deadlineLabel}
-                              {daysUntil === 0 && " (vandaag)"}
-                              {daysUntil === 1 && " (morgen)"}
-                              {daysUntil > 1 && ` (${daysUntil} dagen)`}
-                              {isTaskOverdue && " (verlopen)"}
+                          
+                          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span>
+                                {task.deadlineLabel}
+                                {daysUntil === 0 && " (vandaag)"}
+                                {daysUntil === 1 && " (morgen)"}
+                                {daysUntil > 1 && ` (${daysUntil} dagen)`}
+                                {isTaskOverdue && " (verlopen)"}
+                              </span>
                             </span>
                             {task.assignedToEmail && (
-                              <span className="flex items-center gap-1">
-                                {task.assignedToEmail}
-                              </span>
+                              <>
+                                <span className="text-muted-foreground/40">•</span>
+                                <span className="flex items-center gap-1.5">
+                                  <User className="w-3.5 h-3.5 flex-shrink-0" />
+                                  <span className="truncate">{task.assignedToEmail}</span>
+                                </span>
+                              </>
                             )}
                           </div>
+                          
                           <div className="flex items-center gap-2 flex-wrap">
                             <EditDeadlinePopover
                               taskId={task.id}
@@ -334,11 +342,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="gap-2 h-8"
+                                className="gap-1.5 h-8 text-xs"
                                 onClick={() => window.open(task.affiliateLink, "_blank")}
                               >
                                 Direct regelen
-                                <ExternalLink className="w-3 h-3" />
+                                <ExternalLink className="w-3.5 h-3.5" />
                               </Button>
                             )}
                           </div>
