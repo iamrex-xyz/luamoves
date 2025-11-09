@@ -94,6 +94,7 @@ export type Database = {
           adults: number | null
           children: number | null
           created_at: string
+          household_type: string | null
           id: string
           key_handover_date: string | null
           moving_date: string | null
@@ -112,6 +113,7 @@ export type Database = {
           adults?: number | null
           children?: number | null
           created_at?: string
+          household_type?: string | null
           id?: string
           key_handover_date?: string | null
           moving_date?: string | null
@@ -130,6 +132,7 @@ export type Database = {
           adults?: number | null
           children?: number | null
           created_at?: string
+          household_type?: string | null
           id?: string
           key_handover_date?: string | null
           moving_date?: string | null

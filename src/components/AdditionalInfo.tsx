@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Users, Baby, PawPrint, LogOut } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Plus, Minus, Users, Baby, PawPrint, LogOut, Heart, Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
@@ -14,6 +15,7 @@ interface AdditionalInfoProps {
 
 export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   const [phone, setPhone] = useState("");
+  const [householdType, setHouseholdType] = useState<"partner" | "housemates">("partner");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [pets, setPets] = useState(0);
@@ -42,6 +44,7 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
         .single();
 
       if (profile) {
+        setHouseholdType((profile.household_type as "partner" | "housemates") || "partner");
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
         setPets(profile.pets || 0);
@@ -120,6 +123,27 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
               onChange={(e) => setPhone(e.target.value)}
               className="h-12 text-base"
             />
+          </div>
+
+          {/* Household Type */}
+          <div className="space-y-3">
+            <Label className="text-base">Type huishouden</Label>
+            <RadioGroup value={householdType} onValueChange={(value) => setHouseholdType(value as "partner" | "housemates")}>
+              <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-4">
+                <RadioGroupItem value="partner" id="partner" />
+                <Label htmlFor="partner" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Heart className="w-4 h-4 text-primary" />
+                  Partner
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-4">
+                <RadioGroupItem value="housemates" id="housemates" />
+                <Label htmlFor="housemates" className="flex items-center gap-2 cursor-pointer flex-1">
+                  <Home className="w-4 h-4 text-primary" />
+                  Huisgenoten
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Adults */}
