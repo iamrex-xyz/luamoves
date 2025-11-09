@@ -47,14 +47,14 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
-      <Card className="w-full max-w-lg p-8 shadow-lg">
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Home className="w-8 h-8 text-primary" />
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
+      <Card className="w-full max-w-lg p-6 md:p-8 shadow-lg">
+        <div className="mb-6 md:mb-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
+            <Home className="w-8 h-8 md:w-10 md:h-10 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2 font-charly">Charly</h1>
-          <p className="text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-charly">Charly</h1>
+          <p className="text-base md:text-lg text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
         </div>
 
         <div className="mb-6">
@@ -142,25 +142,25 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
               <div className="grid grid-cols-2 gap-4">
                 <button
                   onClick={() => setFormData({ ...formData, type: "rent" })}
-                  className={`p-6 rounded-lg border-2 transition-all ${
+                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
                     formData.type === "rent"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <Key className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="font-semibold">Huren</p>
+                  <Key className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
+                  <p className="font-semibold text-base">Huren</p>
                 </button>
                 <button
                   onClick={() => setFormData({ ...formData, type: "buy" })}
-                  className={`p-6 rounded-lg border-2 transition-all ${
+                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
                     formData.type === "buy"
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <Building2 className="w-8 h-8 mx-auto mb-2 text-primary" />
-                  <p className="font-semibold">Kopen</p>
+                  <Building2 className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
+                  <p className="font-semibold text-base">Kopen</p>
                 </button>
               </div>
             </div>
@@ -172,7 +172,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             <Button
               variant="outline"
               onClick={handleBack}
-              className="flex-1"
+              size="lg"
+              className="flex-1 min-h-[48px]"
             >
               Terug
             </Button>
@@ -180,7 +181,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           <Button
             onClick={handleNext}
             disabled={!isStepValid()}
-            className="flex-1"
+            size="lg"
+            className="flex-1 min-h-[48px]"
           >
             {step === 4 ? "Start mijn verhuizing" : "Volgende"}
           </Button>

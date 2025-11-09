@@ -101,18 +101,18 @@ export const Auth = ({ onComplete }: AuthProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-8 text-center">
-        <div className="space-y-4">
-          <h1 className="text-5xl font-bold font-charly tracking-tight">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 md:p-6">
+      <div className="w-full max-w-md space-y-6 md:space-y-8 text-center">
+        <div className="space-y-3 md:space-y-4">
+          <h1 className="text-4xl md:text-5xl font-bold font-charly tracking-tight">
             Charly
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-base md:text-lg text-muted-foreground">
             jouw persoonlijke verhuisconcierge
           </p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-8 space-y-6 shadow-lg">
+        <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6 shadow-lg">
           <div className="space-y-2">
             <h2 className="text-2xl font-semibold">
               {isSignUp ? "Account aanmaken" : "Welkom terug"}
@@ -124,9 +124,9 @@ export const Auth = ({ onComplete }: AuthProps) => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2 text-left">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-base">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -134,11 +134,12 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
+                className="h-12 text-base"
               />
             </div>
 
             <div className="space-y-2 text-left">
-              <Label htmlFor="password">Wachtwoord</Label>
+              <Label htmlFor="password" className="text-base">Wachtwoord</Label>
               <Input
                 id="password"
                 type="password"
@@ -146,19 +147,20 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
+                className="h-12 text-base"
               />
             </div>
 
-            <Button type="submit" disabled={loading} size="lg" className="w-full">
+            <Button type="submit" disabled={loading} size="lg" className="w-full min-h-[52px] text-base">
               {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
             </Button>
           </form>
 
-          <div className="text-center">
+          <div className="text-center pt-2">
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-base text-muted-foreground hover:text-foreground transition-colors min-h-[44px] px-4"
               disabled={loading}
             >
               {isSignUp
