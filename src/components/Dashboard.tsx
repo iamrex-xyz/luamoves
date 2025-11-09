@@ -202,9 +202,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
           {/* Stats Card - Collapsible on scroll */}
           <div 
-            className={`transition-all duration-300 pb-4 md:pb-6 ${
-              statsVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pb-0 overflow-hidden'
+            className={`transition-all duration-500 ease-in-out pb-4 md:pb-6 ${
+              statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
             }`}
+            style={{
+              maxHeight: statsVisible ? '400px' : '0',
+              paddingBottom: statsVisible ? undefined : '0'
+            }}
           >
             <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
               <div className="flex items-center gap-4 md:gap-6">
