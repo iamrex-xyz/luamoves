@@ -122,8 +122,8 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Tijdlijn</h1>
-          <p className="text-base md:text-lg text-white/90">
+          <h1 className="text-xl md:text-2xl font-bold mb-2">Tijdlijn</h1>
+          <p className="text-sm md:text-base text-white/90">
             Je verhuizing in 6 belangrijke momenten
           </p>
         </div>
@@ -144,31 +144,31 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
                 </div>
 
                 {/* Content */}
-                <Card className={`p-4 md:p-5 border-2 ${getStatusColor(event.status)}`}>
-                  <div className="flex items-start justify-between gap-3 mb-4">
+                <Card className={`p-3 md:p-4 border-2 ${getStatusColor(event.status)}`}>
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="flex-1">
-                      <h3 className="font-bold text-lg md:text-xl mb-2">{event.title}</h3>
-                      <div className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
-                        <Calendar className="w-4 h-4 md:w-5 md:h-5" />
+                      <h3 className="font-bold text-base md:text-lg mb-1.5">{event.title}</h3>
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                         <span>{event.date}</span>
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-xs md:text-sm shrink-0">
+                    <Badge variant="outline" className="text-xs shrink-0">
                       {event.category}
                     </Badge>
                   </div>
 
-                  <div className="space-y-3">
-                    <p className="text-sm md:text-base font-semibold text-foreground/80">
+                  <div className="space-y-2">
+                    <p className="text-xs md:text-sm font-semibold text-foreground/80">
                       Belangrijkste taken:
                     </p>
-                    <ul className="space-y-2.5">
+                    <ul className="space-y-2">
                       {event.tasks.map((task, taskIndex) => (
                         <li
                           key={taskIndex}
-                          className="text-sm md:text-base flex items-start gap-3"
+                          className="text-xs md:text-sm flex items-start gap-2"
                         >
-                          <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary mt-1 shrink-0" />
                           <span className="leading-relaxed">{task}</span>
                         </li>
                       ))}
