@@ -193,20 +193,38 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               {/* Stats */}
               <div className="flex-1 space-y-3 text-white">
                 <div>
-                  <h3 className="text-lg md:text-base font-semibold mb-1">Jouw voortgang</h3>
+                  <h3 className="text-lg md:text-base font-semibold mb-1">
+                    {progressPercentage >= 75 
+                      ? "🎉 Bijna klaar voor je nieuwe thuis!" 
+                      : progressPercentage >= 50 
+                      ? "💪 Je bent er al bijna!" 
+                      : progressPercentage >= 25 
+                      ? "✨ Goed bezig!" 
+                      : "🏠 Klaar voor een nieuwe start!"}
+                  </h3>
                   <p className="text-white/80 text-sm">
-                    {completedTasks} van {totalTasks} taken voltooid
+                    {completedTasks > 0 
+                      ? `${completedTasks} ${completedTasks === 1 ? 'taak' : 'taken'} afgerond - geweldig werk!`
+                      : "Je avontuur naar je nieuwe thuis begint hier"}
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <div className="text-2xl md:text-xl font-bold">{totalTasks - completedTasks}</div>
-                    <div className="text-xs text-white/80">Te doen</div>
+                    <div className="text-2xl md:text-xl font-bold">🎯 {completedTasks}</div>
+                    <div className="text-xs text-white/80">Succesvol voltooid</div>
                   </div>
                   <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                    <div className="text-2xl md:text-xl font-bold">{daysUntilMove}</div>
-                    <div className="text-xs text-white/80">Dagen resterend</div>
+                    <div className="text-2xl md:text-xl font-bold">
+                      {daysUntilMove === 0 ? "🎉 Vandaag!" : `📅 ${daysUntilMove}`}
+                    </div>
+                    <div className="text-xs text-white/80">
+                      {daysUntilMove === 0 
+                        ? "De grote dag is hier!" 
+                        : daysUntilMove === 1 
+                        ? "Nog één dag te gaan!" 
+                        : "Dagen tot je nieuwe thuis"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -262,9 +280,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {priorityTasks.length === 0 && (
               <Card className="p-8 text-center">
                 <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Geen dringende taken!</h3>
+                <h3 className="font-semibold text-lg mb-2">Perfect! Je loopt op schema! 🎉</h3>
                 <p className="text-muted-foreground mb-4">
-                  Alle taken voor de komende 2 weken zijn voltooid of je hebt nog geen taken.
+                  Alle dringende taken zijn onder controle. Neem even rust of bekijk wat je nog meer kunt voorbereiden.
                 </p>
                 <Button onClick={() => onNavigate("tasks")}>
                   Bekijk alle taken
