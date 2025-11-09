@@ -15,6 +15,8 @@ export type MovingInfo = {
   movingDate: string;
   keyHandoverDate?: string; // Sleuteloverdracht datum (vooral voor huurders)
   type: "buy" | "rent";
+  renovationType?: "none" | "small" | "large";
+  needsContractorHelp?: boolean;
 };
 
 const Index = () => {
@@ -42,6 +44,8 @@ const Index = () => {
           movingDate: profile.moving_date,
           keyHandoverDate: profile.key_handover_date || undefined,
           type: (profile.moving_type as "buy" | "rent") || "rent",
+          renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
+          needsContractorHelp: profile.needs_contractor_help || false,
         });
         setCurrentView("dashboard");
       } else {
@@ -109,6 +113,8 @@ const Index = () => {
           moving_date: movingInfo.movingDate,
           key_handover_date: movingInfo.keyHandoverDate || null,
           moving_type: movingInfo.type,
+          renovation_type: movingInfo.renovationType || "none",
+          needs_contractor_help: movingInfo.needsContractorHelp || false,
         })
         .eq('user_id', user.id);
 

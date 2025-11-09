@@ -23,10 +23,12 @@ export type Database = {
           key_handover_date: string | null
           moving_date: string | null
           moving_type: string | null
+          needs_contractor_help: boolean | null
           new_address: string | null
           old_address: string | null
           pets: number | null
           phone: string | null
+          renovation_type: string | null
           updated_at: string
           user_id: string
         }
@@ -38,10 +40,12 @@ export type Database = {
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
+          needs_contractor_help?: boolean | null
           new_address?: string | null
           old_address?: string | null
           pets?: number | null
           phone?: string | null
+          renovation_type?: string | null
           updated_at?: string
           user_id: string
         }
@@ -53,10 +57,12 @@ export type Database = {
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
+          needs_contractor_help?: boolean | null
           new_address?: string | null
           old_address?: string | null
           pets?: number | null
           phone?: string | null
+          renovation_type?: string | null
           updated_at?: string
           user_id?: string
         }

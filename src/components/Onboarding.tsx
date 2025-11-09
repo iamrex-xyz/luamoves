@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Home, Calendar, Key, Building2, LogOut } from "lucide-react";
+import { Home, Calendar, Key, Building2, LogOut, Users } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,9 +21,18 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
     movingDate: "",
     keyHandoverDate: "",
     type: "rent",
+    renovationType: "none",
+    needsContractorHelp: false,
   });
 
-  const totalSteps = formData.type === "rent" ? 5 : 4;
+  const getTotalSteps = () => {
+    let steps = 5; // base steps: address old, address new, date, type, renovation
+    if (formData.type === "rent") steps += 1; // key handover
+    if (formData.renovationType && formData.renovationType !== "none") steps += 1; // contractor help
+    return steps;
+  };
+
+  const totalSteps = getTotalSteps();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -54,9 +63,13 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 3:
         return formData.movingDate.length > 0;
       case 4:
-        return true;
+        return true; // property type
       case 5:
-        return formData.keyHandoverDate ? formData.keyHandoverDate.length > 0 : true;
+        return formData.type === "rent" ? (formData.keyHandoverDate ? formData.keyHandoverDate.length > 0 : true) : true; // key handover for rent, renovation for buy
+      case 6:
+        return true; // renovation question
+      case 7:
+        return true; // contractor help
       default:
         return false;
     }
@@ -211,6 +224,89 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 }
                 className="text-base"
               />
+            </div>
+          )}
+
+          {((step === 5 && formData.type === "buy") || (step === 6 && formData.type === "rent")) && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-warning/10">
+                  <Building2 className="w-5 h-5 text-warning" />
+                </div>
+                <h2 className="text-xl font-semibold">Ga je verbouwen?</h2>
+              </div>
+              <div className="space-y-3">
+                <button
+                  onClick={() => setFormData({ ...formData, renovationType: "none" })}
+                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                    formData.renovationType === "none"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold">Nee</p>
+                  <p className="text-sm text-muted-foreground">Geen verbouwing gepland</p>
+                </button>
+                <button
+                  onClick={() => setFormData({ ...formData, renovationType: "small" })}
+                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                    formData.renovationType === "small"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold">Ja, kleine klussen</p>
+                  <p className="text-sm text-muted-foreground">Schilderen, behangen, kleine reparaties</p>
+                </button>
+                <button
+                  onClick={() => setFormData({ ...formData, renovationType: "large" })}
+                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                    formData.renovationType === "large"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold">Ja, grote verbouwing</p>
+                  <p className="text-sm text-muted-foreground">Keuken, badkamer, aanbouw, etc.</p>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {((step === 6 && formData.type === "buy" && formData.renovationType !== "none") || 
+            (step === 7 && formData.type === "rent" && formData.renovationType !== "none")) && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 rounded-lg bg-info/10">
+                  <Users className="w-5 h-5 text-info" />
+                </div>
+                <h2 className="text-xl font-semibold">Hulp nodig?</h2>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Wil je dat Charly je helpt met het vinden van een gepaste aannemer?
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setFormData({ ...formData, needsContractorHelp: true })}
+                  className={`p-6 rounded-lg border-2 transition-all ${
+                    formData.needsContractorHelp
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold">Ja graag</p>
+                </button>
+                <button
+                  onClick={() => setFormData({ ...formData, needsContractorHelp: false })}
+                  className={`p-6 rounded-lg border-2 transition-all ${
+                    !formData.needsContractorHelp
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold">Nee, dank je</p>
+                </button>
+              </div>
             </div>
           )}
         </div>

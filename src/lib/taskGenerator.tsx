@@ -16,6 +16,8 @@ import {
   Euro,
   ClipboardCheck,
   Sparkles,
+  Hammer,
+  PaintBucket,
 } from "lucide-react";
 
 export type Task = {
@@ -504,6 +506,186 @@ export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {
       priority: 3,
     }
   );
+
+  // Verbouwing taken - alleen als er verbouwing gepland is
+  if (movingInfo.renovationType === "small") {
+    // Kleine klussen taken
+    if (daysUntilMove > 14 || daysUntilMove < 0) {
+      tasks.push(
+        {
+          id: "reno-small-1",
+          title: "Verfkleuren uitkiezen",
+          category: "Verbouwing",
+          description: "Kies verfkleuren voor de kamers die je wilt schilderen.",
+          deadline: addDays(movingDate, -21),
+          deadlineLabel: "3 weken voor verhuizing",
+          phase: "Voorbereiding",
+          status: "todo",
+          icon: <PaintBucket className="w-4 h-4" />,
+          priority: 2,
+        },
+        {
+          id: "reno-small-2",
+          title: "Materiaal inkopen",
+          category: "Verbouwing",
+          description: "Koop verf, kwasten, afplaktape en ander benodigd materiaal.",
+          deadline: addDays(movingDate, -14),
+          deadlineLabel: "2 weken voor verhuizing",
+          phase: "Voorbereiding",
+          status: "todo",
+          icon: <Package className="w-4 h-4" />,
+          priority: 2,
+        }
+      );
+    }
+
+    tasks.push(
+      {
+        id: "reno-small-3",
+        title: "Schilder- en kluswerk plannen",
+        category: "Verbouwing",
+        description: "Plan wanneer je de klussen gaat uitvoeren (idealiter tussen sleuteloverdracht en verhuisdag).",
+        deadline: keyHandoverDate,
+        deadlineLabel: `Op ${keyHandoverDate.toLocaleDateString("nl-NL")}`,
+        phase: "Sleuteloverdracht",
+        status: "todo",
+        icon: <Hammer className="w-4 h-4" />,
+        priority: 1,
+      },
+      {
+        id: "reno-small-4",
+        title: "Klussen uitvoeren",
+        category: "Verbouwing",
+        description: "Voer de geplande schilder- en kluswerk uit voordat je verhuist.",
+        deadline: addDays(movingDate, -2),
+        deadlineLabel: "2 dagen voor verhuizing",
+        phase: "Laatste voorbereidingen",
+        status: "todo",
+        icon: <PaintBucket className="w-4 h-4" />,
+        priority: 1,
+      }
+    );
+  }
+
+  if (movingInfo.renovationType === "large") {
+    // Grote verbouwing taken
+    if (daysUntilMove > 60 || daysUntilMove < 0) {
+      tasks.push(
+        {
+          id: "reno-large-1",
+          title: "Verbouwingsplan maken",
+          category: "Verbouwing",
+          description: "Maak een gedetailleerd plan van wat er verbouwd moet worden.",
+          deadline: addDays(movingDate, -90),
+          deadlineLabel: "90 dagen voor verhuizing",
+          phase: "Voorbereiding",
+          status: "todo",
+          icon: <FileText className="w-4 h-4" />,
+          priority: 1,
+        }
+      );
+    }
+
+    if (movingInfo.needsContractorHelp) {
+      if (daysUntilMove > 45 || daysUntilMove < 0) {
+        tasks.push(
+          {
+            id: "reno-large-2",
+            title: "Aannemers vergelijken en selecteren",
+            category: "Verbouwing",
+            description: "Haal offertes op bij minimaal 3 aannemers en selecteer de beste optie.",
+            deadline: addDays(movingDate, -75),
+            deadlineLabel: "75 dagen voor verhuizing",
+            phase: "Voorbereiding",
+            status: "todo",
+            icon: <Users className="w-4 h-4" />,
+            priority: 1,
+          },
+          {
+            id: "reno-large-3",
+            title: "Contract met aannemer tekenen",
+            category: "Verbouwing",
+            description: "Onderteken het contract met de gekozen aannemer en plan de werkzaamheden.",
+            deadline: addDays(movingDate, -60),
+            deadlineLabel: "60 dagen voor verhuizing",
+            phase: "Voorbereiding",
+            status: "todo",
+            icon: <FileText className="w-4 h-4" />,
+            priority: 1,
+          }
+        );
+      }
+
+      tasks.push({
+        id: "reno-large-4",
+        title: "Start verbouwing",
+        category: "Verbouwing",
+        description: "De aannemer start met de verbouwingswerkzaamheden.",
+        deadline: addDays(keyHandoverDate, 1),
+        deadlineLabel: `1 dag na sleuteloverdracht`,
+        phase: "Sleuteloverdracht",
+        status: "todo",
+        icon: <Hammer className="w-4 h-4" />,
+        priority: 1,
+      });
+    } else {
+      // Zonder aannemer hulp
+      if (daysUntilMove > 30 || daysUntilMove < 0) {
+        tasks.push(
+          {
+            id: "reno-large-5",
+            title: "Materialen en gereedschap organiseren",
+            category: "Verbouwing",
+            description: "Maak een lijst van alle benodigde materialen en gereedschap voor de verbouwing.",
+            deadline: addDays(movingDate, -45),
+            deadlineLabel: "45 dagen voor verhuizing",
+            phase: "Voorbereiding",
+            status: "todo",
+            icon: <Package className="w-4 h-4" />,
+            priority: 1,
+          },
+          {
+            id: "reno-large-6",
+            title: "Vergunningen checken",
+            category: "Verbouwing",
+            description: "Controleer of je vergunningen nodig hebt voor de geplande verbouwing.",
+            deadline: addDays(movingDate, -60),
+            deadlineLabel: "60 dagen voor verhuizing",
+            phase: "Voorbereiding",
+            status: "todo",
+            icon: <FileText className="w-4 h-4" />,
+            priority: 1,
+          }
+        );
+      }
+
+      tasks.push({
+        id: "reno-large-7",
+        title: "Start verbouwing zelf",
+        category: "Verbouwing",
+        description: "Begin met de verbouwingswerkzaamheden volgens je plan.",
+        deadline: addDays(keyHandoverDate, 1),
+        deadlineLabel: `1 dag na sleuteloverdracht`,
+        phase: "Sleuteloverdracht",
+        status: "todo",
+        icon: <Hammer className="w-4 h-4" />,
+        priority: 1,
+      });
+    }
+
+    tasks.push({
+      id: "reno-large-8",
+      title: "Verbouwing afronden",
+      category: "Verbouwing",
+      description: "Zorg dat de verbouwing afgerond is voor of kort na de verhuisdag.",
+      deadline: addDays(movingDate, 7),
+      deadlineLabel: "1 week na verhuizing",
+      phase: "Settelen",
+      status: "todo",
+      icon: <ClipboardCheck className="w-4 h-4" />,
+      priority: 1,
+    });
+  }
 
   // Sorteer taken op deadline
   return tasks.sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
