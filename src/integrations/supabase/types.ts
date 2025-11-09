@@ -98,6 +98,7 @@ export type Database = {
           needs_contractor_help: boolean | null
           new_address: string | null
           old_address: string | null
+          pet_types: string[] | null
           pets: number | null
           phone: string | null
           renovation_type: string | null
@@ -115,6 +116,7 @@ export type Database = {
           needs_contractor_help?: boolean | null
           new_address?: string | null
           old_address?: string | null
+          pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
           renovation_type?: string | null
@@ -132,6 +134,7 @@ export type Database = {
           needs_contractor_help?: boolean | null
           new_address?: string | null
           old_address?: string | null
+          pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
           renovation_type?: string | null

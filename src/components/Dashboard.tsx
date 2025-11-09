@@ -16,12 +16,13 @@ import {
   Users,
   CheckCircle2,
   Circle,
+  Settings,
 } from "lucide-react";
 import { useMemo } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "timeline") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "timeline" | "settings") => void;
   onLogout: () => void;
 };
 
@@ -220,7 +221,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Quick Actions */}
       <div className="max-w-4xl mx-auto px-4 -mt-6 mb-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <Button
             variant="secondary"
             className="h-auto py-5 md:py-4 flex flex-col gap-2 shadow-md min-h-[100px]"
@@ -236,6 +237,14 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           >
             <Clock className="w-7 h-7 md:w-6 md:h-6" />
             <span className="text-base md:text-sm font-semibold">Tijdlijn</span>
+          </Button>
+          <Button
+            variant="secondary"
+            className="h-auto py-5 md:py-4 flex flex-col gap-2 shadow-md min-h-[100px]"
+            onClick={() => onNavigate("settings")}
+          >
+            <Settings className="w-7 h-7 md:w-6 md:h-6" />
+            <span className="text-base md:text-sm font-semibold">Instellingen</span>
           </Button>
         </div>
       </div>

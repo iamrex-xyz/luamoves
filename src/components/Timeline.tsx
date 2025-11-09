@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, CheckCircle2, Circle, Clock, LogOut } from "lucide
 
 type TimelineProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "timeline") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "timeline" | "settings") => void;
   onLogout: () => void;
 };
 
