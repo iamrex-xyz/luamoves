@@ -28,66 +28,56 @@ const Index = () => {
 
   // Check authentication and load user data
   useEffect(() => {
-    // Set up auth state listener
+    const loadUserProfile = async (userId: string) => {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (profile && profile.moving_date) {
+        setMovingInfo({
+          oldAddress: profile.old_address || '',
+          newAddress: profile.new_address || '',
+          movingDate: profile.moving_date,
+          keyHandoverDate: profile.key_handover_date || undefined,
+          type: (profile.moving_type as "buy" | "rent") || "rent",
+        });
+        setCurrentView("dashboard");
+      } else {
+        setCurrentView("onboarding");
+      }
+      setLoading(false);
+    };
+
+    // Set up auth state listener (MUST be synchronous)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Load user profile data
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-
-          if (profile && profile.moving_date) {
-            setMovingInfo({
-              oldAddress: profile.old_address || '',
-              newAddress: profile.new_address || '',
-              movingDate: profile.moving_date,
-              keyHandoverDate: profile.key_handover_date || undefined,
-              type: (profile.moving_type as "buy" | "rent") || "rent",
-            });
-            setCurrentView("dashboard");
-          } else {
-            setCurrentView("onboarding");
-          }
+          // Defer async operations with setTimeout
+          setTimeout(() => {
+            loadUserProfile(session.user.id);
+          }, 0);
         } else {
           setCurrentView("auth");
           setMovingInfo(null);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-
-        if (profile && profile.moving_date) {
-          setMovingInfo({
-            oldAddress: profile.old_address || '',
-            newAddress: profile.new_address || '',
-            movingDate: profile.moving_date,
-            keyHandoverDate: profile.key_handover_date || undefined,
-            type: (profile.moving_type as "buy" | "rent") || "rent",
-          });
-          setCurrentView("dashboard");
-        } else {
-          setCurrentView("onboarding");
-        }
+        loadUserProfile(session.user.id);
       } else {
         setCurrentView("auth");
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
