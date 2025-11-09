@@ -174,18 +174,14 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Header */}
-      <div 
-        className={`bg-gradient-to-br from-primary to-primary/80 text-white p-5 md:p-6 pb-6 transition-transform duration-300 sticky top-0 z-10 ${
-          headerVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-5">
+      {/* Sticky Header with Charly */}
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto p-5 md:p-6 pb-0">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-            <div className="p-2.5 md:p-2 bg-white/10 rounded-lg backdrop-blur">
-              <Home className="w-7 h-7 md:w-6 md:h-6" />
-            </div>
+              <div className="p-2.5 md:p-2 bg-white/10 rounded-lg backdrop-blur">
+                <Home className="w-7 h-7 md:w-6 md:h-6" />
+              </div>
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold">Charly</h1>
                 <p className="text-white/80 text-sm md:text-base mt-1">
@@ -203,8 +199,17 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               <LogOut className="w-6 h-6 md:w-5 md:h-5" />
             </Button>
           </div>
+        </div>
+      </div>
 
-          <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20">
+      {/* Stats Card - Scrollable */}
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-white">
+        <div 
+          className={`max-w-4xl mx-auto px-5 md:px-6 pb-6 transition-all duration-300 ${
+            headerVisible ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'
+          }`}
+        >
+          <Card className="p-6 md:p-5 bg-white/10 backdrop-blur border-white/20 mt-5">
             <div className="flex items-center gap-6">
               {/* Circular Progress */}
               <div className="relative flex-shrink-0">
