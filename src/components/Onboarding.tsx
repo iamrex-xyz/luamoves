@@ -155,14 +155,17 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 </div>
                 <h2 className="text-lg md:text-xl font-semibold">Verhuisdatum</h2>
               </div>
-              <Input
-                type="date"
-                value={formData.movingDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, movingDate: e.target.value })
-                }
-                className="text-base text-center pr-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-              />
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={formData.movingDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, movingDate: e.target.value })
+                  }
+                  className="text-base text-center px-10 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+              </div>
             </div>
           )}
 
