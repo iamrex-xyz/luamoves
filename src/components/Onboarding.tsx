@@ -26,10 +26,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   });
 
   const getTotalSteps = () => {
-    let steps = 5; // base steps: address old, address new, date, type, renovation
-    if (formData.type === "rent") steps += 1; // key handover
-    if (formData.renovationType && formData.renovationType !== "none") steps += 1; // contractor help
-    return steps;
+    return 7; // Fixed 7 steps for consistency
   };
 
   const totalSteps = getTotalSteps();
@@ -65,7 +62,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
       case 4:
         return true; // property type
       case 5:
-        return formData.type === "rent" ? (formData.keyHandoverDate ? formData.keyHandoverDate.length > 0 : true) : true; // key handover for rent, renovation for buy
+        return true; // key handover - optional
       case 6:
         return true; // renovation question
       case 7:
@@ -204,16 +201,21 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             </div>
           )}
 
-          {step === 5 && formData.type === "rent" && (
+          {step === 5 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-accent/10">
                   <Key className="w-5 h-5 text-accent" />
                 </div>
-                <h2 className="text-lg md:text-xl font-semibold">Sleuteloverdracht</h2>
+                <h2 className="text-lg md:text-xl font-semibold">
+                  {formData.type === "rent" ? "Sleuteloverdracht" : "Overdracht"}
+                </h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Wanneer krijg je de sleutels van je nieuwe woning? (meestal voor de verhuisdatum)
+                {formData.type === "rent" 
+                  ? "Wanneer krijg je de sleutels van je nieuwe woning? (meestal voor de verhuisdatum)"
+                  : "Wanneer krijg je de sleutels van je gekochte woning? (meestal op de dag van overdracht)"
+                }
               </p>
               <Input
                 type="date"
@@ -227,7 +229,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             </div>
           )}
 
-          {((step === 5 && formData.type === "buy") || (step === 6 && formData.type === "rent")) && (
+          {step === 6 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-warning/10">
@@ -273,8 +275,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             </div>
           )}
 
-          {((step === 6 && formData.type === "buy" && formData.renovationType !== "none") || 
-            (step === 7 && formData.type === "rent" && formData.renovationType !== "none")) && (
+          {step === 7 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-info/10">
