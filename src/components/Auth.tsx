@@ -354,9 +354,9 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
         <div className="space-y-4">
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold">Account aanmaken</h2>
+            <h2 className="text-lg font-semibold">Maak een account aan</h2>
             <p className="text-xs text-muted-foreground">
-              Maak een account om te beginnen
+              Ik help je stap voor stap met verhuizen
             </p>
           </div>
 
