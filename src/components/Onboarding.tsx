@@ -131,7 +131,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         <div className="space-y-6">
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
+              <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
                 Wat leuk dat je gaat verhuizen!
               </h2>
             </div>
@@ -139,7 +139,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
+              <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
                 Ik ben Charly, jouw<br />persoonlijke verhuisconcierge.
               </h2>
             </div>
