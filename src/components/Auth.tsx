@@ -172,7 +172,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-6 space-y-4 shadow-lg">
+          <div className="space-y-4">
             <Button 
               onClick={() => setScreen('login')} 
               className="w-full h-12 text-base"
