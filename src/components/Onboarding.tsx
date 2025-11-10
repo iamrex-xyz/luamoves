@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -34,6 +34,17 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   };
 
   const totalSteps = getTotalSteps();
+
+  // Automatically advance from loading screen to success screen
+  useEffect(() => {
+    if (step === 8) {
+      const timer = setTimeout(() => {
+        setStep(9);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
 
   const handleNext = async () => {
     if (step === 8) {
@@ -255,14 +266,22 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
           {step === 8 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-8">
-              <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin" />
-              <div>
+              <div className="relative">
+                <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin" />
+                <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full bg-primary/20 animate-pulse" />
+              </div>
+              <div className="space-y-3">
                 <h2 className="text-xl md:text-2xl font-semibold mb-2">
                   Een momentje...
                 </h2>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground animate-pulse">
                   Charly maakt een persoonlijk verhuisplan voor je aan
                 </p>
+                <div className="flex justify-center gap-2 pt-4">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
               </div>
             </div>
           )}
