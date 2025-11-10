@@ -129,7 +129,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
-                Ik ben Charly, jouw persoonlijke verhuisconcierge
+                Ik ben Charly, jouw persoonlijke verhuisconcierge.
               </h2>
             </div>
           )}
