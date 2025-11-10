@@ -312,7 +312,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           )}
         </div>
 
-        <div className="flex gap-3 mt-8">
+        <div className="flex gap-3 mt-8 justify-end">
           {step > 1 && (
             <Button
               variant="outline"
@@ -327,7 +327,13 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             onClick={handleNext}
             disabled={!isStepValid()}
             size="lg"
-            className={`min-h-[48px] ${step === 1 || step === totalSteps ? 'w-full max-w-[200px] mx-auto' : 'flex-1'}`}
+            className={`min-h-[48px] ${
+              step === 1 
+                ? 'w-full max-w-[200px] mx-auto' 
+                : step === totalSteps 
+                  ? 'w-[calc(50%-0.375rem)]' 
+                  : 'flex-1'
+            }`}
           >
             {step === totalSteps ? "Start verhuizing" : "Volgende"}
           </Button>
