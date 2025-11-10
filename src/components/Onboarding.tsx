@@ -136,25 +136,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-accent/10">
-                  <Building2 className="w-5 h-5 text-accent" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Nieuw adres</h2>
-              </div>
-              <AddressAutocomplete
-                label=""
-                placeholder="Bijv. Dorpsplein 5, Utrecht"
-                value={formData.newAddress}
-                onChange={(address) =>
-                  setFormData({ ...formData, newAddress: address })
-                }
-              />
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
                 Wat is je nieuwe adres?
               </h2>
@@ -182,41 +163,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                   setFormData({ ...formData, oldAddress: address })
                 }
               />
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-warning/10">
-                  <Key className="w-5 h-5 text-warning" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Type woning</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setFormData({ ...formData, type: "rent" })}
-                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
-                    formData.type === "rent"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <Key className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
-                  <p className="font-semibold text-base">Huren</p>
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, type: "buy" })}
-                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
-                    formData.type === "buy"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <Building2 className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
-                  <p className="font-semibold text-base">Kopen</p>
-                </button>
-              </div>
             </div>
           )}
 
