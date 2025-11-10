@@ -30,7 +30,9 @@ export const AddressAutocomplete = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const searchTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     setQuery(value);
@@ -48,9 +50,16 @@ export const AddressAutocomplete = ({
   }, []);
 
   useEffect(() => {
+    // Clear any pending search timeout when dependencies change
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+      searchTimeoutRef.current = null;
+    }
+
     const searchAddress = async () => {
-      if (query.length < 3 || justSelected) {
+      if (query.length < 3 || justSelected || query === selectedValue) {
         setSuggestions([]);
+        setShowSuggestions(false);
         return;
       }
 
@@ -74,18 +83,23 @@ export const AddressAutocomplete = ({
       }
     };
 
-    const timeoutId = setTimeout(searchAddress, 300);
-    return () => clearTimeout(timeoutId);
-  }, [query, justSelected]);
+    searchTimeoutRef.current = window.setTimeout(searchAddress, 300);
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
+    };
+  }, [query, justSelected, selectedValue]);
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
     setJustSelected(true);
+    setSelectedValue(fullAddress);
     setQuery(fullAddress);
     onChange(fullAddress);
     setShowSuggestions(false);
     setSuggestions([]);
-    setTimeout(() => setJustSelected(false), 100);
   };
 
   return (
@@ -96,6 +110,7 @@ export const AddressAutocomplete = ({
           value={query}
           onChange={(e) => {
             setJustSelected(false);
+            setSelectedValue("");
             setQuery(e.target.value);
             setShowSuggestions(true);
           }}
@@ -111,7 +126,7 @@ export const AddressAutocomplete = ({
         </div>
       </div>
 
-      {showSuggestions && suggestions.length > 0 && (
+      {showSuggestions && query !== selectedValue && suggestions.length > 0 && (
         <Card className="absolute z-50 w-full mt-2 max-h-60 overflow-y-auto bg-card border shadow-lg">
           {suggestions.map((suggestion) => (
             <button
@@ -133,7 +148,7 @@ export const AddressAutocomplete = ({
         </Card>
       )}
 
-      {showSuggestions && query.length >= 3 && !isLoading && suggestions.length === 0 && (
+      {showSuggestions && query !== selectedValue && query.length >= 3 && !isLoading && suggestions.length === 0 && (
         <Card className="absolute z-50 w-full mt-2 p-4 bg-card border shadow-lg">
           <p className="text-sm text-muted-foreground text-center">
             Geen adressen gevonden
