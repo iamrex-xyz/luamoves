@@ -17,6 +17,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [formData, setFormData] = useState<MovingInfo>({
@@ -38,11 +39,33 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   // Automatically advance from loading screen to success screen
   useEffect(() => {
     if (step === 8) {
+      const loadingSteps = [
+        "Verhuisplan wordt gemaakt...",
+        "Belangrijke taken worden toegevoegd...",
+        "Deadlines worden berekend...",
+        "Checklists worden gegenereerd...",
+      ];
+      
+      let currentStep = 0;
+      const stepInterval = setInterval(() => {
+        if (currentStep < loadingSteps.length) {
+          setLoadingStep(currentStep);
+          currentStep++;
+        } else {
+          clearInterval(stepInterval);
+        }
+      }, 700);
+
       const timer = setTimeout(() => {
+        clearInterval(stepInterval);
         setStep(9);
+        setLoadingStep(0);
       }, 3000);
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearInterval(stepInterval);
+      };
     }
   }, [step]);
 
@@ -270,17 +293,47 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                 <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin" />
                 <div className="absolute inset-0 w-16 h-16 mx-auto rounded-full bg-primary/20 animate-pulse" />
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <h2 className="text-xl md:text-2xl font-semibold mb-2">
                   Een momentje...
                 </h2>
-                <p className="text-muted-foreground animate-pulse">
-                  Charly maakt een persoonlijk verhuisplan voor je aan
-                </p>
-                <div className="flex justify-center gap-2 pt-4">
-                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className="space-y-3 text-left max-w-sm mx-auto">
+                  {[
+                    "Verhuisplan wordt gemaakt...",
+                    "Belangrijke taken worden toegevoegd...",
+                    "Deadlines worden berekend...",
+                    "Checklists worden gegenereerd...",
+                  ].map((text, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center gap-3 transition-all duration-300 ${
+                        loadingStep >= index ? "opacity-100" : "opacity-30"
+                      }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                          loadingStep > index
+                            ? "bg-primary border-primary"
+                            : "border-primary"
+                        }`}
+                      >
+                        {loadingStep > index && (
+                          <svg
+                            className="w-3 h-3 text-primary-foreground animate-in zoom-in duration-200"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="3"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-sm text-muted-foreground">{text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
