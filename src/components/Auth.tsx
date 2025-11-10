@@ -398,7 +398,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
             </div>
 
             <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
-              {loading ? "Laden..." : "Account aanmaken"}
+              {loading ? "Laden..." : "Begin met verhuizen"}
             </Button>
           </form>
 
