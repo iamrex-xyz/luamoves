@@ -18,18 +18,12 @@ export const Auth = ({ onComplete }: AuthProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        onComplete(session.user);
-      }
-    });
-
-    // Listen for auth changes
+    // Listen for auth changes (only for new logins/signups)
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      // Only call onComplete for new sign-ins, not for existing sessions
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
         onComplete(session.user);
       }
     });
