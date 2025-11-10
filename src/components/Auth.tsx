@@ -350,9 +350,6 @@ export const Auth = ({ onComplete }: AuthProps) => {
           <h1 className="text-3xl font-bold font-charly tracking-tight">
             Charly
           </h1>
-          <p className="text-sm text-muted-foreground">
-            jouw persoonlijke verhuisconcierge
-          </p>
         </div>
 
         <div className="space-y-4">
