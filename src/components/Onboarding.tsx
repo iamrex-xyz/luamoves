@@ -72,11 +72,33 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const handleNext = async () => {
     if (step === 8) {
       // Loading step - simulate processing
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
+      const loadingSteps = [
+        "Verhuisplan wordt gemaakt...",
+        "Belangrijke taken worden toegevoegd...",
+        "Deadlines worden berekend...",
+        "Checklists worden gegenereerd...",
+      ];
+      
+      let currentStep = 0;
+      const stepInterval = setInterval(() => {
+        if (currentStep < loadingSteps.length) {
+          setLoadingStep(currentStep);
+          currentStep++;
+        } else {
+          clearInterval(stepInterval);
+        }
+      }, 700);
+
+      const timer = setTimeout(() => {
+        clearInterval(stepInterval);
         setStep(9);
-      }, 2000);
+        setLoadingStep(0);
+      }, 3000);
+      
+      return () => {
+        clearTimeout(timer);
+        clearInterval(stepInterval);
+      };
     } else if (step === 11) {
       // Account creation
       if (email && password) {
@@ -86,6 +108,21 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       setStep(step + 1);
     }
   };
+
+  // Auto-advance when address is filled in (step 3 and 4)
+  useEffect(() => {
+    if (step === 3 && formData.newAddress.length > 0) {
+      const timer = setTimeout(() => {
+        setStep(4);
+      }, 500);
+      return () => clearTimeout(timer);
+    } else if (step === 4 && formData.oldAddress.length > 0) {
+      const timer = setTimeout(() => {
+        setStep(5);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [step, formData.newAddress, formData.oldAddress]);
 
   const handleBack = () => {
     if (step > 3 && step < 8) setStep(step - 1); // Only allow back on question steps
