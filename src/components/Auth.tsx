@@ -221,19 +221,6 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 />
               </div>
 
-              {!isSignUp && (
-                <div className="text-right">
-                  <button
-                    type="button"
-                    onClick={() => setIsPasswordReset(true)}
-                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    disabled={loading}
-                  >
-                    Wachtwoord vergeten?
-                  </button>
-                </div>
-              )}
-
               <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
                 {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
               </Button>
@@ -241,7 +228,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
           )}
 
           {!isPasswordReset && (
-            <div className="text-center">
+            <div className="text-center space-y-1">
               <button
                 type="button"
                 onClick={() => {
@@ -249,13 +236,23 @@ export const Auth = ({ onComplete }: AuthProps) => {
                   setEmail("");
                   setPassword("");
                 }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
                 disabled={loading}
               >
                 {isSignUp
                   ? "Heb je al een account? Log in"
                   : "Nog geen account? Registreer je"}
               </button>
+              {!isSignUp && (
+                <button
+                  type="button"
+                  onClick={() => setIsPasswordReset(true)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
+                  disabled={loading}
+                >
+                  Wachtwoord vergeten?
+                </button>
+              )}
             </div>
           )}
         </div>
