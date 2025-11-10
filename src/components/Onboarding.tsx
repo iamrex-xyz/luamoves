@@ -304,7 +304,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <p className="font-semibold">Nee, dank je</p>
+                  <p className="font-semibold">Nee dankje</p>
                 </button>
               </div>
             </div>
@@ -328,7 +328,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             size="lg"
             className="flex-1 min-h-[48px]"
           >
-            {step === totalSteps ? "Start mijn verhuizing" : "Volgende"}
+            {step === totalSteps ? "Start de verhuizing" : "Volgende"}
           </Button>
         </div>
       </Card>
