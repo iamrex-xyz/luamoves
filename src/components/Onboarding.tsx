@@ -329,7 +329,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             size="lg"
             className="flex-1 min-h-[48px]"
           >
-            {step === totalSteps ? "Start de verhuizing" : "Volgende"}
+            {step === totalSteps ? "Start verhuizing" : "Volgende"}
           </Button>
         </div>
       </Card>
