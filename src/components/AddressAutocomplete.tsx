@@ -29,6 +29,7 @@ export const AddressAutocomplete = ({
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [justSelected, setJustSelected] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export const AddressAutocomplete = ({
 
   useEffect(() => {
     const searchAddress = async () => {
-      if (query.length < 3) {
+      if (query.length < 3 || justSelected) {
         setSuggestions([]);
         return;
       }
@@ -75,14 +76,16 @@ export const AddressAutocomplete = ({
 
     const timeoutId = setTimeout(searchAddress, 300);
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, justSelected]);
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
+    setJustSelected(true);
     setQuery(fullAddress);
     onChange(fullAddress);
     setShowSuggestions(false);
     setSuggestions([]);
+    setTimeout(() => setJustSelected(false), 100);
   };
 
   return (
@@ -92,6 +95,7 @@ export const AddressAutocomplete = ({
         <Input
           value={query}
           onChange={(e) => {
+            setJustSelected(false);
             setQuery(e.target.value);
             setShowSuggestions(true);
           }}
