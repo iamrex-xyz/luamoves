@@ -31,8 +31,27 @@ export const AddressAutocomplete = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<number | null>(null);
+
+  // Get user's location on component mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log("Locatie toegang geweigerd:", error);
+          // Continue without location - will just show results without distance sorting
+        }
+      );
+    }
+  }, []);
 
   useEffect(() => {
     setQuery(value);
@@ -65,11 +84,17 @@ export const AddressAutocomplete = ({
 
       setIsLoading(true);
       try {
-        const response = await fetch(
-          `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
-            query
-          )}&fq=type:adres&rows=10`
-        );
+        // Build API URL with optional location parameters
+        let apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
+          query
+        )}&fq=type:adres&rows=10`;
+        
+        // Add location parameters if available for distance-based sorting
+        if (userLocation) {
+          apiUrl += `&lat=${userLocation.lat}&lon=${userLocation.lon}`;
+        }
+
+        const response = await fetch(apiUrl);
         const data = await response.json();
 
         if (data.response?.docs) {
@@ -90,7 +115,7 @@ export const AddressAutocomplete = ({
         searchTimeoutRef.current = null;
       }
     };
-  }, [query, justSelected, selectedValue]);
+  }, [query, justSelected, selectedValue, userLocation]);
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
