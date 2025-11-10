@@ -145,7 +145,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
               />
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full h-10 text-sm">
+            <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
               {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
             </Button>
           </form>
