@@ -25,7 +25,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
     newAddress: "",
     movingDate: "",
     keyHandoverDate: "",
-    type: "rent",
+    type: "" as any, // No default selection
     renovationType: "none",
     needsContractorHelp: false,
   });
@@ -121,8 +121,13 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         setStep(5);
       }, 500);
       return () => clearTimeout(timer);
+    } else if (step === 5 && formData.type) {
+      const timer = setTimeout(() => {
+        setStep(6);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [step, formData.newAddress, formData.oldAddress]);
+  }, [step, formData.newAddress, formData.oldAddress, formData.type]);
 
   const handleBack = () => {
     if (step > 3 && step < 8) setStep(step - 1); // Only allow back on question steps
@@ -148,7 +153,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       case 4:
         return formData.oldAddress.length > 0;
       case 5:
-        return true; // property type
+        return formData.type === "rent" || formData.type === "buy"; // Must have a selection
       case 6:
         return formData.movingDate.length > 0;
       case 7:
