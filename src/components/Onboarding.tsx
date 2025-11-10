@@ -327,7 +327,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             onClick={handleNext}
             disabled={!isStepValid()}
             size="lg"
-            className={`min-h-[48px] ${step > 1 ? 'flex-1' : 'w-full max-w-[200px] mx-auto'}`}
+            className={`min-h-[48px] ${step === 1 || step === totalSteps ? 'w-full max-w-[200px] mx-auto' : 'flex-1'}`}
           >
             {step === totalSteps ? "Start verhuizing" : "Volgende"}
           </Button>
