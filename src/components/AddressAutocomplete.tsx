@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { MapPin, Loader2 } from "lucide-react";
+import { MapPin, Loader2, Navigation } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type AddressSuggestion = {
   id: string;
@@ -25,6 +26,7 @@ export const AddressAutocomplete = ({
   onChange,
   placeholder = "Begin met typen...",
 }: AddressAutocompleteProps) => {
+  const { toast } = useToast();
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,26 +34,36 @@ export const AddressAutocomplete = ({
   const [justSelected, setJustSelected] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [locationRequested, setLocationRequested] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const searchTimeoutRef = useRef<number | null>(null);
 
   // Get user's location on component mount
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (navigator.geolocation && !locationRequested) {
+      setLocationRequested(true);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           });
+          toast({
+            title: "Locatie geactiveerd",
+            description: "Adressen worden gesorteerd op afstand van jouw locatie.",
+          });
         },
         (error) => {
           console.log("Locatie toegang geweigerd:", error);
-          // Continue without location - will just show results without distance sorting
+          toast({
+            title: "Locatie uitgeschakeld",
+            description: "Je kunt nog steeds zoeken, maar zonder locatiesortering.",
+            variant: "destructive",
+          });
         }
       );
     }
-  }, []);
+  }, [locationRequested, toast]);
 
   useEffect(() => {
     setQuery(value);
@@ -129,7 +141,15 @@ export const AddressAutocomplete = ({
 
   return (
     <div ref={wrapperRef} className="relative">
-      <label className="block text-sm font-medium mb-2">{label}</label>
+      <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+        {label}
+        {userLocation && (
+          <span className="inline-flex items-center gap-1 text-xs text-primary">
+            <Navigation className="w-3 h-3" />
+            Locatie actief
+          </span>
+        )}
+      </label>
       <div className="relative">
         <Input
           value={query}
