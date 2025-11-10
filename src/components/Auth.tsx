@@ -206,7 +206,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
+          <div className="space-y-4">
             <div className="space-y-1">
               <h2 className="text-lg font-semibold">Wachtwoord vergeten</h2>
               <p className="text-xs text-muted-foreground">
@@ -266,7 +266,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
+          <div className="space-y-4">
             <div className="space-y-1">
               <h2 className="text-lg font-semibold">Welkom terug</h2>
               <p className="text-xs text-muted-foreground">
@@ -346,7 +346,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
           </p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
+        <div className="space-y-4">
           <div className="space-y-1">
             <h2 className="text-lg font-semibold">Account aanmaken</h2>
             <p className="text-xs text-muted-foreground">
