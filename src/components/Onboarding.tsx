@@ -95,7 +95,10 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
-      <Card className="w-full max-w-lg p-6 md:p-8 shadow-lg">
+      <Card 
+        className={`w-full max-w-lg p-6 md:p-8 shadow-lg ${step <= 2 ? 'cursor-pointer' : ''}`}
+        onClick={step <= 2 ? handleNext : undefined}
+      >
         {step > 2 && step < 8 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
@@ -372,18 +375,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           )}
         </div>
 
-        {step <= 2 && (
-          <div className="mt-8 text-center">
-            <Button
-              variant="ghost"
-              onClick={onLogin}
-              size="sm"
-            >
-              Ik heb al een account
-            </Button>
-          </div>
-        )}
-
         {step > 2 && step < 8 && (
           <div className="flex gap-3 mt-8 justify-end">
             {step > 3 && (
@@ -407,14 +398,14 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           </div>
         )}
 
-        {(step === 1 || step === 2 || step === 9 || step === 10) && (
+        {(step === 9 || step === 10) && (
           <div className="mt-8">
             <Button
               onClick={handleNext}
               size="lg"
               className="w-full min-h-[48px]"
             >
-              {step === 9 ? "Doorgaan" : step === 10 ? "Account aanmaken" : "Beginnen"}
+              {step === 9 ? "Doorgaan" : "Account aanmaken"}
             </Button>
           </div>
         )}
