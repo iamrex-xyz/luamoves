@@ -295,7 +295,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <p className="font-semibold">Ja graag</p>
+                  <p className="font-semibold text-sm">Ja graag</p>
                 </button>
                 <button
                   onClick={() => setFormData({ ...formData, needsContractorHelp: false })}
@@ -305,7 +305,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                       : "border-border hover:border-primary/50"
                   }`}
                 >
-                  <p className="font-semibold">Nee dankje</p>
+                  <p className="font-semibold text-sm">Nee dankje</p>
                 </button>
               </div>
             </div>
@@ -318,7 +318,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
               variant="outline"
               onClick={handleBack}
               size="lg"
-              className="flex-1 min-h-[48px]"
+              className="flex-1 min-h-[48px] text-sm"
             >
               Terug
             </Button>
@@ -327,7 +327,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
             onClick={handleNext}
             disabled={!isStepValid()}
             size="lg"
-            className={`min-h-[48px] ${
+            className={`min-h-[48px] text-sm ${
               step === 1 
                 ? 'w-full max-w-[200px] mx-auto' 
                 : step === totalSteps 
