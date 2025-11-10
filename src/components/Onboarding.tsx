@@ -96,16 +96,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card className="w-full max-w-lg p-6 md:p-8 shadow-lg">
-        {step <= 2 && (
-          <div className="mb-6 md:mb-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
-              <Home className="w-8 h-8 md:w-10 md:h-10 text-primary" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-charly">Charly</h1>
-            <p className="text-base md:text-lg text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
-          </div>
-        )}
-
         {step > 2 && step < 8 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
@@ -126,24 +116,18 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
         <div className="space-y-6">
           {step === 1 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-12">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
                 Wat leuk dat je gaat verhuizen!
               </h2>
-              <p className="text-lg text-muted-foreground">
-                Laten we samen zorgen dat alles soepel verloopt.
-              </p>
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-12">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                Ik ben Charly, jouw persoonlijke verhuisconcierge.
+                Ik ben Charly, jouw persoonlijke verhuisconcierge
               </h2>
-              <p className="text-lg text-muted-foreground">
-                Ik zorg dat alles soepel verloopt.
-              </p>
             </div>
           )}
 
