@@ -387,10 +387,10 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                 <Home className="w-10 h-10 text-success" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                Gelukt!
+                Je verhuisplan is klaar.
               </h2>
-              <p className="text-lg text-muted-foreground">
-                Je verhuisplan staat klaar. Laten we aan de slag gaan!
+              <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                Maak een account aan zodat ik alles voor je kan bewaren en je verder kan helpen.
               </p>
             </div>
           )}
@@ -461,11 +461,11 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         {(step === 9 || step === 10) && (
           <div className="mt-8">
             <Button
-              onClick={handleNext}
+              onClick={() => setStep(11)}
               size="lg"
               className="w-full min-h-[48px]"
             >
-              {step === 9 ? "Doorgaan" : "Account aanmaken"}
+              Begin met verhuizen
             </Button>
           </div>
         )}
