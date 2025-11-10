@@ -95,32 +95,32 @@ export const Auth = ({ onComplete }: AuthProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 md:p-6">
-      <div className="w-full max-w-md space-y-6 md:space-y-8 text-center">
-        <div className="space-y-3 md:space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold font-charly tracking-tight">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
+      <div className="w-full max-w-sm space-y-4 text-center">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold font-charly tracking-tight">
             Charly
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             jouw persoonlijke verhuisconcierge
           </p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6 shadow-lg">
-          <div className="space-y-2">
-            <h2 className="text-xl md:text-2xl font-semibold">
+        <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold">
               {isSignUp ? "Account aanmaken" : "Welkom terug"}
             </h2>
-            <p className="text-sm md:text-base text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {isSignUp
                 ? "Maak een account om te beginnen"
-                : "Log in om verder te gaan met je verhuisplanning"}
+                : "Log in om verder te gaan"}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2 text-left">
-              <Label htmlFor="email" className="text-base">Email</Label>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="space-y-1.5 text-left">
+              <Label htmlFor="email" className="text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -128,12 +128,12 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-                className="h-12 text-base"
+                className="h-10 text-sm"
               />
             </div>
 
-            <div className="space-y-2 text-left">
-              <Label htmlFor="password" className="text-base">Wachtwoord</Label>
+            <div className="space-y-1.5 text-left">
+              <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
               <Input
                 id="password"
                 type="password"
@@ -141,20 +141,20 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
-                className="h-12 text-base"
+                className="h-10 text-sm"
               />
             </div>
 
-            <Button type="submit" disabled={loading} size="lg" className="w-full min-h-[52px] text-base">
+            <Button type="submit" disabled={loading} className="w-full h-10 text-sm">
               {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
             </Button>
           </form>
 
-          <div className="text-center pt-2">
+          <div className="text-center">
             <button
               type="button"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-base text-muted-foreground hover:text-foreground transition-colors min-h-[44px] px-4"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               disabled={loading}
             >
               {isSignUp
