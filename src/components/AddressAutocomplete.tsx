@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { MapPin, Loader2, Navigation } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { MapPin, Loader2 } from "lucide-react";
 
 type AddressSuggestion = {
   id: string;
@@ -11,6 +10,7 @@ type AddressSuggestion = {
   huisnummer?: string;
   postcode?: string;
   woonplaatsnaam?: string;
+  centroide_ll?: string; // Format: "POINT(lon lat)"
 };
 
 type AddressAutocompleteProps = {
@@ -26,7 +26,6 @@ export const AddressAutocomplete = ({
   onChange,
   placeholder = "Begin met typen...",
 }: AddressAutocompleteProps) => {
-  const { toast } = useToast();
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,22 +47,35 @@ export const AddressAutocomplete = ({
             lat: position.coords.latitude,
             lon: position.coords.longitude,
           });
-          toast({
-            title: "Locatie geactiveerd",
-            description: "Adressen worden gesorteerd op afstand van jouw locatie.",
-          });
         },
         (error) => {
           console.log("Locatie toegang geweigerd:", error);
-          toast({
-            title: "Locatie uitgeschakeld",
-            description: "Je kunt nog steeds zoeken, maar zonder locatiesortering.",
-            variant: "destructive",
-          });
         }
       );
     }
-  }, [locationRequested, toast]);
+  }, [locationRequested]);
+
+  // Calculate distance between two points using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Parse POINT string to lat/lon
+  const parsePoint = (pointStr: string): { lat: number; lon: number } | null => {
+    const match = pointStr.match(/POINT\(([^\s]+)\s+([^\)]+)\)/);
+    if (match) {
+      return { lon: parseFloat(match[1]), lat: parseFloat(match[2]) };
+    }
+    return null;
+  };
 
   useEffect(() => {
     setQuery(value);
@@ -96,21 +108,38 @@ export const AddressAutocomplete = ({
 
       setIsLoading(true);
       try {
-        // Build API URL with optional location parameters
-        let apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
+        const apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
           query
         )}&fq=type:adres&rows=10`;
-        
-        // Add location parameters if available for distance-based sorting
-        if (userLocation) {
-          apiUrl += `&lat=${userLocation.lat}&lon=${userLocation.lon}`;
-        }
 
         const response = await fetch(apiUrl);
         const data = await response.json();
 
         if (data.response?.docs) {
-          setSuggestions(data.response.docs);
+          let results = data.response.docs;
+          
+          // Sort by distance if user location is available
+          if (userLocation) {
+            results = results
+              .map((doc: AddressSuggestion) => {
+                if (doc.centroide_ll) {
+                  const point = parsePoint(doc.centroide_ll);
+                  if (point) {
+                    const distance = calculateDistance(
+                      userLocation.lat,
+                      userLocation.lon,
+                      point.lat,
+                      point.lon
+                    );
+                    return { ...doc, distance };
+                  }
+                }
+                return { ...doc, distance: Infinity };
+              })
+              .sort((a: any, b: any) => a.distance - b.distance);
+          }
+          
+          setSuggestions(results);
           setShowSuggestions(true);
         }
       } catch (error) {
@@ -141,15 +170,7 @@ export const AddressAutocomplete = ({
 
   return (
     <div ref={wrapperRef} className="relative">
-      <label className="block text-sm font-medium mb-2 flex items-center gap-2">
-        {label}
-        {userLocation && (
-          <span className="inline-flex items-center gap-1 text-xs text-primary">
-            <Navigation className="w-3 h-3" />
-            Locatie actief
-          </span>
-        )}
-      </label>
+      <label className="block text-sm font-medium mb-2">{label}</label>
       <div className="relative">
         <Input
           value={query}
