@@ -108,8 +108,10 @@ export const AddressAutocomplete = ({
 
       setIsLoading(true);
       try {
+        // Add wildcard to query for better partial matching
+        const searchQuery = query.trim() + '*';
         const apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
-          query
+          searchQuery
         )}&fq=type:adres&rows=10`;
 
         const response = await fetch(apiUrl);
