@@ -96,7 +96,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card 
-        className={`w-full max-w-lg p-6 md:p-8 shadow-lg ${step <= 2 ? 'cursor-pointer' : ''}`}
+        className={`w-full max-w-lg shadow-lg ${step <= 2 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
         onClick={step <= 2 ? handleNext : undefined}
       >
         {step > 2 && step < 8 && (
@@ -119,16 +119,16 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
         <div className="space-y-6">
           {step === 1 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-12">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
                 Wat leuk dat je gaat verhuizen!
               </h2>
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-12">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-primary leading-tight">
                 Ik ben Charly, jouw persoonlijke verhuisconcierge
               </h2>
             </div>
