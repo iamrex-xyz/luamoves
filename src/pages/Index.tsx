@@ -25,7 +25,7 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<
     "onboarding" | "auth" | "additionalInfo" | "dashboard" | "tasks" | "timeline" | "settings"
-  >("auth");
+  >("onboarding");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -50,7 +50,7 @@ const Index = () => {
         });
         setCurrentView("dashboard");
       } else {
-        setCurrentView("onboarding");
+        setCurrentView("additionalInfo");
       }
       setLoading(false);
     };
@@ -66,7 +66,7 @@ const Index = () => {
             loadUserProfile(session.user.id);
           }, 0);
         } else {
-          setCurrentView("auth");
+          setCurrentView("onboarding");
           setMovingInfo(null);
           setLoading(false);
         }
@@ -80,7 +80,7 @@ const Index = () => {
       if (session?.user) {
         loadUserProfile(session.user.id);
       } else {
-        setCurrentView("auth");
+        setCurrentView("onboarding");
         setLoading(false);
       }
     });
@@ -88,14 +88,73 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleOnboardingComplete = (info: MovingInfo) => {
+  const handleOnboardingComplete = async (info: MovingInfo, email: string, password: string) => {
     setMovingInfo(info);
+    
+    // Create account
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        setUser(data.user);
+        setCurrentView("additionalInfo");
+        toast({
+          title: "Account aangemaakt!",
+          description: "Welkom bij Charly.",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Fout bij aanmaken account",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLoginRedirect = () => {
     setCurrentView("auth");
   };
 
   const handleAuthComplete = (authenticatedUser: User) => {
     setUser(authenticatedUser);
-    setCurrentView("additionalInfo");
+    
+    // Check if user already has moving info
+    setTimeout(() => {
+      loadUserData(authenticatedUser.id);
+    }, 0);
+  };
+
+  const loadUserData = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (profile && profile.moving_date) {
+      setMovingInfo({
+        oldAddress: profile.old_address || '',
+        newAddress: profile.new_address || '',
+        movingDate: profile.moving_date,
+        keyHandoverDate: profile.key_handover_date || undefined,
+        type: (profile.moving_type as "buy" | "rent") || "rent",
+        renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
+        needsContractorHelp: profile.needs_contractor_help || false,
+      });
+      setCurrentView("dashboard");
+    } else {
+      setCurrentView("additionalInfo");
+    }
   };
 
   const handleAdditionalInfoComplete = async (adults: number, children: number, pets: number, phone: string) => {
@@ -158,7 +217,7 @@ const Index = () => {
   }
 
   if (currentView === "onboarding") {
-    return <Onboarding onComplete={handleOnboardingComplete} />;
+    return <Onboarding onComplete={handleOnboardingComplete} onLogin={handleLoginRedirect} />;
   }
 
   if (currentView === "auth") {

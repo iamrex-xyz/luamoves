@@ -2,19 +2,23 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Home, Calendar, Key, Building2, LogOut, Users } from "lucide-react";
+import { Home, Calendar, Key, Building2, Loader2 } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type OnboardingProps = {
-  onComplete: (info: MovingInfo) => void;
+  onComplete: (info: MovingInfo, email: string, password: string) => void;
+  onLogin: () => void;
 };
 
-export const Onboarding = ({ onComplete }: OnboardingProps) => {
+export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const { toast } = useToast();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [formData, setFormData] = useState<MovingInfo>({
     oldAddress: "",
     newAddress: "",
@@ -26,47 +30,64 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   });
 
   const getTotalSteps = () => {
-    return 7; // Fixed 7 steps for consistency
+    return 11; // Welcome, intro, addresses, type, dates, loading, success, account
   };
 
   const totalSteps = getTotalSteps();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Uitgelogd",
-      description: "Je bent succesvol uitgelogd.",
-    });
-  };
-
-  const handleNext = () => {
-    if (step < totalSteps) {
+  const handleNext = async () => {
+    if (step === 8) {
+      // Loading step - simulate processing
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+        setStep(9);
+      }, 2000);
+    } else if (step === 11) {
+      // Account creation
+      if (email && password) {
+        onComplete(formData, email, password);
+      }
+    } else if (step < totalSteps) {
       setStep(step + 1);
-    } else {
-      onComplete(formData);
     }
   };
 
   const handleBack = () => {
-    if (step > 1) setStep(step - 1);
+    if (step > 3 && step < 8) setStep(step - 1); // Only allow back on question steps
+  };
+
+  const handleSkipDate = () => {
+    if (step === 6) {
+      setFormData({ ...formData, movingDate: "" });
+      setStep(7);
+    } else if (step === 7) {
+      setFormData({ ...formData, keyHandoverDate: "" });
+      setStep(8);
+    }
   };
 
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return formData.oldAddress.length > 0;
       case 2:
-        return formData.newAddress.length > 0;
+        return true; // Welcome screens
       case 3:
-        return formData.movingDate.length > 0;
+        return formData.newAddress.length > 0;
       case 4:
-        return true; // property type
+        return formData.oldAddress.length > 0;
       case 5:
-        return true; // key handover - optional
+        return true; // property type
       case 6:
-        return true; // renovation question
+        return formData.movingDate.length > 0;
       case 7:
-        return true; // contractor help
+        return formData.keyHandoverDate.length > 0;
+      case 8:
+      case 9:
+      case 10:
+        return true;
+      case 11:
+        return email.length > 0 && password.length >= 6;
       default:
         return false;
     }
@@ -75,60 +96,58 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card className="w-full max-w-lg p-6 md:p-8 shadow-lg">
-        <div className="mb-6 md:mb-8 text-center relative">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleLogout}
-            className="absolute right-0 top-0 h-10 w-10"
-            title="Uitloggen"
-          >
-            <LogOut className="w-5 h-5" />
-          </Button>
-          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
-            <Home className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+        {step <= 2 && (
+          <div className="mb-6 md:mb-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 mb-4">
+              <Home className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-charly">Charly</h1>
+            <p className="text-base md:text-lg text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 font-charly">Charly</h1>
-          <p className="text-base md:text-lg text-muted-foreground">jouw persoonlijke verhuisconcierge</p>
-        </div>
+        )}
 
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((num) => (
-              <div
-                key={num}
-                className={`flex-1 h-2 mx-1 rounded-full transition-all ${
-                  num <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
+        {step > 2 && step < 8 && (
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              {Array.from({ length: 5 }, (_, i) => i + 1).map((num) => (
+                <div
+                  key={num}
+                  className={`flex-1 h-2 mx-1 rounded-full transition-all ${
+                    num <= (step - 2) ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground text-center">
+              Vraag {step - 2} van 5
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground text-center">
-            Stap {step} van {totalSteps}
-          </p>
-        </div>
+        )}
 
         <div className="space-y-6">
           {step === 1 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Home className="w-5 h-5 text-primary" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Huidig adres</h2>
-              </div>
-              <AddressAutocomplete
-                label=""
-                placeholder="Bijv. Kerkstraat 12, Amsterdam"
-                value={formData.oldAddress}
-                onChange={(address) =>
-                  setFormData({ ...formData, oldAddress: address })
-                }
-              />
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                Wat leuk dat je gaat verhuizen!
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Laten we samen zorgen dat alles soepel verloopt.
+              </p>
             </div>
           )}
 
           {step === 2 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                Ik ben Charly, jouw persoonlijke verhuisconcierge.
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Ik zorg dat alles soepel verloopt.
+              </p>
+            </div>
+          )}
+
+          {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-accent/10">
@@ -149,27 +168,37 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-info/10">
-                  <Calendar className="w-5 h-5 text-info" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Verhuisdatum</h2>
-              </div>
-              <div className="relative">
-                <Input
-                  type="date"
-                  value={formData.movingDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, movingDate: e.target.value })
-                  }
-                  className="text-base text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit]:w-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-                />
-                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
-              </div>
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Wat is je nieuwe adres?
+              </h2>
+              <AddressAutocomplete
+                label=""
+                placeholder="Begin met typen..."
+                value={formData.newAddress}
+                onChange={(address) =>
+                  setFormData({ ...formData, newAddress: address })
+                }
+              />
             </div>
           )}
 
           {step === 4 && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Wat is je huidige adres?
+              </h2>
+              <AddressAutocomplete
+                label=""
+                placeholder="Begin met typen..."
+                value={formData.oldAddress}
+                onChange={(address) =>
+                  setFormData({ ...formData, oldAddress: address })
+                }
+              />
+            </div>
+          )}
+
+          {step === 5 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-2 rounded-lg bg-warning/10">
@@ -206,141 +235,226 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
           {step === 5 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-accent/10">
-                  <Key className="w-5 h-5 text-accent" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">
-                  {formData.type === "rent" ? "Sleuteloverdracht" : "Overdracht"}
-                </h2>
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Ga je huren of kopen?
+              </h2>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setFormData({ ...formData, type: "rent" })}
+                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
+                    formData.type === "rent"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <Key className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
+                  <p className="font-semibold text-base">Huren</p>
+                </button>
+                <button
+                  onClick={() => setFormData({ ...formData, type: "buy" })}
+                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
+                    formData.type === "buy"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <Building2 className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
+                  <p className="font-semibold text-base">Kopen</p>
+                </button>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                {formData.type === "rent" 
-                  ? "Wanneer krijg je de sleutels van je nieuwe woning? (meestal voor de verhuisdatum)"
-                  : "Wanneer krijg je de sleutels van je gekochte woning? (meestal op de dag van overdracht)"
-                }
-              </p>
-              <Input
-                type="date"
-                value={formData.keyHandoverDate}
-                max={formData.movingDate}
-                onChange={(e) =>
-                  setFormData({ ...formData, keyHandoverDate: e.target.value })
-                }
-                className="text-base"
-              />
             </div>
           )}
 
           {step === 6 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-warning/10">
-                  <Building2 className="w-5 h-5 text-warning" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Ga je verbouwen?</h2>
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Wanneer ga je verhuizen?
+              </h2>
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={formData.movingDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, movingDate: e.target.value })
+                  }
+                  min={new Date().toISOString().split('T')[0]}
+                  className="text-base text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit]:w-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
               </div>
-              <div className="space-y-3">
-                <button
-                  onClick={() => setFormData({ ...formData, renovationType: "none" })}
-                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                    formData.renovationType === "none"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <p className="font-semibold">Nee</p>
-                  <p className="text-sm text-muted-foreground">Geen verbouwing gepland</p>
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, renovationType: "small" })}
-                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                    formData.renovationType === "small"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <p className="font-semibold">Ja, kleine klussen</p>
-                  <p className="text-sm text-muted-foreground">Schilderen, behangen, kleine reparaties</p>
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, renovationType: "large" })}
-                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                    formData.renovationType === "large"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <p className="font-semibold">Ja, grote verbouwing</p>
-                  <p className="text-sm text-muted-foreground">Keuken, badkamer, aanbouw, etc.</p>
-                </button>
-              </div>
+              <Button
+                variant="ghost"
+                onClick={handleSkipDate}
+                className="w-full"
+              >
+                Ik heb nog geen datum
+              </Button>
             </div>
           )}
 
           {step === 7 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-info/10">
-                  <Users className="w-5 h-5 text-info" />
-                </div>
-                <h2 className="text-lg md:text-xl font-semibold">Hulp nodig?</h2>
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Wanneer krijg je de sleutels?
+              </h2>
+              <div className="relative">
+                <Input
+                  type="date"
+                  value={formData.keyHandoverDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, keyHandoverDate: e.target.value })
+                  }
+                  min={new Date().toISOString().split('T')[0]}
+                  max={formData.movingDate}
+                  className="text-base text-center [&::-webkit-datetime-edit]:text-center [&::-webkit-datetime-edit]:w-full [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
-                Wil je dat Charly je helpt met het vinden van een gepaste aannemer?
+              <Button
+                variant="ghost"
+                onClick={handleSkipDate}
+                className="w-full"
+              >
+                Ik heb nog geen datum
+              </Button>
+            </div>
+          )}
+
+          {step === 8 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center py-8">
+              <Loader2 className="w-16 h-16 mx-auto text-primary animate-spin" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-semibold mb-2">
+                  Een momentje...
+                </h2>
+                <p className="text-muted-foreground">
+                  Charly maakt een persoonlijk verhuisplan voor je aan
+                </p>
+              </div>
+            </div>
+          )}
+
+          {step === 9 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-4">
+                <Home className="w-10 h-10 text-success" />
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                Gelukt!
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                Je verhuisplan staat klaar. Laten we aan de slag gaan!
               </p>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setFormData({ ...formData, needsContractorHelp: true })}
-                  className={`p-6 rounded-lg border-2 transition-all ${
-                    formData.needsContractorHelp
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <p className="font-semibold text-sm">Ja graag</p>
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, needsContractorHelp: false })}
-                  className={`p-6 rounded-lg border-2 transition-all ${
-                    !formData.needsContractorHelp
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <p className="font-semibold text-sm">Nee dankje</p>
-                </button>
+            </div>
+          )}
+
+          {step === 10 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
+              <h2 className="text-xl md:text-2xl font-semibold">
+                Wil je je voortgang opslaan?
+              </h2>
+              <p className="text-muted-foreground">
+                Maak een account aan om je verhuisplan te bewaren en toegang te krijgen tot alle functies.
+              </p>
+            </div>
+          )}
+
+          {step === 11 && (
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
+                Maak je account aan
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Email</label>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="jouw@email.nl"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Wachtwoord</label>
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimaal 6 karakters"
+                  />
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex gap-3 mt-8 justify-end">
-          {step > 1 && (
+        {step <= 2 && (
+          <div className="mt-8 text-center">
             <Button
-              variant="outline"
-              onClick={handleBack}
+              variant="ghost"
+              onClick={onLogin}
+              size="sm"
+            >
+              Ik heb al een account
+            </Button>
+          </div>
+        )}
+
+        {step > 2 && step < 8 && (
+          <div className="flex gap-3 mt-8 justify-end">
+            {step > 3 && (
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                size="lg"
+                className="flex-1 min-h-[48px] text-sm"
+              >
+                Terug
+              </Button>
+            )}
+            <Button
+              onClick={handleNext}
+              disabled={!isStepValid()}
               size="lg"
               className="flex-1 min-h-[48px] text-sm"
             >
-              Terug
+              Volgende
             </Button>
-          )}
-          <Button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            size="lg"
-            className={`min-h-[48px] text-sm ${
-              step === 1 
-                ? 'w-full max-w-[200px] mx-auto' 
-                : step === totalSteps 
-                  ? 'w-[calc(50%-0.375rem)]' 
-                  : 'flex-1'
-            }`}
-          >
-            {step === totalSteps ? "Start verhuizing" : "Volgende"}
-          </Button>
-        </div>
+          </div>
+        )}
+
+        {(step === 1 || step === 2 || step === 9 || step === 10) && (
+          <div className="mt-8">
+            <Button
+              onClick={handleNext}
+              size="lg"
+              className="w-full min-h-[48px]"
+            >
+              {step === 9 ? "Doorgaan" : step === 10 ? "Account aanmaken" : "Beginnen"}
+            </Button>
+          </div>
+        )}
+
+        {step === 11 && (
+          <div className="mt-8">
+            <Button
+              onClick={handleNext}
+              disabled={!isStepValid()}
+              size="lg"
+              className="w-full min-h-[48px]"
+            >
+              Account aanmaken
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={onLogin}
+              size="sm"
+              className="w-full mt-2"
+            >
+              Ik heb al een account
+            </Button>
+          </div>
+        )}
       </Card>
     </div>
   );
