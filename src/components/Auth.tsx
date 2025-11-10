@@ -259,14 +259,11 @@ export const Auth = ({ onComplete }: AuthProps) => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
         <div className="w-full max-w-sm space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold font-charly tracking-tight">
-              Charly
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              jouw persoonlijke verhuisconcierge
-            </p>
-          </div>
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold font-charly tracking-tight">
+            Charly
+          </h1>
+        </div>
 
           <div className="space-y-4">
             <div className="space-y-1">
