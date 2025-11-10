@@ -161,11 +161,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
                 onChange={(e) =>
                   setFormData({ ...formData, movingDate: e.target.value })
                 }
-                className="text-base text-center [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3"
-                style={{ 
-                  direction: 'ltr',
-                  textAlign: 'center'
-                }}
+                className="text-base text-center pr-10 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-2 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
             </div>
           )}
