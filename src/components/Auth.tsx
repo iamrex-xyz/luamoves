@@ -13,6 +13,7 @@ interface AuthProps {
 export const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
@@ -30,6 +31,45 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
     return () => subscription.unsubscribe();
   }, [onComplete]);
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      toast({
+        title: "Email vereist",
+        description: "Vul je email in om je wachtwoord te resetten",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/`,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Email verstuurd!",
+        description: "Check je inbox voor de reset link",
+      });
+      
+      setIsPasswordReset(false);
+      setEmail("");
+    } catch (error: any) {
+      toast({
+        title: "Reset mislukt",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,59 +149,115 @@ export const Auth = ({ onComplete }: AuthProps) => {
         <div className="bg-card border border-border rounded-2xl p-5 space-y-4 shadow-lg">
           <div className="space-y-1">
             <h2 className="text-lg font-semibold">
-              {isSignUp ? "Account aanmaken" : "Welkom terug"}
+              {isPasswordReset ? "Wachtwoord vergeten" : isSignUp ? "Account aanmaken" : "Welkom terug"}
             </h2>
             <p className="text-xs text-muted-foreground">
-              {isSignUp
+              {isPasswordReset
+                ? "Vul je email in om een reset link te ontvangen"
+                : isSignUp
                 ? "Maak een account om te beginnen"
                 : "Log in om verder te gaan"}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div className="space-y-1.5 text-left">
-              <Label htmlFor="email" className="text-sm">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="jouw@email.nl"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+          {isPasswordReset ? (
+            <form onSubmit={handlePasswordReset} className="space-y-3">
+              <div className="space-y-1.5 text-left">
+                <Label htmlFor="email" className="text-sm">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jouw@email.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  className="h-10 text-sm"
+                />
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
+                {loading ? "Verzenden..." : "Verstuur reset link"}
+              </Button>
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPasswordReset(false);
+                    setEmail("");
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+                  disabled={loading}
+                >
+                  Terug naar login
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="space-y-1.5 text-left">
+                <Label htmlFor="email" className="text-sm">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jouw@email.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  className="h-10 text-sm"
+                />
+              </div>
+
+              <div className="space-y-1.5 text-left">
+                <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="h-10 text-sm"
+                />
+              </div>
+
+              {!isSignUp && (
+                <div className="text-right">
+                  <button
+                    type="button"
+                    onClick={() => setIsPasswordReset(true)}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={loading}
+                  >
+                    Wachtwoord vergeten?
+                  </button>
+                </div>
+              )}
+
+              <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
+                {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
+              </Button>
+            </form>
+          )}
+
+          {!isPasswordReset && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setEmail("");
+                  setPassword("");
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
                 disabled={loading}
-                className="h-10 text-sm"
-              />
+              >
+                {isSignUp
+                  ? "Heb je al een account? Log in"
+                  : "Nog geen account? Registreer je"}
+              </button>
             </div>
-
-            <div className="space-y-1.5 text-left">
-              <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                className="h-10 text-sm"
-              />
-            </div>
-
-            <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
-              {loading ? "Laden..." : isSignUp ? "Account aanmaken" : "Inloggen"}
-            </Button>
-          </form>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-              disabled={loading}
-            >
-              {isSignUp
-                ? "Heb je al een account? Log in"
-                : "Nog geen account? Registreer je"}
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
