@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
+import { Eye, EyeOff } from "lucide-react";
 
 interface AuthProps {
   onComplete: (user: User) => void;
@@ -17,6 +18,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -268,9 +270,9 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
           <div className="space-y-4">
             <div className="space-y-1">
-              <h2 className="text-lg font-semibold">Welkom terug</h2>
+              <h2 className="text-lg font-semibold">Welkom terug!</h2>
               <p className="text-xs text-muted-foreground">
-                Log in om verder te gaan
+                Charly staat weer voor je klaar
               </p>
             </div>
 
@@ -290,15 +292,25 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
               <div className="space-y-1.5 text-left">
                 <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  className="h-10 text-sm"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    className="h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    disabled={loading}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
@@ -370,15 +382,25 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
             <div className="space-y-1.5 text-left">
               <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                className="h-10 text-sm"
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  className="h-10 text-sm pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={loading}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
             <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
