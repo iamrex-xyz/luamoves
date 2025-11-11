@@ -47,10 +47,36 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
     ? new Date(movingInfo.keyHandoverDate) 
     : new Date(movingDate.getTime() - 7 * 24 * 60 * 60 * 1000);
   
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
   const addDays = (date: Date, days: number) => {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
+  };
+  
+  // Smart deadline adjuster: geeft verlopen taken een realistische nieuwe deadline
+  const adjustDeadline = (originalDeadline: Date, urgencyLevel: 'urgent' | 'normal' | 'later') => {
+    // Als de deadline in de toekomst ligt, gebruik die gewoon
+    if (originalDeadline >= today) {
+      return originalDeadline;
+    }
+    
+    // Als de deadline al voorbij is, pas aan op basis van urgentie
+    switch (urgencyLevel) {
+      case 'urgent':
+        // Zeer dringende taken: binnen 2 dagen
+        return addDays(today, 2);
+      case 'normal':
+        // Normale taken: binnen 5 dagen
+        return addDays(today, 5);
+      case 'later':
+        // Minder urgente taken: binnen 7 dagen
+        return addDays(today, 7);
+      default:
+        return addDays(today, 3);
+    }
   };
 
   const tasks: Task[] = [];
@@ -62,8 +88,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Bevestig nieuwe huurwoning (contract tekenen, borg betalen)",
       category: "Administratie",
       description: "Teken het huurcontract en betaal de borg voor je nieuwe woning.",
-      deadline: addDays(movingDate, -45),
-      deadlineLabel: "6 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -45), 'urgent'),
+      deadlineLabel: "Zo snel mogelijk",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
@@ -74,8 +100,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Controleer huidige huurcontract en opzegtermijn",
       category: "Administratie",
       description: "Check je huidige huurcontract voor de juiste opzegtermijn.",
-      deadline: addDays(movingDate, -60),
-      deadlineLabel: "8 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -60), 'urgent'),
+      deadlineLabel: "Zo snel mogelijk",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
@@ -86,8 +112,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Bepaal verhuisbudget",
       category: "Financieel",
       description: "Maak een overzicht van alle verhuiskosten.",
-      deadline: addDays(movingDate, -45),
-      deadlineLabel: "6 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -45), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
@@ -98,8 +124,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Inventariseer spullen: wat neem je mee, verkoop of geef weg",
       category: "Huishouden",
       description: "Maak een lijst van wat je meeneemt, verkoopt of weggeeft.",
-      deadline: addDays(movingDate, -40),
-      deadlineLabel: "6 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -40), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Package className="w-4 h-4" />,
@@ -110,8 +136,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Selecteer wat je wilt weggeven (aan goede doelen)",
       category: "Huishouden",
       description: "Selecteer items om weg te geven aan goede doelen.",
-      deadline: addDays(movingDate, -35),
-      deadlineLabel: "5 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -35), 'later'),
+      deadlineLabel: "Volgende week",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Package className="w-4 h-4" />,
@@ -122,8 +148,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Regel verhuisbedrijf",
       category: "Verhuizing",
       description: "Boek een verhuisbedrijf of organiseer helpers.",
-      deadline: addDays(movingDate, -30),
-      deadlineLabel: "4 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -30), 'urgent'),
+      deadlineLabel: "Zo snel mogelijk",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
@@ -135,8 +161,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Bestel verhuisdozen en verpakkingsmateriaal",
       category: "Verhuizing",
       description: "Bestel voldoende dozen, tape, bubbelfolie en markers.",
-      deadline: addDays(movingDate, -28),
-      deadlineLabel: "4 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -28), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Package className="w-4 h-4" />,
@@ -148,8 +174,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Controleer meubels/apparatuur op bruikbaarheid/ verkoop of donatie",
       category: "Huishouden",
       description: "Check welke meubels en apparaten mee kunnen naar de nieuwe woning.",
-      deadline: addDays(movingDate, -30),
-      deadlineLabel: "4 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -30), 'later'),
+      deadlineLabel: "Volgende week",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Home className="w-4 h-4" />,
@@ -160,8 +186,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Controleer huurders- en inboedelverzekering; pas eventueel aan",
       category: "Financieel",
       description: "Update je verzekeringen met het nieuwe adres.",
-      deadline: addDays(movingDate, -30),
-      deadlineLabel: "4 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -30), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 1 – Na akkoord nieuwe huurwoning",
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
@@ -177,8 +203,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Zeg huidige huur schriftelijk op",
       category: "Administratie",
       description: "Stuur een opzegtermijn brief naar je huidige verhuurder.",
-      deadline: addDays(movingDate, -60),
-      deadlineLabel: "8 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -60), 'urgent'),
+      deadlineLabel: "Zo snel mogelijk",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
@@ -189,8 +215,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Plan sleuteloverdracht en eindinspectie oude woning",
       category: "Administratie",
       description: "Maak een afspraak met je verhuurder voor de eindopname.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'urgent'),
+      deadlineLabel: "Spoedig regelen",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Key className="w-4 h-4" />,
@@ -201,8 +227,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld verhuizing bij gemeente",
       category: "Administratie",
       description: "Geef je nieuwe adres door aan de gemeente.",
-      deadline: addDays(movingDate, -7),
-      deadlineLabel: "1 week voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -7), 'urgent'),
+      deadlineLabel: "Voor verhuizing",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <MapPin className="w-4 h-4" />,
@@ -213,8 +239,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Vraag PostNL doorstuurservice aan",
       category: "Administratie",
       description: "Activeer postdoorsturen naar je nieuwe adres.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Mail className="w-4 h-4" />,
@@ -226,8 +252,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld adreswijziging bij belastingdienst",
       category: "Administratie",
       description: "Update je adres bij de belastingdienst.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
@@ -238,8 +264,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld adreswijziging bij bank(en)",
       category: "Administratie",
       description: "Update je adres bij al je bankrekeningen.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
@@ -250,8 +276,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld adreswijziging bij zorgverzekering",
       category: "Administratie",
       description: "Update je adres bij je zorgverzekeraar.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
@@ -262,8 +288,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld adreswijziging bij overige verzekeringen",
       category: "Administratie",
       description: "Update adres bij auto-, reis- en aansprakelijkheidsverzekeringen.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
@@ -274,8 +300,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Meld adreswijziging bij telefoon- en internetprovider",
       category: "Nutsvoorzieningen",
       description: "Regel overzetten van internet en telefoon naar nieuwe adres.",
-      deadline: addDays(movingDate, -21),
-      deadlineLabel: "3 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -21), 'urgent'),
+      deadlineLabel: "Spoedig regelen",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Wifi className="w-4 h-4" />,
@@ -287,8 +313,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Informeer abonnementen en lidmaatschappen",
       category: "Administratie",
       description: "Update adres bij streamingdiensten, vakbladen, etc.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'later'),
+      deadlineLabel: "Volgende week",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <ClipboardCheck className="w-4 h-4" />,
@@ -299,8 +325,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Informeer sportclubs/ sportabonnementen",
       category: "Sociaal",
       description: "Meld je nieuwe adres bij je sportschool of vereniging.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'later'),
+      deadlineLabel: "Volgende week",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <Users className="w-4 h-4" />,
@@ -311,8 +337,8 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       title: "Informeer huisarts, tandarts, apotheek",
       category: "Administratie",
       description: "Meld adreswijziging bij medische instanties.",
-      deadline: addDays(movingDate, -14),
-      deadlineLabel: "2 weken voor verhuizing",
+      deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
+      deadlineLabel: "Binnenkort",
       phase: "Fase 2 – Voor sleuteloverdracht",
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
