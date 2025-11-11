@@ -23,55 +23,83 @@ type TimelineEvent = {
 export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) => {
   const movingDate = new Date(movingInfo.movingDate);
 
-  // Mock timeline data
+  const keyHandoverDate = movingInfo.keyHandoverDate 
+    ? new Date(movingInfo.keyHandoverDate) 
+    : new Date(movingDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const getPhaseStatus = (phaseDate: Date): "completed" | "upcoming" | "overdue" => {
+    if (phaseDate < today) return "completed";
+    return "upcoming";
+  };
+
+  // Timeline data met de 8 fases
   const events: TimelineEvent[] = [
     {
       id: "1",
-      title: "4 weken voor verhuizing",
-      date: new Date(movingDate.getTime() - 28 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
-      category: "Voorbereiding",
-      status: "completed",
-      tasks: ["Verhuisbedrijf boeken", "Energiecontract vergelijken"],
+      title: "Fase 1 - Je nieuwe thuis is bevestigd",
+      date: new Date(movingDate.getTime() - 45 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
+      category: "Planning",
+      status: getPhaseStatus(new Date(movingDate.getTime() - 45 * 24 * 60 * 60 * 1000)),
+      tasks: ["Huurcontract tekenen", "Opzegtermijn checken", "Verhuisbudget bepalen"],
     },
     {
       id: "2",
-      title: "3 weken voor verhuizing",
-      date: new Date(movingDate.getTime() - 21 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
+      title: "Fase 2 - De voorbereidingen beginnen",
+      date: new Date(movingDate.getTime() - 35 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
       category: "Administratie",
-      status: "upcoming",
-      tasks: ["Internetprovider regelen", "Verzekeringen aanpassen"],
+      status: getPhaseStatus(new Date(movingDate.getTime() - 35 * 24 * 60 * 60 * 1000)),
+      tasks: ["Huidige huur opzeggen", "Gemeente informeren", "Adreswijzigingen doorgeven"],
     },
     {
       id: "3",
-      title: "2 weken voor verhuizing",
-      date: new Date(movingDate.getTime() - 14 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
-      category: "Diensten",
-      status: "upcoming",
-      tasks: ["Energiecontract afsluiten", "Post doorsturen regelen"],
+      title: "Fase 3 - Sleutels in handen",
+      date: keyHandoverDate.toLocaleDateString("nl-NL"),
+      category: "Inspectie",
+      status: getPhaseStatus(keyHandoverDate),
+      tasks: ["Woning inspecteren", "Ruimtes opmeten", "Verbouwplannen maken"],
     },
     {
       id: "4",
-      title: "1 week voor verhuizing",
-      date: new Date(movingDate.getTime() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
-      category: "Laatste voorbereidingen",
-      status: "upcoming",
-      tasks: ["Spullen inpakken", "Schoonmaak regelen"],
+      title: "Fase 4 - De laatste voorbereidingen",
+      date: new Date(movingDate.getTime() - 3 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
+      category: "Inpakken",
+      status: getPhaseStatus(new Date(movingDate.getTime() - 3 * 24 * 60 * 60 * 1000)),
+      tasks: ["Resterende spullen inpakken", "Schoonmaak oude woning", "Verhuizers bevestigen"],
     },
     {
       id: "5",
-      title: "Verhuisdag",
+      title: "Fase 5 - Afscheid van je oude plek",
       date: movingDate.toLocaleDateString("nl-NL"),
-      category: "De grote dag",
-      status: "upcoming",
-      tasks: ["Verhuizen!", "Eindcontrole oude woning"],
+      category: "Afronding",
+      status: getPhaseStatus(movingDate),
+      tasks: ["Sleutels inleveren", "Meterstanden noteren"],
     },
     {
       id: "6",
-      title: "5 dagen na verhuizing",
-      date: new Date(movingDate.getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
-      category: "Nazorg",
-      status: "upcoming",
-      tasks: ["Adreswijziging gemeente", "Sleutels inleveren"],
+      title: "Fase 6 - De verhuisdag zelf",
+      date: movingDate.toLocaleDateString("nl-NL"),
+      category: "Verhuizing",
+      status: getPhaseStatus(movingDate),
+      tasks: ["Transport naar nieuwe woning", "Belangrijke spullen apart houden", "Voorzieningen controleren"],
+    },
+    {
+      id: "7",
+      title: "Fase 7 - Aankomen in je nieuwe thuis",
+      date: new Date(movingDate.getTime() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
+      category: "Inrichten",
+      status: getPhaseStatus(new Date(movingDate.getTime() + 3 * 24 * 60 * 60 * 1000)),
+      tasks: ["Basismeubels neerzetten", "Dozen uitpakken", "Veiligheidsvoorzieningen checken"],
+    },
+    {
+      id: "8",
+      title: "Fase 8 - Alles op orde",
+      date: new Date(movingDate.getTime() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString("nl-NL"),
+      category: "Afwerking",
+      status: getPhaseStatus(new Date(movingDate.getTime() + 14 * 24 * 60 * 60 * 1000)),
+      tasks: ["Woning definitief inrichten", "Gemeentelijke belastingen checken", "Nieuwe buren ontmoeten"],
     },
   ];
 
@@ -124,7 +152,7 @@ export const Timeline = ({ movingInfo, onNavigate, onLogout }: TimelineProps) =>
           </div>
           <h1 className="text-xl md:text-2xl font-bold mb-2">Tijdlijn</h1>
           <p className="text-sm md:text-base text-white/90">
-            Je verhuizing in 6 belangrijke momenten
+            Je verhuizing in 8 fases van begin tot eind
           </p>
         </div>
       </div>
