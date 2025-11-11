@@ -293,7 +293,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="gap-1.5 h-7 text-xs bg-primary/5 border-primary/20 text-primary hover:bg-primary/10 shrink-0"
+                              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDealTask(task);

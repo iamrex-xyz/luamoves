@@ -120,7 +120,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             <Button
               size="sm"
               variant="outline"
-              className="mt-2 gap-2 h-8"
+              className="mt-2 gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(task.affiliateLink, "_blank");
