@@ -31,7 +31,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   });
 
   const getTotalSteps = () => {
-    return 11; // Welcome, intro, addresses, type, dates, loading, success, account
+    return 10; // Welcome, intro, addresses, type, dates, loading, success, account (removed step 10)
   };
 
   const totalSteps = getTotalSteps();
@@ -58,7 +58,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
       const timer = setTimeout(() => {
         clearInterval(stepInterval);
-        setStep(9);
+        setStep(9); // Go directly to success screen (account creation prompt)
         setLoadingStep(0);
       }, 3000);
       
@@ -91,7 +91,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
       const timer = setTimeout(() => {
         clearInterval(stepInterval);
-        setStep(9);
+        setStep(9); // Go directly to success screen
         setLoadingStep(0);
       }, 3000);
       
@@ -99,7 +99,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         clearTimeout(timer);
         clearInterval(stepInterval);
       };
-    } else if (step === 11) {
+    } else if (step === 10) {
       // Account creation
       if (email && password) {
         onComplete(formData, email, password);
@@ -109,25 +109,15 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
     }
   };
 
-  // Auto-advance when address is filled in (step 3 and 4)
+  // Auto-advance only for type selection (not addresses - users need to be able to correct mistakes)
   useEffect(() => {
-    if (step === 3 && formData.newAddress.length > 0) {
-      const timer = setTimeout(() => {
-        setStep(4);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else if (step === 4 && formData.oldAddress.length > 0) {
-      const timer = setTimeout(() => {
-        setStep(5);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else if (step === 5 && formData.type) {
+    if (step === 5 && formData.type) {
       const timer = setTimeout(() => {
         setStep(6);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [step, formData.newAddress, formData.oldAddress, formData.type]);
+  }, [step, formData.type]);
 
   const handleBack = () => {
     if (step > 3 && step < 8) setStep(step - 1); // Only allow back on question steps
@@ -160,9 +150,8 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         return formData.keyHandoverDate.length > 0;
       case 8:
       case 9:
-      case 10:
         return true;
-      case 11:
+      case 10:
         return email.length > 0 && password.length >= 6;
       default:
         return false;
@@ -396,17 +385,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           )}
 
           {step === 10 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 text-center">
-              <h2 className="text-xl md:text-2xl font-semibold">
-                Wil je je voortgang opslaan?
-              </h2>
-              <p className="text-muted-foreground">
-                Maak een account aan om je verhuisplan te bewaren en toegang te krijgen tot alle functies.
-              </p>
-            </div>
-          )}
-
-          {step === 11 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
                 Maak je account aan
@@ -458,10 +436,10 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           </div>
         )}
 
-        {(step === 9 || step === 10) && (
+        {step === 9 && (
           <div className="mt-8">
             <Button
-              onClick={() => setStep(11)}
+              onClick={() => setStep(10)}
               size="lg"
               className="w-full min-h-[48px]"
             >
@@ -470,7 +448,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           </div>
         )}
 
-        {step === 11 && (
+        {step === 10 && (
           <div className="mt-8">
             <Button
               onClick={handleNext}

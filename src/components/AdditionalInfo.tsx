@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Plus, Minus, Users, Baby, PawPrint, LogOut, Heart, Home } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, Minus, Users, Baby, PawPrint, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
@@ -14,13 +14,22 @@ interface AdditionalInfoProps {
 }
 
 export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
+  const [countryCode, setCountryCode] = useState("+31");
   const [phone, setPhone] = useState("");
-  const [householdType, setHouseholdType] = useState<"partner" | "housemates">("partner");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [pets, setPets] = useState(0);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const countryCodes = [
+    { code: "+31", country: "Nederland", digits: 9 },
+    { code: "+32", country: "België", digits: 9 },
+    { code: "+49", country: "Duitsland", digits: 10 },
+    { code: "+33", country: "Frankrijk", digits: 9 },
+    { code: "+44", country: "Verenigd Koninkrijk", digits: 10 },
+    { code: "+1", country: "VS/Canada", digits: 10 },
+  ];
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -44,11 +53,20 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
         .single();
 
       if (profile) {
-        setHouseholdType((profile.household_type as "partner" | "housemates") || "partner");
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
         setPets(profile.pets || 0);
-        setPhone(profile.phone || "");
+        if (profile.phone) {
+          // Try to extract country code from phone number
+          const phoneStr = profile.phone;
+          const matchedCountry = countryCodes.find(c => phoneStr.startsWith(c.code));
+          if (matchedCountry) {
+            setCountryCode(matchedCountry.code);
+            setPhone(phoneStr.substring(matchedCountry.code.length).trim());
+          } else {
+            setPhone(phoneStr);
+          }
+        }
       }
       setLoading(false);
     };
@@ -60,8 +78,8 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
     setter(value + 1);
   };
 
-  const handleDecrement = (setter: (val: number) => void, value: number) => {
-    if (value > 0) {
+  const handleDecrement = (setter: (val: number) => void, value: number, minimum: number = 0) => {
+    if (value > minimum) {
       setter(value - 1);
     }
   };
@@ -76,7 +94,21 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
       return;
     }
 
-    onComplete(adults, children, pets, phone);
+    // Validate phone number length based on country code
+    const selectedCountry = countryCodes.find(c => c.code === countryCode);
+    const cleanPhone = phone.replace(/\s/g, '');
+    
+    if (selectedCountry && cleanPhone.length !== selectedCountry.digits) {
+      toast({
+        title: "Ongeldig telefoonnummer",
+        description: `Een ${selectedCountry.country} telefoonnummer moet ${selectedCountry.digits} cijfers hebben`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const fullPhone = `${countryCode} ${phone}`;
+    onComplete(adults, children, pets, fullPhone);
   };
 
   if (loading) {
@@ -115,35 +147,29 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
           {/* Phone */}
           <div className="space-y-2">
             <Label htmlFor="phone" className="text-base">Telefoonnummer</Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+31 6 12345678"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="h-12 text-base"
-            />
-          </div>
-
-          {/* Household Type */}
-          <div className="space-y-3">
-            <Label className="text-base">Type huishouden</Label>
-            <RadioGroup value={householdType} onValueChange={(value) => setHouseholdType(value as "partner" | "housemates")}>
-              <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-4">
-                <RadioGroupItem value="partner" id="partner" />
-                <Label htmlFor="partner" className="flex items-center gap-2 cursor-pointer flex-1">
-                  <Heart className="w-4 h-4 text-primary" />
-                  Partner
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-4">
-                <RadioGroupItem value="housemates" id="housemates" />
-                <Label htmlFor="housemates" className="flex items-center gap-2 cursor-pointer flex-1">
-                  <Home className="w-4 h-4 text-primary" />
-                  Huisgenoten
-                </Label>
-              </div>
-            </RadioGroup>
+            <div className="flex gap-2">
+              <Select value={countryCode} onValueChange={setCountryCode}>
+                <SelectTrigger className="h-12 w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryCodes.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.code} {country.country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder={countryCodes.find(c => c.code === countryCode)?.digits === 9 ? "612345678" : "1234567890"}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                className="h-12 text-base flex-1"
+                maxLength={countryCodes.find(c => c.code === countryCode)?.digits || 10}
+              />
+            </div>
           </div>
 
           {/* Adults */}
@@ -157,7 +183,7 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
                 type="button"
                 variant="outline"
                 size="icon"
-                onClick={() => handleDecrement(setAdults, adults)}
+                onClick={() => handleDecrement(setAdults, adults, 1)}
                 disabled={adults <= 1}
                 className="h-12 w-12 md:h-10 md:w-10"
               >
