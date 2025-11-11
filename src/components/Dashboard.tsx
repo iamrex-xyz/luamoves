@@ -59,22 +59,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
 
   const getStatusBadge = (task: Task) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const deadline = new Date(task.deadline);
-    deadline.setHours(0, 0, 0, 0);
-    const isOverdue = deadline < today;
-
     if (task.status === "done") {
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
     }
     if (task.status === "in_progress") {
       return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
     }
-    if (isOverdue) {
-      return <Badge variant="destructive" className="min-w-[75px] justify-center text-xs">Verlopen</Badge>;
-    }
-    return <Badge variant="outline" className="min-w-[75px] justify-center text-xs">Te doen</Badge>;
+    return null;
   };
 
   const TaskItem = ({ task }: { task: Task }) => {
@@ -99,14 +90,16 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           className="mt-1"
         />
         <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
-              {task.title}
-            </h4>
-            <div className="flex-shrink-0">
-              {getStatusBadge(task)}
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                {task.title}
+              </h4>
+              {getStatusBadge(task) && (
+                <div className="flex-shrink-0">
+                  {getStatusBadge(task)}
+                </div>
+              )}
             </div>
-          </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />

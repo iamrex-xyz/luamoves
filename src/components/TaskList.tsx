@@ -265,9 +265,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                                   </div>
                                 )}
                               </div>
-                              <div className="flex-shrink-0">
-                                {getStatusBadge(task)}
-                              </div>
+                              {getStatusBadge(task) && (
+                                <div className="flex-shrink-0">
+                                  {getStatusBadge(task)}
+                                </div>
+                              )}
                             </div>
                             <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
                               <span className="flex items-center gap-1">
