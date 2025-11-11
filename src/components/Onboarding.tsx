@@ -7,10 +7,7 @@ import { MovingInfo } from "@/pages/Index";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type OnboardingProps = {
   onComplete: (info: MovingInfo, email: string, password: string) => void;
@@ -25,7 +22,9 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [birthDate, setBirthDate] = useState<Date>();
+  const [birthDay, setBirthDay] = useState("");
+  const [birthMonth, setBirthMonth] = useState("");
+  const [birthYear, setBirthYear] = useState("");
   const [formData, setFormData] = useState<MovingInfo>({
     oldAddress: "",
     newAddress: "",
@@ -158,7 +157,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       case 9:
         return true;
       case 10:
-        return email.length > 0 && password.length >= 6 && name.length > 0 && birthDate !== undefined;
+        return email.length > 0 && password.length >= 6 && name.length > 0 && birthDay !== "" && birthMonth !== "" && birthYear !== "";
       default:
         return false;
     }
@@ -407,35 +406,47 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Geboortedatum</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !birthDate && "text-muted-foreground"
-                        )}
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {birthDate ? format(birthDate, "dd-MM-yyyy") : <span>Selecteer datum</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={birthDate}
-                        onSelect={setBirthDate}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
-                        }
-                        initialFocus
-                        captionLayout="dropdown-buttons"
-                        fromYear={1900}
-                        toYear={new Date().getFullYear()}
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Select value={birthDay} onValueChange={setBirthDay}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Dag" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                          <SelectItem key={day} value={day.toString()}>
+                            {day}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={birthMonth} onValueChange={setBirthMonth}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Maand" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[
+                          "Januari", "Februari", "Maart", "April", "Mei", "Juni",
+                          "Juli", "Augustus", "September", "Oktober", "November", "December"
+                        ].map((month, index) => (
+                          <SelectItem key={index + 1} value={(index + 1).toString()}>
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={birthYear} onValueChange={setBirthYear}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Jaar" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Email</label>
