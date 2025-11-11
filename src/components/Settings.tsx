@@ -284,15 +284,15 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-6 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("dashboard")}
-              className="text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Terug naar overzicht
-            </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onNavigate("dashboard")}
+                className="text-white hover:bg-white/10 text-xs md:text-sm"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Terug naar overzicht
+              </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -303,8 +303,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">Instellingen</h1>
-          <p className="text-sm md:text-base text-white/80">
+          <h1 className="text-xl md:text-3xl font-bold mb-2">Instellingen</h1>
+          <p className="text-xs md:text-base text-white/80">
             Beheer je verhuizing en huisgenoten
           </p>
         </div>
@@ -317,7 +317,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <HomeIcon className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg md:text-xl font-bold">Verhuizing details</h2>
+            <h2 className="text-base md:text-xl font-bold">Verhuizing details</h2>
           </div>
 
           <div className="space-y-4">
@@ -442,7 +442,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <Users className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg md:text-xl font-bold">Huishouden</h2>
+            <h2 className="text-base md:text-xl font-bold">Huishouden</h2>
           </div>
 
           <div className="space-y-4">
@@ -529,7 +529,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <Users className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg md:text-xl font-bold">Partners of huisgenoten</h2>
+            <h2 className="text-base md:text-xl font-bold">Partners of huisgenoten</h2>
           </div>
 
           <div className="space-y-4">
