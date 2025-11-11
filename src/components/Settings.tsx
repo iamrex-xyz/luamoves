@@ -23,7 +23,6 @@ import {
   Users,
   PawPrint,
   Trash2,
-  Plus,
   Mail,
   Check,
   X,
@@ -204,12 +203,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleAddPet = () => {
-    if (!newPetType || petTypes.includes(newPetType)) return;
-    setPetTypes([...petTypes, newPetType]);
-    setNewPetType("");
   };
 
   const handleRemovePet = (petType: string) => {
@@ -485,9 +478,14 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 <Label>Huisdieren</Label>
               </div>
 
-              <div className="flex gap-2 mb-3">
-                <Select value={newPetType} onValueChange={setNewPetType}>
-                  <SelectTrigger className="flex-1">
+              <div className="mb-3">
+                <Select value={newPetType} onValueChange={(value) => {
+                  if (value && !petTypes.includes(value)) {
+                    setPetTypes([...petTypes, value]);
+                    setNewPetType("");
+                  }
+                }}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Selecteer diersoort" />
                   </SelectTrigger>
                   <SelectContent>
@@ -498,9 +496,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                     ))}
                   </SelectContent>
                 </Select>
-                <Button onClick={handleAddPet} size="icon" variant="secondary">
-                  <Plus className="w-4 h-4" />
-                </Button>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -547,7 +542,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 onKeyDown={(e) => e.key === "Enter" && handleInviteCollaborator()}
               />
               <Button onClick={handleInviteCollaborator} disabled={isLoading}>
-                <Plus className="w-4 h-4 mr-2" />
                 Uitnodigen
               </Button>
             </div>
