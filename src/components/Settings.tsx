@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -28,7 +27,6 @@ import {
   Mail,
   Check,
   X,
-  Heart,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -76,7 +74,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   const [needsContractorHelp, setNeedsContractorHelp] = useState(movingInfo.needsContractorHelp || false);
   
   // Household state
-  const [householdType, setHouseholdType] = useState<"partner" | "housemates">("partner");
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [petTypes, setPetTypes] = useState<string[]>([]);
@@ -103,7 +100,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         .single();
 
       if (profile) {
-        setHouseholdType((profile.household_type as "partner" | "housemates") || "partner");
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
         setPetTypes(profile.pet_types || []);
@@ -190,7 +186,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { error } = await supabase
         .from("profiles")
         .update({
-          household_type: householdType,
           adults,
           children,
           pets: petTypes.length,
@@ -463,28 +458,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           </div>
 
           <div className="space-y-4">
-            <div>
-              <Label className="text-base mb-3 block">Type huishouden</Label>
-              <RadioGroup value={householdType} onValueChange={(value) => setHouseholdType(value as "partner" | "housemates")}>
-                <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-3">
-                  <RadioGroupItem value="partner" id="settings-partner" />
-                  <Label htmlFor="settings-partner" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <Heart className="w-4 h-4 text-primary" />
-                    Partner
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 bg-secondary/50 rounded-lg p-3">
-                  <RadioGroupItem value="housemates" id="settings-housemates" />
-                  <Label htmlFor="settings-housemates" className="flex items-center gap-2 cursor-pointer flex-1">
-                    <HomeIcon className="w-4 h-4 text-primary" />
-                    Huisgenoten
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
-            <Separator />
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="adults">Volwassenen</Label>
