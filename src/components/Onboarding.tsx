@@ -7,6 +7,10 @@ import { MovingInfo } from "@/pages/Index";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 type OnboardingProps = {
   onComplete: (info: MovingInfo, email: string, password: string) => void;
@@ -20,6 +24,8 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [birthDate, setBirthDate] = useState<Date>();
   const [formData, setFormData] = useState<MovingInfo>({
     oldAddress: "",
     newAddress: "",
@@ -152,7 +158,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       case 9:
         return true;
       case 10:
-        return email.length > 0 && password.length >= 6;
+        return email.length > 0 && password.length >= 6 && name.length > 0 && birthDate !== undefined;
       default:
         return false;
     }
@@ -390,6 +396,44 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                 Maak je account aan
               </h2>
               <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Naam</label>
+                  <Input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Voor- en achternaam"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Geboortedatum</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !birthDate && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {birthDate ? format(birthDate, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={birthDate}
+                        onSelect={setBirthDate}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("1900-01-01")
+                        }
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 <div>
                   <label className="text-sm font-medium mb-2 block">Email</label>
                   <Input
