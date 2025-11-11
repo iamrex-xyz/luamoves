@@ -529,7 +529,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div className="p-2 bg-primary/10 rounded-lg">
               <Users className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg md:text-xl font-bold">Huisgenoten & Partners</h2>
+            <h2 className="text-lg md:text-xl font-bold">Partners of huisgenoten</h2>
           </div>
 
           <div className="space-y-4">
