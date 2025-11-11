@@ -9,6 +9,7 @@ import { useTasks } from "@/hooks/useTasks";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
+import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { BottomNav } from "@/components/BottomNav";
 import {
   ArrowLeft,
@@ -20,6 +21,7 @@ import {
   Plus,
   Share2,
   User,
+  FileText,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -29,12 +31,13 @@ type TaskListProps = {
 };
 
 export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
-  const [filter, setFilter] = useState<"all" | "open" | "done">("all");
-  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [filter, setFilter] = useState<"open" | "done">("open");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [assigneeFilter, setAssigneeFilter] = useState<"all" | "mine" | "others">("all");
   const [showAddTask, setShowAddTask] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [dealTask, setDealTask] = useState<Task | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -42,20 +45,28 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   // Bereken categorieën
   const categories = useMemo(() => {
     const cats = new Set(tasks.map((t) => t.category));
-    return ["all", ...Array.from(cats)];
+    return Array.from(cats);
   }, [tasks]);
+
+  // Toggle category selection
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
 
   // Filter taken
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      // Filter logica voor Alle, Open en Afgerond
+      // Filter logica voor Open en Afgerond
       const statusMatch = 
-        filter === "all" 
-          ? true
-          : filter === "done"
+        filter === "done"
           ? task.status === "done"
           : task.status !== "done"; // "open" toont todo + in_progress
-      const categoryMatch = categoryFilter === "all" || task.category === categoryFilter;
+      
+      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
       
       // Assignee filter
       let assigneeMatch = true;
@@ -67,7 +78,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       
       return statusMatch && categoryMatch && assigneeMatch;
     });
-  }, [tasks, filter, categoryFilter, assigneeFilter]);
+  }, [tasks, filter, selectedCategories, assigneeFilter]);
 
   // Groepeer taken per fase
   const tasksByPhase = useMemo(() => {
@@ -83,22 +94,13 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
 
 
   const getStatusBadge = (task: Task) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const deadline = new Date(task.deadline);
-    deadline.setHours(0, 0, 0, 0);
-    const isTaskOverdue = deadline < today;
-
     if (task.status === "done") {
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
     }
     if (task.status === "in_progress") {
       return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
     }
-    if (isTaskOverdue) {
-      return <Badge variant="destructive" className="min-w-[75px] justify-center text-xs">Verlopen</Badge>;
-    }
-    return <Badge variant="outline" className="min-w-[75px] justify-center text-xs">Te doen</Badge>;
+    return null;
   };
 
   const daysUntilMove = Math.ceil(
@@ -169,18 +171,10 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
 
       {/* Compact Filters */}
       <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
           
           {/* Status filters */}
-          <Button
-            variant={filter === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilter("all")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Alle ({tasks.length})
-          </Button>
           <Button
             variant={filter === "open" ? "default" : "outline"}
             size="sm"
@@ -197,21 +191,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           >
             Afgerond ({tasks.filter((t) => t.status === "done").length})
           </Button>
-          
-          <div className="w-px h-6 bg-border shrink-0" />
-          
-          {/* Category filters */}
-          {categories.slice(0, 4).map((cat) => (
-            <Button
-              key={cat}
-              variant={categoryFilter === cat ? "default" : "outline"}
-              size="sm"
-              onClick={() => setCategoryFilter(cat)}
-              className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-            >
-              {cat === "all" ? "Alle cat." : cat}
-            </Button>
-          ))}
           
           <div className="w-px h-6 bg-border shrink-0" />
           
@@ -240,6 +219,23 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           >
             Toegewezen
           </Button>
+        </div>
+        
+        {/* Category filters - Multi-select checkboxes */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pt-2">
+          <span className="text-xs text-muted-foreground shrink-0">Categorieën:</span>
+          {categories.map((cat) => (
+            <label
+              key={cat}
+              className="flex items-center gap-1.5 cursor-pointer bg-secondary hover:bg-secondary/80 rounded-md px-2.5 py-1 text-xs whitespace-nowrap transition-colors"
+            >
+              <Checkbox
+                checked={selectedCategories.includes(cat)}
+                onCheckedChange={() => toggleCategory(cat)}
+              />
+              <span>{cat}</span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -295,9 +291,16 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                         />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
-                            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
-                              {task.title}
-                            </h4>
+                            <div className="flex items-center gap-2 flex-1">
+                              <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                                {task.title}
+                              </h4>
+                              {task.notes && (
+                                <div title="Heeft notitie">
+                                  <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                                </div>
+                              )}
+                            </div>
                             <div className="flex-shrink-0">
                               {getStatusBadge(task)}
                             </div>
@@ -322,10 +325,10 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="mt-2 gap-2 h-8"
+                              className="mt-2 gap-1.5 h-7 text-xs bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(task.affiliateLink, "_blank");
+                                setDealTask(task);
                               }}
                             >
                               Direct regelen
@@ -358,6 +361,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
+      />
+      <TaskDealDialog
+        task={dealTask}
+        open={!!dealTask}
+        onOpenChange={(open) => !open && setDealTask(null)}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
