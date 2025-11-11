@@ -89,7 +89,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           onClick={(e) => e.stopPropagation()}
           className="mt-1"
         />
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-1">
               <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
                 {task.title}
@@ -100,27 +101,29 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 </div>
               )}
             </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {task.deadlineLabel}
-              {daysUntil === 0 && " (vandaag)"}
-              {daysUntil === 1 && " (morgen)"}
-              {daysUntil > 1 && ` (${daysUntil} dagen)`}
-              {isOverdue && " (verlopen)"}
-            </span>
-            {task.assignedToEmail && (
+            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1">
-                <User className="w-3 h-3" />
-                {task.assignedToEmail}
+                <Clock className="w-3 h-3" />
+                {task.deadlineLabel}
+                {daysUntil === 0 && " (vandaag)"}
+                {daysUntil === 1 && " (morgen)"}
+                {daysUntil > 1 && ` (${daysUntil} dagen)`}
+                {isOverdue && " (verlopen)"}
               </span>
-            )}
+              {task.assignedToEmail && (
+                <span className="flex items-center gap-1">
+                  <User className="w-3 h-3" />
+                  {task.assignedToEmail}
+                </span>
+              )}
+            </div>
           </div>
+          
           {task.affiliateLink && task.status !== "done" && (
             <Button
               size="sm"
               variant="outline"
-              className="mt-2 gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0"
+              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(task.affiliateLink, "_blank");
