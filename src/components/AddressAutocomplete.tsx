@@ -124,26 +124,36 @@ export const AddressAutocomplete = ({
         if (data.response?.docs) {
           let results = data.response.docs;
           
-          // Sort by distance if user location is available
-          if (userLocation) {
-            results = results
-              .map((doc: AddressSuggestion) => {
-                if (doc.centroide_ll) {
-                  const point = parsePoint(doc.centroide_ll);
-                  if (point) {
-                    const distance = calculateDistance(
-                      userLocation.lat,
-                      userLocation.lon,
-                      point.lat,
-                      point.lon
-                    );
-                    return { ...doc, distance };
-                  }
+          // Extract house number from query for smart sorting
+          const queryMatch = query.match(/(\d+)/);
+          const searchedNumber = queryMatch ? parseInt(queryMatch[1]) : null;
+          
+          // Sort by relevance: prioritize exact matches and close house numbers
+          results = results
+            .map((doc: AddressSuggestion) => {
+              let relevanceScore = 0;
+              
+              if (doc.huisnummer && searchedNumber) {
+                const docNumber = parseInt(doc.huisnummer);
+                // Calculate how close the house number is to searched number
+                const numberDiff = Math.abs(docNumber - searchedNumber);
+                // Lower difference = higher score (inverted)
+                relevanceScore = 1000 - numberDiff;
+                
+                // Boost exact matches
+                if (docNumber === searchedNumber) {
+                  relevanceScore += 10000;
                 }
-                return { ...doc, distance: Infinity };
-              })
-              .sort((a: any, b: any) => a.distance - b.distance);
-          }
+              }
+              
+              // Additional boost for matching street name
+              if (doc.straatnaam && query.toLowerCase().includes(doc.straatnaam.toLowerCase().substring(0, 5))) {
+                relevanceScore += 5000;
+              }
+              
+              return { ...doc, relevanceScore };
+            })
+            .sort((a: any, b: any) => b.relevanceScore - a.relevanceScore);
           
           setSuggestions(results);
           setShowSuggestions(true);
@@ -162,7 +172,7 @@ export const AddressAutocomplete = ({
         searchTimeoutRef.current = null;
       }
     };
-  }, [query, justSelected, selectedValue, userLocation]);
+  }, [query, justSelected, selectedValue]);
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
