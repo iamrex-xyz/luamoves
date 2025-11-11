@@ -47,11 +47,6 @@ type Collaborator = {
 const PET_TYPES = [
   { value: "dog", label: "Hond" },
   { value: "cat", label: "Kat" },
-  { value: "bird", label: "Vogel" },
-  { value: "fish", label: "Vis" },
-  { value: "rabbit", label: "Konijn" },
-  { value: "hamster", label: "Hamster" },
-  { value: "guinea_pig", label: "Cavia" },
   { value: "other", label: "Anders" },
 ];
 
@@ -182,17 +177,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-
-      // Validatie: minimaal 1 volwassene
-      if (adults < 1) {
-        toast({
-          title: "Fout",
-          description: "Er moet minimaal 1 volwassene zijn.",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
 
       const { error } = await supabase
         .from("profiles")
@@ -475,9 +459,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 <Input
                   id="adults"
                   type="number"
-                  min="0"
+                  min="1"
                   value={adults}
-                  onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
                 />
               </div>
 
