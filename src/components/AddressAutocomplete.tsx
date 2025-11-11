@@ -196,6 +196,11 @@ export const AddressAutocomplete = ({
             setQuery(e.target.value);
             setShowSuggestions(true);
           }}
+          onFocus={() => {
+            if (query.length >= 3 && query !== selectedValue) {
+              setShowSuggestions(true);
+            }
+          }}
           placeholder={placeholder}
           className="pr-10"
         />
