@@ -7,10 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BottomNav } from "@/components/BottomNav";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   LogOut,
@@ -60,7 +65,13 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   const [oldAddress, setOldAddress] = useState(movingInfo.oldAddress);
   const [newAddress, setNewAddress] = useState(movingInfo.newAddress);
   const [movingDate, setMovingDate] = useState(movingInfo.movingDate);
+  const [movingDateObj, setMovingDateObj] = useState<Date | undefined>(
+    movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined
+  );
   const [keyHandoverDate, setKeyHandoverDate] = useState(movingInfo.keyHandoverDate || "");
+  const [keyHandoverDateObj, setKeyHandoverDateObj] = useState<Date | undefined>(
+    movingInfo.keyHandoverDate ? new Date(movingInfo.keyHandoverDate) : undefined
+  );
   const [renovationType, setRenovationType] = useState(movingInfo.renovationType || "none");
   const [needsContractorHelp, setNeedsContractorHelp] = useState(movingInfo.needsContractorHelp || false);
   
@@ -126,13 +137,17 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Convert date objects to strings
+      const movingDateStr = movingDateObj ? format(movingDateObj, "yyyy-MM-dd") : movingDate;
+      const keyHandoverDateStr = keyHandoverDateObj ? format(keyHandoverDateObj, "yyyy-MM-dd") : keyHandoverDate;
+
       const { error } = await supabase
         .from("profiles")
         .update({
           old_address: oldAddress,
           new_address: newAddress,
-          moving_date: movingDate,
-          key_handover_date: keyHandoverDate || null,
+          moving_date: movingDateStr,
+          key_handover_date: keyHandoverDateStr || null,
           renovation_type: renovationType,
           needs_contractor_help: needsContractorHelp,
         })
@@ -143,8 +158,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       onUpdate({
         oldAddress,
         newAddress,
-        movingDate,
-        keyHandoverDate: keyHandoverDate || undefined,
+        movingDate: movingDateStr,
+        keyHandoverDate: keyHandoverDateStr || undefined,
         type: movingInfo.type,
         renovationType: renovationType as "none" | "small" | "large",
         needsContractorHelp,
@@ -325,44 +340,84 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           <div className="space-y-4">
             <div>
               <Label htmlFor="oldAddress">Oud adres</Label>
-              <Input
-                id="oldAddress"
+              <AddressAutocomplete
+                label=""
+                placeholder="Begin met typen..."
                 value={oldAddress}
-                onChange={(e) => setOldAddress(e.target.value)}
-                placeholder="Oude straat 1, 1234 AB Plaats"
+                onChange={setOldAddress}
               />
             </div>
 
             <div>
               <Label htmlFor="newAddress">Nieuw adres</Label>
-              <Input
-                id="newAddress"
+              <AddressAutocomplete
+                label=""
+                placeholder="Begin met typen..."
                 value={newAddress}
-                onChange={(e) => setNewAddress(e.target.value)}
-                placeholder="Nieuwe straat 1, 1234 AB Plaats"
+                onChange={setNewAddress}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="movingDate">Verhuisdatum</Label>
-                <Input
-                  id="movingDate"
-                  type="date"
-                  value={movingDate}
-                  onChange={(e) => setMovingDate(e.target.value)}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !movingDateObj && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={movingDateObj}
+                      onSelect={(date) => {
+                        setMovingDateObj(date);
+                        if (date) setMovingDate(format(date, "yyyy-MM-dd"));
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {movingInfo.type === "rent" && (
                 <div>
                   <Label htmlFor="keyHandoverDate">Sleuteloverdracht</Label>
-                  <Input
-                    id="keyHandoverDate"
-                    type="date"
-                    value={keyHandoverDate}
-                    onChange={(e) => setKeyHandoverDate(e.target.value)}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !keyHandoverDateObj && "text-muted-foreground"
+                        )}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={keyHandoverDateObj}
+                        onSelect={(date) => {
+                          setKeyHandoverDateObj(date);
+                          if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
+                        }}
+                        initialFocus
+                        className="pointer-events-auto"
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               )}
             </div>
