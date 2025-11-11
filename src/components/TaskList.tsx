@@ -33,7 +33,6 @@ type TaskListProps = {
 export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
   const [filter, setFilter] = useState<"open" | "done">("open");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [assigneeFilter, setAssigneeFilter] = useState<"all" | "mine" | "others">("all");
   const [showAddTask, setShowAddTask] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -68,17 +67,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
       
-      // Assignee filter
-      let assigneeMatch = true;
-      if (assigneeFilter === "mine") {
-        assigneeMatch = !task.assignedTo && !task.assignedToEmail;
-      } else if (assigneeFilter === "others") {
-        assigneeMatch = !!(task.assignedTo || task.assignedToEmail);
-      }
-      
-      return statusMatch && categoryMatch && assigneeMatch;
+      return statusMatch && categoryMatch;
     });
-  }, [tasks, filter, selectedCategories, assigneeFilter]);
+  }, [tasks, filter, selectedCategories]);
 
   // Groepeer taken per fase
   const tasksByPhase = useMemo(() => {
@@ -190,34 +181,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
             className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
           >
             Afgerond ({tasks.filter((t) => t.status === "done").length})
-          </Button>
-          
-          <div className="w-px h-6 bg-border shrink-0" />
-          
-          {/* Assignee filters */}
-          <Button
-            variant={assigneeFilter === "all" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setAssigneeFilter("all")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Iedereen
-          </Button>
-          <Button
-            variant={assigneeFilter === "mine" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setAssigneeFilter("mine")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Mijn taken
-          </Button>
-          <Button
-            variant={assigneeFilter === "others" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setAssigneeFilter("others")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Toegewezen
           </Button>
         </div>
         
