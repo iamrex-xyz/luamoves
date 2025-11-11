@@ -13,7 +13,6 @@ import {
   Clock,
   LogOut,
   User,
-  Users,
   CheckCircle2,
   Plus,
   ExternalLink,
@@ -58,16 +57,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       .slice(0, 15); // Show more tasks for better overview
   }, [tasks]);
 
-  // Split tasks by assignment
-  const myTasks = useMemo(() => 
-    priorityTasks.filter(task => !task.assignedTo && !task.assignedToEmail),
-    [priorityTasks]
-  );
-
-  const assignedTasks = useMemo(() => 
-    priorityTasks.filter(task => task.assignedTo || task.assignedToEmail),
-    [priorityTasks]
-  );
 
   const getStatusBadge = (task: Task) => {
     const today = new Date();
@@ -262,14 +251,14 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           </Card>
         ) : (
           <>
-            {/* My Priority Tasks */}
-            {myTasks.length > 0 && (
+            {/* Priority Tasks */}
+            {priorityTasks.length > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                    <h2 className="text-base md:text-lg font-bold">Mijn prioriteiten</h2>
-                    <Badge variant="secondary" className="text-xs">{myTasks.length}</Badge>
+                    <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                    <h2 className="text-base md:text-lg font-bold">Binnenkort te doen</h2>
+                    <Badge variant="secondary" className="text-xs">{priorityTasks.length}</Badge>
                   </div>
                   <Button 
                     variant="outline" 
@@ -284,25 +273,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 </div>
                 <Card className="p-4">
                   <div className="space-y-3">
-                    {myTasks.map((task) => (
-                      <TaskItem key={task.id} task={task} />
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            )}
-
-            {/* Assigned Tasks */}
-            {assignedTasks.length > 0 && (
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Users className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  <h2 className="text-base md:text-lg font-bold">Toegewezen aan anderen</h2>
-                  <Badge variant="secondary" className="text-xs">{assignedTasks.length}</Badge>
-                </div>
-                <Card className="p-4">
-                  <div className="space-y-3">
-                    {assignedTasks.map((task) => (
+                    {priorityTasks.map((task) => (
                       <TaskItem key={task.id} task={task} />
                     ))}
                   </div>
