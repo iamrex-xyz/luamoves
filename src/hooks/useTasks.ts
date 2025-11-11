@@ -1,6 +1,6 @@
 import { useState, useEffect, createElement } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Task, generateTasksForRenter } from "@/lib/taskGenerator";
+import { Task, generateTasksForRenter, HouseholdInfo } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
 import { Package } from "lucide-react";
@@ -24,6 +24,18 @@ export const useTasks = (movingInfo: MovingInfo) => {
         setIsLoading(false);
         return;
       }
+
+      // Haal profiel op voor household info
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("children, pets")
+        .eq("user_id", user.id)
+        .single();
+
+      const householdInfo: HouseholdInfo = {
+        children: profile?.children || 0,
+        pets: profile?.pets || 0,
+      };
 
       // Haal opgeslagen task statuses uit database (inclusief assigned info)
       const { data: savedTasks, error } = await supabase
@@ -50,7 +62,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
       // Genereer de complete task list
       const generatedTasks =
-        movingInfo.type === "rent" ? generateTasksForRenter(movingInfo) : [];
+        movingInfo.type === "rent" ? generateTasksForRenter(movingInfo, householdInfo) : [];
 
       // Merge saved statuses met generated tasks and apply custom deadlines
       const mergedTasks = generatedTasks.map((task) => {

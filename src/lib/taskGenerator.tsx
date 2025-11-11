@@ -36,7 +36,12 @@ export type Task = {
   affiliateLink?: string;
 };
 
-export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {
+export type HouseholdInfo = {
+  children: number;
+  pets: number;
+};
+
+export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: HouseholdInfo): Task[] => {
   const movingDate = new Date(movingInfo.movingDate);
   const keyHandoverDate = movingInfo.keyHandoverDate 
     ? new Date(movingInfo.keyHandoverDate) 
@@ -312,8 +317,12 @@ export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-    },
-    {
+    }
+  );
+
+  // Alleen toevoegen als er kinderen zijn
+  if (householdInfo && householdInfo.children > 0) {
+    tasks.push({
       id: "rent-phase2-13",
       title: "Informeer school/kinderopvang",
       category: "Sociaal",
@@ -324,7 +333,26 @@ export const generateTasksForRenter = (movingInfo: MovingInfo): Task[] => {
       status: "todo",
       icon: <Users className="w-4 h-4" />,
       priority: 2,
-    },
+    });
+  }
+
+  // Alleen toevoegen als er huisdieren zijn
+  if (householdInfo && householdInfo.pets > 0) {
+    tasks.push({
+      id: "rent-phase2-13-pets",
+      title: "Informeer dierenarts over verhuizing",
+      category: "Administratie",
+      description: "Meld je nieuwe adres bij de dierenarts en vraag om overzetten van medisch dossier.",
+      deadline: addDays(movingDate, -14),
+      deadlineLabel: "2 weken voor verhuizing",
+      phase: "Fase 2 – Voor sleuteloverdracht",
+      status: "todo",
+      icon: <FileText className="w-4 h-4" />,
+      priority: 2,
+    });
+  }
+
+  tasks.push(
     {
       id: "rent-phase2-14",
       title: "Controleer afvalinzameling/ gemeente afvalregels nieuw adres",
