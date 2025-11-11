@@ -166,8 +166,8 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card 
-        className={`w-full max-w-lg shadow-lg ${step <= 2 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
-        onClick={step <= 2 ? handleNext : undefined}
+        className={`w-full max-w-lg shadow-lg ${step === 1 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
+        onClick={step === 1 ? handleNext : undefined}
       >
         {step > 2 && step < 8 && (
           <div className="mb-6">
@@ -203,10 +203,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
               </h2>
               <Button
                 variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLogin();
-                }}
+                onClick={onLogin}
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Heb je al een account? Log in
