@@ -289,43 +289,46 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           onClick={(e) => e.stopPropagation()}
                           className="mt-1"
                         />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2 mb-1">
-                            <div className="flex items-center gap-2 flex-1">
-                              <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
-                                {task.title}
-                              </h4>
-                              {task.notes && (
-                                <div title="Heeft notitie">
-                                  <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
-                                </div>
+                        <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-1">
+                              <div className="flex items-center gap-2 flex-1">
+                                <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+                                  {task.title}
+                                </h4>
+                                {task.notes && (
+                                  <div title="Heeft notitie">
+                                    <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex-shrink-0">
+                                {getStatusBadge(task)}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {task.deadlineLabel}
+                                {daysUntil === 0 && " (vandaag)"}
+                                {daysUntil === 1 && " (morgen)"}
+                                {daysUntil > 1 && ` (${daysUntil} dagen)`}
+                                {isTaskOverdue && " (verlopen)"}
+                              </span>
+                              {task.assignedToEmail && (
+                                <span className="flex items-center gap-1">
+                                  <User className="w-3 h-3" />
+                                  {task.assignedToEmail}
+                                </span>
                               )}
                             </div>
-                            <div className="flex-shrink-0">
-                              {getStatusBadge(task)}
-                            </div>
                           </div>
-                          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {task.deadlineLabel}
-                              {daysUntil === 0 && " (vandaag)"}
-                              {daysUntil === 1 && " (morgen)"}
-                              {daysUntil > 1 && ` (${daysUntil} dagen)`}
-                              {isTaskOverdue && " (verlopen)"}
-                            </span>
-                            {task.assignedToEmail && (
-                              <span className="flex items-center gap-1">
-                                <User className="w-3 h-3" />
-                                {task.assignedToEmail}
-                              </span>
-                            )}
-                          </div>
+                          
                           {task.affiliateLink && task.status !== "done" && (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="mt-2 gap-1.5 h-7 text-xs bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+                              className="gap-1.5 h-7 text-xs bg-primary/5 border-primary/20 text-primary hover:bg-primary/10 shrink-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDealTask(task);
