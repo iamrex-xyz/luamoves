@@ -8,116 +8,116 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Modern minimal design - warm neutrals */
+    /* Premium minimalist design - Apple-inspired */
     --background: 0 0% 100%;
-    --foreground: 0 0% 13%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 4 65% 68%;
+    /* Refined primary - sophisticated coral */
+    --primary: 12 76% 61%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 13%;
+    --secondary: 0 0% 98%;
+    --secondary-foreground: 0 0% 9%;
 
     --muted: 0 0% 97%;
-    --muted-foreground: 0 0% 45%;
+    --muted-foreground: 0 0% 46%;
 
-    --accent: 340 8% 95%;
-    --accent-foreground: 0 0% 13%;
+    /* Subtle accent */
+    --accent: 210 20% 98%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 13%;
+    --border: 0 0% 92%;
+    --input: 0 0% 92%;
+    --ring: 12 76% 61%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
     
-    /* Warm accent colors */
-    --blush: 340 45% 92%;
-    --sand: 35 25% 90%;
-    --warm-gray: 30 5% 50%;
-    
-    --success: 150 50% 45%;
-    --warning: 35 90% 55%;
-    --info: 210 100% 50%;
+    /* Refined accent colors */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 217 91% 60%;
     
     /* Progress colors */
-    --progress-start: 0 0% 85%;
-    --progress-low: 35 25% 75%;
-    --progress-medium: 340 30% 70%;
-    --progress-high: 340 40% 60%;
-    --progress-complete: 150 50% 45%;
+    --progress-start: 0 0% 88%;
+    --progress-low: 38 50% 78%;
+    --progress-medium: 12 60% 72%;
+    --progress-high: 12 70% 65%;
+    --progress-complete: 142 71% 45%;
     
-    /* Subtle shadows */
-    --shadow-soft: 0 1px 3px 0 hsl(0 0% 0% / 0.04);
-    --shadow-medium: 0 2px 8px 0 hsl(0 0% 0% / 0.08);
-    --shadow-large: 0 4px 16px 0 hsl(0 0% 0% / 0.1);
+    /* Apple-style shadows */
+    --shadow-soft: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-elegant: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     
-    /* Smooth transitions */
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Smooth, precise transitions */
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 0 0% 13%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 0 0% 9%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 13%;
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 0 0% 13%;
+    --sidebar-accent: 0 0% 98%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 12 76% 61%;
   }
 
   .dark {
-    --background: 0 0% 7%;
+    --background: 0 0% 5%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 10%;
+    --card: 0 0% 8%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 10%;
+    --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 4 65% 68%;
+    --primary: 12 76% 61%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 15%;
+    --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 0 0% 13%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 340 8% 15%;
+    --accent: 210 20% 12%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 98%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 12 76% 61%;
     
     /* Progress colors - dark */
-    --progress-start: 0 0% 25%;
-    --progress-low: 35 20% 35%;
-    --progress-medium: 340 25% 40%;
-    --progress-high: 340 35% 50%;
-    --progress-complete: 150 45% 50%;
+    --progress-start: 0 0% 22%;
+    --progress-low: 38 40% 35%;
+    --progress-medium: 12 50% 42%;
+    --progress-high: 12 60% 50%;
+    --progress-complete: 142 60% 50%;
     
-    --sidebar-background: 0 0% 7%;
+    --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 7%;
-    --sidebar-accent: 0 0% 15%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 0 0% 98%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 12 76% 61%;
   }
 }
 
@@ -127,26 +127,61 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
   }
   
   h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     @apply font-semibold tracking-tight;
+    letter-spacing: -0.02em;
   }
   
   h1 {
     @apply text-4xl md:text-5xl lg:text-6xl;
+    font-weight: 700;
   }
   
   h2 {
     @apply text-3xl md:text-4xl lg:text-5xl;
+    font-weight: 700;
   }
   
   h3 {
     @apply text-2xl md:text-3xl;
+    font-weight: 600;
   }
   
   button {
-    @apply transition-all duration-200;
+    @apply transition-all;
+    transition-duration: 0.25s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  input, textarea, select {
+    @apply transition-all;
+    transition-duration: 0.2s;
+  }
+  
+  /* Refined scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 }
