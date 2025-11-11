@@ -8,6 +8,8 @@ type AddressSuggestion = {
   weergavenaam: string;
   straatnaam?: string;
   huisnummer?: string;
+  huisletter?: string;
+  huisnummertoevoeging?: string;
   postcode?: string;
   woonplaatsnaam?: string;
   centroide_ll?: string; // Format: "POINT(lon lat)"
@@ -110,9 +112,11 @@ export const AddressAutocomplete = ({
       try {
         // Add wildcard to query for better partial matching
         const searchQuery = query.trim() + '*';
+        // Remove the type:adres filter to include all address types including floors/additions
+        // Increase rows to 50 to show more results
         const apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
           searchQuery
-        )}&fq=type:adres&rows=10`;
+        )}&fq=type:(adres)&rows=50`;
 
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -206,6 +210,8 @@ export const AddressAutocomplete = ({
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">
                   {suggestion.straatnaam} {suggestion.huisnummer}
+                  {suggestion.huisletter && suggestion.huisletter}
+                  {suggestion.huisnummertoevoeging && `-${suggestion.huisnummertoevoeging}`}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {suggestion.postcode} {suggestion.woonplaatsnaam}
