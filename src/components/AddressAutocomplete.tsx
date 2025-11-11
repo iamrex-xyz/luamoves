@@ -34,6 +34,7 @@ export const AddressAutocomplete = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
+  const [hasUserTyped, setHasUserTyped] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [locationRequested, setLocationRequested] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -102,7 +103,7 @@ export const AddressAutocomplete = ({
     }
 
     const searchAddress = async () => {
-      if (query.length < 3 || justSelected || query === selectedValue) {
+      if (query.length < 3 || justSelected || query === selectedValue || !hasUserTyped) {
         setSuggestions([]);
         setShowSuggestions(false);
         return;
@@ -172,7 +173,7 @@ export const AddressAutocomplete = ({
         searchTimeoutRef.current = null;
       }
     };
-  }, [query, justSelected, selectedValue]);
+  }, [query, justSelected, selectedValue, hasUserTyped]);
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
@@ -182,6 +183,7 @@ export const AddressAutocomplete = ({
     onChange(fullAddress);
     setShowSuggestions(false);
     setSuggestions([]);
+    setHasUserTyped(false);
   };
 
   return (
@@ -194,10 +196,11 @@ export const AddressAutocomplete = ({
             setJustSelected(false);
             setSelectedValue("");
             setQuery(e.target.value);
+            setHasUserTyped(true);
             setShowSuggestions(true);
           }}
           onFocus={() => {
-            if (query.length >= 3 && query !== selectedValue) {
+            if (query.length >= 3 && query !== selectedValue && hasUserTyped) {
               setShowSuggestions(true);
             }
           }}
