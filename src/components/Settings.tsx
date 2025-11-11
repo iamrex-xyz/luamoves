@@ -183,6 +183,17 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Validatie: minimaal 1 volwassene
+      if (adults < 1) {
+        toast({
+          title: "Fout",
+          description: "Er moet minimaal 1 volwassene zijn.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -464,9 +475,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 <Input
                   id="adults"
                   type="number"
-                  min="1"
+                  min="0"
                   value={adults}
-                  onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
+                  onChange={(e) => setAdults(parseInt(e.target.value) || 0)}
                 />
               </div>
 
