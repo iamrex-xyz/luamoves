@@ -480,7 +480,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
 
               <div className="mb-3">
                 <Select value={newPetType} onValueChange={(value) => {
-                  if (value && !petTypes.includes(value)) {
+                  if (value) {
                     setPetTypes([...petTypes, value]);
                     setNewPetType("");
                   }
