@@ -1,6 +1,6 @@
 import { useState, useEffect, createElement } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Task, generateTasksForRenter, HouseholdInfo } from "@/lib/taskGenerator";
+import { Task, generateTasksForRenter, generateTasksForBuyer, HouseholdInfo } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
 import { Package } from "lucide-react";
@@ -60,9 +60,10 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
       if (customError) throw customError;
 
-      // Genereer de complete task list
-      const generatedTasks =
-        movingInfo.type === "rent" ? generateTasksForRenter(movingInfo, householdInfo) : [];
+      // Genereer de complete task list op basis van type
+      const generatedTasks = movingInfo.type === "rent" 
+        ? generateTasksForRenter(movingInfo, householdInfo)
+        : generateTasksForBuyer(movingInfo, householdInfo);
 
       // Merge saved statuses met generated tasks and apply custom deadlines
       const mergedTasks = generatedTasks.map((task) => {
