@@ -166,8 +166,8 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
       <Card 
-        className={`w-full max-w-lg shadow-lg ${step === 1 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
-        onClick={step === 1 ? handleNext : undefined}
+        className={`w-full max-w-lg shadow-lg ${(step === 1 || step === 2) ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
+        onClick={(step === 1 || step === 2) ? handleNext : undefined}
       >
         {step > 2 && step < 8 && (
           <div className="mb-6">
@@ -197,7 +197,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           )}
 
           {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6">
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6" onClick={(e) => e.stopPropagation()}>
               <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
                 Ik ben Charly,<br />jouw persoonlijke verhuisconcierge.
               </h2>
@@ -208,6 +208,9 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
               >
                 Heb je al een account? Log in
               </Button>
+              <p className="text-xs text-muted-foreground pt-2">
+                Tik ergens op het scherm om verder te gaan zonder account
+              </p>
             </div>
           )}
 
