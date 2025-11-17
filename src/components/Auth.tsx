@@ -9,12 +9,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 interface AuthProps {
   onComplete: (user: User) => void;
-  onSkip?: () => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
 
-export const Auth = ({ onComplete, onSkip }: AuthProps) => {
+export const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
@@ -164,11 +163,8 @@ export const Auth = ({ onComplete, onSkip }: AuthProps) => {
   // Initial screen with two buttons
   if (screen === 'initial') {
     return (
-      <div 
-        className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 cursor-pointer" 
-        onClick={() => onSkip?.()}
-      >
-        <div className="w-full max-w-sm space-y-6 text-center" onClick={(e) => e.stopPropagation()}>
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold font-charly tracking-tight">
               Charly
@@ -180,22 +176,18 @@ export const Auth = ({ onComplete, onSkip }: AuthProps) => {
 
           <div className="space-y-4">
             <Button 
-              onClick={(e) => { e.stopPropagation(); setScreen('login'); }} 
+              onClick={() => setScreen('login')} 
               className="w-full h-12 text-base"
             >
               Inloggen
             </Button>
             <Button 
-              onClick={(e) => { e.stopPropagation(); setScreen('signup'); }} 
+              onClick={() => setScreen('signup')} 
               variant="outline"
               className="w-full h-12 text-base"
             >
               Schrijf je in
             </Button>
-            
-            <p className="text-xs text-muted-foreground pt-2">
-              Tik ergens op het scherm om verder te gaan zonder account
-            </p>
           </div>
         </div>
       </div>

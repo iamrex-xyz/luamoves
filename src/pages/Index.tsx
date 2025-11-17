@@ -125,10 +125,6 @@ const Index = () => {
     setCurrentView("auth");
   };
 
-  const handleSkipAuth = () => {
-    setCurrentView("additionalInfo");
-  };
-
   const handleAuthComplete = (authenticatedUser: User) => {
     setUser(authenticatedUser);
     
@@ -225,7 +221,7 @@ const Index = () => {
   }
 
   if (currentView === "auth") {
-    return <Auth onComplete={handleAuthComplete} onSkip={handleSkipAuth} />;
+    return <Auth onComplete={handleAuthComplete} />;
   }
 
   if (currentView === "additionalInfo") {
