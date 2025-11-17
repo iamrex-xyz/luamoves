@@ -9,12 +9,11 @@ import { Eye, EyeOff } from "lucide-react";
 
 interface AuthProps {
   onComplete: (user: User) => void;
-  onSkip?: () => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
 
-export const Auth = ({ onComplete, onSkip }: AuthProps) => {
+export const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
@@ -189,16 +188,6 @@ export const Auth = ({ onComplete, onSkip }: AuthProps) => {
             >
               Schrijf je in
             </Button>
-            {onSkip && (
-              <div className="pt-2">
-                <button
-                  onClick={onSkip}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors w-full text-center py-2"
-                >
-                  Verder zonder account
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
