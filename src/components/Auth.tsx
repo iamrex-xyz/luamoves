@@ -164,7 +164,10 @@ export const Auth = ({ onComplete, onSkip }: AuthProps) => {
   // Initial screen with two buttons
   if (screen === 'initial') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4" onClick={() => onSkip?.()}>
+      <div 
+        className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4 cursor-pointer" 
+        onClick={() => onSkip?.()}
+      >
         <div className="w-full max-w-sm space-y-6 text-center" onClick={(e) => e.stopPropagation()}>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold font-charly tracking-tight">
@@ -189,6 +192,10 @@ export const Auth = ({ onComplete, onSkip }: AuthProps) => {
             >
               Schrijf je in
             </Button>
+            
+            <p className="text-xs text-muted-foreground pt-2">
+              Tik ergens op het scherm om verder te gaan zonder account
+            </p>
           </div>
         </div>
       </div>
