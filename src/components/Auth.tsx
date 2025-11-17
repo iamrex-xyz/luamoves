@@ -9,11 +9,12 @@ import { Eye, EyeOff } from "lucide-react";
 
 interface AuthProps {
   onComplete: (user: User) => void;
+  onSkip?: () => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
 
-export const Auth = ({ onComplete }: AuthProps) => {
+export const Auth = ({ onComplete, onSkip }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
@@ -163,8 +164,8 @@ export const Auth = ({ onComplete }: AuthProps) => {
   // Initial screen with two buttons
   if (screen === 'initial') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-6 text-center">
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4" onClick={() => onSkip?.()}>
+        <div className="w-full max-w-sm space-y-6 text-center" onClick={(e) => e.stopPropagation()}>
           <div className="space-y-2">
             <h1 className="text-3xl font-bold font-charly tracking-tight">
               Charly
@@ -176,13 +177,13 @@ export const Auth = ({ onComplete }: AuthProps) => {
 
           <div className="space-y-4">
             <Button 
-              onClick={() => setScreen('login')} 
+              onClick={(e) => { e.stopPropagation(); setScreen('login'); }} 
               className="w-full h-12 text-base"
             >
               Inloggen
             </Button>
             <Button 
-              onClick={() => setScreen('signup')} 
+              onClick={(e) => { e.stopPropagation(); setScreen('signup'); }} 
               variant="outline"
               className="w-full h-12 text-base"
             >
