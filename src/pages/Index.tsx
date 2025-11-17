@@ -125,6 +125,10 @@ const Index = () => {
     setCurrentView("auth");
   };
 
+  const handleSkipAuth = () => {
+    setCurrentView("additionalInfo");
+  };
+
   const handleAuthComplete = (authenticatedUser: User) => {
     setUser(authenticatedUser);
     
@@ -158,7 +162,13 @@ const Index = () => {
   };
 
   const handleAdditionalInfoComplete = async (adults: number, children: number, pets: number, phone: string) => {
-    if (!user || !movingInfo) return;
+    if (!movingInfo) return;
+
+    // If user is not logged in, just save to state and go to dashboard
+    if (!user) {
+      setCurrentView("dashboard");
+      return;
+    }
 
     try {
       const { error } = await supabase
@@ -221,7 +231,7 @@ const Index = () => {
   }
 
   if (currentView === "auth") {
-    return <Auth onComplete={handleAuthComplete} />;
+    return <Auth onComplete={handleAuthComplete} onSkip={handleSkipAuth} />;
   }
 
   if (currentView === "additionalInfo") {
