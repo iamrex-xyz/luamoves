@@ -208,9 +208,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
               >
                 Heb je al een account? Log in
               </Button>
-              <p className="text-xs text-muted-foreground pt-2">
-                Tik ergens op het scherm om verder te gaan zonder account
-              </p>
             </div>
           )}
 
