@@ -2,15 +2,14 @@ import { ListChecks, Clock, Home, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type BottomNavProps = {
-  currentView: "dashboard" | "tasks" | "timeline" | "settings";
-  onNavigate: (view: "dashboard" | "tasks" | "timeline" | "settings") => void;
+  currentView: "dashboard" | "tasks" | "settings";
+  onNavigate: (view: "dashboard" | "tasks" | "settings") => void;
 };
 
 export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
   const navItems = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
-    { id: "timeline", label: "Tijdlijn", icon: Clock },
     { id: "settings", label: "Instellingen", icon: Settings },
   ] as const;
 
