@@ -30,7 +30,7 @@ import {
 
 type SettingsProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "timeline" | "settings") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "settings") => void;
   onLogout: () => void;
   onUpdate: (info: MovingInfo) => void;
 };
