@@ -23,12 +23,12 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   const { toast } = useToast();
 
   const countryCodes = [
-    { code: "+31", country: "Nederland", digits: 9 },
-    { code: "+32", country: "België", digits: 9 },
-    { code: "+49", country: "Duitsland", digits: 10 },
-    { code: "+33", country: "Frankrijk", digits: 9 },
-    { code: "+44", country: "Verenigd Koninkrijk", digits: 10 },
-    { code: "+1", country: "VS/Canada", digits: 10 },
+    { code: "+31", country: "Nederland", flag: "🇳🇱", digits: 9 },
+    { code: "+32", country: "België", flag: "🇧🇪", digits: 9 },
+    { code: "+49", country: "Duitsland", flag: "🇩🇪", digits: 10 },
+    { code: "+33", country: "Frankrijk", flag: "🇫🇷", digits: 9 },
+    { code: "+44", country: "Verenigd Koninkrijk", flag: "🇬🇧", digits: 10 },
+    { code: "+1", country: "VS/Canada", flag: "🇺🇸", digits: 10 },
   ];
 
   const handleLogout = async () => {
@@ -149,13 +149,15 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
             <Label htmlFor="phone" className="text-base">Telefoonnummer</Label>
             <div className="flex gap-2">
               <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="h-12 w-[140px]">
-                  <SelectValue />
+                <SelectTrigger className="h-12 w-[160px]">
+                  <SelectValue>
+                    {countryCodes.find(c => c.code === countryCode)?.flag} {countryCode}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {countryCodes.map((country) => (
                     <SelectItem key={country.code} value={country.code}>
-                      {country.code} {country.country}
+                      {country.flag} {country.country}
                     </SelectItem>
                   ))}
                 </SelectContent>

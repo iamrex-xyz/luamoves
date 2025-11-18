@@ -21,7 +21,8 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const [loadingStep, setLoadingStep] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [birthDay, setBirthDay] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthYear, setBirthYear] = useState("");
@@ -157,7 +158,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       case 9:
         return true;
       case 10:
-        return email.length > 0 && password.length >= 6 && name.length > 0 && birthDay !== "" && birthMonth !== "" && birthYear !== "";
+        return email.length > 0 && password.length >= 6 && firstName.length > 0 && lastName.length > 0 && birthDay !== "" && birthMonth !== "" && birthYear !== "";
       default:
         return false;
     }
@@ -403,12 +404,21 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Naam</label>
+                  <label className="text-sm font-medium mb-2 block">Voornaam</label>
                   <Input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Voor- en achternaam"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Je voornaam"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Achternaam</label>
+                  <Input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Je achternaam"
                   />
                 </div>
                 <div>
