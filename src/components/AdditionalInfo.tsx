@@ -23,12 +23,46 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
   const { toast } = useToast();
 
   const countryCodes = [
-    { code: "+31", country: "Nederland", flag: "🇳🇱", digits: 9 },
-    { code: "+32", country: "België", flag: "🇧🇪", digits: 9 },
-    { code: "+49", country: "Duitsland", flag: "🇩🇪", digits: 10 },
-    { code: "+33", country: "Frankrijk", flag: "🇫🇷", digits: 9 },
-    { code: "+44", country: "Verenigd Koninkrijk", flag: "🇬🇧", digits: 10 },
-    { code: "+1", country: "VS/Canada", flag: "🇺🇸", digits: 10 },
+    { code: "+31", country: "Nederland", flag: "🇳🇱", abbr: "NL", digits: 9 },
+    { code: "+32", country: "België", flag: "🇧🇪", abbr: "BE", digits: 9 },
+    { code: "+49", country: "Duitsland", flag: "🇩🇪", abbr: "DE", digits: 10 },
+    { code: "+33", country: "Frankrijk", flag: "🇫🇷", abbr: "FR", digits: 9 },
+    { code: "+34", country: "Spanje", flag: "🇪🇸", abbr: "ES", digits: 9 },
+    { code: "+39", country: "Italië", flag: "🇮🇹", abbr: "IT", digits: 10 },
+    { code: "+41", country: "Zwitserland", flag: "🇨🇭", abbr: "CH", digits: 9 },
+    { code: "+43", country: "Oostenrijk", flag: "🇦🇹", abbr: "AT", digits: 10 },
+    { code: "+44", country: "Verenigd Koninkrijk", flag: "🇬🇧", abbr: "GB", digits: 10 },
+    { code: "+45", country: "Denemarken", flag: "🇩🇰", abbr: "DK", digits: 8 },
+    { code: "+46", country: "Zweden", flag: "🇸🇪", abbr: "SE", digits: 9 },
+    { code: "+47", country: "Noorwegen", flag: "🇳🇴", abbr: "NO", digits: 8 },
+    { code: "+48", country: "Polen", flag: "🇵🇱", abbr: "PL", digits: 9 },
+    { code: "+351", country: "Portugal", flag: "🇵🇹", abbr: "PT", digits: 9 },
+    { code: "+352", country: "Luxemburg", flag: "🇱🇺", abbr: "LU", digits: 9 },
+    { code: "+353", country: "Ierland", flag: "🇮🇪", abbr: "IE", digits: 9 },
+    { code: "+358", country: "Finland", flag: "🇫🇮", abbr: "FI", digits: 9 },
+    { code: "+30", country: "Griekenland", flag: "🇬🇷", abbr: "GR", digits: 10 },
+    { code: "+1", country: "Verenigde Staten", flag: "🇺🇸", abbr: "US", digits: 10 },
+    { code: "+1", country: "Canada", flag: "🇨🇦", abbr: "CA", digits: 10 },
+    { code: "+61", country: "Australië", flag: "🇦🇺", abbr: "AU", digits: 9 },
+    { code: "+64", country: "Nieuw-Zeeland", flag: "🇳🇿", abbr: "NZ", digits: 9 },
+    { code: "+81", country: "Japan", flag: "🇯🇵", abbr: "JP", digits: 10 },
+    { code: "+86", country: "China", flag: "🇨🇳", abbr: "CN", digits: 11 },
+    { code: "+91", country: "India", flag: "🇮🇳", abbr: "IN", digits: 10 },
+    { code: "+7", country: "Rusland", flag: "🇷🇺", abbr: "RU", digits: 10 },
+    { code: "+27", country: "Zuid-Afrika", flag: "🇿🇦", abbr: "ZA", digits: 9 },
+    { code: "+55", country: "Brazilië", flag: "🇧🇷", abbr: "BR", digits: 11 },
+    { code: "+52", country: "Mexico", flag: "🇲🇽", abbr: "MX", digits: 10 },
+    { code: "+20", country: "Egypte", flag: "🇪🇬", abbr: "EG", digits: 10 },
+    { code: "+90", country: "Turkije", flag: "🇹🇷", abbr: "TR", digits: 10 },
+    { code: "+966", country: "Saoedi-Arabië", flag: "🇸🇦", abbr: "SA", digits: 9 },
+    { code: "+971", country: "VAE", flag: "🇦🇪", abbr: "AE", digits: 9 },
+    { code: "+65", country: "Singapore", flag: "🇸🇬", abbr: "SG", digits: 8 },
+    { code: "+60", country: "Maleisië", flag: "🇲🇾", abbr: "MY", digits: 9 },
+    { code: "+66", country: "Thailand", flag: "🇹🇭", abbr: "TH", digits: 9 },
+    { code: "+84", country: "Vietnam", flag: "🇻🇳", abbr: "VN", digits: 9 },
+    { code: "+62", country: "Indonesië", flag: "🇮🇩", abbr: "ID", digits: 10 },
+    { code: "+63", country: "Filipijnen", flag: "🇵🇭", abbr: "PH", digits: 10 },
+    { code: "+82", country: "Zuid-Korea", flag: "🇰🇷", abbr: "KR", digits: 10 },
   ];
 
   const handleLogout = async () => {
@@ -149,15 +183,15 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
             <Label htmlFor="phone" className="text-base">Telefoonnummer</Label>
             <div className="flex gap-2">
               <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="h-12 w-[160px]">
+                <SelectTrigger className="h-12 w-[180px]">
                   <SelectValue>
-                    {countryCodes.find(c => c.code === countryCode)?.flag} {countryCode}
+                    {countryCodes.find(c => c.code === countryCode)?.flag} {countryCodes.find(c => c.code === countryCode)?.abbr} {countryCode}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  {countryCodes.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.flag} {country.country}
+                <SelectContent className="max-h-[300px]">
+                  {countryCodes.map((country, index) => (
+                    <SelectItem key={`${country.code}-${index}`} value={country.code}>
+                      {country.flag} {country.abbr} - {country.country}
                     </SelectItem>
                   ))}
                 </SelectContent>
