@@ -1,15 +1,16 @@
-import { ListChecks, Clock, Home, Settings } from "lucide-react";
+import { ListChecks, Home, Settings, Grid3x3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type BottomNavProps = {
-  currentView: "dashboard" | "tasks" | "settings";
-  onNavigate: (view: "dashboard" | "tasks" | "settings") => void;
+  currentView: "dashboard" | "tasks" | "extras" | "settings";
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
 };
 
 export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
   const navItems = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
+    { id: "extras", label: "Extra", icon: Grid3x3 },
     { id: "settings", label: "Instellingen", icon: Settings },
   ] as const;
 
