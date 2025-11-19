@@ -109,68 +109,34 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   );
 
   return (
-    <div className="min-h-screen pb-20 bg-gradient-to-b from-background to-secondary/20">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-4 md:p-6 pb-6 md:pb-8 sticky top-0 z-20 shadow-lg">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onNavigate("dashboard")}
-              className="text-white hover:bg-white/10 min-h-[44px] text-xs md:text-sm"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1.5" />
-              Terug
-            </Button>
+    <div className="min-h-screen pb-20 bg-background">
+      {/* Unified Header */}
+      <header className="bg-primary text-white sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
+                <FileText className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Taken</h1>
+                <p className="text-white/80 text-xs">Jouw verhuischecklist</p>
+              </div>
+            </div>
             <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowShareDialog(true)}
-                className="text-white hover:bg-white/10 h-10 w-10"
-                title="Verhuizing delen"
-              >
+              <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="text-white hover:bg-white/10 h-10 w-10">
                 <Share2 className="w-5 h-5" />
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onLogout}
-                className="text-white hover:bg-white/10 h-10 w-10"
-                title="Uitloggen"
-              >
+              <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
           </div>
-          <div className="flex items-center justify-between mb-2">
-            <h1 className="text-xl md:text-2xl font-bold">Jouw checklist</h1>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setShowAddTask(true)}
-              className="gap-1.5 min-h-[40px] text-xs md:text-sm px-3"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Toevoegen</span>
-            </Button>
-          </div>
-          <div className="flex items-center gap-2 text-white/90">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm">
-              {daysUntilMove > 0
-                ? `Nog ${daysUntilMove} dagen tot verhuizing`
-                : daysUntilMove === 0
-                ? "Vandaag is de verhuisdag!"
-                : `${Math.abs(daysUntilMove)} dagen geleden verhuisd`}
-            </span>
-          </div>
         </div>
-      </div>
+      </header>
 
       {/* Search Bar */}
-      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b">
+      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[73px] bg-background/95 backdrop-blur-lg z-10 border-b">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -183,7 +149,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       </div>
 
       {/* Compact Filters */}
-      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[190px] md:top-[200px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
+      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[134px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
           

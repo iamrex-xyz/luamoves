@@ -26,6 +26,7 @@ import {
   Mail,
   Check,
   X,
+  Settings as SettingsIcon,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -279,45 +280,35 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-muted/30">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-white p-6 pb-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onNavigate("dashboard")}
-                className="text-white hover:bg-white/10 text-xs md:text-sm"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Terug naar overzicht
-              </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onLogout}
-              className="text-white hover:bg-white/10 h-10 w-10"
-              title="Uitloggen"
-            >
+    <div className="min-h-screen pb-20 bg-background">
+      {/* Unified Header */}
+      <header className="bg-primary text-white sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
+                <SettingsIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Instellingen</h1>
+                <p className="text-white/80 text-xs">Beheer je verhuizing</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
-          <h1 className="text-xl md:text-3xl font-bold mb-2">Instellingen</h1>
-          <p className="text-xs md:text-base text-white/80">
-            Beheer je verhuizing en huisgenoten
-          </p>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-4xl mx-auto px-4 mt-6 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
         {/* Moving Details */}
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-6">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
-              <HomeIcon className="w-5 h-5 text-primary" />
+              <HomeIcon className="w-4 h-4 text-primary" />
             </div>
-            <h2 className="text-base md:text-xl font-bold">Verhuizing details</h2>
+            <h2 className="text-base font-semibold">Verhuizing details</h2>
           </div>
 
           <div className="space-y-4">
@@ -437,12 +428,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         </Card>
 
         {/* Household */}
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-6">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
-              <Users className="w-5 h-5 text-primary" />
+              <Users className="w-4 h-4 text-primary" />
             </div>
-            <h2 className="text-base md:text-xl font-bold">Huishouden</h2>
+            <h2 className="text-base font-semibold">Huishouden</h2>
           </div>
 
           <div className="space-y-4">
@@ -524,12 +515,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         </Card>
 
         {/* Collaborators */}
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-6">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
             <div className="p-2 bg-primary/10 rounded-lg">
-              <Users className="w-5 h-5 text-primary" />
+              <Users className="w-4 h-4 text-primary" />
             </div>
-            <h2 className="text-base md:text-xl font-bold">Partners of huisgenoten</h2>
+            <h2 className="text-base font-semibold">Partners of huisgenoten</h2>
           </div>
 
           <div className="space-y-4">
