@@ -16,12 +16,8 @@ import {
   CheckCircle2,
   Plus,
   ExternalLink,
-  TrendingUp,
-  Calendar,
-  Zap,
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -43,23 +39,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
     (new Date(movingInfo.movingDate).getTime() - new Date().getTime()) /
       (1000 * 60 * 60 * 24)
   );
-
-  // Get priority tasks (upcoming deadlines, not completed)
-  const priorityTasks = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks
-      .filter(task => {
-        if (task.status === "done") return false;
-        const deadline = new Date(task.deadline);
-        deadline.setHours(0, 0, 0, 0);
-        const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-        return daysUntil <= 21; // Next 3 weeks for better overview
-      })
-      .sort((a, b) => a.deadline.getTime() - b.deadline.getTime())
-      .slice(0, 15); // Show more tasks for better overview
-  }, [tasks]);
 
 
   const getStatusBadge = (task: Task) => {
@@ -224,7 +203,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     <div>
                       <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1" />
                       <span className="font-semibold">{completedTasks}</span>
-                      <span className="text-white/70">/{totalTasks}</span>
+                      <span className="text-white/70"> voltooid</span>
                     </div>
                   </div>
                 </div>
@@ -235,160 +214,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-6">
-        
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="p-3 md:p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-2 bg-muted rounded-lg">
-                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              </div>
-              <div>
-                <div className="text-xl md:text-2xl font-bold text-foreground">{completedTasks}</div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Voltooid</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-3 md:p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-2 bg-muted rounded-lg">
-                <Clock className="w-4 h-4 md:w-5 md:h-5 text-warning" />
-              </div>
-              <div>
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {tasks.filter(t => t.status === "in_progress").length}
-                </div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Bezig</div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="p-3 md:p-4">
-            <div className="flex flex-col items-center text-center gap-2">
-              <div className="p-2 bg-muted rounded-lg">
-                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-info" />
-              </div>
-              <div>
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {priorityTasks.length}
-                </div>
-                <div className="text-[10px] md:text-xs text-muted-foreground">Binnenkort</div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Progress Bar */}
-        <Card className="p-4 md:p-5">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-foreground">Voortgang</h3>
-              <span className="text-sm font-semibold text-foreground">{Math.round(progressPercentage)}%</span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-            <p className="text-xs text-muted-foreground">
-              {completedTasks} van {totalTasks} taken voltooid
-            </p>
-          </div>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card className="p-4 md:p-5">
-          <h3 className="text-sm font-medium text-foreground mb-3">Snelle acties</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <Button 
-              onClick={() => setShowAddTask(true)}
-              className="gap-2 h-auto py-3 flex-col items-center justify-center"
-              variant="outline"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="text-xs">Taak toevoegen</span>
-            </Button>
-            <Button 
-              onClick={() => onNavigate("tasks")}
-              className="gap-2 h-auto py-3 flex-col items-center justify-center"
-              variant="outline"
-            >
-              <CheckCircle2 className="w-5 h-5" />
-              <span className="text-xs">Alle taken</span>
-            </Button>
-            <Button 
-              onClick={() => onNavigate("extras")}
-              className="gap-2 h-auto py-3 flex-col items-center justify-center"
-              variant="outline"
-            >
-              <Calendar className="w-5 h-5" />
-              <span className="text-xs">Extra's</span>
-            </Button>
-            <Button 
-              onClick={() => onNavigate("settings")}
-              className="gap-2 h-auto py-3 flex-col items-center justify-center"
-              variant="outline"
-            >
-              <Zap className="w-5 h-5" />
-              <span className="text-xs">Instellingen</span>
-            </Button>
-          </div>
-        </Card>
-
-        {/* Priority Tasks */}
-        {isLoading ? (
-          <Card className="p-6">
-            <p className="text-center text-muted-foreground">Taken laden...</p>
-          </Card>
-        ) : (
-          <>
-            {/* Priority Tasks */}
-            {priorityTasks.length > 0 && (
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                    <h2 className="text-base md:text-lg font-bold">Binnenkort te doen</h2>
-                    <Badge variant="secondary" className="text-xs">{priorityTasks.length}</Badge>
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setShowAddTask(true)}
-                    className="flex items-center gap-1.5 h-8 text-xs md:text-sm"
-                  >
-                    <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                    <span className="hidden md:inline">Taak toevoegen</span>
-                    <span className="md:hidden">Toevoegen</span>
-                  </Button>
-                </div>
-                <Card className="p-4">
-                  <div className="space-y-3">
-                    {priorityTasks.map((task) => (
-                      <TaskItem key={task.id} task={task} />
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            )}
-
-            {priorityTasks.length === 0 && (
-              <Card className="p-6 md:p-8 text-center">
-                <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500 mx-auto mb-3" />
-                <h3 className="font-semibold text-base md:text-lg mb-2">Perfect! Je loopt op schema! 🎉</h3>
-                <p className="text-sm md:text-base text-muted-foreground mb-4">
-                  Alle dringende taken zijn onder controle. Neem even rust of bekijk wat je nog meer kunt voorbereiden.
-                </p>
-                <div className="flex gap-3 justify-center">
-                  <Button onClick={() => onNavigate("tasks")} variant="outline">
-                    Bekijk alle taken
-                  </Button>
-                  <Button onClick={() => setShowAddTask(true)}>
-                    <Plus className="w-4 h-4 mr-2" />
-                    Taak toevoegen
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </>
-        )}
       </div>
 
       <AddTaskDialog 
