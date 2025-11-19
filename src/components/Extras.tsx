@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileText, Camera, Wallet, Lightbulb, Upload, Plus, Trash2, Eye, Download } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
+import { PhotoCard } from "./PhotoCard";
 
 type ExtrasProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
@@ -25,6 +26,13 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("documents");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id);
+    });
+  }, []);
 
   // Fetch moving tips
   const { data: tips = [] } = useQuery({
@@ -66,6 +74,26 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
 
       if (error) throw error;
       return data;
+    },
+  });
+
+  // Fetch photos
+  const { data: photos = [] } = useQuery({
+    queryKey: ["moving-photos"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase.storage
+        .from("moving_photos")
+        .list(user.id, {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: "created_at", order: "desc" },
+        });
+
+      if (error) throw error;
+      return data || [];
     },
   });
 
@@ -164,6 +192,75 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
       toast({ title: "Document verwijderd" });
     },
   });
+
+  // Upload photo mutation
+  const uploadPhoto = useMutation({
+    mutationFn: async (formData: { file: File; category: string; description: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Niet ingelogd");
+
+      const fileExt = formData.file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("moving_photos")
+        .upload(filePath, formData.file);
+
+      if (uploadError) throw uploadError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["moving-photos"] });
+      toast({ title: "Foto geüpload" });
+    },
+    onError: () => {
+      toast({ title: "Fout bij uploaden foto", variant: "destructive" });
+    },
+  });
+
+  // Delete photo mutation
+  const deletePhoto = useMutation({
+    mutationFn: async (filePath: string) => {
+      const { error } = await supabase.storage
+        .from("moving_photos")
+        .remove([filePath]);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["moving-photos"] });
+      toast({ title: "Foto verwijderd" });
+    },
+  });
+
+  // Download document
+  const downloadDocument = async (filePath: string, fileName: string) => {
+    const { data, error } = await supabase.storage
+      .from("moving_documents")
+      .download(filePath);
+
+    if (error) {
+      toast({ title: "Fout bij downloaden", variant: "destructive" });
+      return;
+    }
+
+    const url = URL.createObjectURL(data);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Get photo URL
+  const getPhotoUrl = (filePath: string) => {
+    const { data } = supabase.storage
+      .from("moving_photos")
+      .getPublicUrl(filePath);
+    return data.publicUrl;
+  };
 
   // Group tips by phase
   const tipsByPhase = tips.reduce((acc, tip) => {
@@ -279,7 +376,7 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                         <CardContent className="p-4 flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5 text-primary" />
-                            <div>
+                            <div className="flex-1">
                               <p className="font-medium">{doc.file_name}</p>
                               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <Badge variant="outline">{doc.category}</Badge>
@@ -287,13 +384,22 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                               </div>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteDocument.mutate({ id: doc.id, file_path: doc.file_path })}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => downloadDocument(doc.file_path, doc.file_name)}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => deleteDocument.mutate({ id: doc.id, file_path: doc.file_path })}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </CardContent>
                       </Card>
                     ))
@@ -310,14 +416,84 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                 <CardTitle>Foto's</CardTitle>
                 <CardDescription>Bewaar foto's van meterstanden, schade, etc.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <Button className="w-full">
-                  <Camera className="mr-2 h-4 w-4" />
-                  Foto maken / uploaden
-                </Button>
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Foto upload komt binnenkort
-                </p>
+              <CardContent className="space-y-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full">
+                      <Camera className="mr-2 h-4 w-4" />
+                      Foto uploaden
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Foto uploaden</DialogTitle>
+                      <DialogDescription>Upload een foto (max 10MB)</DialogDescription>
+                    </DialogHeader>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const formData = new FormData(e.currentTarget);
+                        const file = formData.get("file") as File;
+                        const category = formData.get("category") as string;
+                        const description = formData.get("description") as string;
+
+                        if (file) {
+                          uploadPhoto.mutate({ file, category, description });
+                          e.currentTarget.reset();
+                        }
+                      }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <Label htmlFor="photo-file">Foto</Label>
+                        <Input 
+                          id="photo-file" 
+                          name="file" 
+                          type="file" 
+                          accept="image/*"
+                          capture="environment"
+                          required 
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="photo-category">Categorie</Label>
+                        <Select name="category" required>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Kies categorie" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="meterstand">Meterstand</SelectItem>
+                            <SelectItem value="schade">Schade</SelectItem>
+                            <SelectItem value="voor">Voor verhuizing</SelectItem>
+                            <SelectItem value="na">Na verhuizing</SelectItem>
+                            <SelectItem value="overig">Overig</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="photo-description">Beschrijving (optioneel)</Label>
+                        <Textarea id="photo-description" name="description" />
+                      </div>
+                      <Button type="submit" className="w-full">Uploaden</Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+
+                {photos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">
+                    Nog geen foto's geüpload
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    {photos.map((photo) => (
+                      <PhotoCard 
+                        key={photo.name} 
+                        photo={photo}
+                        onDelete={(path) => deletePhoto.mutate(path)}
+                      />
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -410,7 +586,7 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <p className="font-bold text-primary">€ {Number(expense.amount).toFixed(2)}</p>
+                            <p className="font-bold text-lg">€ {Number(expense.amount).toFixed(2)}</p>
                             <Button
                               variant="ghost"
                               size="sm"
