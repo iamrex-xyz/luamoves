@@ -201,7 +201,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                   </p>
                   <div className="flex items-center gap-4 text-xs md:text-sm">
                     <div>
-                      <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1" />
+                      <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1 text-white" />
                       <span className="font-semibold text-white">{completedTasks}</span>
                       <span className="text-white/70"> voltooid</span>
                     </div>
