@@ -69,7 +69,15 @@ export const CollaboratorChat = () => {
           table: "collaborator_messages",
         },
         (payload) => {
-          setMessages((current) => [...current, payload.new as Message]);
+          const newMsg = payload.new as Message;
+          setMessages((current) => [...current, newMsg]);
+          
+          // Show toast if message is from another user
+          if (newMsg.user_id !== currentUserId) {
+            toast.success("Nieuw bericht ontvangen", {
+              description: newMsg.message.substring(0, 50) + (newMsg.message.length > 50 ? "..." : ""),
+            });
+          }
         }
       )
       .subscribe();

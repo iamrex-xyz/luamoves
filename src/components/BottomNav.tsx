@@ -1,5 +1,6 @@
 import { ListChecks, Home, Settings, Grid3x3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 type BottomNavProps = {
   currentView: "dashboard" | "tasks" | "extras" | "settings";
@@ -7,6 +8,8 @@ type BottomNavProps = {
 };
 
 export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
+  const unreadCount = useUnreadMessages(currentView);
+  
   const navItems = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
@@ -21,13 +24,14 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
+            const showBadge = item.id === "extras" && unreadCount > 0;
             
             return (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all min-w-[70px]",
+                  "flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-lg transition-all min-w-[70px] relative",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
@@ -35,6 +39,11 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
               >
                 <Icon className={cn("w-5 h-5", isActive && "stroke-[2.5]")} />
                 <span className="text-xs font-medium">{item.label}</span>
+                {showBadge && (
+                  <span className="absolute top-1 right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </button>
             );
           })}
