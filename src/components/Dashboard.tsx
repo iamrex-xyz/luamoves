@@ -182,7 +182,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
-                      <div className="text-xl md:text-2xl font-bold">{Math.round(progressPercentage)}%</div>
+                      <div className="text-xl md:text-2xl font-bold text-white">{Math.round(progressPercentage)}%</div>
                     </div>
                   </div>
                 </div>
@@ -190,7 +190,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 {/* Stats */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-3xl md:text-4xl font-bold">{daysUntilMove}</span>
+                    <span className="text-3xl md:text-4xl font-bold text-white">{daysUntilMove}</span>
                     <span className="text-base md:text-lg text-white/80">dagen</span>
                   </div>
                   <p className="text-xs md:text-sm text-white/80 mb-3">
@@ -202,7 +202,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                   <div className="flex items-center gap-4 text-xs md:text-sm">
                     <div>
                       <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1" />
-                      <span className="font-semibold">{completedTasks}</span>
+                      <span className="font-semibold text-white">{completedTasks}</span>
                       <span className="text-white/70"> voltooid</span>
                     </div>
                   </div>
