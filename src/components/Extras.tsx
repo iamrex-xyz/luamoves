@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Camera, Wallet, Lightbulb, Upload, Plus, Trash2, Download, LogOut, MessageCircle } from "lucide-react";
+import { FileText, Camera, Wallet, Lightbulb, Upload, Plus, Trash2, Download, LogOut, MessageCircle, Home as HomeIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -260,14 +260,21 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-10">
+      {/* Unified Header */}
+      <header className="bg-primary text-white sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold">Extra</h1>
-            <Button variant="ghost" size="sm" onClick={onLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Uitloggen
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
+                <HomeIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold">Extra</h1>
+                <p className="text-white/80 text-xs">Documenten, budget & meer</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </div>
