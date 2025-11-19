@@ -4,6 +4,7 @@ import { Auth } from "@/components/Auth";
 import { AdditionalInfo } from "@/components/AdditionalInfo";
 import { Dashboard } from "@/components/Dashboard";
 import { TaskList } from "@/components/TaskList";
+import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +24,7 @@ const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<
-    "onboarding" | "auth" | "additionalInfo" | "dashboard" | "tasks" | "settings"
+    "onboarding" | "auth" | "additionalInfo" | "dashboard" | "tasks" | "extras" | "settings"
   >("onboarding");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -239,6 +240,12 @@ const Index = () => {
       {currentView === "tasks" && movingInfo && (
         <TaskList 
           movingInfo={movingInfo}
+          onNavigate={setCurrentView}
+          onLogout={handleLogout}
+        />
+      )}
+      {currentView === "extras" && movingInfo && (
+        <Extras 
           onNavigate={setCurrentView}
           onLogout={handleLogout}
         />

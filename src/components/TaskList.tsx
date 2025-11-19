@@ -26,7 +26,7 @@ import {
 
 type TaskListProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "settings") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
 };
 
