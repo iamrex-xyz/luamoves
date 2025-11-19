@@ -348,7 +348,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                       {movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
                     <CalendarComponent
                       mode="single"
                       selected={movingDateObj}
@@ -363,37 +363,35 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 </Popover>
               </div>
 
-              {movingInfo.type === "rent" && (
-                <div>
-                  <Label htmlFor="keyHandoverDate">Sleuteloverdracht</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !keyHandoverDateObj && "text-muted-foreground"
-                        )}
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={keyHandoverDateObj}
-                        onSelect={(date) => {
-                          setKeyHandoverDateObj(date);
-                          if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
-                        }}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              )}
+              <div>
+                <Label htmlFor="keyHandoverDate">Sleuteloverdracht</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !keyHandoverDateObj && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={keyHandoverDateObj}
+                      onSelect={(date) => {
+                        setKeyHandoverDateObj(date);
+                        if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
+                      }}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
 
             <div>
