@@ -214,6 +214,49 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-6">
+        {isLoading ? (
+          <Card className="p-6">
+            <p className="text-center text-muted-foreground">Taken laden...</p>
+          </Card>
+        ) : tasks.length > 0 ? (
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <h2 className="text-base md:text-lg font-bold">Jouw taken</h2>
+                <Badge variant="secondary" className="text-xs">{tasks.length}</Badge>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAddTask(true)}
+                className="flex items-center gap-1.5 h-8 text-xs md:text-sm"
+              >
+                <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="hidden md:inline">Taak toevoegen</span>
+                <span className="md:hidden">Toevoegen</span>
+              </Button>
+            </div>
+            <Card className="p-4">
+              <div className="space-y-3">
+                {tasks.map((task) => (
+                  <TaskItem key={task.id} task={task} />
+                ))}
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <Card className="p-6 md:p-8 text-center">
+            <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500 mx-auto mb-3" />
+            <h3 className="font-semibold text-base md:text-lg mb-2">Je hebt nog geen taken</h3>
+            <p className="text-sm md:text-base text-muted-foreground mb-4">
+              Voeg je eerste taak toe om te beginnen met de voorbereiding van je verhuizing.
+            </p>
+            <Button onClick={() => setShowAddTask(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Taak toevoegen
+            </Button>
+          </Card>
+        )}
       </div>
 
       <AddTaskDialog 
