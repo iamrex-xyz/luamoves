@@ -89,6 +89,108 @@ export type Database = {
         }
         Relationships: []
       }
+      moving_documents: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id: string
+          upload_date: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id?: string
+          upload_date?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          id?: string
+          upload_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      moving_expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          description: string | null
+          expense_date: string
+          id: string
+          receipt_url: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          description?: string | null
+          expense_date?: string
+          id?: string
+          receipt_url?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          expense_date?: string
+          id?: string
+          receipt_url?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      moving_tips: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          order_index: number | null
+          phase: string
+          title: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          phase: string
+          title: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          order_index?: number | null
+          phase?: string
+          title?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           adults: number | null
