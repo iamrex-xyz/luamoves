@@ -16,7 +16,11 @@ import {
   CheckCircle2,
   Plus,
   ExternalLink,
+  TrendingUp,
+  Calendar,
+  Zap,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { useMemo, useState } from "react";
 
 type DashboardProps = {
@@ -198,49 +202,137 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl md:text-2xl font-bold text-white">
-                      {Math.round(progressPercentage)}%
-                    </span>
+                    <div className="text-center">
+                      <div className="text-xl md:text-2xl font-bold">{Math.round(progressPercentage)}%</div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="flex-1 space-y-2 md:space-y-3 text-white">
-                  <div>
-                    <h3 className="text-sm md:text-base font-semibold mb-1">
-                      {progressPercentage >= 75 
-                        ? "Bijna klaar voor je nieuwe thuis!" 
-                        : progressPercentage >= 50 
-                        ? "Ik help je op weg naar je nieuwe start!" 
-                        : progressPercentage >= 25 
-                        ? "Samen maken we het mogelijk!" 
-                        : "Ik neem je alles uit handen!"}
-                    </h3>
-                    <p className="text-white/80 text-xs md:text-sm">
-                      {movingInfo.newAddress}
-                    </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-3xl md:text-4xl font-bold">{daysUntilMove}</span>
+                    <span className="text-base md:text-lg text-white/80">dagen</span>
                   </div>
-                  
-                  <div className="bg-white/10 rounded-lg p-2 md:p-3 backdrop-blur-sm">
-                    <div className="text-xl md:text-xl font-bold">
-                      {daysUntilMove === 0 ? "Vandaag" : `${daysUntilMove}`}
-                    </div>
-                    <div className="text-xs text-white/80">
-                      {daysUntilMove === 0 
-                        ? "De grote dag is hier" 
-                        : daysUntilMove === 1 
-                        ? "Nog één dag te gaan" 
-                        : "Dagen tot verhuizing"}
+                  <p className="text-xs md:text-sm text-white/80 mb-3">
+                    tot {new Date(movingInfo.movingDate).toLocaleDateString("nl-NL", {
+                      day: "numeric",
+                      month: "long"
+                    })}
+                  </p>
+                  <div className="flex items-center gap-4 text-xs md:text-sm">
+                    <div>
+                      <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1" />
+                      <span className="font-semibold">{completedTasks}</span>
+                      <span className="text-white/70">/{totalTasks}</span>
                     </div>
                   </div>
                 </div>
               </div>
-            </Card>
-          </div>
+          </Card>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-6">
+        
+        {/* Statistics Grid */}
+        <div className="grid grid-cols-3 gap-3">
+          <Card className="p-3 md:p-4">
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-2 bg-muted rounded-lg">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+              </div>
+              <div>
+                <div className="text-xl md:text-2xl font-bold text-foreground">{completedTasks}</div>
+                <div className="text-[10px] md:text-xs text-muted-foreground">Voltooid</div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-3 md:p-4">
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-2 bg-muted rounded-lg">
+                <Clock className="w-4 h-4 md:w-5 md:h-5 text-warning" />
+              </div>
+              <div>
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {tasks.filter(t => t.status === "in_progress").length}
+                </div>
+                <div className="text-[10px] md:text-xs text-muted-foreground">Bezig</div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-3 md:p-4">
+            <div className="flex flex-col items-center text-center gap-2">
+              <div className="p-2 bg-muted rounded-lg">
+                <Calendar className="w-4 h-4 md:w-5 md:h-5 text-info" />
+              </div>
+              <div>
+                <div className="text-xl md:text-2xl font-bold text-foreground">
+                  {priorityTasks.length}
+                </div>
+                <div className="text-[10px] md:text-xs text-muted-foreground">Binnenkort</div>
+              </div>
+            </div>
+          </Card>
         </div>
 
-      {/* Priority Tasks */}
-      <div className="max-w-4xl mx-auto px-4 space-y-4 md:space-y-6 mt-4 md:mt-6">
+        {/* Progress Bar */}
+        <Card className="p-4 md:p-5">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-foreground">Voortgang</h3>
+              <span className="text-sm font-semibold text-foreground">{Math.round(progressPercentage)}%</span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+            <p className="text-xs text-muted-foreground">
+              {completedTasks} van {totalTasks} taken voltooid
+            </p>
+          </div>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card className="p-4 md:p-5">
+          <h3 className="text-sm font-medium text-foreground mb-3">Snelle acties</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <Button 
+              onClick={() => setShowAddTask(true)}
+              className="gap-2 h-auto py-3 flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="text-xs">Taak toevoegen</span>
+            </Button>
+            <Button 
+              onClick={() => onNavigate("tasks")}
+              className="gap-2 h-auto py-3 flex-col items-center justify-center"
+              variant="outline"
+            >
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="text-xs">Alle taken</span>
+            </Button>
+            <Button 
+              onClick={() => onNavigate("extras")}
+              className="gap-2 h-auto py-3 flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="text-xs">Extra's</span>
+            </Button>
+            <Button 
+              onClick={() => onNavigate("settings")}
+              className="gap-2 h-auto py-3 flex-col items-center justify-center"
+              variant="outline"
+            >
+              <Zap className="w-5 h-5" />
+              <span className="text-xs">Instellingen</span>
+            </Button>
+          </div>
+        </Card>
+
+        {/* Priority Tasks */}
         {isLoading ? (
           <Card className="p-6">
             <p className="text-center text-muted-foreground">Taken laden...</p>
