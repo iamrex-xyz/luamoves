@@ -222,7 +222,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-base md:text-lg font-bold">Jouw taken</h2>
+                <h2 className="text-base md:text-lg font-bold text-foreground">Jouw taken</h2>
                 <Badge variant="secondary" className="text-xs">{tasks.length}</Badge>
               </div>
               <Button 
@@ -247,7 +247,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         ) : (
           <Card className="p-6 md:p-8 text-center">
             <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500 mx-auto mb-3" />
-            <h3 className="font-semibold text-base md:text-lg mb-2">Je hebt nog geen taken</h3>
+            <h3 className="font-semibold text-base md:text-lg mb-2 text-foreground">Je hebt nog geen taken</h3>
             <p className="text-sm md:text-base text-muted-foreground mb-4">
               Voeg je eerste taak toe om te beginnen met de voorbereiding van je verhuizing.
             </p>
