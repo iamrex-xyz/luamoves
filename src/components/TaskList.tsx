@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
@@ -22,6 +23,7 @@ import {
   Share2,
   User,
   FileText,
+  Search,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -37,6 +39,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [dealTask, setDealTask] = useState<Task | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -67,9 +70,15 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
       
-      return statusMatch && categoryMatch;
+      // Zoek filter
+      const searchMatch = searchQuery === "" || 
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.category.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return statusMatch && categoryMatch && searchMatch;
     });
-  }, [tasks, filter, selectedCategories]);
+  }, [tasks, filter, selectedCategories, searchQuery]);
 
   // Groepeer taken per fase
   const tasksByPhase = useMemo(() => {
@@ -160,8 +169,21 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         </div>
       </div>
 
+      {/* Search Bar */}
+      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Zoek taken op titel, beschrijving of categorie..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
       {/* Compact Filters */}
-      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[120px] md:top-[130px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
+      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[190px] md:top-[200px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
           <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
           

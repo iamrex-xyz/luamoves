@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      collaborator_messages: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       custom_tasks: {
         Row: {
           assigned_to_email: string | null
