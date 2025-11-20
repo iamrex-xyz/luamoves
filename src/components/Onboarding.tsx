@@ -37,7 +37,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   });
 
   const getTotalSteps = () => {
-    return 10; // Welcome, intro, addresses, type, dates, loading, success, account (removed step 10)
+    return 11; // Welcome, intro, addresses, type, dates, loading, success, account
   };
 
   const totalSteps = getTotalSteps();
@@ -97,7 +97,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
       const timer = setTimeout(() => {
         clearInterval(stepInterval);
-        setStep(9); // Go directly to success screen
+        setStep(9); // Go to success screen
         setLoadingStep(0);
       }, 3000);
       
@@ -107,9 +107,25 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       };
     } else if (step === 10) {
       // Account creation
-      if (email && password) {
-        onComplete(formData, email, password);
+      if (!email || !password) {
+        toast({
+          title: "Velden vereist",
+          description: "Vul alle velden in om je account aan te maken",
+          variant: "destructive",
+        });
+        return;
       }
+      
+      if (password.length < 6) {
+        toast({
+          title: "Wachtwoord te kort",
+          description: "Wachtwoord moet minimaal 6 tekens bevatten",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      onComplete(formData, email, password);
     } else if (step < totalSteps) {
       setStep(step + 1);
     }
@@ -155,8 +171,9 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
       case 7:
         return formData.keyHandoverDate.length > 0;
       case 8:
+        return true; // Loading screen
       case 9:
-        return true;
+        return true; // Success screen
       case 10:
         return email.length > 0 && password.length >= 6 && firstName.length > 0 && lastName.length > 0 && birthDay !== "" && birthMonth !== "" && birthYear !== "";
       default:
@@ -389,11 +406,17 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
                 <Home className="w-10 h-10 text-success" />
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                Je verhuisplan is klaar.
+                Super, je verhuisplan is klaar!
               </h2>
               <p className="text-lg text-muted-foreground max-w-md mx-auto">
-                Maak een account aan zodat ik alles voor je kan bewaren en je verder kan helpen.
+                Maak nu een account aan zodat je plan wordt opgeslagen en je overal toegang hebt.
               </p>
+              <Button
+                onClick={() => setStep(10)}
+                className="w-full mt-4"
+              >
+                Account aanmaken
+              </Button>
             </div>
           )}
 
@@ -511,17 +534,6 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           </div>
         )}
 
-        {step === 9 && (
-          <div className="mt-8">
-            <Button
-              onClick={() => setStep(10)}
-              size="lg"
-              className="w-full min-h-[48px]"
-            >
-              Begin met verhuizen
-            </Button>
-          </div>
-        )}
 
         {step === 10 && (
           <div className="mt-8">
