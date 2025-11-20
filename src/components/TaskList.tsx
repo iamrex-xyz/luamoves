@@ -138,34 +138,21 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         </div>
       </header>
 
-      {/* Search Bar */}
+      {/* Search Bar met Filter */}
       <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[73px] bg-background/95 backdrop-blur-lg z-10 border-b">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Zoek taken op titel, beschrijving of categorie..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
-
-      {/* Filter knop op vaste plek */}
-      <div className="max-w-4xl mx-auto px-4 py-2 sticky top-[134px] bg-background/95 backdrop-blur-lg z-10 border-b">
-        <div className="flex items-center justify-end">
+        <div className="flex items-center gap-2">
+          {/* Filter knop */}
           <Popover>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                size="sm"
-                className="h-8 gap-2"
+                size="icon"
+                className="h-10 w-10 shrink-0"
               >
                 <Filter className="h-4 w-4" />
-                <span className="text-xs">Filters</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 bg-background z-50" align="end">
+            <PopoverContent className="w-72 bg-background z-50" align="start">
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-sm mb-3">Status</h3>
@@ -206,6 +193,17 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
               </div>
             </PopoverContent>
           </Popover>
+          
+          {/* Zoekbalk */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Zoek taken op titel, beschrijving of categorie..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
       </div>
 
@@ -226,7 +224,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           <div className="space-y-6">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
-                <div className="mb-3 sticky top-[175px] md:top-[185px] bg-background/95 backdrop-blur py-2 z-[5]">
+                <div className="mb-3 sticky top-[134px] md:top-[144px] bg-background/95 backdrop-blur py-2 z-[5]">
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
