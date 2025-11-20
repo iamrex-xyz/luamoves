@@ -73,7 +73,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           checked={task.status === "done"}
           onCheckedChange={() => toggleTaskStatus(task.id)}
           onClick={(e) => e.stopPropagation()}
-          className="mt-0.5 h-[10px] w-[10px] shrink-0"
+          className="mt-0.5 h-[18px] w-[18px] shrink-0"
         />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
