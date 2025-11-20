@@ -310,13 +310,16 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           )}
 
           {step === 2 && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6" onClick={(e) => e.stopPropagation()}>
+            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6">
               <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
                 Ik ben Charly,<br />jouw persoonlijke verhuisconcierge.
               </h2>
               <Button
                 variant="ghost"
-                onClick={onLogin}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLogin();
+                }}
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Heb je al een account? Log in
