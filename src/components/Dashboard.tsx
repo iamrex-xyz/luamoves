@@ -30,6 +30,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
 
+  // Filter alleen niet-afgeronde taken voor de homepage
+  const openTasks = tasks.filter(t => t.status !== "done");
+
   // Calculate statistics
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.status === "done").length;
@@ -231,12 +234,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           <Card className="p-6">
             <p className="text-center text-muted-foreground">Taken laden...</p>
           </Card>
-        ) : tasks.length > 0 ? (
+        ) : openTasks.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-base md:text-lg font-bold text-foreground">Jouw taken</h2>
-                <Badge variant="secondary" className="text-xs">{tasks.length}</Badge>
+                <Badge variant="secondary" className="text-xs">{openTasks.length}</Badge>
               </div>
               <Button 
                 variant="outline" 
@@ -251,7 +254,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </div>
             <Card className="p-4">
               <div className="space-y-3">
-                {tasks.map((task) => (
+                {openTasks.map((task) => (
                   <TaskItem key={task.id} task={task} />
                 ))}
               </div>
