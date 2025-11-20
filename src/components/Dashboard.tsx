@@ -66,16 +66,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
     return (
       <div 
-        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
+        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors hover:bg-muted/50 ${
           isOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
         }`}
-        onClick={() => setSelectedTask(task)}
+        onClick={() => toggleTaskStatus(task.id)}
       >
         <div 
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleTaskStatus(task.id);
-          }}
           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
         >
           {task.status === "done" ? (
@@ -86,7 +82,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+            <h4 
+              className={`font-medium text-xs md:text-sm cursor-pointer hover:text-primary transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedTask(task);
+              }}
+            >
               {task.title}
             </h4>
             {getStatusBadge(task) && (
