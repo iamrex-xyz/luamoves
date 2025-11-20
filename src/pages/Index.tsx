@@ -50,7 +50,13 @@ const Index = () => {
         });
         setCurrentView("dashboard");
       } else {
-        setCurrentView("additionalInfo");
+        // User is logged in but hasn't completed onboarding - go to auth screen
+        await supabase.auth.signOut();
+        setCurrentView("auth");
+        toast({
+          title: "Geen verhuisinformatie gevonden",
+          description: "Start opnieuw om je verhuizing in te stellen",
+        });
       }
       setLoading(false);
     };
@@ -153,7 +159,13 @@ const Index = () => {
       });
       setCurrentView("dashboard");
     } else {
-      setCurrentView("additionalInfo");
+      // User logged in but hasn't completed onboarding - log them out
+      await supabase.auth.signOut();
+      setCurrentView("auth");
+      toast({
+        title: "Geen verhuisinformatie gevonden", 
+        description: "Start opnieuw om je verhuizing in te stellen",
+      });
     }
   };
 
