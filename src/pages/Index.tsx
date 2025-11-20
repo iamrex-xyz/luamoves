@@ -50,13 +50,8 @@ const Index = () => {
         });
         setCurrentView("dashboard");
       } else {
-        // User is logged in but hasn't completed onboarding - go to auth screen
-        await supabase.auth.signOut();
-        setCurrentView("auth");
-        toast({
-          title: "Geen verhuisinformatie gevonden",
-          description: "Start opnieuw om je verhuizing in te stellen",
-        });
+        // User logged in but hasn't filled in moving info yet
+        setCurrentView("additionalInfo");
       }
       setLoading(false);
     };
@@ -159,18 +154,24 @@ const Index = () => {
       });
       setCurrentView("dashboard");
     } else {
-      // User logged in but hasn't completed onboarding - log them out
-      await supabase.auth.signOut();
-      setCurrentView("auth");
-      toast({
-        title: "Geen verhuisinformatie gevonden", 
-        description: "Start opnieuw om je verhuizing in te stellen",
-      });
+      // User logged in but hasn't filled in moving info yet
+      setCurrentView("additionalInfo");
     }
   };
 
   const handleAdditionalInfoComplete = async (adults: number, children: number, pets: number, phone: string) => {
-    if (!user || !movingInfo) return;
+    if (!user) return;
+
+    // If movingInfo doesn't exist, create a minimal one (user came from login without onboarding)
+    const infoToSave = movingInfo || {
+      oldAddress: '',
+      newAddress: '',
+      movingDate: '',
+      keyHandoverDate: undefined,
+      type: 'rent' as const,
+      renovationType: 'none' as const,
+      needsContractorHelp: false,
+    };
 
     try {
       const { error } = await supabase
@@ -180,18 +181,19 @@ const Index = () => {
           children,
           pets,
           phone,
-          old_address: movingInfo.oldAddress,
-          new_address: movingInfo.newAddress,
-          moving_date: movingInfo.movingDate,
-          key_handover_date: movingInfo.keyHandoverDate || null,
-          moving_type: movingInfo.type,
-          renovation_type: movingInfo.renovationType || "none",
-          needs_contractor_help: movingInfo.needsContractorHelp || false,
+          old_address: infoToSave.oldAddress,
+          new_address: infoToSave.newAddress,
+          moving_date: infoToSave.movingDate || null,
+          key_handover_date: infoToSave.keyHandoverDate || null,
+          moving_type: infoToSave.type,
+          renovation_type: infoToSave.renovationType || "none",
+          needs_contractor_help: infoToSave.needsContractorHelp || false,
         })
         .eq('user_id', user.id);
 
       if (error) throw error;
 
+      setMovingInfo(infoToSave);
       setCurrentView("dashboard");
       toast({
         title: "Gegevens opgeslagen!",
