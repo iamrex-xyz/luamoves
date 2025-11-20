@@ -181,7 +181,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           id={cat}
                           checked={selectedCategories.includes(cat)}
                           onCheckedChange={() => toggleCategory(cat)}
-                          className="h-3 w-3"
+                          className="h-[10px] w-[10px]"
                         />
                         <Label htmlFor={cat} className="text-sm cursor-pointer">
                           {cat}
@@ -259,7 +259,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="mt-1 h-3 w-3"
+                          className="mt-0.5 h-[10px] w-[10px] shrink-0"
                         />
                         <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
