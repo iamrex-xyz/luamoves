@@ -72,41 +72,39 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           onClick={(e) => e.stopPropagation()}
           className="mt-1"
         />
-        <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
-                {task.title}
-              </h4>
-              {getStatusBadge(task) && (
-                <div className="flex-shrink-0">
-                  {getStatusBadge(task)}
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
+              {task.title}
+            </h4>
+            {getStatusBadge(task) && (
+              <div className="flex-shrink-0">
+                {getStatusBadge(task)}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {task.deadlineLabel}
+              {daysUntil === 0 && " (vandaag)"}
+              {daysUntil === 1 && " (morgen)"}
+              {daysUntil > 1 && ` (${daysUntil} dagen)`}
+              {isOverdue && " (verlopen)"}
+            </span>
+            {task.assignedToEmail && (
               <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {task.deadlineLabel}
-                {daysUntil === 0 && " (vandaag)"}
-                {daysUntil === 1 && " (morgen)"}
-                {daysUntil > 1 && ` (${daysUntil} dagen)`}
-                {isOverdue && " (verlopen)"}
+                <User className="w-3 h-3" />
+                {task.assignedToEmail}
               </span>
-              {task.assignedToEmail && (
-                <span className="flex items-center gap-1">
-                  <User className="w-3 h-3" />
-                  {task.assignedToEmail}
-                </span>
-              )}
-            </div>
+            )}
           </div>
           
           {task.affiliateLink && task.status !== "done" && (
             <Button
               size="sm"
               variant="outline"
-              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0"
+              className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
               onClick={(e) => {
                 e.stopPropagation();
                 window.open(task.affiliateLink, "_blank");
@@ -117,6 +115,21 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             </Button>
           )}
         </div>
+        
+        {task.affiliateLink && task.status !== "done" && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(task.affiliateLink, "_blank");
+            }}
+          >
+            Direct regelen
+            <ExternalLink className="w-3 h-3" />
+          </Button>
+        )}
       </div>
     );
   };

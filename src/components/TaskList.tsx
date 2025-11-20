@@ -275,13 +275,28 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                                 </span>
                               )}
                             </div>
+                            
+                            {task.affiliateLink && task.status !== "done" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDealTask(task);
+                                }}
+                              >
+                                Direct regelen
+                                <ExternalLink className="w-3 h-3" />
+                              </Button>
+                            )}
                           </div>
                           
                           {task.affiliateLink && task.status !== "done" && (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0"
+                              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDealTask(task);
