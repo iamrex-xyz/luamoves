@@ -27,6 +27,8 @@ import {
   User,
   FileText,
   Search,
+  Package,
+  PackageOpen,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -255,12 +257,19 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                         }`}
                         onClick={() => setSelectedTask(task)}
                       >
-                        <Checkbox
-                          checked={task.status === "done"}
-                          onCheckedChange={() => toggleTaskStatus(task.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="mt-0.5 h-[16px] w-[16px] shrink-0"
-                        />
+                        <div 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleTaskStatus(task.id);
+                          }}
+                          className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
+                        >
+                          {task.status === "done" ? (
+                            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
+                          ) : (
+                            <Package className="h-[16px] w-[16px] text-muted-foreground" />
+                          )}
+                        </div>
                         <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-1">
