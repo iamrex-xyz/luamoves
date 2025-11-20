@@ -183,6 +183,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
               <Checkbox
                 checked={selectedCategories.includes(cat)}
                 onCheckedChange={() => toggleCategory(cat)}
+                className="h-4 w-4"
               />
               <span>{cat}</span>
             </label>
@@ -238,7 +239,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           checked={task.status === "done"}
                           onCheckedChange={() => toggleTaskStatus(task.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="mt-1"
+                          className="mt-1 h-4 w-4"
                         />
                         <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
