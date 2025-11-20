@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Camera, Wallet, Lightbulb, Upload, Plus, Trash2, Download, LogOut, MessageCircle, Home as HomeIcon } from "lucide-react";
+import { FileText, Upload, Trash2, Download, LogOut, MessageCircle, Home as HomeIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,7 @@ type ExtrasProps = {
 export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeSection, setActiveSection] = useState<"documents" | "photos" | "budget" | "tips" | "chat">("documents");
+  const [activeSection, setActiveSection] = useState<"documents" | "chat">("documents");
 
   // Fetch moving tips
   const { data: tips = [] } = useQuery({
@@ -248,15 +248,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
     URL.revokeObjectURL(url);
   };
 
-  // Group tips by phase
-  const tipsByPhase = tips.reduce((acc, tip) => {
-    if (!acc[tip.phase]) acc[tip.phase] = [];
-    acc[tip.phase].push(tip);
-    return acc;
-  }, {} as Record<string, typeof tips>);
-
-  // Calculate total expenses
-  const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -270,7 +261,7 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
               </div>
               <div>
                 <h1 className="text-xl font-semibold">Extra</h1>
-                <p className="text-white/80 text-xs">Documenten, budget & meer</p>
+                <p className="text-white/80 text-xs">Gedeelde documenten & chat</p>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
@@ -281,8 +272,15 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
       </header>
 
       <main className="max-w-4xl mx-auto p-4 space-y-4">
+        {/* Info Banner */}
+        <Card className="p-4 bg-muted/50">
+          <p className="text-sm text-muted-foreground">
+            💡 Alles onder het tabblad "Extra" is zichtbaar voor iedereen in je verhuisomgeving (bewoners/huisgenoten).
+          </p>
+        </Card>
+
         {/* Section Navigation */}
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <Button
             variant={activeSection === "documents" ? "default" : "outline"}
             onClick={() => setActiveSection("documents")}
@@ -290,30 +288,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
           >
             <FileText className="h-4 w-4" />
             <span className="text-xs">Documenten</span>
-          </Button>
-          <Button
-            variant={activeSection === "photos" ? "default" : "outline"}
-            onClick={() => setActiveSection("photos")}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Camera className="h-4 w-4" />
-            <span className="text-xs">Foto's</span>
-          </Button>
-          <Button
-            variant={activeSection === "budget" ? "default" : "outline"}
-            onClick={() => setActiveSection("budget")}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Wallet className="h-4 w-4" />
-            <span className="text-xs">Budget</span>
-          </Button>
-          <Button
-            variant={activeSection === "tips" ? "default" : "outline"}
-            onClick={() => setActiveSection("tips")}
-            className="flex flex-col h-auto py-3 gap-1"
-          >
-            <Lightbulb className="h-4 w-4" />
-            <span className="text-xs">Tips</span>
           </Button>
           <Button
             variant={activeSection === "chat" ? "default" : "outline"}
@@ -328,6 +302,16 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
         {/* Documents Section */}
         {activeSection === "documents" && (
           <div className="space-y-4">
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                Documenten
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Upload documenten vanaf je apparaat. Je kunt een categorie selecteren of zelf een categorie toevoegen.
+              </p>
+            </Card>
+
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="w-full">
@@ -429,205 +413,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
           </div>
         )}
 
-        {/* Photos Section */}
-        {activeSection === "photos" && (
-          <div className="space-y-4">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full">
-                  <Camera className="mr-2 h-4 w-4" />
-                  Foto uploaden
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Foto uploaden</DialogTitle>
-                  <DialogDescription>Upload een foto (max 10MB)</DialogDescription>
-                </DialogHeader>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const file = formData.get("file") as File;
-
-                    if (file) {
-                      uploadPhoto.mutate({ file });
-                      e.currentTarget.reset();
-                    }
-                  }}
-                  className="space-y-4"
-                >
-                  <div>
-                    <Label htmlFor="photo-file">Foto</Label>
-                    <Input 
-                      id="photo-file" 
-                      name="file" 
-                      type="file" 
-                      accept="image/*"
-                      capture="environment"
-                      required 
-                    />
-                  </div>
-                  <Button type="submit" className="w-full">Uploaden</Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            {photos.length === 0 ? (
-              <Card className="p-8 text-center">
-                <Camera className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Nog geen foto's geüpload</p>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                {photos.map((photo) => (
-                  <PhotoCard 
-                    key={photo.name} 
-                    photo={photo}
-                    onDelete={(path) => deletePhoto.mutate(path)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Budget Section */}
-        {activeSection === "budget" && (
-          <div className="space-y-4">
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <p className="text-sm text-muted-foreground mb-1">Totale uitgaven</p>
-              <p className="text-3xl font-bold">€ {totalExpenses.toFixed(2)}</p>
-            </Card>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Uitgave toevoegen
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Uitgave toevoegen</DialogTitle>
-                </DialogHeader>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    addExpense.mutate({
-                      category: formData.get("category") as string,
-                      description: formData.get("description") as string,
-                      amount: Number(formData.get("amount")),
-                      expense_date: formData.get("expense_date") as string,
-                    });
-                    e.currentTarget.reset();
-                  }}
-                  className="space-y-4"
-                >
-                  <div>
-                    <Label htmlFor="category">Categorie</Label>
-                    <Select name="category" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Kies categorie" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="verhuisbedrijf">Verhuisbedrijf</SelectItem>
-                        <SelectItem value="verpakking">Verpakkingsmateriaal</SelectItem>
-                        <SelectItem value="klusjesman">Klusjesman</SelectItem>
-                        <SelectItem value="schoonmaak">Schoonmaak</SelectItem>
-                        <SelectItem value="transport">Transport</SelectItem>
-                        <SelectItem value="overig">Overig</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Beschrijving</Label>
-                    <Input id="description" name="description" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="amount">Bedrag (€)</Label>
-                    <Input id="amount" name="amount" type="number" step="0.01" required />
-                  </div>
-                  <div>
-                    <Label htmlFor="expense_date">Datum</Label>
-                    <Input id="expense_date" name="expense_date" type="date" required />
-                  </div>
-                  <Button type="submit" className="w-full">Toevoegen</Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            {expenses.length === 0 ? (
-              <Card className="p-8 text-center">
-                <Wallet className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Nog geen uitgaven toegevoegd</p>
-              </Card>
-            ) : (
-              <div className="space-y-2">
-                {expenses.map((expense) => (
-                  <Card key={expense.id} className="p-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{expense.description}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">{expense.category}</Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(expense.expense_date), "d MMM yyyy", { locale: nl })}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <p className="font-bold text-lg">€ {Number(expense.amount).toFixed(2)}</p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteExpense.mutate(expense.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tips Section */}
-        {activeSection === "tips" && (
-          <div className="space-y-3">
-            {Object.entries(tipsByPhase).map(([phase, phaseTips]) => (
-              <Card key={phase} className="overflow-hidden">
-                <Accordion type="single" collapsible>
-                  <AccordionItem value={phase} className="border-0">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                      <div className="flex items-center gap-2">
-                        <Lightbulb className="h-4 w-4 text-primary" />
-                        <span className="font-medium">{phase}</span>
-                        <Badge variant="secondary" className="ml-2">{phaseTips.length}</Badge>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="px-4 pb-3">
-                      <div className="space-y-3 pt-2">
-                        {phaseTips.map((tip) => (
-                          <div key={tip.id} className="border-l-2 border-primary/30 pl-3">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="outline" className="text-xs">{tip.category}</Badge>
-                            </div>
-                            <h4 className="font-medium text-sm mb-1">{tip.title}</h4>
-                            <p className="text-sm text-muted-foreground">{tip.content}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </Card>
-            ))}
-          </div>
-        )}
 
         {/* Chat Section */}
         {activeSection === "chat" && <CollaboratorChat />}
