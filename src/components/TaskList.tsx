@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
@@ -148,49 +151,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
         </div>
       </div>
 
-      {/* Compact Filters */}
-      <div className="max-w-4xl mx-auto px-4 py-2.5 sticky top-[134px] bg-background/95 backdrop-blur-lg z-10 border-b shadow-sm">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-          <Filter className="w-4 h-4 text-muted-foreground shrink-0" />
-          
-          {/* Status filters */}
-          <Button
-            variant={filter === "open" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilter("open")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Open ({tasks.filter((t) => t.status !== "done").length})
-          </Button>
-          <Button
-            variant={filter === "done" ? "default" : "outline"}
-            size="sm"
-            onClick={() => setFilter("done")}
-            className="min-h-[32px] whitespace-nowrap text-xs px-2.5 py-1"
-          >
-            Afgerond ({tasks.filter((t) => t.status === "done").length})
-          </Button>
-        </div>
-        
-        {/* Category filters - Multi-select checkboxes */}
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pt-2">
-          <span className="text-xs text-muted-foreground shrink-0">Categorieën:</span>
-          {categories.map((cat) => (
-            <label
-              key={cat}
-              className="flex items-center gap-1.5 cursor-pointer bg-secondary hover:bg-secondary/80 rounded-md px-2.5 py-1 text-xs whitespace-nowrap transition-colors"
-            >
-              <Checkbox
-                checked={selectedCategories.includes(cat)}
-                onCheckedChange={() => toggleCategory(cat)}
-                className="h-4 w-4"
-              />
-              <span>{cat}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
       {/* Tasks grouped by phase */}
       <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
         {isLoading ? (
@@ -206,16 +166,75 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
           </Card>
         ) : (
           <div className="space-y-6">
-            {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
+            {Object.entries(tasksByPhase).map(([phase, phaseTasks], index) => (
               <div key={phase}>
-                <div className="mb-3 sticky top-[165px] md:top-[175px] bg-background/95 backdrop-blur py-2 z-[5]">
-                  <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                    {phase}
-                  </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {phaseTasks.length} {phaseTasks.length === 1 ? "taak" : "taken"}
-                  </p>
+                <div className="mb-3 sticky top-[134px] md:top-[144px] bg-background/95 backdrop-blur py-2 z-[5]">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                        {phase}
+                      </h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {phaseTasks.length} {phaseTasks.length === 1 ? "taak" : "taken"}
+                      </p>
+                    </div>
+                    
+                    {/* Filter popover alleen bij eerste fase */}
+                    {index === 0 && (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="icon"
+                            className="h-8 w-8"
+                          >
+                            <Filter className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-72 bg-background z-50" align="end">
+                          <div className="space-y-4">
+                            <div>
+                              <h3 className="font-semibold text-sm mb-3">Status</h3>
+                              <RadioGroup value={filter} onValueChange={(val: "open" | "done") => setFilter(val)}>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="open" id="open" />
+                                  <Label htmlFor="open" className="text-sm cursor-pointer">
+                                    Open taken ({tasks.filter((t) => t.status !== "done").length})
+                                  </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="done" id="done" />
+                                  <Label htmlFor="done" className="text-sm cursor-pointer">
+                                    Afgeronde taken ({tasks.filter((t) => t.status === "done").length})
+                                  </Label>
+                                </div>
+                              </RadioGroup>
+                            </div>
+                            
+                            <div className="border-t pt-4">
+                              <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
+                              <div className="space-y-2">
+                                {categories.map((cat) => (
+                                  <div key={cat} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={cat}
+                                      checked={selectedCategories.includes(cat)}
+                                      onCheckedChange={() => toggleCategory(cat)}
+                                      className="h-4 w-4"
+                                    />
+                                    <Label htmlFor={cat} className="text-sm cursor-pointer">
+                                      {cat}
+                                    </Label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-3">
