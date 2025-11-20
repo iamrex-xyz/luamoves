@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -176,14 +175,14 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                   <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
                   <div className="space-y-2">
                     {categories.map((cat) => (
-                      <div key={cat} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={cat}
-                          checked={selectedCategories.includes(cat)}
-                          onCheckedChange={() => toggleCategory(cat)}
-                          className="h-[18px] w-[18px]"
-                        />
-                        <Label htmlFor={cat} className="text-sm cursor-pointer">
+                      <div 
+                        key={cat} 
+                        className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-colors ${
+                          selectedCategories.includes(cat) ? "bg-primary/10" : "hover:bg-muted"
+                        }`}
+                        onClick={() => toggleCategory(cat)}
+                      >
+                        <Label htmlFor={cat} className="text-sm cursor-pointer flex-1">
                           {cat}
                         </Label>
                       </div>
@@ -250,17 +249,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                     return (
                       <div
                         key={task.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
                           isTaskOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
                         }`}
                         onClick={() => setSelectedTask(task)}
                       >
-                        <Checkbox
-                          checked={task.status === "done"}
-                          onCheckedChange={() => toggleTaskStatus(task.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="mt-0.5 h-[18px] w-[18px] shrink-0"
-                        />
                         <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2 mb-1">

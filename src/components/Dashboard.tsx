@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
@@ -64,17 +63,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
     return (
       <div 
-        className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
+        className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
           isOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
         }`}
         onClick={() => setSelectedTask(task)}
       >
-        <Checkbox
-          checked={task.status === "done"}
-          onCheckedChange={() => toggleTaskStatus(task.id)}
-          onClick={(e) => e.stopPropagation()}
-          className="mt-0.5 h-[18px] w-[18px] shrink-0"
-        />
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
             <h4 className={`font-medium text-xs md:text-sm ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}>
