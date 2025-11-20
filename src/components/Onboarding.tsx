@@ -8,11 +8,26 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { z } from "zod";
 
 type OnboardingProps = {
   onComplete: (info: MovingInfo, email: string, password: string) => void;
   onLogin: () => void;
 };
+
+const nameSchema = z.string()
+  .trim()
+  .min(1, "Dit veld is verplicht")
+  .max(50, "Naam mag maximaal 50 tekens bevatten")
+  .regex(/^[a-zA-ZÀ-ÿ\s\-']+$/, "Naam mag alleen letters, spaties, koppeltekens en apostroffen bevatten");
+
+const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
+const passwordSchema = z.string().min(6, "Wachtwoord moet minimaal 6 tekens bevatten");
+
+const addressSchema = z.string()
+  .trim()
+  .min(1, "Adres is verplicht")
+  .max(200, "Adres mag maximaal 200 tekens bevatten");
 
 export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
   const { toast } = useToast();
@@ -106,23 +121,103 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
         clearInterval(stepInterval);
       };
     } else if (step === 10) {
-      // Account creation
-      if (!email || !password) {
+      // Account creation - validate all fields
+      const firstNameValidation = nameSchema.safeParse(firstName);
+      const lastNameValidation = nameSchema.safeParse(lastName);
+      const emailValidation = emailSchema.safeParse(email);
+      const passwordValidation = passwordSchema.safeParse(password);
+      
+      if (!firstNameValidation.success) {
         toast({
-          title: "Velden vereist",
-          description: "Vul alle velden in om je account aan te maken",
+          title: "Ongeldige invoer",
+          description: `Voornaam: ${firstNameValidation.error.errors[0].message}`,
           variant: "destructive",
         });
         return;
       }
       
-      if (password.length < 6) {
+      if (!lastNameValidation.success) {
         toast({
-          title: "Wachtwoord te kort",
-          description: "Wachtwoord moet minimaal 6 tekens bevatten",
+          title: "Ongeldige invoer",
+          description: `Achternaam: ${lastNameValidation.error.errors[0].message}`,
           variant: "destructive",
         });
         return;
+      }
+      
+      if (!emailValidation.success) {
+        toast({
+          title: "Ongeldige invoer",
+          description: emailValidation.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!passwordValidation.success) {
+        toast({
+          title: "Ongeldige invoer",
+          description: passwordValidation.error.errors[0].message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (!birthDay || !birthMonth || !birthYear) {
+        toast({
+          title: "Ongeldige invoer",
+          description: "Vul je volledige geboortedatum in",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate birth date
+      const birthDate = new Date(parseInt(birthYear), parseInt(birthMonth) - 1, parseInt(birthDay));
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      
+      if (birthDate > today) {
+        toast({
+          title: "Ongeldige geboortedatum",
+          description: "Geboortedatum kan niet in de toekomst liggen",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (age < 16 || age > 120) {
+        toast({
+          title: "Ongeldige geboortedatum",
+          description: "Je moet minimaal 16 jaar oud zijn",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Validate addresses when completing
+      if (formData.oldAddress) {
+        const oldAddressValidation = addressSchema.safeParse(formData.oldAddress);
+        if (!oldAddressValidation.success) {
+          toast({
+            title: "Ongeldig adres",
+            description: "Huidig adres is te lang of ongeldig",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+      
+      if (formData.newAddress) {
+        const newAddressValidation = addressSchema.safeParse(formData.newAddress);
+        if (!newAddressValidation.success) {
+          toast({
+            title: "Ongeldig adres",
+            description: "Nieuw adres is te lang of ongeldig",
+            variant: "destructive",
+          });
+          return;
+        }
       }
       
       onComplete(formData, email, password);

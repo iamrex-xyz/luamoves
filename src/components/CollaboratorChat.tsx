@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { z } from "zod";
 
 type Message = {
   id: string;
@@ -13,6 +14,13 @@ type Message = {
   message: string;
   created_at: string;
 };
+
+const messageSchema = z.object({
+  message: z.string()
+    .trim()
+    .min(1, "Bericht mag niet leeg zijn")
+    .max(1000, "Bericht mag maximaal 1000 tekens bevatten")
+});
 
 export const CollaboratorChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -88,14 +96,23 @@ export const CollaboratorChat = () => {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !currentUserId) return;
+    if (!currentUserId) return;
+
+    const validation = messageSchema.safeParse({ message: newMessage });
+    
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
+
+    const messageToSend = validation.data.message;
 
     try {
       const { error } = await supabase
         .from("collaborator_messages")
         .insert({
           user_id: currentUserId,
-          message: newMessage.trim(),
+          message: messageToSend,
         });
 
       if (error) throw error;

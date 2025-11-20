@@ -6,12 +6,16 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@supabase/supabase-js";
 import { Eye, EyeOff } from "lucide-react";
+import { z } from "zod";
 
 interface AuthProps {
   onComplete: (user: User) => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
+
+const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
+const passwordSchema = z.string().min(6, "Wachtwoord moet minimaal 6 tekens bevatten");
 
 export const Auth = ({ onComplete }: AuthProps) => {
   const [loading, setLoading] = useState(false);
@@ -38,10 +42,11 @@ export const Auth = ({ onComplete }: AuthProps) => {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
+    const emailValidation = emailSchema.safeParse(email);
+    if (!emailValidation.success) {
       toast({
-        title: "Email vereist",
-        description: "Vul je email in om je wachtwoord te resetten",
+        title: "Ongeldige invoer",
+        description: emailValidation.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -77,10 +82,22 @@ export const Auth = ({ onComplete }: AuthProps) => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    const emailValidation = emailSchema.safeParse(email);
+    const passwordValidation = passwordSchema.safeParse(password);
+    
+    if (!emailValidation.success) {
       toast({
-        title: "Velden vereist",
-        description: "Vul je email en wachtwoord in",
+        title: "Ongeldige invoer",
+        description: emailValidation.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!passwordValidation.success) {
+      toast({
+        title: "Ongeldige invoer",
+        description: passwordValidation.error.errors[0].message,
         variant: "destructive",
       });
       return;
@@ -114,19 +131,22 @@ export const Auth = ({ onComplete }: AuthProps) => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email || !password) {
+    const emailValidation = emailSchema.safeParse(email);
+    const passwordValidation = passwordSchema.safeParse(password);
+    
+    if (!emailValidation.success) {
       toast({
-        title: "Velden vereist",
-        description: "Vul je email en wachtwoord in",
+        title: "Ongeldige invoer",
+        description: emailValidation.error.errors[0].message,
         variant: "destructive",
       });
       return;
     }
-
-    if (password.length < 6) {
+    
+    if (!passwordValidation.success) {
       toast({
-        title: "Wachtwoord te kort",
-        description: "Wachtwoord moet minimaal 6 tekens bevatten",
+        title: "Ongeldige invoer",
+        description: passwordValidation.error.errors[0].message,
         variant: "destructive",
       });
       return;
