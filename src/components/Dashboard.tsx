@@ -87,11 +87,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       <div 
         className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-500 ${
           isCompleting 
-            ? "bg-primary/10 border-primary/30 opacity-0 scale-95 -translate-y-2" 
+            ? "bg-primary/20 border-primary/40 scale-95 -translate-y-2" 
             : isOverdue 
               ? "border-destructive/30 bg-destructive/5 hover:bg-muted/50" 
               : "border-border bg-card hover:bg-muted/50"
-        }`}
+        } cursor-pointer`}
+        style={isCompleting ? { 
+          opacity: 0,
+          transition: 'opacity 0.3s ease-out 0.3s, transform 0.5s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out'
+        } : undefined}
         onClick={() => !isCompleting && handleTaskToggle(task.id)}
       >
         <div 
