@@ -273,7 +273,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                         key={task.id}
                         className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-500 ${
                           isCompleting 
-                            ? "bg-green-50 border-green-200 opacity-0 scale-95 translate-x-4" 
+                            ? "bg-primary/10 border-primary/30 opacity-0 scale-95 -translate-y-2" 
                             : isTaskOverdue 
                               ? "border-destructive/30 bg-destructive/5 hover:bg-muted/50" 
                               : "border-border bg-card hover:bg-muted/50"
@@ -284,7 +284,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
                         >
                           {isCompleting ? (
-                            <PackageOpen className="h-[16px] w-[16px] text-green-600 animate-scale-in" />
+                            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
                           ) : task.status === "done" ? (
                             <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
                           ) : (
