@@ -45,9 +45,27 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [dealTask, setDealTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+
+  const handleTaskToggle = async (taskId: string) => {
+    setCompletingTasks(prev => new Set(prev).add(taskId));
+    
+    // Wacht op animatie
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // Update status
+    await toggleTaskStatus(taskId);
+    
+    // Verwijder uit animating set
+    setCompletingTasks(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(taskId);
+      return newSet;
+    });
+  };
 
   // Bereken categorieën
   const categories = useMemo(() => {
@@ -248,19 +266,26 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                     deadline.setHours(0, 0, 0, 0);
                     const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
                     const isTaskOverdue = deadline < today && task.status !== "done";
+                    const isCompleting = completingTasks.has(task.id);
 
                     return (
                       <div
                         key={task.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors hover:bg-muted/50 ${
-                          isTaskOverdue ? "border-destructive/30 bg-destructive/5" : "border-border bg-card"
+                        className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-500 ${
+                          isCompleting 
+                            ? "bg-green-50 border-green-200 opacity-0 scale-95 translate-x-4" 
+                            : isTaskOverdue 
+                              ? "border-destructive/30 bg-destructive/5 hover:bg-muted/50" 
+                              : "border-border bg-card hover:bg-muted/50"
                         }`}
-                        onClick={() => toggleTaskStatus(task.id)}
+                        onClick={() => !isCompleting && handleTaskToggle(task.id)}
                       >
                         <div 
                           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
                         >
-                          {task.status === "done" ? (
+                          {isCompleting ? (
+                            <PackageOpen className="h-[16px] w-[16px] text-green-600 animate-scale-in" />
+                          ) : task.status === "done" ? (
                             <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
                           ) : (
                             <Package className="h-[16px] w-[16px] text-muted-foreground" />
@@ -271,10 +296,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             <div className="flex items-start justify-between gap-2 mb-1">
                               <div className="flex items-center gap-2 flex-1">
                                 <h4 
-                                  className={`font-medium text-sm md:text-base cursor-pointer hover:text-primary transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
+                                  className={`font-medium text-sm md:text-base ${!isCompleting && "cursor-pointer hover:text-primary"} transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
                                   onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedTask(task);
+                                    if (!isCompleting) {
+                                      e.stopPropagation();
+                                      setSelectedTask(task);
+                                    }
                                   }}
                                 >
                                   {task.title}
