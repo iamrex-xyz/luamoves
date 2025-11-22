@@ -14,6 +14,7 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
+import { TaskDealOptions } from "@/components/TaskDealOptions";
 import { BottomNav } from "@/components/BottomNav";
 import {
   ArrowLeft,
@@ -340,18 +341,21 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             </div>
                             
                             {task.affiliateLink && task.status !== "done" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setDealTask(task);
-                                }}
-                              >
-                                Direct regelen
-                                <ExternalLink className="w-3 h-3" />
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDealTask(task);
+                                  }}
+                                >
+                                  Direct regelen
+                                  <ExternalLink className="w-3 h-3" />
+                                </Button>
+                                <TaskDealOptions taskTitle={task.title} />
+                              </>
                             )}
                           </div>
                           
