@@ -180,7 +180,7 @@ export const Auth = ({ onComplete }: AuthProps) => {
     }
   };
 
-  // Initial screen with two buttons
+  // Initial screen - only login option
   if (screen === 'initial') {
     return (
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
@@ -200,13 +200,6 @@ export const Auth = ({ onComplete }: AuthProps) => {
               className="w-full h-12 text-base"
             >
               Inloggen
-            </Button>
-            <Button 
-              onClick={() => setScreen('signup')} 
-              variant="outline"
-              className="w-full h-12 text-base"
-            >
-              Schrijf je in
             </Button>
           </div>
         </div>
@@ -362,78 +355,6 @@ export const Auth = ({ onComplete }: AuthProps) => {
     );
   }
 
-  // Signup screen
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-4 text-center">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold font-charly tracking-tight">
-            Charly
-          </h1>
-        </div>
-
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <h2 className="text-lg font-semibold">Maak een account aan</h2>
-            <p className="text-xs text-muted-foreground">
-              Ik help je stap voor stap met verhuizen
-            </p>
-          </div>
-
-          <form onSubmit={handleSignUp} className="space-y-3">
-            <div className="space-y-1.5 text-left">
-              <Label htmlFor="email" className="text-sm">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="jouw@email.nl"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                className="h-10 text-sm"
-              />
-            </div>
-
-            <div className="space-y-1.5 text-left">
-              <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  className="h-10 text-sm pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  disabled={loading}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
-            <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
-              {loading ? "Laden..." : "Begin met verhuizen"}
-            </Button>
-          </form>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setScreen('initial')}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-              disabled={loading}
-            >
-              Terug
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // Signup screen removed - users must go through onboarding
+  return null;
 };
