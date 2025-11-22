@@ -235,7 +235,7 @@ const Index = () => {
   }
 
   if (currentView === "auth") {
-    return <Auth onComplete={handleAuthComplete} />;
+    return <Auth onComplete={handleAuthComplete} onSignUpRequest={() => setCurrentView("onboarding")} />;
   }
 
   if (currentView === "additionalInfo") {

@@ -10,6 +10,7 @@ import { z } from "zod";
 
 interface AuthProps {
   onComplete: (user: User) => void;
+  onSignUpRequest?: () => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
@@ -17,7 +18,7 @@ type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
 const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
 const passwordSchema = z.string().min(6, "Wachtwoord moet minimaal 6 tekens bevatten");
 
-export const Auth = ({ onComplete }: AuthProps) => {
+export const Auth = ({ onComplete, onSignUpRequest }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
@@ -201,6 +202,13 @@ export const Auth = ({ onComplete }: AuthProps) => {
             >
               Inloggen
             </Button>
+            <Button 
+              onClick={onSignUpRequest} 
+              variant="outline"
+              className="w-full h-12 text-base"
+            >
+              Account aanmaken
+            </Button>
           </div>
         </div>
       </div>
@@ -347,6 +355,14 @@ export const Auth = ({ onComplete }: AuthProps) => {
                 disabled={loading}
               >
                 Wachtwoord vergeten?
+              </button>
+              <button
+                type="button"
+                onClick={onSignUpRequest}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
+                disabled={loading}
+              >
+                Nog geen account? Maak er een aan
               </button>
             </div>
           </div>
