@@ -14,8 +14,8 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
-import { TaskDealOptions } from "@/components/TaskDealOptions";
 import { BottomNav } from "@/components/BottomNav";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   ExternalLink,
@@ -50,6 +50,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+  const navigate = useNavigate();
 
   const handleTaskToggle = async (taskId: string) => {
     setCompletingTasks(prev => new Set(prev).add(taskId));
@@ -341,21 +342,18 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                             </div>
                             
                             {task.affiliateLink && task.status !== "done" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setDealTask(task);
-                                  }}
-                                >
-                                  Direct regelen
-                                  <ExternalLink className="w-3 h-3" />
-                                </Button>
-                                <TaskDealOptions taskTitle={task.title} />
-                              </>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+                                }}
+                              >
+                                Direct regelen
+                                <ExternalLink className="w-3 h-3" />
+                              </Button>
                             )}
                           </div>
                           
@@ -366,7 +364,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
                               className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setDealTask(task);
+                                navigate(`/deals?task=${encodeURIComponent(task.title)}`);
                               }}
                             >
                               Direct regelen
