@@ -8,7 +8,7 @@ import { Task } from "@/lib/taskGenerator";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
-import { TaskDealOptions } from "@/components/TaskDealOptions";
+import { useNavigate } from "react-router-dom";
 import {
   Home,
   Clock,
@@ -33,6 +33,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
+  const navigate = useNavigate();
 
   // Filter alleen niet-afgeronde taken voor de homepage
   const openTasks = tasks.filter(t => t.status !== "done");
@@ -147,21 +148,18 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           </div>
           
           {task.affiliateLink && task.status !== "done" && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.open(task.affiliateLink, "_blank");
-                }}
-              >
-                Direct regelen
-                <ExternalLink className="w-3 h-3" />
-              </Button>
-              <TaskDealOptions taskTitle={task.title} />
-            </>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+              }}
+            >
+              Direct regelen
+              <ExternalLink className="w-3 h-3" />
+            </Button>
           )}
         </div>
         
@@ -172,7 +170,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
             onClick={(e) => {
               e.stopPropagation();
-              window.open(task.affiliateLink, "_blank");
+              navigate(`/deals?task=${encodeURIComponent(task.title)}`);
             }}
           >
             Direct regelen
