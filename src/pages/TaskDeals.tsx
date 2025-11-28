@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -69,40 +70,40 @@ export const TaskDeals = () => {
       </div>
 
       {/* Deals List */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 space-y-4">
-        <p className="text-sm text-muted-foreground mb-4">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 space-y-3">
+        <p className="text-xs text-muted-foreground mb-3">
           Vergelijk de opties en kies wat het beste bij jouw situatie past
         </p>
 
         {deals.map((deal) => (
           <Card 
             key={deal.id} 
-            className={`p-6 relative ${deal.popular ? 'border-primary border-2 shadow-lg' : 'shadow-md'}`}
+            className={`p-3 md:p-4 relative ${deal.popular ? 'border-primary border-2 shadow-lg' : 'shadow-md'}`}
           >
             {deal.popular && (
-              <Badge className="absolute -top-3 left-6 bg-primary h-6 px-3">
+              <Badge className="absolute -top-2 left-3 bg-primary h-5 px-2 text-xs">
                 <Star className="w-3 h-3 mr-1" />
                 Meest gekozen
               </Badge>
             )}
             
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex gap-3 md:gap-4">
               {/* Left side - Icon & Info */}
-              <div className="flex-1">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className={`p-3 rounded-lg ${deal.iconBg} flex-shrink-0`}>
-                    {deal.icon}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start gap-2 md:gap-3 mb-2">
+                  <div className={`p-2 rounded-lg ${deal.iconBg} flex-shrink-0`}>
+                    {React.cloneElement(deal.icon, { className: "w-4 h-4" })}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-xl mb-1">{deal.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{deal.provider}</p>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-base md:text-lg mb-0.5 truncate">{deal.title}</h3>
+                    <p className="text-xs text-muted-foreground mb-2">{deal.provider}</p>
                     
-                    <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-1.5 mb-2">
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${
+                            className={`w-3 h-3 ${
                               i < Math.floor(deal.rating)
                                 ? "fill-yellow-400 text-yellow-400"
                                 : "text-gray-300"
@@ -110,48 +111,47 @@ export const TaskDeals = () => {
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         {deal.rating}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1 mb-2">
                   {deal.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                      <span>{feature}</span>
+                    <div key={index} className="flex items-center gap-1.5 text-xs">
+                      <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
+                      <span className="truncate">{feature}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Right side - Price & CTA */}
-              <div className="flex flex-col items-center justify-center md:items-end md:justify-between gap-4 md:w-48">
-                <div className="text-center md:text-right">
-                  <div className="text-3xl font-bold text-primary mb-1">
+              <div className="flex flex-col items-end justify-between gap-2 flex-shrink-0">
+                <div className="text-right">
+                  <div className="text-xl md:text-2xl font-bold text-primary">
                     {deal.price}
                   </div>
-                  <p className="text-xs text-muted-foreground">per dienst</p>
+                  <p className="text-[10px] text-muted-foreground">per dienst</p>
                 </div>
                 <Button
-                  className="gap-2 w-full md:w-auto"
-                  size="lg"
+                  className="gap-1.5 text-xs h-8 px-3"
                   onClick={() => {
                     window.open(deal.url, "_blank");
                   }}
                 >
-                  Kies deze optie
-                  <ExternalLink className="w-4 h-4" />
+                  Kies
+                  <ExternalLink className="w-3 h-3" />
                 </Button>
               </div>
             </div>
           </Card>
         ))}
 
-        <div className="mt-8 p-4 bg-muted rounded-lg">
-          <p className="text-sm text-muted-foreground text-center">
+        <div className="mt-4 p-3 bg-muted rounded-lg">
+          <p className="text-xs text-muted-foreground text-center">
             💡 Tip: Vergelijk de opties rustig en kies wat het beste bij jouw budget en wensen past
           </p>
         </div>
