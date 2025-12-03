@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Save, Users, Tag } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
@@ -94,20 +94,48 @@ export const SignupPromptDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
-          <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="w-8 h-8 text-primary" />
-          </div>
           <DialogTitle className="text-xl">Goed bezig! 🎉</DialogTitle>
           <DialogDescription className="text-base">
-            Maak een account aan om je voortgang op te slaan en toegang te krijgen tot alle functies.
+            Maak gratis een account aan voor deze voordelen:
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        {/* Benefits list */}
+        <div className="space-y-3 py-2">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Save className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">Voortgang bewaren</p>
+              <p className="text-xs text-muted-foreground">Je taken en notities blijven opgeslagen</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">Partner/huisgenoten koppelen</p>
+              <p className="text-xs text-muted-foreground">Verdeel taken en werk samen</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+            <div className="p-2 rounded-full bg-primary/10">
+              <Tag className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="font-medium text-sm">Exclusieve verhuiskortingen</p>
+              <p className="text-xs text-muted-foreground">Bespaar bij onze partners</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 pt-2">
           <div className="space-y-2">
-            <Label htmlFor="email">E-mailadres</Label>
+            <Label htmlFor="signup-email">E-mailadres</Label>
             <Input
-              id="email"
+              id="signup-email"
               type="email"
               placeholder="jouw@email.nl"
               value={email}
@@ -116,10 +144,10 @@ export const SignupPromptDialog = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Wachtwoord</Label>
+            <Label htmlFor="signup-password">Wachtwoord</Label>
             <div className="relative">
               <Input
-                id="password"
+                id="signup-password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Minimaal 6 tekens"
                 value={password}
@@ -140,19 +168,19 @@ export const SignupPromptDialog = ({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Button onClick={handleSignup} disabled={isLoading}>
+        <div className="flex flex-col gap-2 pt-2">
+          <Button onClick={handleSignup} disabled={isLoading} className="h-11">
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 Bezig...
               </>
             ) : (
-              "Account aanmaken"
+              "Gratis account maken"
             )}
           </Button>
-          <Button variant="ghost" onClick={onSkip} disabled={isLoading}>
-            Later doen
+          <Button variant="ghost" onClick={onSkip} disabled={isLoading} className="text-muted-foreground">
+            Misschien later
           </Button>
         </div>
       </DialogContent>
