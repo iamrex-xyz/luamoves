@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -15,6 +16,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import {
   ArrowLeft,
   LogOut,
@@ -27,6 +29,7 @@ import {
   Check,
   X,
   Settings as SettingsIcon,
+  Shield,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -77,10 +80,16 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   // Collaborators state
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [newCollaboratorEmail, setNewCollaboratorEmail] = useState("");
+  
+  // Partner consent state
+  const [partnerConsent, setPartnerConsent] = useState(false);
+  const CONSENT_KEY = "partnerConsent";
 
   useEffect(() => {
     loadProfile();
     loadCollaborators();
+    // Load partner consent
+    setPartnerConsent(localStorage.getItem(CONSENT_KEY) === "true");
   }, []);
 
   const loadProfile = async () => {
@@ -572,6 +581,48 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        </Card>
+
+        {/* Privacy & Deals */}
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Shield className="w-4 h-4 text-primary" />
+            </div>
+            <h2 className="text-base font-semibold">Privacy & deals</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <p className="font-medium text-sm">Gepersonaliseerde deals</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ontvang slimme deals voor je verhuizing. We delen alleen noodzakelijke gegevens (postcode, verhuisdatum, woningtype) met geselecteerde partners.
+                </p>
+              </div>
+              <Switch
+                checked={partnerConsent}
+                onCheckedChange={(checked) => {
+                  setPartnerConsent(checked);
+                  localStorage.setItem(CONSENT_KEY, checked ? "true" : "false");
+                  trackEvent(AnalyticsEvents.PARTNER_CONSENT_CHANGED, { consent: checked });
+                  toast({
+                    title: checked ? "Deals ingeschakeld" : "Deals uitgeschakeld",
+                    description: checked 
+                      ? "Je ontvangt nu gepersonaliseerde aanbiedingen." 
+                      : "Je gegevens worden niet meer gedeeld met partners.",
+                  });
+                }}
+              />
+            </div>
+            
+            <Separator />
+            
+            <div className="text-xs text-muted-foreground space-y-2">
+              <p><strong>Welke gegevens?</strong> Postcode, verhuisdatum, woningtype (huur/koop)</p>
+              <p><strong>Geen cookies.</strong> We gebruiken alleen lokale opslag in je browser.</p>
             </div>
           </div>
         </Card>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,25 +15,21 @@ import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
+import { PartnerDealsSection } from "@/components/PartnerDealsSection";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft,
   ExternalLink,
   Filter,
   Clock,
   Loader2,
   LogOut,
-  Plus,
   Share2,
   User,
   FileText,
   Search,
   Package,
   PackageOpen,
-  Check,
-  X,
-  Sparkles,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -55,24 +51,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
-  const [showConsentBanner, setShowConsentBanner] = useState(false);
-
-  const CONSENT_KEY = "charly_deals_consent";
-
-  useEffect(() => {
-    // Check if user has already made a consent choice
-    const consent = localStorage.getItem(CONSENT_KEY);
-    if (consent === null) {
-      // Show banner after a short delay
-      const timer = setTimeout(() => setShowConsentBanner(true), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
-
-  const handleConsentChoice = (accepted: boolean) => {
-    localStorage.setItem(CONSENT_KEY, accepted ? "true" : "false");
-    setShowConsentBanner(false);
-  };
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -456,6 +434,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
             ))}
           </div>
         )}
+
+        {/* Partner Deals Section */}
+        <PartnerDealsSection movingInfo={movingInfo} />
       </div>
 
       {/* Dialogs */}
@@ -487,46 +468,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
         taskTitle={contextualPrompt?.task.title}
         onComplete={handleContextualPromptComplete}
       />
-
-      {/* Consent Banner */}
-      {showConsentBanner && (
-        <div className="fixed bottom-20 left-0 right-0 px-4 z-20 animate-in slide-in-from-bottom-4 duration-300">
-          <div className="max-w-4xl mx-auto">
-            <Card className="p-4 shadow-lg border-primary/20 bg-card/95 backdrop-blur">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-full bg-primary/10 shrink-0">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium mb-1">Slimme aanbiedingen ontvangen?</p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Ontvang gepersonaliseerde deals van onze partners op basis van jouw verhuizing.
-                  </p>
-                  <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
-                      onClick={() => handleConsentChoice(true)}
-                      className="h-8 text-xs gap-1.5"
-                    >
-                      <Check className="w-3 h-3" />
-                      Ja, ik wil slimme aanbiedingen
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => handleConsentChoice(false)}
-                      className="h-8 text-xs text-muted-foreground gap-1.5"
-                    >
-                      <X className="w-3 h-3" />
-                      Nee, bedankt
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
     </div>
