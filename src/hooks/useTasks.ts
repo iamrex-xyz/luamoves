@@ -5,12 +5,14 @@ import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
 import { Package } from "lucide-react";
 
+const GUEST_TASKS_KEY = "charly_guest_tasks";
+
 export const useTasks = (movingInfo: MovingInfo) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGuest, setIsGuest] = useState(false);
   const { toast } = useToast();
 
-  // Laad taken uit database en merge met gegenereerde taken
   useEffect(() => {
     loadTasks();
   }, [movingInfo]);
@@ -20,10 +22,15 @@ export const useTasks = (movingInfo: MovingInfo) => {
       setIsLoading(true);
 
       const { data: { user } } = await supabase.auth.getUser();
+      
       if (!user) {
-        setIsLoading(false);
+        // Guest mode - generate tasks locally
+        setIsGuest(true);
+        loadGuestTasks();
         return;
       }
+
+      setIsGuest(false);
 
       // Haal profiel op voor household info
       const { data: profile } = await supabase
@@ -118,6 +125,38 @@ export const useTasks = (movingInfo: MovingInfo) => {
     }
   };
 
+  const loadGuestTasks = () => {
+    try {
+      // Check if we have saved guest task statuses
+      const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
+      const statusMap: Record<string, "todo" | "in_progress" | "done"> = savedStatuses 
+        ? JSON.parse(savedStatuses) 
+        : {};
+
+      const householdInfo: HouseholdInfo = {
+        children: 0,
+        pets: 0,
+      };
+
+      // Generate tasks
+      const generatedTasks = movingInfo.type === "rent" 
+        ? generateTasksForRenter(movingInfo, householdInfo)
+        : generateTasksForBuyer(movingInfo, householdInfo);
+
+      // Apply saved statuses
+      const tasksWithStatus = generatedTasks.map((task) => ({
+        ...task,
+        status: statusMap[task.id] || task.status,
+      }));
+
+      setTasks(tasksWithStatus);
+    } catch (error) {
+      console.error("Error loading guest tasks:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateTaskStatus = async (
     taskId: string,
     newStatus: "todo" | "in_progress" | "done"
@@ -130,7 +169,23 @@ export const useTasks = (movingInfo: MovingInfo) => {
         )
       );
 
-      // Update in database
+      if (isGuest) {
+        // Save to localStorage for guests
+        const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
+        const statusMap: Record<string, string> = savedStatuses 
+          ? JSON.parse(savedStatuses) 
+          : {};
+        
+        statusMap[taskId] = newStatus;
+        localStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
+        
+        toast({
+          title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
+        });
+        return;
+      }
+
+      // Update in database for logged-in users
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -179,6 +234,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
   return {
     tasks,
     isLoading,
+    isGuest,
     updateTaskStatus,
     toggleTaskStatus,
     refreshTasks: loadTasks,
