@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
+import { useMilestones } from "@/hooks/useMilestones";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
@@ -17,6 +18,7 @@ import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
 import { PartnerDealsSection } from "@/components/PartnerDealsSection";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
+import { ProgressBanner } from "@/components/ProgressBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
@@ -52,10 +54,29 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
+  const [dealsRef, setDealsRef] = useState<HTMLDivElement | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const navigate = useNavigate();
+
+  // Milestone celebrations
+  const completedTasksCount = tasks.filter(t => t.status === "done").length;
+  useMilestones(completedTasksCount, tasks.length);
+
+  // Calculate days until move
+  const daysUntilMove = useMemo(() => {
+    if (!movingInfo.movingDate) return 30;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const moveDate = new Date(movingInfo.movingDate);
+    moveDate.setHours(0, 0, 0, 0);
+    return Math.ceil((moveDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }, [movingInfo.movingDate]);
+
+  const handleViewDeals = () => {
+    dealsRef?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const handleTaskClick = (task: Task) => {
     // Check if this task requires additional info
@@ -158,11 +179,6 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
     }
     return null;
   };
-
-  const daysUntilMove = Math.ceil(
-    (new Date(movingInfo.movingDate).getTime() - new Date().getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
 
   const getCountdownText = () => {
     if (!movingInfo.movingDate) return null;
@@ -286,6 +302,13 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
 
       {/* Tasks grouped by phase */}
       <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
+        {/* Progress Banner - Funnel Fase 1 & 2 */}
+        <ProgressBanner 
+          tasks={tasks.map(t => ({ id: t.id, status: t.status }))}
+          daysUntilMove={daysUntilMove}
+          onViewDeals={handleViewDeals}
+        />
+        
         {/* In-app reminder banner */}
         <InAppReminderBanner 
           onFilterDeadlineTasks={() => {
@@ -445,7 +468,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
         )}
 
         {/* Partner Deals Section */}
-        <PartnerDealsSection movingInfo={movingInfo} />
+        <div ref={setDealsRef}>
+          <PartnerDealsSection movingInfo={movingInfo} />
+        </div>
       </div>
 
       {/* Dialogs */}
