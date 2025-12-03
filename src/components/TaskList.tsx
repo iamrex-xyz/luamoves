@@ -143,26 +143,50 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
       (1000 * 60 * 60 * 24)
   );
 
+  const getCountdownText = () => {
+    if (!movingInfo.movingDate) return null;
+    if (daysUntilMove === 0) return "Vandaag is de grote dag!";
+    if (daysUntilMove === 1) return "Nog 1 dag tot je verhuizing";
+    if (daysUntilMove < 0) return `${Math.abs(daysUntilMove)} dagen geleden verhuisd`;
+    return `Nog ${daysUntilMove} dagen tot je verhuizing`;
+  };
+
   return (
     <div className="min-h-screen pb-20 bg-background">
-      {/* Unified Header */}
-      <header className="bg-primary text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      {/* Countdown Header */}
+      {movingInfo.movingDate && (
+        <div className="bg-gradient-to-r from-primary to-primary/80 text-white">
+          <div className="max-w-4xl mx-auto px-4 py-6 text-center">
+            <p className="text-white/80 text-sm mb-1">
+              {movingInfo.newAddress && `Verhuizing naar ${movingInfo.newAddress}`}
+            </p>
+            <h1 className="text-2xl md:text-3xl font-bold">
+              {getCountdownText()}
+            </h1>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <header className="bg-card border-b sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
-                <FileText className="w-5 h-5" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileText className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold">Taken</h1>
-                <p className="text-white/80 text-xs">Jouw verhuischecklist</p>
+                <h2 className="text-lg font-semibold">Taken</h2>
+                <p className="text-muted-foreground text-xs">
+                  {tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid
+                </p>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="text-white hover:bg-white/10 h-10 w-10">
+              <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10">
                 <Share2 className="w-5 h-5" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
+              <Button variant="ghost" size="icon" onClick={onLogout} className="h-10 w-10">
                 <LogOut className="w-5 h-5" />
               </Button>
             </div>
@@ -171,7 +195,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
       </header>
 
       {/* Search Bar met Filter */}
-      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[73px] bg-background/95 backdrop-blur-lg z-10 border-b">
+      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[57px] bg-background/95 backdrop-blur-lg z-10 border-b">
         <div className="flex items-center gap-2">
           {/* Filter knop */}
           <Popover>
@@ -256,7 +280,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
           <div className="space-y-6">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
-                <div className="mb-3 sticky top-[134px] md:top-[144px] bg-background/95 backdrop-blur py-2 z-[5]">
+                <div className="mb-3 sticky top-[118px] md:top-[128px] bg-background/95 backdrop-blur py-2 z-[5]">
                   <div className="flex items-center justify-between">
                     <div>
                       <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">

@@ -1,9 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Key, Building2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
-import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { cn } from "@/lib/utils";
 
 type SimpleOnboardingProps = {
   onComplete: (info: MovingInfo) => void;
@@ -12,27 +18,11 @@ type SimpleOnboardingProps = {
 
 export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps) => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<MovingInfo>({
-    oldAddress: "",
-    newAddress: "",
-    movingDate: "",
-    keyHandoverDate: "",
-    type: "" as any,
-    renovationType: "none",
-    needsContractorHelp: false,
-  });
+  const [movingDate, setMovingDate] = useState<Date | undefined>(undefined);
+  const [postcode, setPostcode] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
 
-  const totalSteps = 4; // Welcome, new address, old address, type
-
-  // Auto-advance for type selection
-  useEffect(() => {
-    if (step === 4 && formData.type) {
-      const timer = setTimeout(() => {
-        onComplete(formData);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [step, formData.type, formData, onComplete]);
+  const totalSteps = 3; // Welcome, date, address
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -40,16 +30,25 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     }
   };
 
+  const handleComplete = () => {
+    onComplete({
+      oldAddress: "",
+      newAddress: `${postcode} ${houseNumber}`.trim(),
+      movingDate: movingDate ? format(movingDate, "yyyy-MM-dd") : "",
+      type: "rent", // Default, will be asked later in context
+      renovationType: "none",
+      needsContractorHelp: false,
+    });
+  };
+
   const isStepValid = () => {
     switch (step) {
       case 1:
         return true;
       case 2:
-        return formData.newAddress.length > 0;
+        return !!movingDate;
       case 3:
-        return formData.oldAddress.length > 0;
-      case 4:
-        return formData.type === "rent" || formData.type === "buy";
+        return postcode.length >= 4 && houseNumber.length > 0;
       default:
         return false;
     }
@@ -64,7 +63,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         {step > 1 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
-              {Array.from({ length: 3 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 2 }, (_, i) => i + 1).map((num) => (
                 <div
                   key={num}
                   className={`flex-1 h-2 mx-1 rounded-full transition-all ${
@@ -74,7 +73,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               ))}
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Vraag {step - 1} van 3
+              Vraag {step - 1} van 2
             </p>
           </div>
         )}
@@ -104,69 +103,68 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
-                Wat is je nieuwe adres?
+                Wanneer ga je verhuizen?
               </h2>
-              <AddressAutocomplete
-                label=""
-                placeholder="Begin met typen..."
-                value={formData.newAddress}
-                onChange={(address) =>
-                  setFormData({ ...formData, newAddress: address })
-                }
-              />
+              <div className="flex justify-center">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full max-w-xs justify-start text-left font-normal h-12",
+                        !movingDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {movingDate ? format(movingDate, "d MMMM yyyy", { locale: nl }) : "Kies een datum"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="center">
+                    <Calendar
+                      mode="single"
+                      selected={movingDate}
+                      onSelect={setMovingDate}
+                      initialFocus
+                      locale={nl}
+                      disabled={(date) => date < new Date()}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           )}
 
           {step === 3 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
               <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
-                Wat is je huidige adres?
+                Wat is je nieuwe adres?
               </h2>
-              <AddressAutocomplete
-                label=""
-                placeholder="Begin met typen..."
-                value={formData.oldAddress}
-                onChange={(address) =>
-                  setFormData({ ...formData, oldAddress: address })
-                }
-              />
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
-                Ga je huren of kopen?
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <button
-                  onClick={() => setFormData({ ...formData, type: "rent" })}
-                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
-                    formData.type === "rent"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <Key className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
-                  <p className="font-semibold text-base">Huren</p>
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, type: "buy" })}
-                  className={`p-8 md:p-6 rounded-lg border-2 transition-all min-h-[120px] ${
-                    formData.type === "buy"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <Building2 className="w-10 h-10 md:w-8 md:h-8 mx-auto mb-3 text-primary" />
-                  <p className="font-semibold text-base">Kopen</p>
-                </button>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="postcode">Postcode</Label>
+                  <Input
+                    id="postcode"
+                    placeholder="1234 AB"
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value.toUpperCase())}
+                    maxLength={7}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="houseNumber">Huisnummer</Label>
+                  <Input
+                    id="houseNumber"
+                    placeholder="12"
+                    value={houseNumber}
+                    onChange={(e) => setHouseNumber(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           )}
 
           {/* Navigation buttons */}
-          {step > 1 && step < 4 && (
+          {step === 2 && (
             <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
@@ -181,6 +179,25 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 className="flex-1"
               >
                 Volgende
+              </Button>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="flex gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setStep(step - 1)}
+                className="flex-1"
+              >
+                Terug
+              </Button>
+              <Button
+                onClick={handleComplete}
+                disabled={!isStepValid()}
+                className="flex-1"
+              >
+                Bekijk mijn taken
               </Button>
             </div>
           )}
