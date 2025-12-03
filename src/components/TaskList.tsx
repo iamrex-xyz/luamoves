@@ -19,6 +19,7 @@ import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/
 import { PartnerDealsSection } from "@/components/PartnerDealsSection";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
+import { InvitePartnerSection } from "@/components/InvitePartnerSection";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
@@ -466,6 +467,14 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
             ))}
           </div>
         )}
+
+        {/* Invite Partner Section */}
+        <div className="mb-6">
+          <InvitePartnerSection 
+            isGuest={isGuest} 
+            onSignupComplete={() => window.location.reload()} 
+          />
+        </div>
 
         {/* Partner Deals Section */}
         <div ref={setDealsRef}>
