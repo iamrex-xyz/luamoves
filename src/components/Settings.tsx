@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BottomNav } from "@/components/BottomNav";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { ReminderSettings } from "@/components/ReminderSettings";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
@@ -520,6 +521,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             </Button>
           </div>
         </Card>
+
+        {/* Reminder Settings */}
+        <ReminderSettings />
 
         {/* Collaborators */}
         <Card className="p-4">

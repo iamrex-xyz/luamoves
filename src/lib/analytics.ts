@@ -28,4 +28,9 @@ export const AnalyticsEvents = {
   PARTNER_DEAL_CLICKED: "partnerDealClicked",
   PARTNER_DEAL_VIEWED: "partnerDealViewed",
   PRIVACY_MODAL_OPENED: "privacyModalOpened",
+  // Reminder events
+  REMINDER_SCHEDULED: "reminderScheduled",
+  REMINDER_DELIVERED: "reminderDelivered",
+  REMINDER_CLICKED: "reminderClicked",
+  NOTIFICATION_PERMISSION_DENIED: "notificationPermissionDenied",
 } as const;
