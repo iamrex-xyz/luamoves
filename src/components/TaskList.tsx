@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,7 @@ import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
 import { PartnerDealsSection } from "@/components/PartnerDealsSection";
+import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
@@ -285,6 +286,14 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
 
       {/* Tasks grouped by phase */}
       <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
+        {/* In-app reminder banner */}
+        <InAppReminderBanner 
+          onFilterDeadlineTasks={() => {
+            setFilter("open");
+            setSelectedCategories([]);
+          }} 
+        />
+        
         {isLoading ? (
           <Card className="p-12 text-center">
             <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
