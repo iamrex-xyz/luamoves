@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
+import { calculateReminderDates } from "@/lib/reminderTimings";
 
 export type ReminderPreferences = {
   email_enabled: boolean;
@@ -160,14 +161,13 @@ export const useReminderPreferences = () => {
     }
   };
 
-  const scheduleReminders = useCallback(async (taskId: string, deadline: string) => {
+  const scheduleReminders = useCallback(async (taskId: string, deadline: string, taskTitle?: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const deadlineDate = new Date(deadline);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      // Use smart timing based on task type
+      const reminderDates = calculateReminderDates(deadline, taskId, taskTitle);
 
       const remindersToSchedule: Array<{
         user_id: string;
@@ -176,45 +176,34 @@ export const useReminderPreferences = () => {
         scheduled_for: string;
       }> = [];
 
-      // 7 days before
-      const sevenDaysBefore = new Date(deadlineDate);
-      sevenDaysBefore.setDate(sevenDaysBefore.getDate() - 7);
-      if (sevenDaysBefore >= today) {
-        remindersToSchedule.push({
-          user_id: user.id,
-          task_id: taskId,
-          reminder_type: "email_7_days",
-          scheduled_for: sevenDaysBefore.toISOString().split("T")[0],
-        });
-      }
+      // Map calculated reminders to database format
+      let emailIndex = 0;
+      reminderDates.forEach(({ date, type }) => {
+        let reminderType: string;
+        
+        if (type === "email") {
+          emailIndex++;
+          reminderType = emailIndex === 1 ? "email_7_days" : "email_2_days";
+        } else if (type === "push") {
+          reminderType = "push_deadline";
+        } else {
+          reminderType = "in_app";
+        }
 
-      // 2 days before
-      const twoDaysBefore = new Date(deadlineDate);
-      twoDaysBefore.setDate(twoDaysBefore.getDate() - 2);
-      if (twoDaysBefore >= today) {
-        remindersToSchedule.push({
-          user_id: user.id,
-          task_id: taskId,
-          reminder_type: "email_2_days",
-          scheduled_for: twoDaysBefore.toISOString().split("T")[0],
-        });
-      }
-
-      // On deadline (push + in-app)
-      if (deadlineDate >= today) {
-        remindersToSchedule.push({
-          user_id: user.id,
-          task_id: taskId,
-          reminder_type: "push_deadline",
-          scheduled_for: deadline,
-        });
-        remindersToSchedule.push({
-          user_id: user.id,
-          task_id: taskId,
-          reminder_type: "in_app",
-          scheduled_for: deadline,
-        });
-      }
+        // Avoid duplicates for same date + type
+        const exists = remindersToSchedule.some(
+          r => r.scheduled_for === date && r.reminder_type === reminderType
+        );
+        
+        if (!exists) {
+          remindersToSchedule.push({
+            user_id: user.id,
+            task_id: taskId,
+            reminder_type: reminderType,
+            scheduled_for: date,
+          });
+        }
+      });
 
       if (remindersToSchedule.length > 0) {
         // Delete existing reminders for this task first
