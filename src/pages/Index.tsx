@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Onboarding } from "@/components/Onboarding";
+import { SimpleOnboarding } from "@/components/SimpleOnboarding";
 import { Auth } from "@/components/Auth";
-import { AdditionalInfo } from "@/components/AdditionalInfo";
 import { Dashboard } from "@/components/Dashboard";
 import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
+import { SignupPromptDialog } from "@/components/SignupPromptDialog";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,128 +14,72 @@ export type MovingInfo = {
   oldAddress: string;
   newAddress: string;
   movingDate: string;
-  keyHandoverDate?: string; // Sleuteloverdracht datum (vooral voor huurders)
+  keyHandoverDate?: string;
   type: "buy" | "rent";
   renovationType?: "none" | "small" | "large";
   needsContractorHelp?: boolean;
 };
 
+const LOCAL_STORAGE_KEY = "charly_moving_info";
+const SIGNUP_PROMPTED_KEY = "charly_signup_prompted";
+
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<
-    "onboarding" | "auth" | "additionalInfo" | "dashboard" | "tasks" | "extras" | "settings"
+    "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings"
   >("onboarding");
   const [loading, setLoading] = useState(true);
+  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const { toast } = useToast();
 
-  // Check authentication and load user data
+  // Check for existing data on load
   useEffect(() => {
-    const loadUserProfile = async (userId: string) => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+    const initializeApp = async () => {
+      // First check for logged in user
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        setUser(session.user);
+        await loadUserProfile(session.user.id);
+        return;
+      }
 
-      if (profile && profile.moving_date) {
-        setMovingInfo({
-          oldAddress: profile.old_address || '',
-          newAddress: profile.new_address || '',
-          movingDate: profile.moving_date,
-          keyHandoverDate: profile.key_handover_date || undefined,
-          type: (profile.moving_type as "buy" | "rent") || "rent",
-          renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
-          needsContractorHelp: profile.needs_contractor_help || false,
-        });
-        setCurrentView("dashboard");
+      // No user - check localStorage for guest data
+      const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedInfo) {
+        try {
+          const parsed = JSON.parse(savedInfo);
+          setMovingInfo(parsed);
+          setCurrentView("tasks"); // Go directly to tasks
+        } catch {
+          setCurrentView("onboarding");
+        }
       } else {
-        // User logged in but hasn't filled in moving info yet
-        setCurrentView("additionalInfo");
+        setCurrentView("onboarding");
       }
       setLoading(false);
     };
 
-    // Set up auth state listener (MUST be synchronous)
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
         
-        if (session?.user) {
-          // Defer async operations with setTimeout
+        if (session?.user && event === 'SIGNED_IN') {
           setTimeout(() => {
-            loadUserProfile(session.user.id);
+            syncLocalDataToProfile(session.user.id);
           }, 0);
-        } else {
-          setCurrentView("onboarding");
-          setMovingInfo(null);
-          setLoading(false);
         }
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        loadUserProfile(session.user.id);
-      } else {
-        setCurrentView("onboarding");
-        setLoading(false);
-      }
-    });
+    initializeApp();
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleOnboardingComplete = async (info: MovingInfo, email: string, password: string) => {
-    setMovingInfo(info);
-    
-    // Create account
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        setUser(data.user);
-        setCurrentView("additionalInfo");
-        toast({
-          title: "Account aangemaakt!",
-          description: "Welkom bij Charly.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Fout bij aanmaken account",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleLoginRedirect = () => {
-    setCurrentView("auth");
-  };
-
-  const handleAuthComplete = (authenticatedUser: User) => {
-    setUser(authenticatedUser);
-    
-    // Check if user already has moving info
-    setTimeout(() => {
-      loadUserData(authenticatedUser.id);
-    }, 0);
-  };
-
-  const loadUserData = async (userId: string) => {
+  const loadUserProfile = async (userId: string) => {
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -152,67 +96,92 @@ const Index = () => {
         renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
         needsContractorHelp: profile.needs_contractor_help || false,
       });
-      setCurrentView("dashboard");
+      setCurrentView("tasks");
     } else {
-      // User logged in but hasn't filled in moving info yet
-      setCurrentView("additionalInfo");
+      // Check if we have local data to sync
+      const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedInfo) {
+        const parsed = JSON.parse(savedInfo);
+        setMovingInfo(parsed);
+        await syncLocalDataToProfile(userId);
+        setCurrentView("tasks");
+      } else {
+        setCurrentView("onboarding");
+      }
+    }
+    setLoading(false);
+  };
+
+  const syncLocalDataToProfile = async (userId: string) => {
+    const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!savedInfo) return;
+
+    try {
+      const info = JSON.parse(savedInfo) as MovingInfo;
+      
+      await supabase
+        .from('profiles')
+        .update({
+          old_address: info.oldAddress,
+          new_address: info.newAddress,
+          moving_date: info.movingDate || null,
+          key_handover_date: info.keyHandoverDate || null,
+          moving_type: info.type,
+          renovation_type: info.renovationType || "none",
+          needs_contractor_help: info.needsContractorHelp || false,
+        })
+        .eq('user_id', userId);
+
+      // Clear localStorage after sync
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      localStorage.removeItem(SIGNUP_PROMPTED_KEY);
+      
+      setCurrentView("tasks");
+    } catch (error) {
+      console.error('Error syncing data:', error);
     }
   };
 
-  const handleAdditionalInfoComplete = async (adults: number, children: number, pets: number, phone: string) => {
-    if (!user) return;
+  const handleSimpleOnboardingComplete = (info: MovingInfo) => {
+    setMovingInfo(info);
+    // Save to localStorage for guests
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(info));
+    setCurrentView("tasks");
+  };
 
-    // If movingInfo doesn't exist, create a minimal one (user came from login without onboarding)
-    const infoToSave = movingInfo || {
-      oldAddress: '',
-      newAddress: '',
-      movingDate: '',
-      keyHandoverDate: undefined,
-      type: 'rent' as const,
-      renovationType: 'none' as const,
-      needsContractorHelp: false,
-    };
+  const handleLoginRedirect = () => {
+    setCurrentView("auth");
+  };
 
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          adults,
-          children,
-          pets,
-          phone,
-          old_address: infoToSave.oldAddress,
-          new_address: infoToSave.newAddress,
-          moving_date: infoToSave.movingDate || null,
-          key_handover_date: infoToSave.keyHandoverDate || null,
-          moving_type: infoToSave.type,
-          renovation_type: infoToSave.renovationType || "none",
-          needs_contractor_help: infoToSave.needsContractorHelp || false,
-        })
-        .eq('user_id', user.id);
+  const handleAuthComplete = async (authenticatedUser: User) => {
+    setUser(authenticatedUser);
+    await loadUserProfile(authenticatedUser.id);
+  };
 
-      if (error) throw error;
-
-      setMovingInfo(infoToSave);
-      setCurrentView("dashboard");
-      toast({
-        title: "Gegevens opgeslagen!",
-        description: "Je verhuisinformatie is succesvol opgeslagen.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Fout bij opslaan",
-        description: error.message,
-        variant: "destructive",
-      });
+  const handleTaskComplete = () => {
+    // Only show signup prompt if not logged in and not already prompted
+    if (!user && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
+      localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+      setShowSignupPrompt(true);
     }
+  };
+
+  const handleSignupComplete = async () => {
+    setShowSignupPrompt(false);
+    // User is now signed up, data will sync via auth listener
+  };
+
+  const handleSignupSkip = () => {
+    setShowSignupPrompt(false);
   };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setMovingInfo(null);
-    setCurrentView("auth");
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    localStorage.removeItem(SIGNUP_PROMPTED_KEY);
+    setCurrentView("onboarding");
     toast({
       title: "Uitgelogd",
       description: "Je bent succesvol uitgelogd.",
@@ -231,15 +200,11 @@ const Index = () => {
   }
 
   if (currentView === "onboarding") {
-    return <Onboarding onComplete={handleOnboardingComplete} onLogin={handleLoginRedirect} />;
+    return <SimpleOnboarding onComplete={handleSimpleOnboardingComplete} onLogin={handleLoginRedirect} />;
   }
 
   if (currentView === "auth") {
     return <Auth onComplete={handleAuthComplete} onSignUpRequest={() => setCurrentView("onboarding")} />;
-  }
-
-  if (currentView === "additionalInfo") {
-    return <AdditionalInfo onComplete={handleAdditionalInfoComplete} user={user} />;
   }
 
   return (
@@ -256,6 +221,8 @@ const Index = () => {
           movingInfo={movingInfo}
           onNavigate={setCurrentView}
           onLogout={handleLogout}
+          onTaskComplete={handleTaskComplete}
+          isGuest={!user}
         />
       )}
       {currentView === "extras" && movingInfo && (
@@ -272,6 +239,13 @@ const Index = () => {
           onUpdate={setMovingInfo}
         />
       )}
+
+      <SignupPromptDialog
+        open={showSignupPrompt}
+        onOpenChange={setShowSignupPrompt}
+        onSignupComplete={handleSignupComplete}
+        onSkip={handleSignupSkip}
+      />
     </div>
   );
 };

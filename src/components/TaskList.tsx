@@ -36,9 +36,11 @@ type TaskListProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
+  onTaskComplete?: () => void;
+  isGuest?: boolean;
 };
 
-export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) => {
+export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isGuest }: TaskListProps) => {
   const [filter, setFilter] = useState<"open" | "done">("open");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -53,6 +55,9 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
   const navigate = useNavigate();
 
   const handleTaskToggle = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    const wasNotDone = task?.status !== "done";
+    
     setCompletingTasks(prev => new Set(prev).add(taskId));
     
     // Wacht op animatie
@@ -67,6 +72,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout }: TaskListProps) =>
       newSet.delete(taskId);
       return newSet;
     });
+
+    // Trigger signup prompt if task was completed (not uncompleted)
+    if (wasNotDone && onTaskComplete) {
+      onTaskComplete();
+    }
   };
 
   // Bereken categorieën
