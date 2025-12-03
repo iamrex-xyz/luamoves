@@ -14,6 +14,7 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
+import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
@@ -37,10 +38,11 @@ type TaskListProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
   onTaskComplete?: () => void;
+  onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
   isGuest?: boolean;
 };
 
-export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isGuest }: TaskListProps) => {
+export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onUpdateMovingInfo, isGuest }: TaskListProps) => {
   const [filter, setFilter] = useState<"open" | "done">("open");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -49,10 +51,29 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
   const [dealTask, setDealTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
+  const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const navigate = useNavigate();
+
+  const handleTaskClick = (task: Task) => {
+    // Check if this task requires additional info
+    const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
+    if (requiredPrompt && task.status !== "done") {
+      setContextualPrompt({ type: requiredPrompt, task });
+      return;
+    }
+    // Otherwise toggle the task
+    handleTaskToggle(task.id);
+  };
+
+  const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+    setContextualPrompt(null);
+  };
 
   const handleTaskToggle = async (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
@@ -318,7 +339,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
                           opacity: 0,
                           transition: 'opacity 0.3s ease-out 0.3s, transform 0.5s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out'
                         } : undefined}
-                        onClick={() => !isCompleting && handleTaskToggle(task.id)}
+                        onClick={() => !isCompleting && handleTaskClick(task)}
                       >
                         <div 
                           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
@@ -436,6 +457,14 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, isG
         task={dealTask}
         open={!!dealTask}
         onOpenChange={(open) => !open && setDealTask(null)}
+      />
+      
+      <ContextualPromptDialog
+        open={!!contextualPrompt}
+        onOpenChange={(open) => !open && setContextualPrompt(null)}
+        promptType={contextualPrompt?.type || "oldAddress"}
+        taskTitle={contextualPrompt?.task.title}
+        onComplete={handleContextualPromptComplete}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
