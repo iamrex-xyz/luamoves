@@ -121,12 +121,16 @@ export const ReminderSettings = () => {
         {/* Info section */}
         <div className="bg-muted/50 rounded-lg p-3">
           <p className="text-xs text-muted-foreground">
-            <strong>Wanneer ontvang je herinneringen?</strong>
+            <strong>Slimme herinneringen</strong>
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Timing is afgestemd op taaktype:
           </p>
           <ul className="text-xs text-muted-foreground mt-2 space-y-1 list-disc list-inside">
-            <li>7 dagen voor deadline (e-mail)</li>
-            <li>2 dagen voor deadline (e-mail)</li>
-            <li>Op de deadline (push + in-app)</li>
+            <li><strong>Energie/internet:</strong> 10, 6 en 2 dagen voor</li>
+            <li><strong>Verhuisbedrijf:</strong> 14, 7 en 2 dagen voor</li>
+            <li><strong>Inspectie:</strong> 7, 3 en 1 dag voor</li>
+            <li><strong>Overige:</strong> 7 en 2 dagen voor deadline</li>
           </ul>
           <p className="text-xs text-muted-foreground mt-2">
             Je kunt per taak herinneringen uitschakelen via de taakdetails.
