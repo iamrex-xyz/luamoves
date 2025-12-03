@@ -175,6 +175,36 @@ const Index = () => {
     setShowSignupPrompt(false);
   };
 
+  const handleUpdateMovingInfo = async (data: Partial<MovingInfo>) => {
+    if (!movingInfo) return;
+    
+    const updatedInfo = { ...movingInfo, ...data };
+    setMovingInfo(updatedInfo);
+    
+    // Save to localStorage for guests
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedInfo));
+    
+    // Sync to database if logged in
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            old_address: updatedInfo.oldAddress || null,
+            new_address: updatedInfo.newAddress || null,
+            moving_date: updatedInfo.movingDate || null,
+            key_handover_date: updatedInfo.keyHandoverDate || null,
+            moving_type: updatedInfo.type || null,
+            renovation_type: updatedInfo.renovationType || "none",
+            needs_contractor_help: updatedInfo.needsContractorHelp || false,
+          })
+          .eq('user_id', user.id);
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -226,6 +256,7 @@ const Index = () => {
           onNavigate={setCurrentView}
           onLogout={handleLogout}
           onTaskComplete={handleTaskComplete}
+          onUpdateMovingInfo={handleUpdateMovingInfo}
           isGuest={!user}
         />
       )}
