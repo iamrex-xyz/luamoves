@@ -11,6 +11,7 @@ import { z } from "zod";
 interface AuthProps {
   onComplete: (user: User) => void;
   onSignUpRequest?: () => void;
+  onContinueAsGuest?: () => void;
 }
 
 type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
@@ -18,7 +19,7 @@ type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
 const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
 const passwordSchema = z.string().min(6, "Wachtwoord moet minimaal 6 tekens bevatten");
 
-export const Auth = ({ onComplete, onSignUpRequest }: AuthProps) => {
+export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
@@ -210,6 +211,18 @@ export const Auth = ({ onComplete, onSignUpRequest }: AuthProps) => {
               Account aanmaken
             </Button>
           </div>
+
+          {onContinueAsGuest && (
+            <div className="pt-4 border-t">
+              <Button 
+                onClick={onContinueAsGuest} 
+                variant="ghost"
+                className="w-full h-12 text-base text-muted-foreground hover:text-foreground"
+              >
+                Ga door zonder account →
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

@@ -204,7 +204,11 @@ const Index = () => {
   }
 
   if (currentView === "auth") {
-    return <Auth onComplete={handleAuthComplete} onSignUpRequest={() => setCurrentView("onboarding")} />;
+    return <Auth 
+      onComplete={handleAuthComplete} 
+      onSignUpRequest={() => setCurrentView("onboarding")}
+      onContinueAsGuest={() => setCurrentView("onboarding")}
+    />;
   }
 
   return (
