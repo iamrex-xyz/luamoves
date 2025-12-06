@@ -20,14 +20,12 @@ type EmailCaptureDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEmailSubmit: (email: string) => void;
-  onSkip: () => void;
 };
 
 export const EmailCaptureDialog = ({
   open,
   onOpenChange,
   onEmailSubmit,
-  onSkip,
 }: EmailCaptureDialogProps) => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
@@ -57,7 +55,7 @@ export const EmailCaptureDialog = ({
       trackEvent("email_submitted");
       onEmailSubmit(email);
       toast({
-        title: "E-mail opgeslagen!",
+        title: "Top!",
         description: "We bewaren je voortgang.",
       });
     } catch (error: any) {
@@ -71,14 +69,10 @@ export const EmailCaptureDialog = ({
     }
   };
 
-  const handleSkip = () => {
-    trackEvent("email_modal_skipped");
-    onSkip();
-  };
-
+  // Prevent closing without submitting email
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen && open) {
-      handleSkip();
+      // Don't allow closing - email is required
       return;
     }
     onOpenChange(newOpen);
@@ -86,7 +80,11 @@ export const EmailCaptureDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md animate-in fade-in-0 zoom-in-95 duration-200">
+      <DialogContent 
+        className="sm:max-w-md animate-in fade-in-0 zoom-in-95 duration-200"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader className="text-center space-y-2">
           <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
             <Sparkles className="w-6 h-6 text-white" />
@@ -95,7 +93,7 @@ export const EmailCaptureDialog = ({
             Topstart! 🎉
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">
-            Laat je e-mail achter — dan bewaren we je voortgang en zorgen we dat je niets vergeet.
+            Laat je e-mail achter zodat we je voortgang kunnen bewaren en je niets vergeet.
           </DialogDescription>
         </DialogHeader>
 
@@ -136,18 +134,10 @@ export const EmailCaptureDialog = ({
               "Opslaan"
             )}
           </Button>
-          <Button 
-            variant="ghost" 
-            onClick={handleSkip} 
-            disabled={isLoading} 
-            className="text-muted-foreground h-11"
-          >
-            Later
-          </Button>
         </div>
 
         <p className="text-xs text-center text-muted-foreground pt-1">
-          We gebruiken je e-mail alleen voor je verhuizing. Geen spam. Beloofd.
+          We gebruiken je e-mail alleen voor je verhuizing. Geen spam, beloofd.
         </p>
       </DialogContent>
     </Dialog>
