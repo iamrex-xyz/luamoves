@@ -184,7 +184,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         >
           {/* Header */}
           <div className="px-5 pt-5 pb-3 flex justify-between items-center">
-            <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
+            <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
             <Button
               variant="ghost"
               size="sm"

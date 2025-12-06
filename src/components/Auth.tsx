@@ -188,7 +188,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6">
-          <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
+          <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
         </div>
 
         {/* Main content */}
@@ -269,7 +269,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6 flex justify-between items-center">
-          <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
+          <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
           <button
             onClick={() => {
               setScreen('login');
@@ -333,7 +333,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6 flex justify-between items-center">
-          <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
+          <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
           <button
             onClick={() => setScreen('initial')}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
