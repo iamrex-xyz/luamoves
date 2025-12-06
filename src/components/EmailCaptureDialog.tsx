@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  MobileModal,
+  MobileModalContent,
+} from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,72 +74,72 @@ export const EmailCaptureDialog = ({
     }
   };
 
+  const handleLater = () => {
+    trackEvent("email_modal_skipped");
+    onOpenChange(false);
+  };
+
   // Check if email is valid for button state
   const isEmailValid = emailSchema.safeParse(email).success;
 
   return (
-    <Sheet open={open} onOpenChange={() => {}}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[100dvh] p-0 flex flex-col"
+    <MobileModal open={open} onOpenChange={() => {}}>
+      <MobileModalContent 
+        showCloseButton={!isHardBlock}
+        onCloseClick={handleLater}
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        {/* Centered content */}
-        <div className="flex-1 overflow-y-auto p-6 flex items-center justify-center">
-          <div className="w-full max-w-md">
-            {/* Header */}
-            <div className="text-center space-y-3 mb-8">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <Sparkles className="w-7 h-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">
-                  {isHardBlock ? "Je bent lekker op dreef!" : "Topstart!"}
-                </h2>
-                <p className="text-muted-foreground mt-2">
-                  {isHardBlock 
-                    ? "Vul je e-mail in zodat we je voortgang veilig kunnen bewaren."
-                    : "Laat je e-mail achter zodat we je voortgang kunnen bewaren en je niets vergeet."
-                  }
-                </p>
-              </div>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          {/* Header */}
+          <div className="text-center space-y-3 mb-6">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Sparkles className="w-7 h-7 text-primary-foreground" />
             </div>
-
-            {/* Form */}
-            <div className="space-y-2">
-              <Label htmlFor="capture-email" className="flex items-center gap-2 text-base">
-                <Mail className="w-4 h-4 text-muted-foreground" />
-                E-mailadres
-              </Label>
-              <Input
-                id="capture-email"
-                type="email"
-                placeholder="jouw@email.nl"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (emailError) setEmailError("");
-                }}
-                className={`h-14 rounded-xl text-base ${emailError ? 'border-destructive' : ''}`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && isEmailValid) {
-                    handleSubmit();
-                  }
-                }}
-              />
-              {emailError && (
-                <p className="text-sm text-destructive">{emailError}</p>
-              )}
-              <p className="text-sm text-muted-foreground">
-                Lua onthoudt alles voor je, zodat jij je kunt focussen op verhuizen.
+            <div>
+              <h2 className="text-2xl font-bold">
+                {isHardBlock ? "Je bent lekker op dreef!" : "Topstart!"}
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                {isHardBlock 
+                  ? "Vul je e-mail in zodat we je voortgang veilig kunnen bewaren."
+                  : "Laat je e-mail achter — dan bewaren we je voortgang."
+                }
               </p>
             </div>
+          </div>
+
+          {/* Form */}
+          <div className="space-y-2">
+            <Label htmlFor="capture-email" className="flex items-center gap-2 text-base">
+              <Mail className="w-4 h-4 text-muted-foreground" />
+              E-mailadres
+            </Label>
+            <Input
+              id="capture-email"
+              type="email"
+              placeholder="jouw@email.nl"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError("");
+              }}
+              className={`h-14 rounded-xl text-base ${emailError ? 'border-destructive' : ''}`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && isEmailValid) {
+                  handleSubmit();
+                }
+              }}
+            />
+            {emailError && (
+              <p className="text-sm text-destructive">{emailError}</p>
+            )}
           </div>
         </div>
 
         {/* Fixed bottom CTA */}
-        <div className="p-6 border-t bg-background space-y-3">
+        <div className="p-6 pt-4 border-t bg-background space-y-3">
           <Button 
             onClick={handleSubmit} 
             disabled={!isEmailValid || isLoading} 
@@ -148,15 +151,25 @@ export const EmailCaptureDialog = ({
                 Bezig...
               </>
             ) : (
-              isHardBlock ? "Volgende" : "Opslaan"
+              "Opslaan"
             )}
           </Button>
 
+          {!isHardBlock && (
+            <Button 
+              variant="ghost" 
+              onClick={handleLater}
+              className="w-full h-12 rounded-xl text-base text-muted-foreground"
+            >
+              Later
+            </Button>
+          )}
+
           <p className="text-xs text-center text-muted-foreground">
-            We gebruiken je e-mail alleen voor je verhuizing. Geen spam, beloofd.
+            We gebruiken je e-mail alleen voor je verhuizing. Geen spam.
           </p>
         </div>
-      </SheetContent>
-    </Sheet>
+      </MobileModalContent>
+    </MobileModal>
   );
 };
