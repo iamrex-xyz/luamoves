@@ -218,6 +218,7 @@ export type Database = {
       profiles: {
         Row: {
           adults: number | null
+          birth_date: string | null
           children: number | null
           created_at: string
           household_type: string | null
@@ -237,6 +238,7 @@ export type Database = {
         }
         Insert: {
           adults?: number | null
+          birth_date?: string | null
           children?: number | null
           created_at?: string
           household_type?: string | null
@@ -256,6 +258,7 @@ export type Database = {
         }
         Update: {
           adults?: number | null
+          birth_date?: string | null
           children?: number | null
           created_at?: string
           household_type?: string | null
