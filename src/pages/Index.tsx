@@ -47,8 +47,8 @@ const Index = () => {
         return;
       }
 
-      // No user - check localStorage for guest data
-      const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      // No user - check sessionStorage for guest data (cleared when browser closes)
+      const savedInfo = sessionStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedInfo) {
         try {
           const parsed = JSON.parse(savedInfo);
@@ -100,8 +100,8 @@ const Index = () => {
       });
       setCurrentView("dashboard");
     } else {
-      // Check if we have local data to sync
-      const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      // Check if we have session data to sync
+      const savedInfo = sessionStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedInfo) {
         const parsed = JSON.parse(savedInfo);
         setMovingInfo(parsed);
@@ -115,7 +115,7 @@ const Index = () => {
   };
 
   const syncLocalDataToProfile = async (userId: string) => {
-    const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const savedInfo = sessionStorage.getItem(LOCAL_STORAGE_KEY);
     if (!savedInfo) return;
 
     try {
@@ -134,9 +134,9 @@ const Index = () => {
         })
         .eq('user_id', userId);
 
-      // Clear localStorage after sync
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-      localStorage.removeItem(SIGNUP_PROMPTED_KEY);
+      // Clear sessionStorage after sync
+      sessionStorage.removeItem(LOCAL_STORAGE_KEY);
+      sessionStorage.removeItem(SIGNUP_PROMPTED_KEY);
       
       setCurrentView("dashboard");
     } catch (error) {
@@ -146,8 +146,8 @@ const Index = () => {
 
   const handleSimpleOnboardingComplete = (info: MovingInfo) => {
     setMovingInfo(info);
-    // Save to localStorage for guests
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(info));
+    // Save to sessionStorage for guests (cleared when browser closes)
+    sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(info));
     setCurrentView("dashboard");
   };
 
@@ -171,8 +171,8 @@ const Index = () => {
       }
       
       // Show soft prompt after 2 completed tasks (if not already prompted)
-      if (completedCount >= 2 && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
-        localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+      if (completedCount >= 2 && !sessionStorage.getItem(SIGNUP_PROMPTED_KEY)) {
+        sessionStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
         setIsHardBlock(false);
         setShowSignupPrompt(true);
       }
@@ -202,8 +202,8 @@ const Index = () => {
     const updatedInfo = { ...movingInfo, ...data };
     setMovingInfo(updatedInfo);
     
-    // Save to localStorage for guests
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedInfo));
+    // Save to sessionStorage for guests (cleared when browser closes)
+    sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedInfo));
     
     // Sync to database if logged in
     if (user) {
@@ -230,8 +230,8 @@ const Index = () => {
     await supabase.auth.signOut();
     setUser(null);
     setMovingInfo(null);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    localStorage.removeItem(SIGNUP_PROMPTED_KEY);
+    sessionStorage.removeItem(LOCAL_STORAGE_KEY);
+    sessionStorage.removeItem(SIGNUP_PROMPTED_KEY);
     setCurrentView("onboarding");
     toast({
       title: "Uitgelogd",

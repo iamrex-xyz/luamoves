@@ -127,8 +127,8 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
   const loadGuestTasks = () => {
     try {
-      // Check if we have saved guest task statuses
-      const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
+      // Check if we have saved guest task statuses (sessionStorage = cleared when browser closes)
+      const savedStatuses = sessionStorage.getItem(GUEST_TASKS_KEY);
       const statusMap: Record<string, "todo" | "in_progress" | "done"> = savedStatuses 
         ? JSON.parse(savedStatuses) 
         : {};
@@ -170,14 +170,14 @@ export const useTasks = (movingInfo: MovingInfo) => {
       );
 
       if (isGuest) {
-        // Save to localStorage for guests
-        const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
+        // Save to sessionStorage for guests (cleared when browser closes)
+        const savedStatuses = sessionStorage.getItem(GUEST_TASKS_KEY);
         const statusMap: Record<string, string> = savedStatuses 
           ? JSON.parse(savedStatuses) 
           : {};
         
         statusMap[taskId] = newStatus;
-        localStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
+        sessionStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
         
         toast({
           title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
