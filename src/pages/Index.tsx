@@ -22,7 +22,6 @@ export type MovingInfo = {
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
 const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
-const GUEST_TASKS_KEY = "lua_guest_tasks";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
@@ -161,27 +160,21 @@ const Index = () => {
     await loadUserProfile(authenticatedUser.id);
   };
 
-  const handleTaskComplete = () => {
+  const handleTaskComplete = (completedCount: number) => {
     // Only show signup prompt if not logged in
     if (!user) {
-      const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
-      if (savedStatuses) {
-        const statusMap: Record<string, string> = JSON.parse(savedStatuses);
-        const completedCount = Object.values(statusMap).filter(status => status === "done").length;
-        
-        // Hard block at 6 tasks - must create account
-        if (completedCount >= 6) {
-          setIsHardBlock(true);
-          setShowSignupPrompt(true);
-          return;
-        }
-        
-        // Show soft prompt after 2 completed tasks (if not already prompted)
-        if (completedCount >= 2 && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
-          localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
-          setIsHardBlock(false);
-          setShowSignupPrompt(true);
-        }
+      // Hard block at 6 tasks - must create account
+      if (completedCount >= 6) {
+        setIsHardBlock(true);
+        setShowSignupPrompt(true);
+        return;
+      }
+      
+      // Show soft prompt after 2 completed tasks (if not already prompted)
+      if (completedCount >= 2 && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
+        localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+        setIsHardBlock(false);
+        setShowSignupPrompt(true);
       }
     }
   };
