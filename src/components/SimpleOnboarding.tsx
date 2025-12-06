@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
@@ -16,13 +16,54 @@ type SimpleOnboardingProps = {
   onLogin: () => void;
 };
 
+const generatingSteps = [
+  "Je verhuisdatum analyseren...",
+  "Belangrijke deadlines berekenen...",
+  "Persoonlijke taken samenstellen...",
+  "Je checklist gereedmaken...",
+];
+
 export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps) => {
   const [step, setStep] = useState(1);
   const [movingDate, setMovingDate] = useState<Date | undefined>(undefined);
   const [postcode, setPostcode] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
+  const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
-  const totalSteps = 3; // Welcome, date, address
+  const totalSteps = 4; // Welcome, date, address, generating
+
+  // Handle the generating animation
+  useEffect(() => {
+    if (step === 4) {
+      const interval = setInterval(() => {
+        setCurrentGeneratingStep((prev) => {
+          if (prev < generatingSteps.length - 1) {
+            setCompletedSteps((completed) => [...completed, prev]);
+            return prev + 1;
+          }
+          return prev;
+        });
+      }, 800);
+
+      // Complete after all steps
+      const timeout = setTimeout(() => {
+        onComplete({
+          oldAddress: "",
+          newAddress: `${postcode} ${houseNumber}`.trim(),
+          movingDate: movingDate ? format(movingDate, "yyyy-MM-dd") : "",
+          type: "rent",
+          renovationType: "none",
+          needsContractorHelp: false,
+        });
+      }, generatingSteps.length * 800 + 500);
+
+      return () => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [step, postcode, houseNumber, movingDate, onComplete]);
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -30,15 +71,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     }
   };
 
-  const handleComplete = () => {
-    onComplete({
-      oldAddress: "",
-      newAddress: `${postcode} ${houseNumber}`.trim(),
-      movingDate: movingDate ? format(movingDate, "yyyy-MM-dd") : "",
-      type: "rent", // Default, will be asked later in context
-      renovationType: "none",
-      needsContractorHelp: false,
-    });
+  const handleStartGenerating = () => {
+    setStep(4);
   };
 
   const isStepValid = () => {
@@ -60,7 +94,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         className={`w-full max-w-lg shadow-lg ${step === 1 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
         onClick={step === 1 ? handleNext : undefined}
       >
-        {step > 1 && (
+        {step > 1 && step < 4 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               {Array.from({ length: 2 }, (_, i) => i + 1).map((num) => (
@@ -163,6 +197,54 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             </div>
           )}
 
+          {step === 4 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 py-4">
+              <h2 className="text-xl md:text-2xl font-semibold text-center">
+                Even geduld...
+              </h2>
+              <p className="text-muted-foreground text-center text-sm">
+                We maken je persoonlijke verhuischecklist
+              </p>
+              
+              <div className="space-y-3 pt-4">
+                {generatingSteps.map((stepText, index) => (
+                  <div 
+                    key={index}
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-xl transition-all duration-300",
+                      index === currentGeneratingStep && "bg-primary/10",
+                      completedSteps.includes(index) && "opacity-60"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
+                      completedSteps.includes(index) 
+                        ? "bg-primary text-primary-foreground" 
+                        : index === currentGeneratingStep
+                          ? "bg-primary/20 border-2 border-primary"
+                          : "bg-muted"
+                    )}>
+                      {completedSteps.includes(index) && (
+                        <Check className="w-3.5 h-3.5" />
+                      )}
+                      {index === currentGeneratingStep && (
+                        <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                      )}
+                    </div>
+                    <span className={cn(
+                      "text-sm transition-all duration-300",
+                      index === currentGeneratingStep && "font-medium text-foreground",
+                      completedSteps.includes(index) && "text-muted-foreground",
+                      !completedSteps.includes(index) && index !== currentGeneratingStep && "text-muted-foreground/50"
+                    )}>
+                      {stepText}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Navigation buttons */}
           {step === 2 && (
             <div className="flex gap-3 pt-4">
@@ -193,11 +275,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 Terug
               </Button>
               <Button
-                onClick={handleComplete}
+                onClick={handleStartGenerating}
                 disabled={!isStepValid()}
                 className="flex-1"
               >
-                Bekijk mijn taken
+                Maak mijn checklist
               </Button>
             </div>
           )}
