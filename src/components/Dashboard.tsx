@@ -26,9 +26,10 @@ type DashboardProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
+  onTaskComplete?: (completedCount: number) => void;
 };
 
-export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) => {
+export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -48,6 +49,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   };
 
   const handleTaskToggle = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    const wasNotDone = task?.status !== "done";
+    
     setCompletingTasks(prev => new Set(prev).add(taskId));
     
     // Wacht op animatie
@@ -62,6 +66,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       newSet.delete(taskId);
       return newSet;
     });
+
+    // Trigger signup prompt if task was completed (not uncompleted)
+    if (wasNotDone && onTaskComplete) {
+      const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
+      onTaskComplete(newCompletedCount);
+    }
   };
 
   // Calculate statistics

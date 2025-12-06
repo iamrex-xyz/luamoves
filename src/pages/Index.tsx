@@ -325,6 +325,7 @@ const Index = () => {
           movingInfo={movingInfo} 
           onNavigate={setCurrentView}
           onLogout={handleLogout}
+          onTaskComplete={handleTaskComplete}
         />
       )}
       {currentView === "tasks" && movingInfo && (
