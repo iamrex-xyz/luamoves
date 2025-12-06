@@ -28,10 +28,55 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [movingDate, setMovingDate] = useState<Date | undefined>(undefined);
   const [postcode, setPostcode] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
+  const [streetName, setStreetName] = useState("");
+  const [cityName, setCityName] = useState("");
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
   const totalSteps = 4; // Welcome, date, address, generating
+
+  // Lookup street name when postcode and house number are filled
+  useEffect(() => {
+    const lookupAddress = async () => {
+      // Clean postcode (remove spaces)
+      const cleanPostcode = postcode.replace(/\s/g, "");
+      
+      if (cleanPostcode.length >= 6 && houseNumber.length > 0) {
+        setIsLoadingAddress(true);
+        try {
+          const searchQuery = `${cleanPostcode} ${houseNumber}`;
+          const apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
+            searchQuery
+          )}&fq=type:(adres)&rows=1`;
+          
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          
+          if (data.response?.docs?.[0]) {
+            const result = data.response.docs[0];
+            setStreetName(result.straatnaam || "");
+            setCityName(result.woonplaatsnaam || "");
+          } else {
+            setStreetName("");
+            setCityName("");
+          }
+        } catch (error) {
+          console.error("Fout bij ophalen adres:", error);
+          setStreetName("");
+          setCityName("");
+        } finally {
+          setIsLoadingAddress(false);
+        }
+      } else {
+        setStreetName("");
+        setCityName("");
+      }
+    };
+
+    const timeoutId = setTimeout(lookupAddress, 500);
+    return () => clearTimeout(timeoutId);
+  }, [postcode, houseNumber]);
 
   // Handle the generating animation
   useEffect(() => {
@@ -366,11 +411,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   {postcode && houseNumber && (
                     <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-2xl animate-in fade-in duration-300">
                       <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center">
-                        <Check className="w-5 h-5 text-white" />
+                        {isLoadingAddress ? (
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Check className="w-5 h-5 text-white" />
+                        )}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">{postcode} {houseNumber}</p>
-                        <p className="text-sm text-muted-foreground">Je nieuwe adres</p>
+                        <p className="font-semibold text-foreground">
+                          {streetName ? `${streetName} ${houseNumber}` : `${postcode} ${houseNumber}`}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {streetName && cityName ? `${postcode}, ${cityName}` : "Je nieuwe adres"}
+                        </p>
                       </div>
                     </div>
                   )}
