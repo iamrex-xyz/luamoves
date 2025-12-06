@@ -167,7 +167,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <span className="text-primary">georganiseerd.</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-md">
-                  100% gratis. Slimme deadlines. Wij onthouden alles, zodat jij dat niet hoeft.
+                  Jouw slimme verhuis assistent. 100% gratis. Wij onthouden alles, zodat jij dat niet hoeft.
                 </p>
               </div>
 
