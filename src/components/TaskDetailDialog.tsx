@@ -30,6 +30,7 @@ type TaskDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTaskUpdate: () => void;
+  onToggleStatus?: (taskId: string) => void;
 };
 
 export const TaskDetailDialog = ({
@@ -37,6 +38,7 @@ export const TaskDetailDialog = ({
   open,
   onOpenChange,
   onTaskUpdate,
+  onToggleStatus,
 }: TaskDetailDialogProps) => {
   const [notes, setNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -249,14 +251,29 @@ export const TaskDetailDialog = ({
               onChange={(e) => setNotes(e.target.value)}
               className="min-h-[120px] resize-none"
             />
-            <Button
-              onClick={handleSaveNotes}
-              disabled={isSaving}
-              className="mt-3 w-full"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? "Opslaan..." : "Notities opslaan"}
-            </Button>
+            <div className="flex gap-2 mt-3">
+              <Button
+                onClick={handleSaveNotes}
+                disabled={isSaving}
+                variant="outline"
+                className="flex-1"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isSaving ? "Opslaan..." : "Notities opslaan"}
+              </Button>
+              {onToggleStatus && (
+                <Button
+                  onClick={() => {
+                    onToggleStatus(task.id);
+                    onOpenChange(false);
+                  }}
+                  className="flex-1"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  {task.status === "done" ? "Markeer als open" : "Markeer als voltooid"}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

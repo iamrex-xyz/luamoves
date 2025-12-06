@@ -80,6 +80,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
   };
 
   const handleTaskClick = (task: Task) => {
+    // Open the task detail dialog instead of toggling status
+    setSelectedTask(task);
+  };
+
+  const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
+    e.stopPropagation();
     // Check if this task requires additional info
     const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
     if (requiredPrompt && task.status !== "done") {
@@ -375,6 +381,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                       >
                         <div 
                           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
+                          onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                         >
                           {isCompleting ? (
                             <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
@@ -497,6 +504,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
+        onToggleStatus={handleTaskToggle}
       />
       <TaskDealDialog
         task={dealTask}
