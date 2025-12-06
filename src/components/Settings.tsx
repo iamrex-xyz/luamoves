@@ -29,6 +29,8 @@ import {
   ChevronRight,
   MapPin,
   UserPlus,
+  Phone,
+  Cake,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -74,6 +76,11 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [petTypes, setPetTypes] = useState<string[]>([]);
+  
+  // Personal info state
+  const [phone, setPhone] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [birthDateObj, setBirthDateObj] = useState<Date | undefined>(undefined);
   const [newPetType, setNewPetType] = useState("");
   
   // Collaborators state
@@ -105,6 +112,11 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
         setPetTypes(profile.pet_types || []);
+        setPhone(profile.phone || "");
+        if (profile.birth_date) {
+          setBirthDate(profile.birth_date);
+          setBirthDateObj(new Date(profile.birth_date));
+        }
       }
     } catch (error) {
       console.error("Error loading profile:", error);
@@ -184,6 +196,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
+      
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -191,6 +205,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           children,
           pets: petTypes.length,
           pet_types: petTypes,
+          phone: phone || null,
+          birth_date: birthDateStr || null,
         })
         .eq("user_id", user.id);
 
@@ -502,6 +518,71 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                   ))}
                 </div>
               )}
+            </div>
+
+            <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full rounded-xl h-11">
+              Opslaan
+            </Button>
+          </div>
+        </div>
+
+        {/* Personal Info Card */}
+        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+          <div className="p-4 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Phone className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground">Persoonlijke gegevens</h2>
+                <p className="text-xs text-muted-foreground">Contact en geboortedatum</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-4">
+            <div>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Telefoonnummer</Label>
+              <Input
+                type="tel"
+                placeholder="06 12345678"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="rounded-xl h-11"
+              />
+            </div>
+
+            <div>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Geboortedatum</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal rounded-xl h-11",
+                      !birthDateObj && "text-muted-foreground"
+                    )}
+                  >
+                    <Cake className="mr-2 h-4 w-4" />
+                    {birthDateObj ? format(birthDateObj, "dd-MM-yyyy") : "Selecteer"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={birthDateObj}
+                    onSelect={(date) => {
+                      setBirthDateObj(date);
+                      if (date) setBirthDate(format(date, "yyyy-MM-dd"));
+                    }}
+                    initialFocus
+                    className="pointer-events-auto"
+                    captionLayout="dropdown-buttons"
+                    fromYear={1920}
+                    toYear={new Date().getFullYear()}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
 
             <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full rounded-xl h-11">

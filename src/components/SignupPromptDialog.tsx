@@ -146,6 +146,7 @@ export const SignupPromptDialog = ({
             adults: parseInt(adults) || 1,
             children: parseInt(children) || 0,
             pets: parseInt(pets) || 0,
+            birth_date: birthDate || null,
           })
           .eq('user_id', data.user.id);
 
