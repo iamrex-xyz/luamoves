@@ -142,7 +142,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         >
           {/* Header */}
           <div className="p-6 flex justify-between items-center">
-            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+            <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
             <Button
               variant="ghost"
               size="sm"

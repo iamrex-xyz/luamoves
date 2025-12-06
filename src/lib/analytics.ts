@@ -9,14 +9,14 @@ export const trackEvent = (eventName: string, properties?: Record<string, unknow
   
   // Store in localStorage for debugging (non-identifiable)
   try {
-    const events = JSON.parse(localStorage.getItem("charly_analytics") || "[]");
+    const events = JSON.parse(localStorage.getItem("lua_analytics") || "[]");
     events.push({
       event: eventName,
       timestamp: new Date().toISOString(),
       ...properties,
     });
     // Keep only last 50 events
-    localStorage.setItem("charly_analytics", JSON.stringify(events.slice(-50)));
+    localStorage.setItem("lua_analytics", JSON.stringify(events.slice(-50)));
   } catch {
     // Ignore storage errors
   }

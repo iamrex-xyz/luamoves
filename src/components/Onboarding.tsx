@@ -312,7 +312,7 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6">
               <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
-                Ik ben Charly,<br />jouw persoonlijke verhuisconcierge.
+                Welkom bij Lua,<br />jouw persoonlijke verhuis assistent.
               </h2>
               <Button
                 variant="ghost"

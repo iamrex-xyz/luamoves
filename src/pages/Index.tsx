@@ -20,8 +20,8 @@ export type MovingInfo = {
   needsContractorHelp?: boolean;
 };
 
-const LOCAL_STORAGE_KEY = "charly_moving_info";
-const SIGNUP_PROMPTED_KEY = "charly_signup_prompted";
+const LOCAL_STORAGE_KEY = "lua_moving_info";
+const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);

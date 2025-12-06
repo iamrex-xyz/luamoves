@@ -7,6 +7,7 @@ import { Task } from "@/lib/taskGenerator";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
+import { LuaLogo } from "@/components/LuaLogo";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -156,8 +157,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Charly</h1>
-            <p className="text-sm text-muted-foreground">Jouw verhuis concierge</p>
+            <LuaLogo size="lg" />
+            <p className="text-sm text-muted-foreground mt-0.5">Jouw verhuis assistent</p>
           </div>
           <Button
             variant="ghost"
