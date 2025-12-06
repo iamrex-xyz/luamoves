@@ -1,11 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,34 +15,31 @@ import {
   Phone, 
   Lock,
   Calendar,
-  Flame,
   HardHat,
   Check,
   ArrowRight,
   Cake,
-  MapPin
+  MapPin,
+  Shield
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics";
 import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
-// Password must be min 8 chars, at least 1 letter and 1 number
+// Password must be min 8 chars, at least 1 number
 const passwordSchema = z.string()
   .min(8, "Wachtwoord moet minimaal 8 tekens bevatten")
-  .regex(/[a-zA-Z]/, "Wachtwoord moet minimaal 1 letter bevatten")
   .regex(/[0-9]/, "Wachtwoord moet minimaal 1 cijfer bevatten");
 
 type SignupPromptDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSignupComplete: () => void;
-  onSkip: () => void;
-  isHardBlock?: boolean;
   capturedEmail?: string;
 };
 
@@ -56,8 +47,6 @@ export const SignupPromptDialog = ({
   open,
   onOpenChange,
   onSignupComplete,
-  onSkip,
-  isHardBlock = false,
   capturedEmail = "",
 }: SignupPromptDialogProps) => {
   const { toast } = useToast();
@@ -69,6 +58,7 @@ export const SignupPromptDialog = ({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [passwordSet, setPasswordSet] = useState(false);
   
   // Step 2: Profile fields
   const [phone, setPhone] = useState("");
@@ -84,6 +74,21 @@ export const SignupPromptDialog = ({
   
   const [isLoading, setIsLoading] = useState(false);
   const [step2Errors, setStep2Errors] = useState<Record<string, string>>({});
+
+  // Calculate fields completed for progress indicator
+  const filledFieldsCount = useMemo(() => {
+    let count = 0;
+    if (postcode.trim()) count++;
+    if (houseNumber.trim()) count++;
+    if (keyHandoverDate) count++;
+    if (phone.trim()) count++;
+    if (birthDate) count++;
+    // renovationType always has a value so count it as done
+    count++;
+    return count;
+  }, [postcode, houseNumber, keyHandoverDate, phone, birthDate]);
+
+  const totalFields = 6;
 
   // Generate year options (from 1920 to current year)
   const yearOptions = useMemo(() => {
@@ -121,10 +126,18 @@ export const SignupPromptDialog = ({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      setCurrentStep(1);
+      // Check if password was already set in this session
+      const wasPasswordSet = sessionStorage.getItem("lua_password_set") === "true";
+      if (wasPasswordSet) {
+        setPasswordSet(true);
+        setCurrentStep(2);
+        trackEvent("account_modal_triggered_task3_safeguard");
+      } else {
+        setCurrentStep(1);
+        trackEvent("account_modal_shown_after_task_2");
+      }
       setPassword("");
       setPasswordError("");
-      trackEvent("account_modal_step1_shown");
     }
   }, [open]);
 
@@ -138,18 +151,27 @@ export const SignupPromptDialog = ({
     return true;
   };
 
+  // Check if password meets requirements
+  const isPasswordValid = useMemo(() => {
+    return passwordSchema.safeParse(password).success;
+  }, [password]);
+
   const handleStep1Next = () => {
     if (!validatePassword()) {
       return;
     }
     
+    // Store password temporarily and mark as set
+    sessionStorage.setItem("lua_temp_password", password);
+    sessionStorage.setItem("lua_password_set", "true");
+    setPasswordSet(true);
+    
     trackEvent("password_set");
     toast({
       title: "Wachtwoord opgeslagen ✅",
-      description: "Klaar voor de volgende stap!",
+      description: "Vul nu je gegevens in.",
     });
     
-    trackEvent("account_modal_step2_shown");
     setCurrentStep(2);
   };
 
@@ -177,7 +199,7 @@ export const SignupPromptDialog = ({
     if (Object.keys(errors).length > 0) {
       toast({
         title: "Vul alle velden in",
-        description: "Sommige verplichte velden zijn nog niet ingevuld.",
+        description: `Nog ${totalFields - filledFieldsCount} velden te gaan.`,
         variant: "destructive",
       });
       return false;
@@ -185,6 +207,11 @@ export const SignupPromptDialog = ({
     
     return true;
   };
+
+  // Check if all step 2 fields are filled
+  const isStep2Complete = useMemo(() => {
+    return postcode.trim() && houseNumber.trim() && keyHandoverDate && phone.trim() && birthDate;
+  }, [postcode, houseNumber, keyHandoverDate, phone, birthDate]);
 
   const handleSignup = async () => {
     if (!capturedEmail) {
@@ -200,13 +227,25 @@ export const SignupPromptDialog = ({
       return;
     }
 
+    // Get password from session storage if we're in step 2 safeguard mode
+    const storedPassword = sessionStorage.getItem("lua_temp_password") || password;
+    
+    if (!storedPassword) {
+      toast({
+        title: "Wachtwoord ontbreekt",
+        description: "Er is iets misgegaan. Probeer opnieuw.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const redirectUrl = `${window.location.origin}/`;
       const { data, error } = await supabase.auth.signUp({
         email: capturedEmail,
-        password,
+        password: storedPassword,
         options: {
           emailRedirectTo: redirectUrl,
         },
@@ -237,10 +276,16 @@ export const SignupPromptDialog = ({
           console.error('Error updating profile:', profileError);
         }
 
-        trackEvent("account_created_from_step2");
+        // Track completion
+        trackEvent("account_fully_completed");
+        
+        // Clear temporary storage
+        sessionStorage.removeItem("lua_temp_password");
+        sessionStorage.removeItem("lua_password_set");
+        
         toast({
           title: "Account aangemaakt! 🎉",
-          description: "Je voortgang is veilig opgeslagen.",
+          description: "Lua onthoudt nu alles voor je.",
         });
         onSignupComplete();
       }
@@ -263,54 +308,44 @@ export const SignupPromptDialog = ({
     }
   };
 
-  const handleSkip = () => {
-    if (currentStep === 1) {
-      trackEvent("step1_skipped");
-    } else {
-      trackEvent("step2_skipped");
-    }
-    onSkip();
-  };
-
-  const handleOpenChange = (newOpen: boolean) => {
-    // Never allow closing the dialog - user must complete the signup
-    if (!newOpen && open) {
-      return;
-    }
-    onOpenChange(newOpen);
+  // Track field completion
+  const trackFieldComplete = (fieldName: string) => {
+    trackEvent("account_field_completed", { field: fieldName });
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent 
-        className="sm:max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in-0 slide-in-from-bottom-4 duration-300"
+    <Sheet open={open} onOpenChange={() => {}}>
+      <SheetContent 
+        side="bottom" 
+        className="h-[100dvh] p-0 flex flex-col"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {currentStep === 1 ? (
-          <>
-            <DialogHeader className="text-center space-y-2">
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
-                <Flame className="w-6 h-6 text-white" />
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+            {/* Header */}
+            <div className="text-center space-y-3 mb-6">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                <Shield className="w-7 h-7 text-primary-foreground" />
               </div>
-              <DialogTitle className="text-2xl font-bold">
-                Je bent lekker op dreef!
-              </DialogTitle>
-              <DialogDescription className="text-base text-muted-foreground">
-                Maak eerst een wachtwoord aan, zodat we je voortgang veilig kunnen bewaren.
-              </DialogDescription>
-            </DialogHeader>
+              <div>
+                <h2 className="text-2xl font-bold">Beveilig je account</h2>
+                <p className="text-muted-foreground mt-1">
+                  Kies een wachtwoord zodat wij je voortgang veilig kunnen opslaan.
+                </p>
+              </div>
+            </div>
 
-            <div className="space-y-4 py-4">
+            <div className="flex-1 space-y-6">
               {/* E-mail display */}
-              <div className="p-3 rounded-xl bg-primary/5 border border-primary/10">
+              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
                 <p className="text-sm text-muted-foreground">E-mailadres</p>
                 <p className="font-medium">{capturedEmail}</p>
               </div>
 
               {/* Password */}
               <div className="space-y-2">
-                <Label htmlFor="signup-password" className="flex items-center gap-2">
+                <Label htmlFor="signup-password" className="flex items-center gap-2 text-base">
                   <Lock className="w-4 h-4 text-muted-foreground" />
                   Wachtwoord
                 </Label>
@@ -318,77 +353,88 @@ export const SignupPromptDialog = ({
                   <Input
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Minimaal 8 tekens, 1 letter en 1 cijfer"
+                    placeholder="Minimaal 8 tekens met 1 cijfer"
                     value={password}
                     onChange={(e) => {
                       setPassword(e.target.value);
                       if (passwordError) setPasswordError("");
                     }}
-                    className={`h-12 rounded-xl pr-10 ${passwordError ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    className={cn(
+                      "h-14 rounded-xl pr-12 text-base",
+                      passwordError && "border-destructive focus-visible:ring-destructive"
+                    )}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
+                      <EyeOff className="w-5 h-5" />
                     ) : (
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-5 h-5" />
                     )}
                   </button>
                 </div>
                 {passwordError && (
                   <p className="text-sm text-destructive">{passwordError}</p>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  Kies iets dat je makkelijk onthoudt, wij houden alles veilig voor je.
+                <p className="text-sm text-muted-foreground">
+                  Lua onthoudt alles voor je, zodat jij je kunt focussen op verhuizen.
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 pt-2">
+            {/* CTA */}
+            <div className="pt-4 mt-auto">
               <Button 
                 onClick={handleStep1Next} 
-                disabled={!password || isLoading} 
-                className="h-12 rounded-xl text-base font-semibold"
+                disabled={!isPasswordValid || isLoading} 
+                className="w-full h-14 rounded-xl text-lg font-semibold"
               >
                 Volgende
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-              {!isHardBlock && (
-                <Button 
-                  variant="ghost" 
-                  onClick={handleSkip} 
-                  disabled={isLoading} 
-                  className="text-muted-foreground h-11"
-                >
-                  Later verder
-                </Button>
-              )}
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <DialogHeader className="text-center space-y-2">
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
-                <Home className="w-6 h-6 text-white" />
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+            {/* Header */}
+            <div className="text-center space-y-3 mb-4">
+              <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                <Home className="w-7 h-7 text-primary-foreground" />
               </div>
-              <DialogTitle className="text-2xl font-bold">
-                Je account compleet maken
-              </DialogTitle>
-              <DialogDescription className="text-base text-muted-foreground">
-                Vul je gegevens in zodat Lua je verhuizing helemaal kan regelen.
-              </DialogDescription>
-            </DialogHeader>
+              <div>
+                <h2 className="text-2xl font-bold">Maak je account compleet</h2>
+                <p className="text-muted-foreground mt-1">
+                  Vul alle gegevens in zodat Lua al je taken en deadlines kan onthouden.
+                </p>
+              </div>
+            </div>
 
-            <div className="space-y-4 py-4">
-              {/* Success indicator for step 1 */}
-              <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 flex items-center gap-2">
+            {/* Progress indicator */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">{filledFieldsCount}/{totalFields} velden ingevuld</span>
+                <span className="text-sm text-muted-foreground">{Math.round((filledFieldsCount / totalFields) * 100)}%</span>
+              </div>
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+                  style={{ width: `${(filledFieldsCount / totalFields) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Success indicator for step 1 */}
+            {passwordSet && (
+              <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 flex items-center gap-2 mb-4">
                 <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
                 <p className="text-sm text-green-700 dark:text-green-300">Wachtwoord opgeslagen</p>
               </div>
+            )}
 
+            <div className="flex-1 space-y-4">
               {/* Old Address - Postcode + House Number */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
@@ -402,7 +448,9 @@ export const SignupPromptDialog = ({
                       placeholder="Postcode"
                       value={postcode}
                       onChange={(e) => {
-                        setPostcode(e.target.value.toUpperCase());
+                        const val = e.target.value.toUpperCase();
+                        setPostcode(val);
+                        if (val.trim() && !postcode.trim()) trackFieldComplete("postcode");
                         if (step2Errors.postcode) {
                           setStep2Errors(prev => ({ ...prev, postcode: "" }));
                         }
@@ -421,6 +469,7 @@ export const SignupPromptDialog = ({
                       value={houseNumber}
                       onChange={(e) => {
                         setHouseNumber(e.target.value);
+                        if (e.target.value.trim() && !houseNumber.trim()) trackFieldComplete("houseNumber");
                         if (step2Errors.houseNumber) {
                           setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
                         }
@@ -434,7 +483,7 @@ export const SignupPromptDialog = ({
                 </div>
               </div>
 
-              {/* Key Handover Date - with date picker */}
+              {/* Key Handover Date */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -450,7 +499,7 @@ export const SignupPromptDialog = ({
                         step2Errors.keyHandoverDate && "border-destructive"
                       )}
                     >
-                      <span>{keyHandoverDate ? format(keyHandoverDate, "dd-MM-yy") : "dd-mm-jj"}</span>
+                      <span>{keyHandoverDate ? format(keyHandoverDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
@@ -459,6 +508,7 @@ export const SignupPromptDialog = ({
                       mode="single"
                       selected={keyHandoverDate}
                       onSelect={(date) => {
+                        if (date && !keyHandoverDate) trackFieldComplete("keyHandoverDate");
                         setKeyHandoverDate(date);
                         if (step2Errors.keyHandoverDate) {
                           setStep2Errors(prev => ({ ...prev, keyHandoverDate: "" }));
@@ -475,11 +525,11 @@ export const SignupPromptDialog = ({
                 )}
               </div>
 
-              {/* Renovation Type - matching Settings options */}
+              {/* Renovation Type */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <HardHat className="w-4 h-4 text-muted-foreground" />
-                  Hoeveel moet er nog gebeuren?
+                  Mate van verbouwing
                 </Label>
                 <RadioGroup 
                   value={renovationType} 
@@ -488,33 +538,36 @@ export const SignupPromptDialog = ({
                 >
                   <Label
                     htmlFor="reno-none-signup"
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={cn(
+                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
                       renovationType === "none" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
-                    }`}
+                    )}
                   >
                     <RadioGroupItem value="none" id="reno-none-signup" className="sr-only" />
-                    <span className="text-sm font-medium">Geen</span>
+                    <span className="text-sm font-medium">Niets</span>
                   </Label>
                   <Label
                     htmlFor="reno-small-signup"
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={cn(
+                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
                       renovationType === "small" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
-                    }`}
+                    )}
                   >
                     <RadioGroupItem value="small" id="reno-small-signup" className="sr-only" />
                     <span className="text-sm font-medium">Klein</span>
                   </Label>
                   <Label
                     htmlFor="reno-large-signup"
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                    className={cn(
+                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
                       renovationType === "large" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
-                    }`}
+                    )}
                   >
                     <RadioGroupItem value="large" id="reno-large-signup" className="sr-only" />
                     <span className="text-sm font-medium">Groot</span>
@@ -538,7 +591,7 @@ export const SignupPromptDialog = ({
                       max="10"
                       value={adults}
                       onChange={(e) => setAdults(e.target.value)}
-                      className="h-10 rounded-xl text-center"
+                      className="h-11 rounded-xl text-center"
                     />
                   </div>
                   <div className="space-y-1">
@@ -550,7 +603,7 @@ export const SignupPromptDialog = ({
                       max="10"
                       value={children}
                       onChange={(e) => setChildren(e.target.value)}
-                      className="h-10 rounded-xl text-center"
+                      className="h-11 rounded-xl text-center"
                     />
                   </div>
                   <div className="space-y-1">
@@ -562,7 +615,7 @@ export const SignupPromptDialog = ({
                       max="10"
                       value={pets}
                       onChange={(e) => setPets(e.target.value)}
-                      className="h-10 rounded-xl text-center"
+                      className="h-11 rounded-xl text-center"
                     />
                   </div>
                 </div>
@@ -580,6 +633,7 @@ export const SignupPromptDialog = ({
                   placeholder="06 12345678"
                   value={phone}
                   onChange={(e) => {
+                    if (e.target.value.trim() && !phone.trim()) trackFieldComplete("phone");
                     setPhone(e.target.value);
                     if (step2Errors.phone) {
                       setStep2Errors(prev => ({ ...prev, phone: "" }));
@@ -592,7 +646,7 @@ export const SignupPromptDialog = ({
                 )}
               </div>
 
-              {/* Birth Date - with calendar and month/year dropdowns */}
+              {/* Birth Date */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Cake className="w-4 h-4 text-muted-foreground" />
@@ -608,7 +662,7 @@ export const SignupPromptDialog = ({
                         step2Errors.birthDate && "border-destructive"
                       )}
                     >
-                      <span>{birthDate ? format(birthDate, "dd-MM-yy") : "dd-mm-jj"}</span>
+                      <span>{birthDate ? format(birthDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
@@ -652,6 +706,7 @@ export const SignupPromptDialog = ({
                       mode="single"
                       selected={birthDate}
                       onSelect={(date) => {
+                        if (date && !birthDate) trackFieldComplete("birthDate");
                         setBirthDate(date);
                         if (step2Errors.birthDate) {
                           setStep2Errors(prev => ({ ...prev, birthDate: "" }));
@@ -671,32 +726,33 @@ export const SignupPromptDialog = ({
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 pt-2">
+            {/* CTA */}
+            <div className="pt-4 mt-auto space-y-3">
               <Button 
                 onClick={handleSignup} 
-                disabled={isLoading} 
-                className="h-12 rounded-xl text-base font-semibold"
+                disabled={!isStep2Complete || isLoading} 
+                className="w-full h-14 rounded-xl text-lg font-semibold"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     Bezig...
                   </>
                 ) : (
                   "Account afronden"
                 )}
               </Button>
-            </div>
 
-            <p className="text-xs text-center text-muted-foreground pt-1">
-              Door je account te maken ga je akkoord met onze{" "}
-              <a href="/voorwaarden" className="underline hover:text-foreground">voorwaarden</a>
-              {" "}en{" "}
-              <a href="/privacy" className="underline hover:text-foreground">privacyverklaring</a>.
-            </p>
-          </>
+              <p className="text-xs text-center text-muted-foreground">
+                Door je account te maken ga je akkoord met onze{" "}
+                <a href="/voorwaarden" className="underline hover:text-foreground">voorwaarden</a>
+                {" "}en{" "}
+                <a href="/privacy" className="underline hover:text-foreground">privacyverklaring</a>.
+              </p>
+            </div>
+          </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
