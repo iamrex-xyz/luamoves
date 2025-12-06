@@ -90,7 +90,7 @@ export const EmailCaptureDialog = ({
             <Sparkles className="w-6 h-6 text-white" />
           </div>
           <DialogTitle className="text-2xl font-bold">
-            Topstart! 🎉
+            Topstart!
           </DialogTitle>
           <DialogDescription className="text-base text-muted-foreground">
             Laat je e-mail achter zodat we je voortgang kunnen bewaren en je niets vergeet.

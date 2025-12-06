@@ -263,7 +263,7 @@ export const SignupPromptDialog = ({
                 <Flame className="w-6 h-6 text-white" />
               </div>
               <DialogTitle className="text-2xl font-bold">
-                Je bent lekker op dreef! 🔥
+                Je bent lekker op dreef!
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 Maak eerst een wachtwoord aan, zodat we je voortgang veilig kunnen bewaren.
@@ -344,7 +344,7 @@ export const SignupPromptDialog = ({
                 <Home className="w-6 h-6 text-white" />
               </div>
               <DialogTitle className="text-2xl font-bold">
-                Je account compleet maken 🏡
+                Je account compleet maken
               </DialogTitle>
               <DialogDescription className="text-base text-muted-foreground">
                 Vul je gegevens in zodat Lua je verhuizing helemaal kan regelen.
