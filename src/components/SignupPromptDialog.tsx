@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   Eye, 
   EyeOff, 
@@ -32,7 +33,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { format } from "date-fns";
+import { format, getDaysInMonth } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -78,9 +79,54 @@ export const SignupPromptDialog = ({
   const [adults, setAdults] = useState("1");
   const [children, setChildren] = useState("0");
   const [pets, setPets] = useState("0");
-  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const [birthMonth, setBirthMonth] = useState<string>("");
+  const [birthYear, setBirthYear] = useState<string>("");
+  const [birthDay, setBirthDay] = useState<string>("");
   
   const [isLoading, setIsLoading] = useState(false);
+
+  // Calculate available days based on selected month and year
+  const availableDays = useMemo(() => {
+    if (!birthMonth || !birthYear) return [];
+    const daysInMonth = getDaysInMonth(new Date(parseInt(birthYear), parseInt(birthMonth) - 1));
+    return Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
+  }, [birthMonth, birthYear]);
+
+  // Construct birth date from components
+  const birthDate = useMemo(() => {
+    if (birthDay && birthMonth && birthYear) {
+      return new Date(parseInt(birthYear), parseInt(birthMonth) - 1, parseInt(birthDay));
+    }
+    return undefined;
+  }, [birthDay, birthMonth, birthYear]);
+
+  // Reset day if it exceeds available days
+  useEffect(() => {
+    if (birthDay && availableDays.length > 0 && parseInt(birthDay) > availableDays.length) {
+      setBirthDay("");
+    }
+  }, [availableDays, birthDay]);
+
+  // Generate year options (from 1920 to current year)
+  const yearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: currentYear - 1920 + 1 }, (_, i) => (currentYear - i).toString());
+  }, []);
+
+  const monthOptions = [
+    { value: "1", label: "Januari" },
+    { value: "2", label: "Februari" },
+    { value: "3", label: "Maart" },
+    { value: "4", label: "April" },
+    { value: "5", label: "Mei" },
+    { value: "6", label: "Juni" },
+    { value: "7", label: "Juli" },
+    { value: "8", label: "Augustus" },
+    { value: "9", label: "September" },
+    { value: "10", label: "Oktober" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -489,7 +535,7 @@ export const SignupPromptDialog = ({
                 />
               </div>
 
-              {/* Birth Date - with date picker */}
+              {/* Birth Date - with month/year/day dropdowns */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Cake className="w-4 h-4 text-muted-foreground" />
@@ -508,18 +554,61 @@ export const SignupPromptDialog = ({
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={birthDate}
-                      onSelect={setBirthDate}
-                      initialFocus
-                      className="pointer-events-auto"
-                      locale={nl}
-                      captionLayout="dropdown-buttons"
-                      fromYear={1920}
-                      toYear={new Date().getFullYear()}
-                    />
+                  <PopoverContent className="w-auto p-4 bg-background z-50" align="start">
+                    <div className="space-y-4">
+                      {/* Month selector */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">Maand</Label>
+                        <Select value={birthMonth} onValueChange={setBirthMonth}>
+                          <SelectTrigger className="h-10 rounded-lg">
+                            <SelectValue placeholder="Selecteer maand" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-[60]">
+                            {monthOptions.map((month) => (
+                              <SelectItem key={month.value} value={month.value}>
+                                {month.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Year selector */}
+                      <div className="space-y-1.5">
+                        <Label className="text-xs text-muted-foreground">Geboortejaar</Label>
+                        <Select value={birthYear} onValueChange={setBirthYear}>
+                          <SelectTrigger className="h-10 rounded-lg">
+                            <SelectValue placeholder="Selecteer jaar" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-[60] max-h-[200px]">
+                            {yearOptions.map((year) => (
+                              <SelectItem key={year} value={year}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Day selector - only show when month and year are selected */}
+                      {birthMonth && birthYear && (
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground">Dag</Label>
+                          <Select value={birthDay} onValueChange={setBirthDay}>
+                            <SelectTrigger className="h-10 rounded-lg">
+                              <SelectValue placeholder="Selecteer dag" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background z-[60] max-h-[200px]">
+                              {availableDays.map((day) => (
+                                <SelectItem key={day} value={day}>
+                                  {day}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>
