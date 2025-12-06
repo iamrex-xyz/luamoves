@@ -130,9 +130,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
       // Complete after all steps
       const timeout = setTimeout(() => {
+        // Build full address string
+        const fullAddress = streetName && cityName 
+          ? `${streetName} ${houseNumber}, ${postcode} ${cityName}`
+          : `${postcode} ${houseNumber}`.trim();
+        
         onComplete({
           oldAddress: "",
-          newAddress: `${postcode} ${houseNumber}`.trim(),
+          newAddress: fullAddress,
           movingDate: movingDate ? format(movingDate, "yyyy-MM-dd") : "",
           type: "rent",
           renovationType: "none",
