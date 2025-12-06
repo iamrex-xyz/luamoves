@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
         display: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        italiana: ['Italiana', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
