@@ -33,25 +33,35 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [animatedTaskIndex, setAnimatedTaskIndex] = useState(0);
+  const [taskStartIndex, setTaskStartIndex] = useState(0);
+  const [isCheckingTask, setIsCheckingTask] = useState(false);
 
   const animatedTasks = [
-    { title: "Verhuisbedrijf boeken", checked: false },
-    { title: "Adreswijziging doorgeven", checked: false },
-    { title: "Energiecontract afsluiten", checked: false },
-    { title: "Internet overzetten", checked: false },
-    { title: "Verzekeringen aanpassen", checked: false },
-    { title: "Verhuisdozen bestellen", checked: false },
+    "Verhuisbedrijf boeken",
+    "Adreswijziging doorgeven",
+    "Energiecontract afsluiten",
+    "Internet overzetten",
+    "Verzekeringen aanpassen",
+    "Verhuisdozen bestellen",
+    "Sleutels ophalen",
+    "Meter standen noteren",
   ];
 
   const totalSteps = 4; // Welcome, date, address, generating
 
-  // Animate tasks on welcome screen
+  // Animate tasks on welcome screen - check off top task periodically
   useEffect(() => {
     if (step === 1) {
       const interval = setInterval(() => {
-        setAnimatedTaskIndex((prev) => (prev + 1) % animatedTasks.length);
-      }, 4000);
+        // Start checking animation
+        setIsCheckingTask(true);
+        
+        // After check animation, move to next task
+        setTimeout(() => {
+          setTaskStartIndex((prev) => (prev + 1) % animatedTasks.length);
+          setIsCheckingTask(false);
+        }, 600);
+      }, 3500);
       return () => clearInterval(interval);
     }
   }, [step]);
@@ -214,38 +224,50 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                   </div>
                   
-                  <div className="space-y-2 overflow-hidden">
-                    {/* Checked task - animates out */}
+                  <div className="space-y-2 overflow-hidden relative h-[120px]">
+                    {/* First task - gets checked off */}
                     <div 
-                      key={`checked-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
-                      style={{ animationDuration: '800ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-500 ease-out ${
+                        isCheckingTask 
+                          ? "bg-primary/10 scale-95 opacity-0 -translate-y-2" 
+                          : "bg-primary-light"
+                      }`}
                     >
-                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-                      <span className="text-sm text-primary/70 line-through">
-                        {animatedTasks[(animatedTaskIndex + animatedTasks.length - 1) % animatedTasks.length].title}
+                      <div className="shrink-0 transition-transform duration-300">
+                        {isCheckingTask ? (
+                          <CheckCircle2 className="w-5 h-5 text-primary animate-scale-in" />
+                        ) : (
+                          <Circle className="w-5 h-5 text-primary" />
+                        )}
+                      </div>
+                      <span className={`text-sm font-medium transition-all duration-300 ${
+                        isCheckingTask ? "line-through text-primary/60" : "text-foreground"
+                      }`}>
+                        {animatedTasks[taskStartIndex % animatedTasks.length]}
                       </span>
                     </div>
-                    {/* Current task - highlighted */}
+                    
+                    {/* Second task */}
                     <div 
-                      key={`current-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-primary-light rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
-                      style={{ animationDuration: '800ms', animationDelay: '150ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)', animationFillMode: 'both' }}
-                    >
-                      <Circle className="w-5 h-5 text-primary shrink-0" />
-                      <span className="text-sm text-foreground font-medium">
-                        {animatedTasks[animatedTaskIndex].title}
-                      </span>
-                    </div>
-                    {/* Next task */}
-                    <div 
-                      key={`next-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-secondary rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
-                      style={{ animationDuration: '800ms', animationDelay: '300ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)', animationFillMode: 'both' }}
+                      className={`flex items-center gap-3 p-3 bg-secondary rounded-xl transition-all duration-500 ease-out ${
+                        isCheckingTask ? "-translate-y-1" : ""
+                      }`}
                     >
                       <Circle className="w-5 h-5 text-muted-foreground/40 shrink-0" />
                       <span className="text-sm text-muted-foreground">
-                        {animatedTasks[(animatedTaskIndex + 1) % animatedTasks.length].title}
+                        {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
+                      </span>
+                    </div>
+                    
+                    {/* Third task */}
+                    <div 
+                      className={`flex items-center gap-3 p-3 bg-secondary/50 rounded-xl transition-all duration-500 ease-out ${
+                        isCheckingTask ? "-translate-y-1 opacity-80" : "opacity-60"
+                      }`}
+                    >
+                      <Circle className="w-5 h-5 text-muted-foreground/30 shrink-0" />
+                      <span className="text-sm text-muted-foreground/70">
+                        {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
                       </span>
                     </div>
                   </div>
