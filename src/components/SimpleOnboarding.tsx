@@ -224,19 +224,16 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                   
                   <div className="overflow-hidden relative h-[100px]">
-                    <div 
-                      className="flex flex-col gap-1.5"
-                      style={{
-                        transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                        transform: animationPhase === 'sliding' ? 'translateY(-38px)' : 'translateY(0)',
-                      }}
-                    >
-                      {/* Task 1 - gets checked and fades out during slide */}
+                    <div className="flex flex-col gap-1.5">
+                      {/* Task 1 - gets checked and fades/slides out */}
                       <div 
                         className="flex items-center gap-2.5 p-2.5 rounded-lg"
                         style={{
-                          transition: 'all 0.4s ease',
+                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                           opacity: animationPhase === 'sliding' ? 0 : 1,
+                          height: animationPhase === 'sliding' ? 0 : 'auto',
+                          padding: animationPhase === 'sliding' ? '0 10px' : '10px',
+                          marginBottom: animationPhase === 'sliding' ? 0 : undefined,
                           backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
                             ? 'hsl(var(--primary) / 0.1)' 
                             : 'hsl(var(--primary-light))',
@@ -246,7 +243,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                           className="w-4 h-4 shrink-0 flex items-center justify-center"
                           style={{
                             transition: 'transform 0.3s ease',
-                            transform: animationPhase === 'checking' || animationPhase === 'sliding' ? 'scale(1.1)' : 'scale(1)',
+                            transform: animationPhase === 'checking' ? 'scale(1.2)' : 'scale(1)',
                           }}
                         >
                           {animationPhase === 'checking' || animationPhase === 'sliding' ? (
@@ -256,7 +253,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                           )}
                         </div>
                         <span 
-                          className="text-xs font-medium"
+                          className="text-xs font-medium whitespace-nowrap"
                           style={{
                             transition: 'all 0.3s ease',
                             textDecoration: animationPhase === 'checking' || animationPhase === 'sliding' ? 'line-through' : 'none',
@@ -269,11 +266,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         </span>
                       </div>
                       
-                      {/* Task 2 - becomes primary style during slide */}
+                      {/* Task 2 - becomes primary after slide */}
                       <div 
                         className="flex items-center gap-2.5 p-2.5 rounded-lg"
                         style={{
-                          transition: 'background-color 0.6s ease',
+                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                           backgroundColor: animationPhase === 'sliding' 
                             ? 'hsl(var(--primary-light))' 
                             : 'hsl(var(--secondary))',
@@ -282,7 +279,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <Circle 
                           className="w-4 h-4 shrink-0"
                           style={{
-                            transition: 'color 0.6s ease',
+                            transition: 'color 0.5s ease',
                             color: animationPhase === 'sliding' 
                               ? 'hsl(var(--primary))' 
                               : 'hsl(var(--muted-foreground) / 0.4)',
@@ -291,7 +288,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <span 
                           className="text-xs"
                           style={{
-                            transition: 'all 0.6s ease',
+                            transition: 'all 0.5s ease',
                             fontWeight: animationPhase === 'sliding' ? 500 : 400,
                             color: animationPhase === 'sliding' 
                               ? 'hsl(var(--foreground))' 
@@ -302,11 +299,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         </span>
                       </div>
                       
-                      {/* Task 3 - becomes secondary style during slide */}
+                      {/* Task 3 - becomes secondary after slide */}
                       <div 
                         className="flex items-center gap-2.5 p-2.5 rounded-lg"
                         style={{
-                          transition: 'all 0.6s ease',
+                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                           backgroundColor: animationPhase === 'sliding' 
                             ? 'hsl(var(--secondary))' 
                             : 'hsl(var(--secondary) / 0.5)',
@@ -315,7 +312,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <Circle 
                           className="w-4 h-4 shrink-0"
                           style={{
-                            transition: 'color 0.6s ease',
+                            transition: 'color 0.5s ease',
                             color: animationPhase === 'sliding' 
                               ? 'hsl(var(--muted-foreground) / 0.4)' 
                               : 'hsl(var(--muted-foreground) / 0.3)',
@@ -324,27 +321,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <span 
                           className="text-xs"
                           style={{
-                            transition: 'color 0.6s ease',
+                            transition: 'color 0.5s ease',
                             color: animationPhase === 'sliding' 
                               ? 'hsl(var(--muted-foreground))' 
                               : 'hsl(var(--muted-foreground) / 0.7)',
                           }}
                         >
                           {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
-                        </span>
-                      </div>
-                      
-                      {/* Task 4 - fades in from below */}
-                      <div 
-                        className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary/30"
-                        style={{
-                          transition: 'opacity 0.6s ease',
-                          opacity: animationPhase === 'sliding' ? 0.6 : 0,
-                        }}
-                      >
-                        <Circle className="w-4 h-4 text-muted-foreground/20 shrink-0" />
-                        <span className="text-xs text-muted-foreground/50">
-                          {animatedTasks[(taskStartIndex + 3) % animatedTasks.length]}
                         </span>
                       </div>
                     </div>
