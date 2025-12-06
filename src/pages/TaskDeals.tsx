@@ -48,15 +48,15 @@ export const TaskDeals = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white border-b border-orange-100">
+      <div className="sticky top-0 z-10 bg-gradient-to-br from-primary-light via-primary-light/80 to-white border-b border-primary/10">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-full hover:bg-orange-100"
+              className="h-10 w-10 rounded-full hover:bg-primary-light"
               onClick={() => navigate(-1)}
             >
               <ArrowLeft className="w-5 h-5" />
@@ -78,10 +78,10 @@ export const TaskDeals = () => {
         {deals.map((deal) => (
           <div 
             key={deal.id} 
-            className={`p-3 md:p-4 relative rounded-3xl bg-white shadow-lg ${deal.popular ? 'ring-2 ring-orange-500 shadow-orange-200/50' : 'shadow-orange-100/50'}`}
+            className={`p-3 md:p-4 relative rounded-3xl bg-white shadow-lg ${deal.popular ? 'ring-2 ring-primary shadow-primary/20' : 'shadow-primary/10'}`}
           >
             {deal.popular && (
-              <span className="absolute -top-2 left-3 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-medium flex items-center gap-1">
+              <span className="absolute -top-2 left-3 px-2 py-0.5 rounded-full bg-gradient-to-r from-primary to-primary/80 text-white text-xs font-medium flex items-center gap-1">
                 <Star className="w-3 h-3" />
                 Meest gekozen
               </span>
@@ -131,13 +131,13 @@ export const TaskDeals = () => {
               {/* Right side - Price & CTA */}
               <div className="flex flex-col items-end justify-between gap-2 flex-shrink-0">
                 <div className="text-right">
-                  <div className="text-xl md:text-2xl font-bold text-orange-500">
+                  <div className="text-xl md:text-2xl font-bold text-primary">
                     {deal.price}
                   </div>
                   <p className="text-[10px] text-muted-foreground">per dienst</p>
                 </div>
                 <Button
-                  className="gap-1.5 text-xs h-8 px-3 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600"
+                  className="gap-1.5 text-xs h-8 px-3 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                   onClick={() => {
                     window.open(deal.url, "_blank");
                   }}
@@ -150,7 +150,7 @@ export const TaskDeals = () => {
           </div>
         ))}
 
-        <div className="mt-4 p-4 bg-white rounded-2xl shadow-sm border border-orange-100">
+        <div className="mt-4 p-4 bg-white rounded-2xl shadow-sm border border-primary/10">
           <p className="text-sm text-muted-foreground text-center">
             💡 Tip: Vergelijk de opties rustig en kies wat het beste bij jouw budget en wensen past
           </p>

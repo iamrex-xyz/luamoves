@@ -139,20 +139,20 @@ export const InAppReminderBanner = ({ onFilterDeadlineTasks }: InAppReminderBann
   }
 
   return (
-    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+    <div className="bg-gradient-to-r from-primary-light to-primary-light/80 dark:from-primary/10 dark:to-primary/5 border border-primary/20 dark:border-primary/30 rounded-lg p-3 mb-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 flex-1">
-          <div className="p-2 bg-amber-100 dark:bg-amber-900/50 rounded-full shrink-0">
-            <Bell className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          <div className="p-2 bg-primary-light dark:bg-primary/20 rounded-full shrink-0">
+            <Bell className="w-4 h-4 text-primary dark:text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm text-amber-900 dark:text-amber-100">
+            <p className="font-medium text-sm text-foreground dark:text-foreground">
               {taskCount === 1 
                 ? `1 taak met deadline ${urgencyText}`
                 : `${taskCount} taken met deadlines ${urgencyText}`
               }
             </p>
-            <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5 truncate">
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5 truncate">
               {firstDeadline.title}
               {taskCount > 1 && ` en ${taskCount - 1} andere${taskCount > 2 ? "n" : ""}`}
             </p>
@@ -164,7 +164,7 @@ export const InAppReminderBanner = ({ onFilterDeadlineTasks }: InAppReminderBann
             variant="ghost"
             size="sm"
             onClick={handleClick}
-            className="text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50 h-8 px-2"
+            className="text-primary dark:text-primary hover:bg-primary-light dark:hover:bg-primary/20 h-8 px-2"
           >
             <span className="text-xs">Bekijk</span>
             <ChevronRight className="w-4 h-4 ml-1" />
@@ -173,7 +173,7 @@ export const InAppReminderBanner = ({ onFilterDeadlineTasks }: InAppReminderBann
             variant="ghost"
             size="icon"
             onClick={handleDismiss}
-            className="text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 h-8 w-8"
+            className="text-primary dark:text-primary hover:bg-primary-light dark:hover:bg-primary/20 h-8 w-8"
           >
             <X className="w-4 h-4" />
           </Button>

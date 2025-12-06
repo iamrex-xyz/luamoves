@@ -18,9 +18,11 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
 
-    /* Refined primary - sophisticated coral */
-    --primary: 12 76% 61%;
+    /* Primary - coral #e27f78 */
+    --primary: 4 65% 68%;
     --primary-foreground: 0 0% 100%;
+    --primary-light: 4 70% 95%;
+    --primary-muted: 4 50% 85%;
 
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 9%;
@@ -37,7 +39,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 92%;
     --input: 0 0% 92%;
-    --ring: 12 76% 61%;
+    --ring: 4 65% 68%;
 
     --radius: 1rem;
     
@@ -71,7 +73,7 @@ All colors MUST be HSL.
     --sidebar-accent: 0 0% 98%;
     --sidebar-accent-foreground: 0 0% 9%;
     --sidebar-border: 0 0% 92%;
-    --sidebar-ring: 12 76% 61%;
+    --sidebar-ring: 4 65% 68%;
   }
 
   .dark {
@@ -84,8 +86,10 @@ All colors MUST be HSL.
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 12 76% 61%;
+    --primary: 4 65% 68%;
     --primary-foreground: 0 0% 100%;
+    --primary-light: 4 50% 20%;
+    --primary-muted: 4 40% 35%;
 
     --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 98%;
@@ -101,7 +105,7 @@ All colors MUST be HSL.
 
     --border: 0 0% 18%;
     --input: 0 0% 18%;
-    --ring: 12 76% 61%;
+    --ring: 4 65% 68%;
     
     /* Progress colors - dark */
     --progress-start: 0 0% 22%;
@@ -117,7 +121,7 @@ All colors MUST be HSL.
     --sidebar-accent: 0 0% 12%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 12 76% 61%;
+    --sidebar-ring: 4 65% 68%;
   }
 }
 

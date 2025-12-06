@@ -151,7 +151,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
+    <div className="min-h-screen pb-24 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
@@ -172,12 +172,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Moving Date Card */}
       <div className="px-6 mb-6">
-        <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-orange-200/50">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-primary/20">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative p-6">
             <div className="flex items-center gap-6">
               {/* Date Display */}
-              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg">
+              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg">
                 <span className="text-xs uppercase tracking-wide opacity-80">{dayOfWeek}</span>
                 <span className="text-3xl font-bold">{dayNumber}</span>
               </div>
@@ -187,7 +187,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Verhuisdatum</p>
                 <h2 className="text-xl font-semibold text-foreground mb-1">{monthName}</h2>
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-medium">
+                  <span className="px-3 py-1 rounded-full bg-primary-light text-primary text-sm font-medium">
                     {daysUntilMove} dagen
                   </span>
                 </div>
@@ -208,7 +208,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     cx="32"
                     cy="32"
                     r="28"
-                    className="stroke-orange-500"
+                    className="stroke-primary"
                     strokeWidth="4"
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 28}`}
@@ -236,8 +236,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               </div>
               <div className="w-px h-10 bg-border/50" />
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-orange-500" />
+                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">{openTasks.length}</p>
@@ -260,7 +260,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             variant="ghost" 
             size="sm"
             onClick={() => setShowAddTask(true)}
-            className="h-9 px-3 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200"
+            className="h-9 px-3 rounded-full bg-primary-light text-primary hover:bg-primary-muted"
           >
             <Plus className="w-4 h-4 mr-1" />
             Toevoegen
@@ -296,7 +296,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             <p className="text-sm text-muted-foreground mb-4">
               Voeg een nieuwe taak toe om verder te gaan.
             </p>
-            <Button onClick={() => setShowAddTask(true)} className="rounded-full bg-orange-500 hover:bg-orange-600">
+            <Button onClick={() => setShowAddTask(true)} className="rounded-full bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />
               Taak toevoegen
             </Button>
