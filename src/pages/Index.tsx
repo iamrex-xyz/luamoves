@@ -38,9 +38,8 @@ const Index = () => {
   // Email capture dialog (after 1st task)
   const [showEmailCapture, setShowEmailCapture] = useState(false);
   
-  // Full signup dialog (after 2nd task)
+  // Full signup dialog (after 2nd task) - hard blocking
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
-  const [isHardBlock, setIsHardBlock] = useState(false);
   
   // Captured email for signup flow
   const [capturedEmail, setCapturedEmail] = useState<string>("");
@@ -186,17 +185,13 @@ const Index = () => {
   const handleTaskComplete = (completedCount: number) => {
     // Only show prompts if not logged in
     if (!user) {
-      // Hard block at 6 tasks - must create account
-      if (completedCount >= 6) {
-        setIsHardBlock(true);
-        setShowSignupPrompt(true);
-        return;
-      }
+      // Check if account is already complete (signed up)
+      const isAccountComplete = sessionStorage.getItem("lua_account_complete") === "true";
+      if (isAccountComplete) return;
       
-      // After 2nd task (or any subsequent task) - show full signup dialog
-      // Re-show if user skipped before and completes another task
-      if (completedCount >= 2) {
-        setIsHardBlock(false);
+      // After 2nd task - show full signup dialog (hard blocking)
+      // Also triggers at task 3 as safeguard if user somehow bypassed
+      if (completedCount >= 2 && capturedEmail) {
         setShowSignupPrompt(true);
         return;
       }
@@ -220,21 +215,15 @@ const Index = () => {
   const handleSignupComplete = async () => {
     setShowSignupPrompt(false);
     setShowAccountBadge(false);
-    setIsHardBlock(false);
     setCapturedEmail("");
+    sessionStorage.setItem("lua_account_complete", "true");
     sessionStorage.removeItem(CAPTURED_EMAIL_KEY);
     // User is now signed up, data will sync via auth listener
-  };
-
-  const handleSignupSkip = () => {
-    setShowSignupPrompt(false);
-    setShowAccountBadge(true); // Show reminder badge
   };
 
   const handleBadgeClick = () => {
     // If we have an email, show signup prompt, otherwise show email capture
     if (capturedEmail) {
-      setIsHardBlock(false);
       setShowSignupPrompt(true);
     } else {
       setShowEmailCapture(true);
@@ -358,13 +347,11 @@ const Index = () => {
         onEmailSubmit={handleEmailSubmit}
       />
 
-      {/* Full signup dialog - shown after 2nd task */}
+      {/* Full signup dialog - shown after 2nd task (hard blocking) */}
       <SignupPromptDialog
         open={showSignupPrompt}
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={handleSignupComplete}
-        onSkip={handleSignupSkip}
-        isHardBlock={isHardBlock}
         capturedEmail={capturedEmail}
       />
     </div>

@@ -180,7 +180,6 @@ export const InvitePartnerSection = ({ isGuest, onSignupComplete }: InvitePartne
         open={showSignupPrompt}
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={handleSignupComplete}
-        onSkip={() => setShowSignupPrompt(false)}
       />
     </>
   );
