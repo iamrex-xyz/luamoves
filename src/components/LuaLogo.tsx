@@ -17,12 +17,11 @@ export const LuaLogo = ({ size = "md", className, showText = true }: LuaLogoProp
     <div className={cn("flex items-center gap-1", className)}>
       <span 
         className={cn(
-          "font-light tracking-wide text-foreground",
+          "font-italiana tracking-wide text-foreground",
           sizeClasses[size]
         )}
-        style={{ fontFamily: "'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" }}
       >
-        {showText ? "lua" : "l"}
+        {showText ? "LUA" : "L"}
       </span>
     </div>
   );
