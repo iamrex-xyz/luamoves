@@ -208,19 +208,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <div className="absolute top-3 left-2 right-2 h-full bg-white/80 rounded-3xl shadow-lg transform -rotate-1" />
                 {/* Front card */}
                 <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                        <Check className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">Vandaag</p>
-                        <p className="text-sm text-muted-foreground">3 taken</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                      <Check className="w-5 h-5 text-white" />
                     </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">42</p>
-                      <p className="text-xs text-muted-foreground">dagen te gaan</p>
+                    <div>
+                      <p className="font-semibold text-foreground">Vandaag</p>
+                      <p className="text-sm text-muted-foreground">3 taken</p>
                     </div>
                   </div>
                   
