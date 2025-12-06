@@ -216,10 +216,6 @@ const Index = () => {
     setShowEmailCapture(false);
   };
 
-  const handleEmailSkip = () => {
-    setShowEmailCapture(false);
-    setShowAccountBadge(true); // Show reminder badge
-  };
 
   const handleSignupComplete = async () => {
     setShowSignupPrompt(false);
@@ -360,7 +356,6 @@ const Index = () => {
         open={showEmailCapture}
         onOpenChange={setShowEmailCapture}
         onEmailSubmit={handleEmailSubmit}
-        onSkip={handleEmailSkip}
       />
 
       {/* Full signup dialog - shown after 2nd task */}
