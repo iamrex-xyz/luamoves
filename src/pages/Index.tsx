@@ -51,7 +51,7 @@ const Index = () => {
         try {
           const parsed = JSON.parse(savedInfo);
           setMovingInfo(parsed);
-          setCurrentView("tasks"); // Go directly to tasks
+          setCurrentView("dashboard"); // Go to home/dashboard
         } catch {
           setCurrentView("onboarding");
         }
@@ -96,7 +96,7 @@ const Index = () => {
         renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
         needsContractorHelp: profile.needs_contractor_help || false,
       });
-      setCurrentView("tasks");
+      setCurrentView("dashboard");
     } else {
       // Check if we have local data to sync
       const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -104,7 +104,7 @@ const Index = () => {
         const parsed = JSON.parse(savedInfo);
         setMovingInfo(parsed);
         await syncLocalDataToProfile(userId);
-        setCurrentView("tasks");
+        setCurrentView("dashboard");
       } else {
         setCurrentView("onboarding");
       }
@@ -136,7 +136,7 @@ const Index = () => {
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       localStorage.removeItem(SIGNUP_PROMPTED_KEY);
       
-      setCurrentView("tasks");
+      setCurrentView("dashboard");
     } catch (error) {
       console.error('Error syncing data:', error);
     }
@@ -146,7 +146,7 @@ const Index = () => {
     setMovingInfo(info);
     // Save to localStorage for guests
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(info));
-    setCurrentView("tasks");
+    setCurrentView("dashboard");
   };
 
   const handleLoginRedirect = () => {
