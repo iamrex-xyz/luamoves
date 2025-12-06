@@ -89,50 +89,95 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-background via-secondary/20 to-primary/5">
-      <Card 
-        className={`w-full max-w-lg shadow-lg ${step === 1 ? 'cursor-pointer p-8 md:p-10' : 'p-6 md:p-8'}`}
-        onClick={step === 1 ? handleNext : undefined}
-      >
-        {step > 1 && step < 4 && (
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              {Array.from({ length: 2 }, (_, i) => i + 1).map((num) => (
-                <div
-                  key={num}
-                  className={`flex-1 h-2 mx-1 rounded-full transition-all ${
-                    num <= (step - 1) ? "bg-primary" : "bg-muted"
-                  }`}
-                />
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground text-center">
-              Vraag {step - 1} van 2
-            </p>
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-orange-50 via-amber-50/50 to-white">
+      {step === 1 ? (
+        <div 
+          className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500 cursor-pointer group"
+          onClick={handleNext}
+        >
+          {/* Warm gradient blob background */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-orange-200/40 to-amber-100/30 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-tr from-orange-100/30 to-yellow-100/20 rounded-full blur-3xl" />
           </div>
-        )}
 
-        <div className="space-y-6">
-          {step === 1 && (
-            <div className="animate-in fade-in slide-in-from-right-4 duration-300 text-center space-y-6">
-              <h2 className="text-xl md:text-2xl font-bold text-primary leading-tight">
-                Wat leuk dat je gaat verhuizen!
-              </h2>
-              <p className="text-muted-foreground">
-                Ik ben Charly, jouw persoonlijke verhuisconcierge.
+          <Card className="relative overflow-hidden rounded-3xl border-0 shadow-2xl shadow-orange-200/40 bg-gradient-to-br from-orange-100 via-orange-50 to-white p-8 md:p-10">
+            {/* Arrow button top right */}
+            <div className="absolute top-6 right-6">
+              <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg 
+                  className="w-5 h-5 text-background" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-4">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
+                Verhuizen?
+              </h1>
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Plan je verhuizing met een persoonlijke checklist die meeleeft met jouw datum.
               </p>
-              <Button
-                variant="ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onLogin();
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Heb je al een account? Log in
-              </Button>
+              
+              {/* Feature highlights */}
+              <div className="flex flex-wrap gap-3 pt-2">
+                <span className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-foreground shadow-sm">
+                  📅 Slimme deadlines
+                </span>
+                <span className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-foreground shadow-sm">
+                  ✓ Persoonlijke taken
+                </span>
+              </div>
+            </div>
+
+            {/* Bottom section */}
+            <div className="mt-10 pt-6 border-t border-orange-200/50">
+              <p className="text-sm text-muted-foreground">
+                Tik om te starten →
+              </p>
+            </div>
+          </Card>
+
+          {/* Login link below card */}
+          <div className="text-center mt-6">
+            <Button
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLogin();
+              }}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Heb je al een account? Log in
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Card className="w-full max-w-lg shadow-lg p-6 md:p-8 rounded-2xl border-0">
+          {step > 1 && step < 4 && (
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                {Array.from({ length: 2 }, (_, i) => i + 1).map((num) => (
+                  <div
+                    key={num}
+                    className={`flex-1 h-2 mx-1 rounded-full transition-all ${
+                      num <= (step - 1) ? "bg-orange-500" : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground text-center">
+                Vraag {step - 1} van 2
+              </p>
             </div>
           )}
+
+          <div className="space-y-6">
 
           {step === 2 && (
             <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -283,8 +328,9 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </Button>
             </div>
           )}
-        </div>
-      </Card>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
