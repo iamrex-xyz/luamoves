@@ -167,7 +167,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <span className="text-primary">georganiseerd.</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-md">
-                  Krijg een persoonlijke checklist met slimme deadlines die meetellen naar jouw verhuisdag.
+                  Gratis en slim. Wij regelen het, zodat jij je geen zorgen hoeft te maken.
                 </p>
               </div>
 
