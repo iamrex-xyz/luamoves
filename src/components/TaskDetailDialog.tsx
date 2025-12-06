@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,6 +24,7 @@ import {
   Clock,
   AlertCircle,
   Save,
+  X,
 } from "lucide-react";
 
 type TaskDetailDialogProps = {
@@ -153,130 +155,144 @@ export const TaskDetailDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full h-full max-w-full max-h-full sm:max-w-2xl sm:max-h-[90vh] sm:h-auto rounded-none sm:rounded-lg overflow-y-auto fixed inset-0 sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
-        <DialogHeader>
-          <DialogTitle className="text-xl flex items-start gap-3">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
+          <DrawerTitle className="text-lg font-semibold">Taak details</DrawerTitle>
+          <DrawerClose asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <X className="h-5 w-5" />
+            </Button>
+          </DrawerClose>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          {/* Task Title with Icon */}
+          <div className="flex items-start gap-3 mb-4">
             <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
               {task.icon}
             </div>
             <div className="flex-1">
-              <div className="mb-2">{task.title}</div>
+              <h2 className="text-lg font-semibold mb-2">{task.title}</h2>
               {getStatusBadge()}
-            </div>
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Description */}
-          {task.description && (
-            <div>
-              <Label className="text-base font-semibold mb-2 flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Beschrijving
-              </Label>
-              <p className="text-sm text-muted-foreground">{task.description}</p>
-            </div>
-          )}
-
-          <Separator />
-
-          {/* Task Details */}
-          <div className="grid gap-4">
-            {/* Deadline */}
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-primary" />
-                <div>
-                  <Label className="text-sm font-medium">Deadline</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {task.deadlineLabel}
-                    {daysUntilDeadline === 0 && " (vandaag)"}
-                    {daysUntilDeadline === 1 && " (morgen)"}
-                    {daysUntilDeadline > 1 && ` (over ${daysUntilDeadline} dagen)`}
-                    {isOverdue && " (verlopen)"}
-                  </p>
-                </div>
-              </div>
-              <EditDeadlinePopover
-                taskId={task.id}
-                currentDeadline={task.deadline}
-                onDeadlineChange={onTaskUpdate}
-              />
-            </div>
-
-            {/* Assigned To */}
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-primary" />
-                <div>
-                  <Label className="text-sm font-medium">Toegewezen aan</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {task.assignedToEmail || "Niet toegewezen"}
-                  </p>
-                </div>
-              </div>
-              <AssignTaskDropdown
-                taskId={task.id}
-                currentAssignedTo={task.assignedTo}
-                currentAssignedEmail={task.assignedToEmail}
-                onAssignmentChange={onTaskUpdate}
-              />
-            </div>
-
-            {/* Category & Phase */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <Label className="text-xs text-muted-foreground">Categorie</Label>
-                <p className="text-sm font-medium">{task.category}</p>
-              </div>
-              <div className="p-3 bg-muted/50 rounded-lg">
-                <Label className="text-xs text-muted-foreground">Fase</Label>
-                <p className="text-sm font-medium">{task.phase}</p>
-              </div>
             </div>
           </div>
 
-          <Separator />
+          <div className="space-y-6">
+            {/* Description */}
+            {task.description && (
+              <div>
+                <Label className="text-base font-semibold mb-2 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Beschrijving
+                </Label>
+                <p className="text-sm text-muted-foreground">{task.description}</p>
+              </div>
+            )}
 
-          {/* Notes Section */}
-          <div>
-            <Label className="text-base font-semibold mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Notities
-            </Label>
-            <Textarea
-              placeholder="Voeg notities toe over deze taak..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="min-h-[120px] resize-none"
-            />
-            <div className="flex gap-2 mt-3">
-              <Button
-                onClick={handleSaveNotes}
-                disabled={isSaving}
-                variant="outline"
-                className="flex-1"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                {isSaving ? "Opslaan..." : "Notities opslaan"}
-              </Button>
-              {onToggleStatus && (
-                <Button
-                  onClick={() => {
-                    onToggleStatus(task.id);
-                    onOpenChange(false);
-                  }}
-                  className="flex-1"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  {task.status === "done" ? "Markeer als open" : "Markeer als voltooid"}
-                </Button>
-              )}
+            <Separator />
+
+            {/* Task Details */}
+            <div className="grid gap-4">
+              {/* Deadline */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  <div>
+                    <Label className="text-sm font-medium">Deadline</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {task.deadlineLabel}
+                      {daysUntilDeadline === 0 && " (vandaag)"}
+                      {daysUntilDeadline === 1 && " (morgen)"}
+                      {daysUntilDeadline > 1 && ` (over ${daysUntilDeadline} dagen)`}
+                      {isOverdue && " (verlopen)"}
+                    </p>
+                  </div>
+                </div>
+                <EditDeadlinePopover
+                  taskId={task.id}
+                  currentDeadline={task.deadline}
+                  onDeadlineChange={onTaskUpdate}
+                />
+              </div>
+
+              {/* Assigned To */}
+              <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <User className="w-5 h-5 text-primary" />
+                  <div>
+                    <Label className="text-sm font-medium">Toegewezen aan</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {task.assignedToEmail || "Niet toegewezen"}
+                    </p>
+                  </div>
+                </div>
+                <AssignTaskDropdown
+                  taskId={task.id}
+                  currentAssignedTo={task.assignedTo}
+                  currentAssignedEmail={task.assignedToEmail}
+                  onAssignmentChange={onTaskUpdate}
+                />
+              </div>
+
+              {/* Category & Phase */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <Label className="text-xs text-muted-foreground">Categorie</Label>
+                  <p className="text-sm font-medium">{task.category}</p>
+                </div>
+                <div className="p-3 bg-muted/50 rounded-lg">
+                  <Label className="text-xs text-muted-foreground">Fase</Label>
+                  <p className="text-sm font-medium">{task.phase}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Notes Section */}
+            <div>
+              <Label className="text-base font-semibold mb-3 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Notities
+              </Label>
+              <Textarea
+                placeholder="Voeg notities toe over deze taak..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[120px] resize-none"
+              />
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {/* Fixed Footer with Actions */}
+        <div className="border-t bg-background px-4 py-4 space-y-2 sticky bottom-0">
+          <Button
+            onClick={handleSaveNotes}
+            disabled={isSaving}
+            variant="outline"
+            className="w-full h-12 rounded-xl"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? "Opslaan..." : "Notities opslaan"}
+          </Button>
+          {onToggleStatus && (
+            <Button
+              onClick={() => {
+                onToggleStatus(task.id);
+                onOpenChange(false);
+              }}
+              className="w-full h-12 rounded-xl"
+            >
+              <CheckCircle2 className="w-4 h-4 mr-2" />
+              {task.status === "done" ? "Markeer als open" : "Markeer als voltooid"}
+            </Button>
+          )}
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
