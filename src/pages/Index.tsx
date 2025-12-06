@@ -35,8 +35,9 @@ const Index = () => {
   >("onboarding");
   const [loading, setLoading] = useState(true);
   
-  // Email capture dialog (after 1st task)
+  // Email capture dialog (after 1st task, or hard block after 2nd)
   const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [isEmailHardBlock, setIsEmailHardBlock] = useState(false);
   
   // Full signup dialog (after 2nd task) - hard blocking
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
@@ -189,26 +190,64 @@ const Index = () => {
       const isAccountComplete = sessionStorage.getItem("lua_account_complete") === "true";
       if (isAccountComplete) return;
       
-      // After 2nd task - show full signup dialog (hard blocking)
-      // Also triggers at task 3 as safeguard if user somehow bypassed
-      if (completedCount >= 2 && capturedEmail) {
-        setShowSignupPrompt(true);
+      // After 2nd task - show signup dialog (hard blocking)
+      // If no email captured yet, show email capture first (also hard blocking)
+      if (completedCount >= 2) {
+        if (capturedEmail) {
+          setShowSignupPrompt(true);
+        } else {
+          // Force email capture - this is now hard blocking
+          setIsEmailHardBlock(true);
+          setShowEmailCapture(true);
+        }
         return;
       }
       
-      // After 1st task - show email capture dialog (if not already prompted)
+      // After 1st task - show email capture dialog (soft, can skip after entering)
       if (completedCount >= 1 && !sessionStorage.getItem(EMAIL_PROMPTED_KEY)) {
         sessionStorage.setItem(EMAIL_PROMPTED_KEY, "true");
+        setIsEmailHardBlock(false);
         setShowEmailCapture(true);
         return;
       }
     }
   };
 
+  // Check on mount and whenever capturedEmail changes if we need to show signup
+  useEffect(() => {
+    if (!user && capturedEmail) {
+      // Get completed count from session storage
+      const savedTasks = sessionStorage.getItem(GUEST_TASKS_KEY);
+      if (savedTasks) {
+        try {
+          const tasks = JSON.parse(savedTasks);
+          const completedCount = Object.values(tasks).filter((status) => status === "done").length;
+          const isAccountComplete = sessionStorage.getItem("lua_account_complete") === "true";
+          
+          // If 2+ tasks completed, email captured, but account not complete - show signup
+          if (completedCount >= 2 && !isAccountComplete && !showSignupPrompt) {
+            setShowSignupPrompt(true);
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+    }
+  }, [user, capturedEmail, showSignupPrompt]);
+
   const handleEmailSubmit = (email: string) => {
     setCapturedEmail(email);
     sessionStorage.setItem(CAPTURED_EMAIL_KEY, email);
     setShowEmailCapture(false);
+    
+    // If this was a hard block (after 2nd task), immediately show signup
+    if (isEmailHardBlock) {
+      setIsEmailHardBlock(false);
+      // Use setTimeout to ensure state updates properly
+      setTimeout(() => {
+        setShowSignupPrompt(true);
+      }, 100);
+    }
   };
 
 
@@ -340,11 +379,12 @@ const Index = () => {
         />
       )}
 
-      {/* Email capture dialog - shown after 1st task */}
+      {/* Email capture dialog - shown after 1st task (soft) or 2nd task (hard block) */}
       <EmailCaptureDialog
         open={showEmailCapture}
         onOpenChange={setShowEmailCapture}
         onEmailSubmit={handleEmailSubmit}
+        isHardBlock={isEmailHardBlock}
       />
 
       {/* Full signup dialog - shown after 2nd task (hard blocking) */}
