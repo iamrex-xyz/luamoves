@@ -154,7 +154,7 @@ export const TaskDetailDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full h-full max-w-full max-h-full sm:max-w-2xl sm:max-h-[90vh] sm:h-auto rounded-none sm:rounded-lg overflow-y-auto fixed inset-0 sm:inset-auto sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%]">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-start gap-3">
             <div className="flex-shrink-0 p-2 bg-primary/10 rounded-lg">
