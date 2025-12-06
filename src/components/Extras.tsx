@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Upload, Trash2, Download, LogOut, MessageCircle, Home as HomeIcon } from "lucide-react";
+import { FileText, Upload, Trash2, Download, LogOut, MessageCircle, FolderOpen, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,15 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
-import { PhotoCard } from "./PhotoCard";
 import { BottomNav } from "./BottomNav";
-import { CollaboratorChat } from "./CollaboratorChat";
+import { ChatAccessGate } from "./ChatAccessGate";
 
 type ExtrasProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
@@ -27,35 +25,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<"documents" | "chat">("documents");
-
-  // Fetch moving tips
-  const { data: tips = [] } = useQuery({
-    queryKey: ["moving-tips"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("moving_tips")
-        .select("*")
-        .order("phase", { ascending: true })
-        .order("order_index", { ascending: true });
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  // Fetch expenses
-  const { data: expenses = [] } = useQuery({
-    queryKey: ["moving-expenses"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("moving_expenses")
-        .select("*")
-        .order("expense_date", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-  });
 
   // Fetch documents
   const { data: documents = [] } = useQuery({
@@ -68,65 +37,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
 
       if (error) throw error;
       return data;
-    },
-  });
-
-  // Fetch photos
-  const { data: photos = [] } = useQuery({
-    queryKey: ["moving-photos"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
-
-      const { data, error } = await supabase.storage
-        .from("moving_photos")
-        .list(user.id, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: "created_at", order: "desc" },
-        });
-
-      if (error) throw error;
-      return data || [];
-    },
-  });
-
-  // Add expense mutation
-  const addExpense = useMutation({
-    mutationFn: async (expense: {
-      category: string;
-      description: string;
-      amount: number;
-      expense_date: string;
-    }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Niet ingelogd");
-
-      const { error } = await supabase.from("moving_expenses").insert({
-        ...expense,
-        user_id: user.id,
-      });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["moving-expenses"] });
-      toast({ title: "Uitgave toegevoegd" });
-    },
-    onError: () => {
-      toast({ title: "Fout bij toevoegen uitgave", variant: "destructive" });
-    },
-  });
-
-  // Delete expense mutation
-  const deleteExpense = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("moving_expenses").delete().eq("id", id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["moving-expenses"] });
-      toast({ title: "Uitgave verwijderd" });
     },
   });
 
@@ -187,46 +97,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
     },
   });
 
-  // Upload photo mutation
-  const uploadPhoto = useMutation({
-    mutationFn: async (formData: { file: File }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Niet ingelogd");
-
-      const fileExt = formData.file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${user.id}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("moving_photos")
-        .upload(filePath, formData.file);
-
-      if (uploadError) throw uploadError;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["moving-photos"] });
-      toast({ title: "Foto geüpload" });
-    },
-    onError: () => {
-      toast({ title: "Fout bij uploaden foto", variant: "destructive" });
-    },
-  });
-
-  // Delete photo mutation
-  const deletePhoto = useMutation({
-    mutationFn: async (filePath: string) => {
-      const { error } = await supabase.storage
-        .from("moving_photos")
-        .remove([filePath]);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["moving-photos"] });
-      toast({ title: "Foto verwijderd" });
-    },
-  });
-
   // Download document
   const downloadDocument = async (filePath: string, fileName: string) => {
     const { data, error } = await supabase.storage
@@ -248,78 +118,75 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
     URL.revokeObjectURL(url);
   };
 
-
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Unified Header */}
-      <header className="bg-primary text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
-                <HomeIcon className="w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold">Extra</h1>
-                <p className="text-white/80 text-xs">Gedeelde documenten & chat</p>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
-              <LogOut className="w-5 h-5" />
-            </Button>
+    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Extra</h1>
+            <p className="text-sm text-muted-foreground">Documenten & chat</p>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto p-4 space-y-4">
-        {/* Info Banner */}
-        <Card className="p-4 bg-muted/50">
-          <p className="text-sm text-muted-foreground">
-            💡 Alles onder het tabblad "Extra" is zichtbaar voor iedereen in je verhuisomgeving (bewoners/huisgenoten).
-          </p>
-        </Card>
-
-        {/* Section Navigation */}
-        <div className="grid grid-cols-2 gap-2">
           <Button
-            variant={activeSection === "documents" ? "default" : "outline"}
-            onClick={() => setActiveSection("documents")}
-            className="flex flex-col h-auto py-3 gap-1"
+            variant="ghost"
+            size="icon"
+            onClick={onLogout}
+            className="h-10 w-10 rounded-full hover:bg-secondary"
           >
-            <FileText className="h-4 w-4" />
-            <span className="text-xs">Documenten</span>
+            <LogOut className="w-5 h-5 text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Section Navigation */}
+      <div className="px-6 mb-6">
+        <div className="flex gap-2 p-1 bg-secondary/50 rounded-2xl">
+          <Button
+            variant="ghost"
+            onClick={() => setActiveSection("documents")}
+            className={`flex-1 h-12 rounded-xl gap-2 transition-all ${
+              activeSection === "documents" 
+                ? "bg-card shadow-soft text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <FolderOpen className="h-4 w-4" />
+            Documenten
           </Button>
           <Button
-            variant={activeSection === "chat" ? "default" : "outline"}
+            variant="ghost"
             onClick={() => setActiveSection("chat")}
-            className="flex flex-col h-auto py-3 gap-1"
+            className={`flex-1 h-12 rounded-xl gap-2 transition-all ${
+              activeSection === "chat" 
+                ? "bg-card shadow-soft text-foreground" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
           >
             <MessageCircle className="h-4 w-4" />
-            <span className="text-xs">Chat</span>
+            Chat
           </Button>
+        </div>
+      </div>
+
+      <div className="px-6">
+        {/* Info Banner */}
+        <div className="p-4 mb-6 rounded-2xl bg-primary/5 border border-primary/10">
+          <p className="text-sm text-muted-foreground">
+            Alles onder "Extra" is zichtbaar voor iedereen in je verhuisomgeving.
+          </p>
         </div>
 
         {/* Documents Section */}
         {activeSection === "documents" && (
           <div className="space-y-4">
-            <Card className="p-4 bg-primary/5 border-primary/20">
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <FileText className="h-4 w-4 text-primary" />
-                Documenten
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Upload documenten vanaf je apparaat. Je kunt een categorie selecteren of zelf een categorie toevoegen.
-              </p>
-            </Card>
-
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="w-full">
-                  <Upload className="mr-2 h-4 w-4" />
+                <Button className="w-full h-12 rounded-xl gap-2">
+                  <Upload className="h-4 w-4" />
                   Document uploaden
                 </Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="rounded-2xl">
                 <DialogHeader>
                   <DialogTitle>Document uploaden</DialogTitle>
                   <DialogDescription>Upload een document (max 20MB)</DialogDescription>
@@ -341,12 +208,12 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                 >
                   <div>
                     <Label htmlFor="file">Bestand</Label>
-                    <Input id="file" name="file" type="file" required />
+                    <Input id="file" name="file" type="file" required className="rounded-xl" />
                   </div>
                   <div>
                     <Label htmlFor="category">Categorie</Label>
                     <Select name="category" required>
-                      <SelectTrigger>
+                      <SelectTrigger className="rounded-xl">
                         <SelectValue placeholder="Kies categorie" />
                       </SelectTrigger>
                       <SelectContent>
@@ -360,63 +227,76 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                   </div>
                   <div>
                     <Label htmlFor="description">Beschrijving (optioneel)</Label>
-                    <Textarea id="description" name="description" />
+                    <Textarea id="description" name="description" className="rounded-xl" />
                   </div>
-                  <Button type="submit" className="w-full">Uploaden</Button>
+                  <Button type="submit" className="w-full rounded-xl">Uploaden</Button>
                 </form>
               </DialogContent>
             </Dialog>
 
             {documents.length === 0 ? (
-              <Card className="p-8 text-center">
-                <FileText className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+              <div className="p-12 text-center rounded-2xl bg-secondary/30">
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  <FileText className="h-8 w-8 text-muted-foreground" />
+                </div>
                 <p className="text-sm text-muted-foreground">Nog geen documenten geüpload</p>
-              </Card>
+              </div>
             ) : (
               <div className="space-y-2">
                 {documents.map((doc) => (
-                  <Card key={doc.id} className="p-3">
+                  <div 
+                    key={doc.id} 
+                    className="group p-4 rounded-2xl bg-secondary/50 hover:bg-secondary transition-colors"
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <FileText className="h-5 w-5 text-primary flex-shrink-0" />
+                        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm truncate">{doc.file_name}</p>
+                          <p className="font-medium text-sm truncate text-foreground">{doc.file_name}</p>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="outline" className="text-xs">{doc.category}</Badge>
+                            <Badge variant="secondary" className="text-xs bg-muted/50">{doc.category}</Badge>
                             <span className="text-xs text-muted-foreground">
                               {format(new Date(doc.upload_date), "d MMM yyyy", { locale: nl })}
                             </span>
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
+                      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-9 w-9 rounded-xl"
                           onClick={() => downloadDocument(doc.file_path, doc.file_name)}
                         >
                           <Download className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
-                          size="sm"
+                          size="icon"
+                          className="h-9 w-9 rounded-xl text-destructive hover:text-destructive"
                           onClick={() => deleteDocument.mutate({ id: doc.id, file_path: doc.file_path })}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                  </Card>
+                  </div>
                 ))}
               </div>
             )}
           </div>
         )}
 
-
         {/* Chat Section */}
-        {activeSection === "chat" && <CollaboratorChat />}
-      </main>
+        {activeSection === "chat" && (
+          <ChatAccessGate 
+            onLogin={() => onNavigate("settings")} 
+            onAddPartner={() => onNavigate("settings")} 
+          />
+        )}
+      </div>
 
       <BottomNav currentView="extras" onNavigate={onNavigate} />
     </div>
