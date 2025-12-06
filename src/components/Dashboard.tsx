@@ -151,7 +151,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+    <div className="min-h-screen pb-24 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
@@ -172,12 +172,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
       {/* Moving Date Card */}
       <div className="px-6 mb-6">
-        <Card className="relative overflow-hidden border-0 shadow-elegant bg-gradient-to-br from-primary/5 via-card to-primary/10">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-orange-200/50">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-400/20 to-orange-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative p-6">
             <div className="flex items-center gap-6">
               {/* Date Display */}
-              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-primary text-primary-foreground shadow-lg">
+              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg">
                 <span className="text-xs uppercase tracking-wide opacity-80">{dayOfWeek}</span>
                 <span className="text-3xl font-bold">{dayNumber}</span>
               </div>
@@ -187,9 +187,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Verhuisdatum</p>
                 <h2 className="text-xl font-semibold text-foreground mb-1">{monthName}</h2>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-medium">
+                  <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-sm font-medium">
                     {daysUntilMove} dagen
-                  </Badge>
+                  </span>
                 </div>
               </div>
 
@@ -208,13 +208,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
                     cx="32"
                     cy="32"
                     r="28"
-                    stroke="hsl(var(--primary))"
+                    className="stroke-orange-500"
                     strokeWidth="4"
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 28}`}
                     strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
                     strokeLinecap="round"
-                    className="transition-all duration-1000 ease-out"
+                    style={{ transition: 'stroke-dashoffset 1s ease-out' }}
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -226,8 +226,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             {/* Stats Row */}
             <div className="flex items-center gap-4 mt-5 pt-5 border-t border-border/50">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4 text-success" />
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">{completedTasks}</p>
@@ -236,8 +236,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               </div>
               <div className="w-px h-10 bg-border/50" />
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-primary" />
+                <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-orange-500" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-foreground">{openTasks.length}</p>
@@ -246,7 +246,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
               </div>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Tasks Section */}
@@ -260,7 +260,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             variant="ghost" 
             size="sm"
             onClick={() => setShowAddTask(true)}
-            className="h-9 px-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+            className="h-9 px-3 rounded-full bg-orange-100 text-orange-600 hover:bg-orange-200"
           >
             <Plus className="w-4 h-4 mr-1" />
             Toevoegen
@@ -268,9 +268,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         </div>
 
         {isLoading ? (
-          <Card className="p-8 border-0 shadow-soft">
+          <div className="p-8 rounded-3xl bg-white shadow-lg">
             <p className="text-center text-muted-foreground">Taken laden...</p>
-          </Card>
+          </div>
         ) : openTasks.length > 0 ? (
           <div className="space-y-2">
             {openTasks.slice(0, 5).map((task) => (
@@ -288,19 +288,19 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
             )}
           </div>
         ) : (
-          <Card className="p-8 text-center border-0 shadow-soft bg-card">
-            <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8 text-success" />
+          <div className="p-8 text-center rounded-3xl bg-white shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
             <h3 className="font-semibold text-lg mb-2 text-foreground">Alle taken voltooid!</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Voeg een nieuwe taak toe om verder te gaan.
             </p>
-            <Button onClick={() => setShowAddTask(true)} className="rounded-full">
+            <Button onClick={() => setShowAddTask(true)} className="rounded-full bg-orange-500 hover:bg-orange-600">
               <Plus className="w-4 h-4 mr-2" />
               Taak toevoegen
             </Button>
-          </Card>
+          </div>
         )}
       </div>
 

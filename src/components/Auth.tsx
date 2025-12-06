@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "@supabase/supabase-js";
-import { Eye, EyeOff } from "lucide-react";
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import { Eye, EyeOff, User as UserIcon, UserPlus, ChevronRight } from "lucide-react";
 import { z } from "zod";
 
 interface AuthProps {
-  onComplete: (user: User) => void;
+  onComplete: (user: SupabaseUser) => void;
   onSignUpRequest?: () => void;
   onContinueAsGuest?: () => void;
 }
@@ -185,44 +185,79 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Initial screen - only login option
   if (screen === 'initial') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-6 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold font-charly tracking-tight">
-              Charly
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              jouw persoonlijke verhuisconcierge
-            </p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+        {/* Header */}
+        <div className="p-6">
+          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+        </div>
 
-          <div className="space-y-4">
-            <Button 
-              onClick={() => setScreen('login')} 
-              className="w-full h-12 text-base"
-            >
-              Inloggen
-            </Button>
-            <Button 
-              onClick={onSignUpRequest} 
-              variant="outline"
-              className="w-full h-12 text-base"
-            >
-              Account aanmaken
-            </Button>
-          </div>
-
-          {onContinueAsGuest && (
-            <div className="pt-4 border-t">
-              <Button 
-                onClick={onContinueAsGuest} 
-                variant="ghost"
-                className="w-full h-12 text-base text-muted-foreground hover:text-foreground"
-              >
-                Ga door zonder account →
-              </Button>
+        {/* Main content */}
+        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            {/* Large headline */}
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Welkom
+                <br />
+                <span className="text-orange-500">terug!</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-md">
+                Log in om verder te gaan met je verhuisplanning.
+              </p>
             </div>
-          )}
+
+            {/* Action card */}
+            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 space-y-4">
+              <button 
+                onClick={() => setScreen('login')} 
+                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-orange-400 hover:bg-orange-50/50 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                    <UserIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground">Inloggen</p>
+                    <p className="text-sm text-muted-foreground">Met je bestaande account</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </button>
+
+              <button 
+                onClick={onSignUpRequest} 
+                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-orange-400 hover:bg-orange-50/50 transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
+                    <UserPlus className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-semibold text-foreground">Account aanmaken</p>
+                    <p className="text-sm text-muted-foreground">Start met je verhuisplanning</p>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {onContinueAsGuest && (
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent" />
+                <button 
+                  onClick={onContinueAsGuest}
+                  className="flex items-center gap-3 group"
+                >
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Ga door zonder account</span>
+                  <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center group-hover:bg-foreground group-hover:text-background transition-all">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -231,57 +266,61 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Password reset screen
   if (screen === 'passwordReset') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold font-charly tracking-tight">
-              Charly
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              jouw persoonlijke verhuisconcierge
-            </p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+        {/* Header */}
+        <div className="p-6 flex justify-between items-center">
+          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <button
+            onClick={() => {
+              setScreen('login');
+              setEmail("");
+            }}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Terug
+          </button>
+        </div>
 
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold">Wachtwoord vergeten</h2>
-              <p className="text-xs text-muted-foreground">
-                Vul je email in om een reset link te ontvangen
+        {/* Main content */}
+        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            {/* Large headline */}
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Wachtwoord
+                <br />
+                <span className="text-orange-500">vergeten?</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-md">
+                Vul je email in om een reset link te ontvangen.
               </p>
             </div>
 
-            <form onSubmit={handlePasswordReset} className="space-y-3">
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="email" className="text-sm">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="jouw@email.nl"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  className="h-10 text-sm"
-                />
-              </div>
+            {/* Form card */}
+            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+              <form onSubmit={handlePasswordReset} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="jouw@email.nl"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                  />
+                </div>
 
-              <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
-                {loading ? "Verzenden..." : "Verstuur reset link"}
-              </Button>
-
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setScreen('login');
-                    setEmail("");
-                  }}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-                  disabled={loading}
+                <Button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="w-full h-14 text-base rounded-xl bg-foreground hover:bg-foreground/90"
                 >
-                  Terug naar login
-                </button>
-              </div>
-            </form>
+                  {loading ? "Verzenden..." : "Verstuur reset link"}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -291,92 +330,102 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Login screen
   if (screen === 'login') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30 flex items-center justify-center p-4">
-        <div className="w-full max-w-sm space-y-4 text-center">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold font-charly tracking-tight">
-            Charly
-          </h1>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+        {/* Header */}
+        <div className="p-6 flex justify-between items-center">
+          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <button
+            onClick={() => setScreen('initial')}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Terug
+          </button>
         </div>
 
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold">Welkom terug!</h2>
-              <p className="text-xs text-muted-foreground">
-                Charly staat weer voor je klaar
+        {/* Main content */}
+        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            {/* Large headline */}
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Welkom
+                <br />
+                <span className="text-orange-500">terug!</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-md">
+                Log in om verder te gaan met je verhuisplanning.
               </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-3">
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="email" className="text-sm">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="jouw@email.nl"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  className="h-10 text-sm"
-                />
-              </div>
-
-              <div className="space-y-1.5 text-left">
-                <Label htmlFor="password" className="text-sm">Wachtwoord</Label>
-                <div className="relative">
+            {/* Form card */}
+            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
                   <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    id="email"
+                    type="email"
+                    placeholder="jouw@email.nl"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
-                    className="h-10 text-sm pr-10"
+                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                    disabled={loading}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-sm font-medium text-muted-foreground">Wachtwoord</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={loading}
+                      className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400 pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      disabled={loading}
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={loading} 
+                  className="w-full h-14 text-base rounded-xl bg-foreground hover:bg-foreground/90"
+                >
+                  {loading ? "Laden..." : "Inloggen"}
+                </Button>
+              </form>
+
+              <div className="mt-4 pt-4 border-t border-muted space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setScreen('passwordReset');
+                    setPassword("");
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors block w-full text-center py-2"
+                  disabled={loading}
+                >
+                  Wachtwoord vergeten?
+                </button>
+                <button
+                  type="button"
+                  onClick={onSignUpRequest}
+                  className="text-sm text-orange-500 hover:text-orange-600 transition-colors block w-full text-center py-2 font-medium"
+                  disabled={loading}
+                >
+                  Nog geen account? Maak er een aan
+                </button>
               </div>
-
-              <Button type="submit" disabled={loading} className="w-auto px-8 h-10 text-sm mx-auto block">
-                {loading ? "Laden..." : "Inloggen"}
-              </Button>
-            </form>
-
-            <div className="text-center space-y-1">
-              <button
-                type="button"
-                onClick={() => setScreen('initial')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
-                disabled={loading}
-              >
-                Terug
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setScreen('passwordReset');
-                  setPassword("");
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
-                disabled={loading}
-              >
-                Wachtwoord vergeten?
-              </button>
-              <button
-                type="button"
-                onClick={onSignUpRequest}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 block w-full"
-                disabled={loading}
-              >
-                Nog geen account? Maak er een aan
-              </button>
             </div>
           </div>
         </div>

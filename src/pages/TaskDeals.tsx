@@ -48,22 +48,22 @@ export const TaskDeals = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
       {/* Header */}
-      <div className="bg-primary text-white sticky top-0 z-10">
+      <div className="sticky top-0 z-10 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white border-b border-orange-100">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="text-white hover:bg-white/10"
+              className="h-10 w-10 rounded-full hover:bg-orange-100"
               onClick={() => navigate(-1)}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
-              <h1 className="text-lg md:text-xl font-bold">Kies de beste optie</h1>
-              <p className="text-sm text-white/80">{taskTitle}</p>
+              <h1 className="text-lg md:text-xl font-bold text-foreground">Kies de beste optie</h1>
+              <p className="text-sm text-muted-foreground">{taskTitle}</p>
             </div>
           </div>
         </div>
@@ -76,15 +76,15 @@ export const TaskDeals = () => {
         </p>
 
         {deals.map((deal) => (
-          <Card 
+          <div 
             key={deal.id} 
-            className={`p-3 md:p-4 relative ${deal.popular ? 'border-primary border-2 shadow-lg' : 'shadow-md'}`}
+            className={`p-3 md:p-4 relative rounded-3xl bg-white shadow-lg ${deal.popular ? 'ring-2 ring-orange-500 shadow-orange-200/50' : 'shadow-orange-100/50'}`}
           >
             {deal.popular && (
-              <Badge className="absolute -top-2 left-3 bg-primary h-5 px-2 text-xs">
-                <Star className="w-3 h-3 mr-1" />
+              <span className="absolute -top-2 left-3 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-medium flex items-center gap-1">
+                <Star className="w-3 h-3" />
                 Meest gekozen
-              </Badge>
+              </span>
             )}
             
             <div className="flex gap-3 md:gap-4">
@@ -131,13 +131,13 @@ export const TaskDeals = () => {
               {/* Right side - Price & CTA */}
               <div className="flex flex-col items-end justify-between gap-2 flex-shrink-0">
                 <div className="text-right">
-                  <div className="text-xl md:text-2xl font-bold text-primary">
+                  <div className="text-xl md:text-2xl font-bold text-orange-500">
                     {deal.price}
                   </div>
                   <p className="text-[10px] text-muted-foreground">per dienst</p>
                 </div>
                 <Button
-                  className="gap-1.5 text-xs h-8 px-3"
+                  className="gap-1.5 text-xs h-8 px-3 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600"
                   onClick={() => {
                     window.open(deal.url, "_blank");
                   }}
@@ -147,11 +147,11 @@ export const TaskDeals = () => {
                 </Button>
               </div>
             </div>
-          </Card>
+          </div>
         ))}
 
-        <div className="mt-4 p-3 bg-muted rounded-lg">
-          <p className="text-xs text-muted-foreground text-center">
+        <div className="mt-4 p-4 bg-white rounded-2xl shadow-sm border border-orange-100">
+          <p className="text-sm text-muted-foreground text-center">
             💡 Tip: Vergelijk de opties rustig en kies wat het beste bij jouw budget en wensen past
           </p>
         </div>

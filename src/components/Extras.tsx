@@ -119,7 +119,7 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+    <div className="min-h-screen pb-24 bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
