@@ -27,9 +27,10 @@ type DashboardProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
   onTaskComplete?: (completedCount: number) => void;
+  onSignupClick?: () => void;
 };
 
-export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: DashboardProps) => {
+export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onSignupClick }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -296,6 +297,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
         open={showAddTask} 
         onOpenChange={setShowAddTask}
         onTaskAdded={refreshTasks}
+        onSignupClick={onSignupClick}
       />
 
       <TaskDetailDialog

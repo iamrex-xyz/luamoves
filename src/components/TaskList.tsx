@@ -46,6 +46,7 @@ type TaskListProps = {
   isGuest?: boolean;
   showAccountBadge?: boolean;
   onAccountBadgeClick?: () => void;
+  onSignupClick?: () => void;
 };
 
 export const TaskList = ({ 
@@ -56,7 +57,8 @@ export const TaskList = ({
   onUpdateMovingInfo, 
   isGuest,
   showAccountBadge,
-  onAccountBadgeClick
+  onAccountBadgeClick,
+  onSignupClick
 }: TaskListProps) => {
   const [filter, setFilter] = useState<"open" | "done">("open");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -452,6 +454,7 @@ export const TaskList = ({
         open={showAddTask} 
         onOpenChange={setShowAddTask}
         onTaskAdded={refreshTasks}
+        onSignupClick={onSignupClick}
       />
       <ShareMovingDialog
         open={showShareDialog}
