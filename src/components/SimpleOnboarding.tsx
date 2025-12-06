@@ -209,14 +209,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
 
               {/* Stacked preview cards */}
-              <div className="relative h-44 md:h-52">
+              <div className="relative h-52 md:h-56">
                 {/* Back card */}
                 <div className="absolute top-5 left-3 right-3 h-full bg-white/60 rounded-2xl shadow-lg transform rotate-2" />
                 {/* Middle card */}
                 <div className="absolute top-2.5 left-1.5 right-1.5 h-full bg-white/80 rounded-2xl shadow-lg transform -rotate-1" />
                 {/* Front card */}
-                <div className="absolute inset-0 bg-white rounded-2xl shadow-2xl shadow-primary/20 p-4 md:p-5 flex flex-col justify-between">
-                  <div className="flex items-center gap-2.5">
+                <div className="absolute inset-0 bg-white rounded-2xl shadow-2xl shadow-primary/20 p-5 flex flex-col">
+                  <div className="flex items-center gap-3 mb-4">
                     <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                       <Check className="w-4 h-4 text-white" />
                     </div>
@@ -226,7 +226,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <div className="flex flex-col gap-2">
                     {/* Task 1 - Primary position, gets checked */}
                     <div 
-                      className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1"
+                      className="flex items-center gap-3 py-2.5 px-3 rounded-xl"
                       style={{
                         transition: 'background-color 0.4s ease',
                         backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
@@ -262,7 +262,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                     
                     {/* Task 2 - Secondary position */}
-                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1 bg-secondary">
+                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-secondary">
                       <Circle className="w-5 h-5 shrink-0 text-muted-foreground/40" />
                       <span className="text-sm text-muted-foreground">
                         {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
@@ -270,7 +270,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                     
                     {/* Task 3 - Tertiary position */}
-                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1 bg-secondary/50">
+                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-secondary/50">
                       <Circle className="w-5 h-5 shrink-0 text-muted-foreground/30" />
                       <span className="text-sm text-muted-foreground/70">
                         {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
