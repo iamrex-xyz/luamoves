@@ -300,8 +300,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Instellingen</h1>
-            <p className="text-sm text-muted-foreground">Beheer je verhuizing</p>
+            <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+            <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
           </div>
           <Button
             variant="ghost"
