@@ -34,7 +34,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [taskStartIndex, setTaskStartIndex] = useState(0);
-  const [isCheckingTask, setIsCheckingTask] = useState(false);
+  const [animationPhase, setAnimationPhase] = useState<'idle' | 'checking' | 'sliding'>('idle');
 
   const animatedTasks = [
     "Verhuisbedrijf boeken",
@@ -53,14 +53,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   useEffect(() => {
     if (step === 1) {
       const interval = setInterval(() => {
-        // Start checking animation
-        setIsCheckingTask(true);
+        // Phase 1: Check the task (show checkmark)
+        setAnimationPhase('checking');
         
-        // After check animation, move to next task
+        // Phase 2: Slide out the checked task and slide up others
+        setTimeout(() => {
+          setAnimationPhase('sliding');
+        }, 500);
+        
+        // Phase 3: Update index and reset to idle
         setTimeout(() => {
           setTaskStartIndex((prev) => (prev + 1) % animatedTasks.length);
-          setIsCheckingTask(false);
-        }, 600);
+          setAnimationPhase('idle');
+        }, 1000);
       }, 3500);
       return () => clearInterval(interval);
     }
@@ -216,44 +221,54 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                   
                   <div className="space-y-1.5 overflow-hidden relative h-[100px]">
-                    {/* First task - gets checked off */}
+                    {/* First task - gets checked off and slides away */}
                     <div 
-                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all duration-500 ease-out ${
-                        isCheckingTask 
-                          ? "bg-primary/10 scale-95 opacity-0 -translate-y-2" 
-                          : "bg-primary-light"
+                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
+                        animationPhase === 'idle' 
+                          ? "bg-primary-light duration-300" 
+                          : animationPhase === 'checking'
+                            ? "bg-primary/15 duration-300"
+                            : "bg-primary/10 -translate-y-8 opacity-0 scale-95 duration-500"
                       }`}
                     >
-                      <div className="shrink-0 transition-transform duration-300">
-                        {isCheckingTask ? (
-                          <CheckCircle2 className="w-4 h-4 text-primary animate-scale-in" />
+                      <div className="shrink-0">
+                        {animationPhase !== 'idle' ? (
+                          <CheckCircle2 className="w-4 h-4 text-primary transition-transform duration-300 scale-110" />
                         ) : (
                           <Circle className="w-4 h-4 text-primary" />
                         )}
                       </div>
                       <span className={`text-xs font-medium transition-all duration-300 ${
-                        isCheckingTask ? "line-through text-primary/60" : "text-foreground"
+                        animationPhase !== 'idle' ? "line-through text-primary/60" : "text-foreground"
                       }`}>
                         {animatedTasks[taskStartIndex % animatedTasks.length]}
                       </span>
                     </div>
                     
-                    {/* Second task */}
+                    {/* Second task - slides up to first position */}
                     <div 
-                      className={`flex items-center gap-2.5 p-2.5 bg-secondary rounded-lg transition-all duration-500 ease-out ${
-                        isCheckingTask ? "-translate-y-1" : ""
+                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
+                        animationPhase === 'sliding' 
+                          ? "bg-primary-light -translate-y-[calc(100%+6px)] duration-500" 
+                          : "bg-secondary duration-300"
                       }`}
                     >
-                      <Circle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                      <span className="text-xs text-muted-foreground">
+                      <Circle className={`w-4 h-4 shrink-0 transition-colors duration-300 ${
+                        animationPhase === 'sliding' ? "text-primary" : "text-muted-foreground/40"
+                      }`} />
+                      <span className={`text-xs transition-all duration-300 ${
+                        animationPhase === 'sliding' ? "text-foreground font-medium" : "text-muted-foreground"
+                      }`}>
                         {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
                       </span>
                     </div>
                     
-                    {/* Third task */}
+                    {/* Third task - slides up to second position */}
                     <div 
-                      className={`flex items-center gap-2.5 p-2.5 bg-secondary/50 rounded-lg transition-all duration-500 ease-out ${
-                        isCheckingTask ? "-translate-y-1 opacity-80" : "opacity-60"
+                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
+                        animationPhase === 'sliding' 
+                          ? "bg-secondary -translate-y-[calc(100%+6px)] opacity-100 duration-500" 
+                          : "bg-secondary/50 opacity-60 duration-300"
                       }`}
                     >
                       <Circle className="w-4 h-4 text-muted-foreground/30 shrink-0" />
