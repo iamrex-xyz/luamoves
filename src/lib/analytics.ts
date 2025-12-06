@@ -33,4 +33,9 @@ export const AnalyticsEvents = {
   REMINDER_DELIVERED: "reminderDelivered",
   REMINDER_CLICKED: "reminderClicked",
   NOTIFICATION_PERMISSION_DENIED: "notificationPermissionDenied",
+  // Account modal events
+  ACCOUNT_MODAL_SHOWN_AT_TASK_2: "account_modal_shown_at_task_2",
+  ACCOUNT_MODAL_SHOWN_AT_TASK_6: "account_modal_shown_at_task_6",
+  ACCOUNT_CREATED_FROM_MODAL: "account_created_from_modal",
+  ACCOUNT_MODAL_LATER_CLICKED: "account_modal_later_clicked",
 } as const;
