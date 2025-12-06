@@ -196,61 +196,17 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
-      {/* Header */}
-      <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Taken</h1>
-            <p className="text-sm text-muted-foreground">
-              {tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowShareDialog(true)}
-              className="h-10 w-10 rounded-full hover:bg-secondary"
-            >
-              <Share2 className="w-5 h-5 text-muted-foreground" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onLogout}
-              className="h-10 w-10 rounded-full hover:bg-secondary"
-            >
-              <LogOut className="w-5 h-5 text-muted-foreground" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Countdown Banner */}
-      {movingInfo.movingDate && (
-        <div className="px-6 mb-4">
-          <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
-            <p className="text-xs text-muted-foreground mb-1">
-              {movingInfo.newAddress && `Verhuizing naar ${movingInfo.newAddress}`}
-            </p>
-            <p className="text-lg font-semibold text-foreground">
-              {getCountdownText()}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Search Bar met Filter */}
-      <div className="px-6 mb-4 sticky top-0 bg-gradient-to-b from-secondary/30 to-background/95 backdrop-blur-lg z-10 pb-4">
-        <div className="flex items-center gap-2">
+    <div className="min-h-screen pb-24 bg-background">
+      {/* Compact Header with Search */}
+      <div className="px-4 pt-4 pb-3 sticky top-0 bg-background/95 backdrop-blur-lg z-10 border-b border-border/50">
+        <div className="flex items-center gap-3">
           {/* Filter knop */}
           <Popover>
             <PopoverTrigger asChild>
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="icon"
-                className="h-11 w-11 shrink-0 rounded-xl border-border/50"
+                className="h-10 w-10 shrink-0 rounded-xl"
               >
                 <Filter className="h-4 w-4" />
               </Button>
@@ -263,13 +219,13 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="open" id="open" />
                       <Label htmlFor="open" className="text-sm cursor-pointer">
-                        Open taken ({tasks.filter((t) => t.status !== "done").length})
+                        Open ({tasks.filter((t) => t.status !== "done").length})
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="done" id="done" />
                       <Label htmlFor="done" className="text-sm cursor-pointer">
-                        Afgeronde taken ({tasks.filter((t) => t.status === "done").length})
+                        Voltooid ({tasks.filter((t) => t.status === "done").length})
                       </Label>
                     </div>
                   </RadioGroup>
@@ -277,7 +233,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                 
                 <div className="border-t pt-4">
                   <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
                     {categories.map((cat) => (
                       <div 
                         key={cat} 
@@ -304,59 +260,57 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
               placeholder="Zoek taken..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 rounded-xl border-border/50"
+              className="pl-10 h-10 rounded-xl border-0 bg-secondary/50"
             />
           </div>
+
+          {/* Action buttons */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowShareDialog(true)}
+            className="h-10 w-10 rounded-xl"
+          >
+            <Share2 className="w-4 h-4 text-muted-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onLogout}
+            className="h-10 w-10 rounded-xl"
+          >
+            <LogOut className="w-4 h-4 text-muted-foreground" />
+          </Button>
+        </div>
+        
+        {/* Mini progress indicator */}
+        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
+          <span>{tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid</span>
+          <span>{daysUntilMove > 0 ? `${daysUntilMove} dagen tot verhuizing` : getCountdownText()}</span>
         </div>
       </div>
 
-      {/* Tasks grouped by phase */}
-      <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
-        {/* Progress Banner - Funnel Fase 1 & 2 */}
-        <ProgressBanner 
-          tasks={tasks.map(t => ({ id: t.id, status: t.status }))}
-          daysUntilMove={daysUntilMove}
-          onViewDeals={handleViewDeals}
-        />
-        
-        {/* In-app reminder banner */}
-        <InAppReminderBanner 
-          onFilterDeadlineTasks={() => {
-            setFilter("open");
-            setSelectedCategories([]);
-          }} 
-        />
-        
+      {/* Tasks */}
+      <div className="px-4 py-3">
         {isLoading ? (
-          <Card className="p-12 text-center">
-            <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
-            <p className="text-muted-foreground">Taken laden...</p>
-          </Card>
+          <div className="p-8 text-center">
+            <Loader2 className="w-6 h-6 mx-auto animate-spin text-primary" />
+          </div>
         ) : Object.entries(tasksByPhase).length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground">
-              Geen taken gevonden voor deze filters.
-            </p>
-          </Card>
+          <div className="p-8 text-center text-muted-foreground">
+            Geen taken gevonden.
+          </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
-                <div className="mb-3 sticky top-[118px] md:top-[128px] bg-background/95 backdrop-blur py-2 z-[5]">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-base md:text-lg font-bold text-foreground flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                        {phase}
-                      </h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {phaseTasks.length} {phaseTasks.length === 1 ? "taak" : "taken"}
-                      </p>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2 mb-2 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                  <span className="text-sm font-medium text-foreground">{phase}</span>
+                  <span className="text-xs text-muted-foreground">({phaseTasks.length})</span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-1">
                   {phaseTasks.map((task) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -369,105 +323,35 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                     return (
                       <div
                         key={task.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-500 ${
+                        className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
                           isCompleting 
-                            ? "bg-primary/20 border-primary/40 scale-95 -translate-y-2" 
+                            ? "bg-primary/10 scale-95 opacity-0" 
                             : isTaskOverdue 
-                              ? "border-destructive/30 bg-destructive/5 hover:bg-muted/50" 
-                              : "border-border bg-card hover:bg-muted/50"
+                              ? "bg-destructive/5 hover:bg-destructive/10" 
+                              : "hover:bg-secondary/50"
                         } cursor-pointer`}
-                        style={isCompleting ? { 
-                          opacity: 0,
-                          transition: 'opacity 0.3s ease-out 0.3s, transform 0.5s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out'
-                        } : undefined}
                         onClick={() => !isCompleting && handleTaskClick(task)}
                       >
                         <div 
-                          className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
+                          className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
                           onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                         >
                           {isCompleting ? (
-                            <CheckCircle2 className="h-[18px] w-[18px] text-primary animate-scale-in" />
+                            <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
                           ) : task.status === "done" ? (
-                            <CheckCircle2 className="h-[18px] w-[18px] text-primary" />
+                            <CheckCircle2 className="h-5 w-5 text-primary" />
                           ) : (
-                            <Circle className="h-[18px] w-[18px] text-muted-foreground" />
+                            <Circle className="h-5 w-5 text-muted-foreground/40" />
                           )}
                         </div>
-                        <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2 mb-1">
-                              <div className="flex items-center gap-2 flex-1">
-                                <h4 
-                                  className={`font-medium text-sm md:text-base ${!isCompleting && "cursor-pointer hover:text-primary"} transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
-                                  onClick={(e) => {
-                                    if (!isCompleting) {
-                                      e.stopPropagation();
-                                      setSelectedTask(task);
-                                    }
-                                  }}
-                                >
-                                  {task.title}
-                                </h4>
-                                {task.notes && (
-                                  <div title="Heeft notitie">
-                                    <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
-                                  </div>
-                                )}
-                              </div>
-                              {getStatusBadge(task) && (
-                                <div className="flex-shrink-0">
-                                  {getStatusBadge(task)}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {task.deadlineLabel}
-                                {daysUntil === 0 && " (vandaag)"}
-                                {daysUntil === 1 && " (morgen)"}
-                                {daysUntil > 1 && ` (${daysUntil} dagen)`}
-                                {isTaskOverdue && " (verlopen)"}
-                              </span>
-                              {task.assignedToEmail && (
-                                <span className="flex items-center gap-1">
-                                  <User className="w-3 h-3" />
-                                  {task.assignedToEmail}
-                                </span>
-                              )}
-                            </div>
-                            
-                            {task.affiliateLink && task.status !== "done" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-                                }}
-                              >
-                                Direct regelen
-                                <ExternalLink className="w-3 h-3" />
-                              </Button>
-                            )}
-                          </div>
-                          
-                          {task.affiliateLink && task.status !== "done" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-                              }}
-                            >
-                              Direct regelen
-                              <ExternalLink className="w-3 h-3" />
-                            </Button>
-                          )}
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                            {task.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {task.deadlineLabel}
+                            {isTaskOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
+                          </p>
                         </div>
                       </div>
                     );
