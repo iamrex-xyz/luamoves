@@ -223,10 +223,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-2.5">
                     {/* Task 1 - Primary position, gets checked */}
                     <div 
-                      className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      className="flex items-center gap-3 p-3 rounded-lg"
                       style={{
                         transition: 'background-color 0.4s ease',
                         backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
@@ -262,7 +262,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                     
                     {/* Task 2 - Secondary position */}
-                    <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
                       <Circle className="w-4 h-4 shrink-0 text-muted-foreground/40" />
                       <span className="text-xs text-muted-foreground">
                         {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
@@ -270,7 +270,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                     
                     {/* Task 3 - Tertiary position */}
-                    <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary/50">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
                       <Circle className="w-4 h-4 shrink-0 text-muted-foreground/30" />
                       <span className="text-xs text-muted-foreground/70">
                         {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
