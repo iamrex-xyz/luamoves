@@ -223,96 +223,59 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="overflow-hidden relative h-[114px]">
-                    {/* We render 3 visible tasks, animating their positions */}
-                    {[0, 1, 2].map((offset) => {
-                      const taskIndex = (taskStartIndex + offset) % animatedTasks.length;
-                      const isFirst = offset === 0;
-                      const isSecond = offset === 1;
-                      const isThird = offset === 2;
-                      
-                      // Calculate position based on animation phase
-                      let translateY = offset * 38; // Each task is 38px tall (including gap)
-                      let opacity = 1;
-                      let scale = 1;
-                      
-                      if (animationPhase === 'sliding') {
-                        // First task slides up and fades out
-                        if (isFirst) {
-                          translateY = -38;
-                          opacity = 0;
-                          scale = 0.95;
-                        } else {
-                          // Other tasks slide up one position
-                          translateY = (offset - 1) * 38;
-                        }
-                      }
-                      
-                      // Determine styling based on position and animation phase
-                      const isPrimary = isFirst && animationPhase !== 'sliding';
-                      const becomingPrimary = isSecond && animationPhase === 'sliding';
-                      const isChecked = isFirst && (animationPhase === 'checking' || animationPhase === 'sliding');
-                      
-                      const bgColor = isPrimary || becomingPrimary
-                        ? 'hsl(var(--primary-light))'
-                        : isChecked
-                          ? 'hsl(var(--primary) / 0.1)'
-                          : 'hsl(var(--secondary))';
-                      
-                      const iconColor = isPrimary || becomingPrimary
-                        ? 'hsl(var(--primary))'
-                        : 'hsl(var(--muted-foreground) / 0.4)';
-                      
-                      const textColor = isPrimary || becomingPrimary
-                        ? 'hsl(var(--foreground))'
-                        : 'hsl(var(--muted-foreground))';
-                      
-                      const fontWeight = isPrimary || becomingPrimary ? 500 : 400;
-                      
-                      return (
-                        <div
-                          key={`task-${offset}-${taskIndex}`}
-                          className="absolute left-0 right-0 flex items-center gap-2.5 p-2.5 rounded-lg"
-                          style={{
-                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transform: `translateY(${translateY}px) scale(${scale})`,
-                            opacity,
-                            backgroundColor: isChecked ? 'hsl(var(--primary) / 0.1)' : bgColor,
-                          }}
-                        >
-                          <div 
-                            className="w-4 h-4 shrink-0 flex items-center justify-center"
-                            style={{
-                              transition: 'transform 0.3s ease',
-                              transform: isChecked ? 'scale(1.2)' : 'scale(1)',
-                            }}
-                          >
-                            {isChecked ? (
-                              <CheckCircle2 className="w-4 h-4 text-primary" />
-                            ) : (
-                              <Circle 
-                                className="w-4 h-4" 
-                                style={{ 
-                                  transition: 'color 0.5s ease',
-                                  color: iconColor 
-                                }} 
-                              />
-                            )}
-                          </div>
-                          <span 
-                            className="text-xs whitespace-nowrap"
-                            style={{
-                              transition: 'all 0.3s ease',
-                              textDecoration: isChecked ? 'line-through' : 'none',
-                              color: isChecked ? 'hsl(var(--primary) / 0.5)' : textColor,
-                              fontWeight: isChecked ? 400 : fontWeight,
-                            }}
-                          >
-                            {animatedTasks[taskIndex]}
-                          </span>
-                        </div>
-                      );
-                    })}
+                  <div className="flex flex-col gap-1.5">
+                    {/* Task 1 - Primary position, gets checked */}
+                    <div 
+                      className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      style={{
+                        transition: 'background-color 0.4s ease',
+                        backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
+                          ? 'hsl(var(--primary) / 0.1)' 
+                          : 'hsl(var(--primary-light))',
+                      }}
+                    >
+                      <div 
+                        className="w-4 h-4 shrink-0 flex items-center justify-center"
+                        style={{
+                          transition: 'transform 0.3s ease',
+                          transform: animationPhase === 'checking' ? 'scale(1.2)' : 'scale(1)',
+                        }}
+                      >
+                        {animationPhase === 'checking' || animationPhase === 'sliding' ? (
+                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                        ) : (
+                          <Circle className="w-4 h-4 text-primary" />
+                        )}
+                      </div>
+                      <span 
+                        className="text-xs font-medium"
+                        style={{
+                          transition: 'all 0.3s ease',
+                          textDecoration: animationPhase === 'checking' || animationPhase === 'sliding' ? 'line-through' : 'none',
+                          color: animationPhase === 'checking' || animationPhase === 'sliding' 
+                            ? 'hsl(var(--primary) / 0.5)' 
+                            : 'hsl(var(--foreground))',
+                        }}
+                      >
+                        {animatedTasks[taskStartIndex % animatedTasks.length]}
+                      </span>
+                    </div>
+                    
+                    {/* Task 2 - Secondary position */}
+                    <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary">
+                      <Circle className="w-4 h-4 shrink-0 text-muted-foreground/40" />
+                      <span className="text-xs text-muted-foreground">
+                        {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
+                      </span>
+                    </div>
+                    
+                    {/* Task 3 - Tertiary position */}
+                    <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary/50">
+                      <Circle className="w-4 h-4 shrink-0 text-muted-foreground/30" />
+                      <span className="text-xs text-muted-foreground/70">
+                        {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
