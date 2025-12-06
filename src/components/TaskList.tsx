@@ -237,8 +237,13 @@ export const TaskList = ({
 
   return (
     <div className="min-h-screen pb-24 bg-background">
+      {/* Header with Logo */}
+      <div className="px-4 pt-4 pb-2">
+        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+      </div>
+      
       {/* Compact Header with Search */}
-      <div className="px-4 pt-4 pb-3 sticky top-0 bg-background/95 backdrop-blur-lg z-10 border-b border-border/50">
+      <div className="px-4 pb-3 sticky top-0 bg-background/95 backdrop-blur-lg z-10 border-b border-border/50">
         <div className="flex items-center gap-3">
           {/* Filter knop */}
           <Popover>
