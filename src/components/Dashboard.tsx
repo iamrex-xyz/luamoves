@@ -162,7 +162,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="min-h-screen pb-24 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
@@ -183,7 +183,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
 
       {/* Moving Date Card */}
       <div className="px-6 mb-6">
-        <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-primary/20">
+        <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-primary/15">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative p-6">
             <div className="flex items-center gap-6">
@@ -256,11 +256,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
         </div>
 
         {isLoading ? (
-          <div className="p-8 rounded-3xl bg-white shadow-lg">
+          <div className="p-8 rounded-3xl bg-white shadow-lg shadow-primary/10">
             <p className="text-center text-muted-foreground">Taken laden...</p>
           </div>
         ) : openTasks.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
             {openTasks.slice(0, 5).map((task) => (
               <TaskItem key={task.id} task={task} />
             ))}
@@ -276,7 +276,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
             )}
           </div>
         ) : (
-          <div className="p-8 text-center rounded-3xl bg-white shadow-lg">
+          <div className="p-8 text-center rounded-3xl bg-white shadow-lg shadow-primary/10">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
