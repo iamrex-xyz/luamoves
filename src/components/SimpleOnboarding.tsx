@@ -183,179 +183,297 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             </div>
           </div>
         </div>
-      ) : (
-        <Card className="w-full max-w-lg shadow-lg p-6 md:p-8 rounded-2xl border-0">
-          {step > 1 && step < 4 && (
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                {Array.from({ length: 2 }, (_, i) => i + 1).map((num) => (
+      ) : step === 2 ? (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <div className="p-6 flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1">
+                {[1, 2].map((num) => (
                   <div
                     key={num}
-                    className={`flex-1 h-2 mx-1 rounded-full transition-all ${
-                      num <= (step - 1) ? "bg-orange-500" : "bg-muted"
+                    className={`w-8 h-1 rounded-full transition-all ${
+                      num <= 1 ? "bg-orange-500" : "bg-muted"
                     }`}
                   />
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground text-center">
-                Vraag {step - 1} van 2
-              </p>
             </div>
-          )}
+          </div>
 
-          <div className="space-y-6">
-
-          {step === 2 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
-                Wanneer ga je verhuizen?
-              </h2>
-              <div className="flex justify-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full max-w-xs justify-start text-left font-normal h-12",
-                        !movingDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {movingDate ? format(movingDate, "d MMMM yyyy", { locale: nl }) : "Kies een datum"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="center">
-                    <Calendar
-                      mode="single"
-                      selected={movingDate}
-                      onSelect={setMovingDate}
-                      initialFocus
-                      locale={nl}
-                      disabled={(date) => date < new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
+          {/* Main content */}
+          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {/* Large headline */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  Wanneer is de
+                  <br />
+                  <span className="text-orange-500">grote dag?</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-md">
+                  We gebruiken je verhuisdatum om slimme deadlines te berekenen.
+                </p>
               </div>
-            </div>
-          )}
 
-          {step === 3 && (
-            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-              <h2 className="text-xl md:text-2xl font-semibold text-center mb-6">
-                Wat is je nieuwe adres?
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="postcode">Postcode</Label>
-                  <Input
-                    id="postcode"
-                    placeholder="1234 AB"
-                    value={postcode}
-                    onChange={(e) => setPostcode(e.target.value.toUpperCase())}
-                    maxLength={7}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="houseNumber">Huisnummer</Label>
-                  <Input
-                    id="houseNumber"
-                    placeholder="12"
-                    value={houseNumber}
-                    onChange={(e) => setHouseNumber(e.target.value)}
-                  />
+              {/* Date picker card */}
+              <div className="relative">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        className={cn(
+                          "w-full flex items-center justify-between p-4 rounded-2xl border-2 border-dashed transition-all hover:border-orange-400 hover:bg-orange-50/50",
+                          movingDate ? "border-orange-400 bg-orange-50/50" : "border-muted"
+                        )}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={cn(
+                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
+                            movingDate ? "bg-gradient-to-br from-orange-400 to-orange-500" : "bg-muted"
+                          )}>
+                            <CalendarIcon className={cn(
+                              "w-6 h-6",
+                              movingDate ? "text-white" : "text-muted-foreground"
+                            )} />
+                          </div>
+                          <div className="text-left">
+                            <p className={cn(
+                              "font-semibold",
+                              movingDate ? "text-foreground" : "text-muted-foreground"
+                            )}>
+                              {movingDate ? format(movingDate, "d MMMM yyyy", { locale: nl }) : "Kies een datum"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {movingDate ? "Je verhuisdatum" : "Klik om te selecteren"}
+                            </p>
+                          </div>
+                        </div>
+                        {movingDate && (
+                          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                            <Check className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="center">
+                      <Calendar
+                        mode="single"
+                        selected={movingDate}
+                        onSelect={setMovingDate}
+                        initialFocus
+                        locale={nl}
+                        disabled={(date) => date < new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </div>
-            </div>
-          )}
 
-          {step === 4 && (
-            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300 py-4">
-              <h2 className="text-xl md:text-2xl font-semibold text-center">
-                Even geduld...
-              </h2>
-              <p className="text-muted-foreground text-center text-sm">
-                We maken je persoonlijke verhuischecklist
-              </p>
-              
-              <div className="space-y-3 pt-4">
-                {generatingSteps.map((stepText, index) => (
-                  <div 
-                    key={index}
-                    className={cn(
-                      "flex items-center gap-3 p-3 rounded-xl transition-all duration-300",
-                      index === currentGeneratingStep && "bg-primary/10",
-                      completedSteps.includes(index) && "opacity-60"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-300",
-                      completedSteps.includes(index) 
-                        ? "bg-primary text-primary-foreground" 
-                        : index === currentGeneratingStep
-                          ? "bg-primary/20 border-2 border-primary"
-                          : "bg-muted"
-                    )}>
-                      {completedSteps.includes(index) && (
-                        <Check className="w-3.5 h-3.5" />
-                      )}
-                      {index === currentGeneratingStep && (
-                        <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                      )}
-                    </div>
-                    <span className={cn(
-                      "text-sm transition-all duration-300",
-                      index === currentGeneratingStep && "font-medium text-foreground",
-                      completedSteps.includes(index) && "text-muted-foreground",
-                      !completedSteps.includes(index) && index !== currentGeneratingStep && "text-muted-foreground/50"
-                    )}>
-                      {stepText}
-                    </span>
+              {/* Navigation */}
+              <div className="flex items-center justify-between pt-4">
+                <button 
+                  onClick={() => setStep(step - 1)}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Terug</span>
+                </button>
+                
+                <button 
+                  onClick={handleNext}
+                  disabled={!isStepValid()}
+                  className={cn(
+                    "flex items-center gap-3 group",
+                    !isStepValid() && "opacity-40 pointer-events-none"
+                  )}
+                >
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : step === 3 ? (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <div className="p-6 flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1">
+                {[1, 2].map((num) => (
+                  <div
+                    key={num}
+                    className={`w-8 h-1 rounded-full transition-all ${
+                      num <= 2 ? "bg-orange-500" : "bg-muted"
+                    }`}
+                  />
                 ))}
               </div>
             </div>
-          )}
-
-          {/* Navigation buttons */}
-          {step === 2 && (
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setStep(step - 1)}
-                className="flex-1"
-              >
-                Terug
-              </Button>
-              <Button
-                onClick={handleNext}
-                disabled={!isStepValid()}
-                className="flex-1"
-              >
-                Volgende
-              </Button>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setStep(step - 1)}
-                className="flex-1"
-              >
-                Terug
-              </Button>
-              <Button
-                onClick={handleStartGenerating}
-                disabled={!isStepValid()}
-                className="flex-1"
-              >
-                Maak mijn checklist
-              </Button>
-            </div>
-          )}
           </div>
-        </Card>
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {/* Large headline */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  Waar ga je
+                  <br />
+                  <span className="text-orange-500">naartoe?</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-md">
+                  Je nieuwe adres helpt ons om relevante taken toe te voegen.
+                </p>
+              </div>
+
+              {/* Address input card */}
+              <div className="relative">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="postcode" className="text-sm font-medium text-muted-foreground">Postcode</Label>
+                      <Input
+                        id="postcode"
+                        placeholder="1234 AB"
+                        value={postcode}
+                        onChange={(e) => setPostcode(e.target.value.toUpperCase())}
+                        maxLength={7}
+                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="houseNumber" className="text-sm font-medium text-muted-foreground">Huisnummer</Label>
+                      <Input
+                        id="houseNumber"
+                        placeholder="12"
+                        value={houseNumber}
+                        onChange={(e) => setHouseNumber(e.target.value)}
+                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                      />
+                    </div>
+                  </div>
+                  
+                  {postcode && houseNumber && (
+                    <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-2xl animate-in fade-in duration-300">
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center">
+                        <Check className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">{postcode} {houseNumber}</p>
+                        <p className="text-sm text-muted-foreground">Je nieuwe adres</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between pt-4">
+                <button 
+                  onClick={() => setStep(step - 1)}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Terug</span>
+                </button>
+                
+                <button 
+                  onClick={handleStartGenerating}
+                  disabled={!isStepValid()}
+                  className={cn(
+                    "flex items-center gap-3 group",
+                    !isStepValid() && "opacity-40 pointer-events-none"
+                  )}
+                >
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Genereer checklist</span>
+                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <div className="p-6 flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          </div>
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {/* Large headline */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  Even
+                  <br />
+                  <span className="text-orange-500">geduld...</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-md">
+                  We maken je persoonlijke verhuischecklist.
+                </p>
+              </div>
+
+              {/* Progress card */}
+              <div className="relative">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+                  <div className="space-y-3">
+                    {generatingSteps.map((stepText, index) => (
+                      <div 
+                        key={index}
+                        className={cn(
+                          "flex items-center gap-4 p-4 rounded-2xl transition-all duration-300",
+                          index === currentGeneratingStep && "bg-orange-50",
+                          completedSteps.includes(index) && "opacity-60"
+                        )}
+                      >
+                        <div className={cn(
+                          "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
+                          completedSteps.includes(index) 
+                            ? "bg-gradient-to-br from-orange-400 to-orange-500" 
+                            : index === currentGeneratingStep
+                              ? "bg-orange-100 border-2 border-orange-400"
+                              : "bg-muted"
+                        )}>
+                          {completedSteps.includes(index) && (
+                            <Check className="w-5 h-5 text-white" />
+                          )}
+                          {index === currentGeneratingStep && (
+                            <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse" />
+                          )}
+                        </div>
+                        <span className={cn(
+                          "font-medium transition-all duration-300",
+                          index === currentGeneratingStep && "text-foreground",
+                          completedSteps.includes(index) && "text-muted-foreground",
+                          !completedSteps.includes(index) && index !== currentGeneratingStep && "text-muted-foreground/50"
+                        )}>
+                          {stepText}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
