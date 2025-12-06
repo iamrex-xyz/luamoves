@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { checkNewMilestone, Milestone } from "@/lib/progressMilestones";
 import { trackEvent } from "@/lib/analytics";
 
-const CELEBRATED_MILESTONES_KEY = "charly_celebrated_milestones";
+const CELEBRATED_MILESTONES_KEY = "lua_celebrated_milestones";
 
 export const useMilestones = (completedTasks: number, totalTasks: number) => {
   const { toast } = useToast();

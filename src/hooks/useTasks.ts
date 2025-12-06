@@ -5,7 +5,7 @@ import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
 import { Package } from "lucide-react";
 
-const GUEST_TASKS_KEY = "charly_guest_tasks";
+const GUEST_TASKS_KEY = "lua_guest_tasks";
 
 export const useTasks = (movingInfo: MovingInfo) => {
   const [tasks, setTasks] = useState<Task[]>([]);
