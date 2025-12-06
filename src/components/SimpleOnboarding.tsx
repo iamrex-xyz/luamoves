@@ -51,7 +51,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     if (step === 1) {
       const interval = setInterval(() => {
         setAnimatedTaskIndex((prev) => (prev + 1) % animatedTasks.length);
-      }, 2500);
+      }, 4000);
       return () => clearInterval(interval);
     }
   }, [step]);
@@ -218,7 +218,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     {/* Checked task - animates out */}
                     <div 
                       key={`checked-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
+                      className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
+                      style={{ animationDuration: '800ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
                     >
                       <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
                       <span className="text-sm text-primary/70 line-through">
@@ -228,7 +229,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     {/* Current task - highlighted */}
                     <div 
                       key={`current-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-primary-light rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100"
+                      className="flex items-center gap-3 p-3 bg-primary-light rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
+                      style={{ animationDuration: '800ms', animationDelay: '150ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)', animationFillMode: 'both' }}
                     >
                       <Circle className="w-5 h-5 text-primary shrink-0" />
                       <span className="text-sm text-foreground font-medium">
@@ -238,7 +240,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     {/* Next task */}
                     <div 
                       key={`next-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-secondary rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200"
+                      className="flex items-center gap-3 p-3 bg-secondary rounded-xl transition-all duration-700 ease-out animate-in fade-in slide-in-from-bottom-3"
+                      style={{ animationDuration: '800ms', animationDelay: '300ms', animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)', animationFillMode: 'both' }}
                     >
                       <Circle className="w-5 h-5 text-muted-foreground/40 shrink-0" />
                       <span className="text-sm text-muted-foreground">
