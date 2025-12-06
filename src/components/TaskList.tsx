@@ -44,9 +44,20 @@ type TaskListProps = {
   onTaskComplete?: () => void;
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
   isGuest?: boolean;
+  showAccountBadge?: boolean;
+  onAccountBadgeClick?: () => void;
 };
 
-export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onUpdateMovingInfo, isGuest }: TaskListProps) => {
+export const TaskList = ({ 
+  movingInfo, 
+  onNavigate, 
+  onLogout, 
+  onTaskComplete, 
+  onUpdateMovingInfo, 
+  isGuest,
+  showAccountBadge,
+  onAccountBadgeClick
+}: TaskListProps) => {
   const [filter, setFilter] = useState<"open" | "done">("open");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -309,6 +320,18 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
             <LogOut className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
+        
+        {/* Account reminder badge */}
+        {showAccountBadge && (
+          <button
+            onClick={onAccountBadgeClick}
+            className="mt-3 w-full flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors"
+          >
+            <User className="w-4 h-4 text-primary" />
+            <span className="text-sm text-primary font-medium">Bewaar je voortgang met een account</span>
+            <ArrowRight className="w-4 h-4 text-primary ml-auto" />
+          </button>
+        )}
         
         {/* Mini progress indicator */}
         <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">

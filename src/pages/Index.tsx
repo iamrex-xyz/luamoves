@@ -32,6 +32,8 @@ const Index = () => {
   >("onboarding");
   const [loading, setLoading] = useState(true);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const [isHardBlock, setIsHardBlock] = useState(false);
+  const [showAccountBadge, setShowAccountBadge] = useState(false);
   const { toast } = useToast();
 
   // Check for existing data on load
@@ -160,17 +162,24 @@ const Index = () => {
   };
 
   const handleTaskComplete = () => {
-    // Only show signup prompt if not logged in and not already prompted
-    if (!user && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
-      // Count completed tasks from guest storage
+    // Only show signup prompt if not logged in
+    if (!user) {
       const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
       if (savedStatuses) {
         const statusMap: Record<string, string> = JSON.parse(savedStatuses);
         const completedCount = Object.values(statusMap).filter(status => status === "done").length;
         
-        // Show signup prompt after exactly 2 completed tasks
-        if (completedCount >= 2) {
+        // Hard block at 6 tasks - must create account
+        if (completedCount >= 6) {
+          setIsHardBlock(true);
+          setShowSignupPrompt(true);
+          return;
+        }
+        
+        // Show soft prompt after 2 completed tasks (if not already prompted)
+        if (completedCount >= 2 && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
           localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+          setIsHardBlock(false);
           setShowSignupPrompt(true);
         }
       }
@@ -179,11 +188,19 @@ const Index = () => {
 
   const handleSignupComplete = async () => {
     setShowSignupPrompt(false);
+    setShowAccountBadge(false);
+    setIsHardBlock(false);
     // User is now signed up, data will sync via auth listener
   };
 
   const handleSignupSkip = () => {
     setShowSignupPrompt(false);
+    setShowAccountBadge(true); // Show reminder badge
+  };
+
+  const handleBadgeClick = () => {
+    setIsHardBlock(false);
+    setShowSignupPrompt(true);
   };
 
   const handleUpdateMovingInfo = async (data: Partial<MovingInfo>) => {
@@ -271,6 +288,8 @@ const Index = () => {
           onTaskComplete={handleTaskComplete}
           onUpdateMovingInfo={handleUpdateMovingInfo}
           isGuest={!user}
+          showAccountBadge={showAccountBadge}
+          onAccountBadgeClick={handleBadgeClick}
         />
       )}
       {currentView === "extras" && movingInfo && (
@@ -293,6 +312,7 @@ const Index = () => {
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={handleSignupComplete}
         onSkip={handleSignupSkip}
+        isHardBlock={isHardBlock}
       />
     </div>
   );
