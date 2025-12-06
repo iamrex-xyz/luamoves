@@ -82,7 +82,7 @@ export const EmailCaptureDialog = ({
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-center">
           {/* Header */}
           <div className="text-center space-y-3 mb-8">
             <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
