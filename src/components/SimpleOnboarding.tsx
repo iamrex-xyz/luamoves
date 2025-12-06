@@ -59,14 +59,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         // Phase 2: Slide out the checked task and slide up others
         setTimeout(() => {
           setAnimationPhase('sliding');
-        }, 500);
+        }, 600);
         
         // Phase 3: Update index and reset to idle
         setTimeout(() => {
           setTaskStartIndex((prev) => (prev + 1) % animatedTasks.length);
           setAnimationPhase('idle');
-        }, 1000);
-      }, 3500);
+        }, 1300);
+      }, 4000);
       return () => clearInterval(interval);
     }
   }, [step]);
@@ -220,61 +220,81 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="space-y-1.5 overflow-hidden relative h-[100px]">
-                    {/* First task - gets checked off and slides away */}
-                    <div 
-                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
-                        animationPhase === 'idle' 
-                          ? "bg-primary-light duration-300" 
-                          : animationPhase === 'checking'
-                            ? "bg-primary/15 duration-300"
-                            : "bg-primary/10 -translate-y-8 opacity-0 scale-95 duration-500"
-                      }`}
-                    >
-                      <div className="shrink-0">
-                        {animationPhase !== 'idle' ? (
-                          <CheckCircle2 className="w-4 h-4 text-primary transition-transform duration-300 scale-110" />
-                        ) : (
-                          <Circle className="w-4 h-4 text-primary" />
-                        )}
+                  <div className="overflow-hidden relative h-[100px]">
+                    <div className="flex flex-col gap-1.5">
+                      {/* First task - gets checked off and slides away */}
+                      <div 
+                        style={{
+                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transform: animationPhase === 'sliding' ? 'translateY(-100%) scale(0.95)' : 'translateY(0)',
+                          opacity: animationPhase === 'sliding' ? 0 : 1,
+                        }}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-lg ${
+                          animationPhase === 'idle' ? "bg-primary-light" : "bg-primary/15"
+                        }`}
+                      >
+                        <div className="shrink-0" style={{ transition: 'transform 0.3s ease' }}>
+                          {animationPhase !== 'idle' ? (
+                            <CheckCircle2 className="w-4 h-4 text-primary" style={{ transform: 'scale(1.1)' }} />
+                          ) : (
+                            <Circle className="w-4 h-4 text-primary" />
+                          )}
+                        </div>
+                        <span 
+                          className="text-xs font-medium"
+                          style={{
+                            transition: 'all 0.3s ease',
+                            textDecoration: animationPhase !== 'idle' ? 'line-through' : 'none',
+                            color: animationPhase !== 'idle' ? 'hsl(var(--primary) / 0.6)' : 'hsl(var(--foreground))',
+                          }}
+                        >
+                          {animatedTasks[taskStartIndex % animatedTasks.length]}
+                        </span>
                       </div>
-                      <span className={`text-xs font-medium transition-all duration-300 ${
-                        animationPhase !== 'idle' ? "line-through text-primary/60" : "text-foreground"
-                      }`}>
-                        {animatedTasks[taskStartIndex % animatedTasks.length]}
-                      </span>
-                    </div>
-                    
-                    {/* Second task - slides up to first position */}
-                    <div 
-                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
-                        animationPhase === 'sliding' 
-                          ? "bg-primary-light -translate-y-[calc(100%+6px)] duration-500" 
-                          : "bg-secondary duration-300"
-                      }`}
-                    >
-                      <Circle className={`w-4 h-4 shrink-0 transition-colors duration-300 ${
-                        animationPhase === 'sliding' ? "text-primary" : "text-muted-foreground/40"
-                      }`} />
-                      <span className={`text-xs transition-all duration-300 ${
-                        animationPhase === 'sliding' ? "text-foreground font-medium" : "text-muted-foreground"
-                      }`}>
-                        {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
-                      </span>
-                    </div>
-                    
-                    {/* Third task - slides up to second position */}
-                    <div 
-                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all ease-out ${
-                        animationPhase === 'sliding' 
-                          ? "bg-secondary -translate-y-[calc(100%+6px)] opacity-100 duration-500" 
-                          : "bg-secondary/50 opacity-60 duration-300"
-                      }`}
-                    >
-                      <Circle className="w-4 h-4 text-muted-foreground/30 shrink-0" />
-                      <span className="text-xs text-muted-foreground/70">
-                        {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
-                      </span>
+                      
+                      {/* Second task - slides up to first position */}
+                      <div 
+                        style={{
+                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transform: animationPhase === 'sliding' ? 'translateY(calc(-100% - 6px))' : 'translateY(0)',
+                          backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--primary-light))' : 'hsl(var(--secondary))',
+                        }}
+                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      >
+                        <Circle 
+                          className="w-4 h-4 shrink-0"
+                          style={{
+                            transition: 'color 0.4s ease',
+                            color: animationPhase === 'sliding' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.4)',
+                          }}
+                        />
+                        <span 
+                          className="text-xs"
+                          style={{
+                            transition: 'all 0.4s ease',
+                            fontWeight: animationPhase === 'sliding' ? 500 : 400,
+                            color: animationPhase === 'sliding' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                          }}
+                        >
+                          {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
+                        </span>
+                      </div>
+                      
+                      {/* Third task - slides up to second position */}
+                      <div 
+                        style={{
+                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transform: animationPhase === 'sliding' ? 'translateY(calc(-100% - 6px))' : 'translateY(0)',
+                          opacity: animationPhase === 'sliding' ? 1 : 0.6,
+                          backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--secondary))' : 'hsl(var(--secondary) / 0.5)',
+                        }}
+                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      >
+                        <Circle className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                        <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground) / 0.7)' }}>
+                          {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
