@@ -22,6 +22,7 @@ export type MovingInfo = {
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
 const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
+const GUEST_TASKS_KEY = "lua_guest_tasks";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
@@ -161,8 +162,18 @@ const Index = () => {
   const handleTaskComplete = () => {
     // Only show signup prompt if not logged in and not already prompted
     if (!user && !localStorage.getItem(SIGNUP_PROMPTED_KEY)) {
-      localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
-      setShowSignupPrompt(true);
+      // Count completed tasks from guest storage
+      const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
+      if (savedStatuses) {
+        const statusMap: Record<string, string> = JSON.parse(savedStatuses);
+        const completedCount = Object.values(statusMap).filter(status => status === "done").length;
+        
+        // Show signup prompt after exactly 2 completed tasks
+        if (completedCount >= 2) {
+          localStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+          setShowSignupPrompt(true);
+        }
+      }
     }
   };
 
