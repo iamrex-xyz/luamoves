@@ -34,6 +34,7 @@ import {
   Search,
   Circle,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -164,8 +165,19 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
     });
   }, [tasks, filter, selectedCategories, searchQuery]);
 
-  // Groepeer taken per fase
+  // Groepeer taken per fase met correcte volgorde
   const tasksByPhase = useMemo(() => {
+    const phaseOrder = [
+      "Direct regelen",
+      "6-8 weken voor",
+      "4-6 weken voor",
+      "2-4 weken voor",
+      "1-2 weken voor",
+      "Laatste week",
+      "Verhuisdag",
+      "Na de verhuizing"
+    ];
+    
     const phases: { [key: string]: Task[] } = {};
     filteredTasks.forEach((task) => {
       if (!phases[task.phase]) {
@@ -173,7 +185,22 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
       }
       phases[task.phase].push(task);
     });
-    return phases;
+    
+    // Sorteer de phases op volgorde
+    const sortedPhases: { [key: string]: Task[] } = {};
+    phaseOrder.forEach(phase => {
+      if (phases[phase]) {
+        sortedPhases[phase] = phases[phase];
+      }
+    });
+    // Voeg eventuele onbekende phases toe aan het einde
+    Object.keys(phases).forEach(phase => {
+      if (!sortedPhases[phase]) {
+        sortedPhases[phase] = phases[phase];
+      }
+    });
+    
+    return sortedPhases;
   }, [filteredTasks]);
 
 
@@ -353,6 +380,20 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                             {isTaskOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
                           </p>
                         </div>
+                        {task.affiliateLink && task.status !== "done" && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+                            }}
+                          >
+                            Regelen
+                            <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        )}
                       </div>
                     );
                   })}
