@@ -221,21 +221,27 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                   
                   <div className="overflow-hidden relative h-[100px]">
-                    <div className="flex flex-col gap-1.5">
-                      {/* First task - gets checked off and slides away */}
+                    <div 
+                      className="flex flex-col gap-1.5"
+                      style={{
+                        transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: animationPhase === 'sliding' ? 'translateY(calc(-33.33% - 2px))' : 'translateY(0)',
+                      }}
+                    >
+                      {/* First task - gets checked off and fades away */}
                       <div 
                         style={{
-                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                          transform: animationPhase === 'sliding' ? 'translateY(-100%) scale(0.95)' : 'translateY(0)',
+                          transition: 'opacity 0.4s ease, transform 0.4s ease',
                           opacity: animationPhase === 'sliding' ? 0 : 1,
+                          transform: animationPhase === 'sliding' ? 'scale(0.95)' : 'scale(1)',
                         }}
                         className={`flex items-center gap-2.5 p-2.5 rounded-lg ${
                           animationPhase === 'idle' ? "bg-primary-light" : "bg-primary/15"
                         }`}
                       >
-                        <div className="shrink-0" style={{ transition: 'transform 0.3s ease' }}>
+                        <div className="shrink-0">
                           {animationPhase !== 'idle' ? (
-                            <CheckCircle2 className="w-4 h-4 text-primary" style={{ transform: 'scale(1.1)' }} />
+                            <CheckCircle2 className="w-4 h-4 text-primary" />
                           ) : (
                             <Circle className="w-4 h-4 text-primary" />
                           )}
@@ -243,7 +249,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <span 
                           className="text-xs font-medium"
                           style={{
-                            transition: 'all 0.3s ease',
                             textDecoration: animationPhase !== 'idle' ? 'line-through' : 'none',
                             color: animationPhase !== 'idle' ? 'hsl(var(--primary) / 0.6)' : 'hsl(var(--foreground))',
                           }}
@@ -252,11 +257,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         </span>
                       </div>
                       
-                      {/* Second task - slides up to first position */}
+                      {/* Second task */}
                       <div 
                         style={{
-                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                          transform: animationPhase === 'sliding' ? 'translateY(calc(-100% - 6px))' : 'translateY(0)',
+                          transition: 'background-color 0.5s ease',
                           backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--primary-light))' : 'hsl(var(--secondary))',
                         }}
                         className="flex items-center gap-2.5 p-2.5 rounded-lg"
@@ -264,14 +268,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         <Circle 
                           className="w-4 h-4 shrink-0"
                           style={{
-                            transition: 'color 0.4s ease',
+                            transition: 'color 0.5s ease',
                             color: animationPhase === 'sliding' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.4)',
                           }}
                         />
                         <span 
                           className="text-xs"
                           style={{
-                            transition: 'all 0.4s ease',
+                            transition: 'all 0.5s ease',
                             fontWeight: animationPhase === 'sliding' ? 500 : 400,
                             color: animationPhase === 'sliding' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
                           }}
@@ -280,11 +284,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         </span>
                       </div>
                       
-                      {/* Third task - slides up to second position */}
+                      {/* Third task */}
                       <div 
                         style={{
-                          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                          transform: animationPhase === 'sliding' ? 'translateY(calc(-100% - 6px))' : 'translateY(0)',
+                          transition: 'all 0.5s ease',
                           opacity: animationPhase === 'sliding' ? 1 : 0.6,
                           backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--secondary))' : 'hsl(var(--secondary) / 0.5)',
                         }}
@@ -295,27 +298,41 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                           {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
                         </span>
                       </div>
+                      
+                      {/* Fourth task - appears from below */}
+                      <div 
+                        style={{
+                          transition: 'opacity 0.5s ease',
+                          opacity: animationPhase === 'sliding' ? 0.6 : 0,
+                          backgroundColor: 'hsl(var(--secondary) / 0.5)',
+                        }}
+                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      >
+                        <Circle className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--muted-foreground) / 0.3)' }} />
+                        <span className="text-xs" style={{ color: 'hsl(var(--muted-foreground) / 0.7)' }}>
+                          {animatedTasks[(taskStartIndex + 3) % animatedTasks.length]}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* CTA */}
-              <div className="flex items-center gap-3 pt-2">
-                <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent" />
-                <div className="flex items-center gap-2.5 group">
-                  <span className="text-sm text-muted-foreground">Start nu</span>
-                  <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg 
-                      className="w-4 h-4 text-background" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </div>
+            </div>
+          </div>
+          
+          {/* CTA - Bottom right */}
+          <div className="absolute bottom-8 right-5">
+            <div className="flex items-center gap-2.5 group">
+              <span className="text-sm text-muted-foreground">Start nu</span>
+              <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg 
+                  className="w-4 h-4 text-background" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </div>
             </div>
           </div>
