@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Check } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
@@ -33,10 +33,29 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [animatedTaskIndex, setAnimatedTaskIndex] = useState(0);
+
+  const animatedTasks = [
+    { title: "Verhuisbedrijf boeken", checked: false },
+    { title: "Adreswijziging doorgeven", checked: false },
+    { title: "Energiecontract afsluiten", checked: false },
+    { title: "Internet overzetten", checked: false },
+    { title: "Verzekeringen aanpassen", checked: false },
+    { title: "Verhuisdozen bestellen", checked: false },
+  ];
 
   const totalSteps = 4; // Welcome, date, address, generating
 
-  // Lookup street name when postcode and house number are filled
+  // Animate tasks on welcome screen
+  useEffect(() => {
+    if (step === 1) {
+      const interval = setInterval(() => {
+        setAnimatedTaskIndex((prev) => (prev + 1) % animatedTasks.length);
+      }, 2500);
+      return () => clearInterval(interval);
+    }
+  }, [step]);
+
   useEffect(() => {
     const lookupAddress = async () => {
       // Clean postcode (remove spaces)
@@ -195,14 +214,36 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 p-3 bg-primary-light rounded-xl">
-                      <div className="w-5 h-5 rounded-full border-2 border-primary" />
-                      <span className="text-sm text-foreground">Verhuisbedrijf boeken</span>
+                  <div className="space-y-2 overflow-hidden">
+                    {/* Checked task - animates out */}
+                    <div 
+                      key={`checked-${animatedTaskIndex}`}
+                      className="flex items-center gap-3 p-3 bg-green-50 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
+                    >
+                      <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+                      <span className="text-sm text-green-700 line-through">
+                        {animatedTasks[(animatedTaskIndex + animatedTasks.length - 1) % animatedTasks.length].title}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
-                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30" />
-                      <span className="text-sm text-muted-foreground">Adreswijziging doorgeven</span>
+                    {/* Current task - highlighted */}
+                    <div 
+                      key={`current-${animatedTaskIndex}`}
+                      className="flex items-center gap-3 p-3 bg-primary-light rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100"
+                    >
+                      <Circle className="w-5 h-5 text-primary shrink-0" />
+                      <span className="text-sm text-foreground font-medium">
+                        {animatedTasks[animatedTaskIndex].title}
+                      </span>
+                    </div>
+                    {/* Next task */}
+                    <div 
+                      key={`next-${animatedTaskIndex}`}
+                      className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200"
+                    >
+                      <Circle className="w-5 h-5 text-muted-foreground/40 shrink-0" />
+                      <span className="text-sm text-muted-foreground">
+                        {animatedTasks[(animatedTaskIndex + 1) % animatedTasks.length].title}
+                      </span>
                     </div>
                   </div>
                 </div>
