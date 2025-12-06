@@ -17,8 +17,7 @@ import {
   CheckCircle2,
   Plus,
   ExternalLink,
-  Package,
-  PackageOpen,
+  Circle,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -104,11 +103,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
           className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
         >
           {isCompleting ? (
-            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
+            <CheckCircle2 className="h-[18px] w-[18px] text-primary animate-scale-in" />
           ) : task.status === "done" ? (
-            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
+            <CheckCircle2 className="h-[18px] w-[18px] text-primary" />
           ) : (
-            <Package className="h-[16px] w-[16px] text-muted-foreground" />
+            <Circle className="h-[18px] w-[18px] text-muted-foreground" />
           )}
         </div>
         <div className="flex-1 min-w-0">
