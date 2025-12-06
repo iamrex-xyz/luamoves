@@ -33,7 +33,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { format, getDaysInMonth } from "date-fns";
+import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
@@ -79,33 +79,10 @@ export const SignupPromptDialog = ({
   const [adults, setAdults] = useState("1");
   const [children, setChildren] = useState("0");
   const [pets, setPets] = useState("0");
-  const [birthMonth, setBirthMonth] = useState<string>("");
-  const [birthYear, setBirthYear] = useState<string>("");
-  const [birthDay, setBirthDay] = useState<string>("");
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
+  const [birthCalendarMonth, setBirthCalendarMonth] = useState<Date>(new Date(1990, 0, 1));
   
   const [isLoading, setIsLoading] = useState(false);
-
-  // Calculate available days based on selected month and year
-  const availableDays = useMemo(() => {
-    if (!birthMonth || !birthYear) return [];
-    const daysInMonth = getDaysInMonth(new Date(parseInt(birthYear), parseInt(birthMonth) - 1));
-    return Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString());
-  }, [birthMonth, birthYear]);
-
-  // Construct birth date from components
-  const birthDate = useMemo(() => {
-    if (birthDay && birthMonth && birthYear) {
-      return new Date(parseInt(birthYear), parseInt(birthMonth) - 1, parseInt(birthDay));
-    }
-    return undefined;
-  }, [birthDay, birthMonth, birthYear]);
-
-  // Reset day if it exceeds available days
-  useEffect(() => {
-    if (birthDay && availableDays.length > 0 && parseInt(birthDay) > availableDays.length) {
-      setBirthDay("");
-    }
-  }, [availableDays, birthDay]);
 
   // Generate year options (from 1920 to current year)
   const yearOptions = useMemo(() => {
@@ -114,19 +91,31 @@ export const SignupPromptDialog = ({
   }, []);
 
   const monthOptions = [
-    { value: "1", label: "Januari" },
-    { value: "2", label: "Februari" },
-    { value: "3", label: "Maart" },
-    { value: "4", label: "April" },
-    { value: "5", label: "Mei" },
-    { value: "6", label: "Juni" },
-    { value: "7", label: "Juli" },
-    { value: "8", label: "Augustus" },
-    { value: "9", label: "September" },
-    { value: "10", label: "Oktober" },
-    { value: "11", label: "November" },
-    { value: "12", label: "December" },
+    { value: "0", label: "Januari" },
+    { value: "1", label: "Februari" },
+    { value: "2", label: "Maart" },
+    { value: "3", label: "April" },
+    { value: "4", label: "Mei" },
+    { value: "5", label: "Juni" },
+    { value: "6", label: "Juli" },
+    { value: "7", label: "Augustus" },
+    { value: "8", label: "September" },
+    { value: "9", label: "Oktober" },
+    { value: "10", label: "November" },
+    { value: "11", label: "December" },
   ];
+
+  const handleBirthMonthChange = (month: string) => {
+    const newDate = new Date(birthCalendarMonth);
+    newDate.setMonth(parseInt(month));
+    setBirthCalendarMonth(newDate);
+  };
+
+  const handleBirthYearChange = (year: string) => {
+    const newDate = new Date(birthCalendarMonth);
+    newDate.setFullYear(parseInt(year));
+    setBirthCalendarMonth(newDate);
+  };
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -535,7 +524,7 @@ export const SignupPromptDialog = ({
                 />
               </div>
 
-              {/* Birth Date - with month/year/day dropdowns */}
+              {/* Birth Date - with calendar and month/year dropdowns */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Cake className="w-4 h-4 text-muted-foreground" />
@@ -554,14 +543,16 @@ export const SignupPromptDialog = ({
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-4 bg-background z-50" align="start">
-                    <div className="space-y-4">
-                      {/* Month selector */}
-                      <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">Maand</Label>
-                        <Select value={birthMonth} onValueChange={setBirthMonth}>
-                          <SelectTrigger className="h-10 rounded-lg">
-                            <SelectValue placeholder="Selecteer maand" />
+                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                    <div className="p-3 space-y-3">
+                      {/* Month and Year selectors */}
+                      <div className="flex gap-2">
+                        <Select 
+                          value={birthCalendarMonth.getMonth().toString()} 
+                          onValueChange={handleBirthMonthChange}
+                        >
+                          <SelectTrigger className="flex-1 h-9 rounded-lg text-sm">
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background z-[60]">
                             {monthOptions.map((month) => (
@@ -571,14 +562,12 @@ export const SignupPromptDialog = ({
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
-
-                      {/* Year selector */}
-                      <div className="space-y-1.5">
-                        <Label className="text-xs text-muted-foreground">Geboortejaar</Label>
-                        <Select value={birthYear} onValueChange={setBirthYear}>
-                          <SelectTrigger className="h-10 rounded-lg">
-                            <SelectValue placeholder="Selecteer jaar" />
+                        <Select 
+                          value={birthCalendarMonth.getFullYear().toString()} 
+                          onValueChange={handleBirthYearChange}
+                        >
+                          <SelectTrigger className="w-24 h-9 rounded-lg text-sm">
+                            <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="bg-background z-[60] max-h-[200px]">
                             {yearOptions.map((year) => (
@@ -589,26 +578,17 @@ export const SignupPromptDialog = ({
                           </SelectContent>
                         </Select>
                       </div>
-
-                      {/* Day selector - only show when month and year are selected */}
-                      {birthMonth && birthYear && (
-                        <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground">Dag</Label>
-                          <Select value={birthDay} onValueChange={setBirthDay}>
-                            <SelectTrigger className="h-10 rounded-lg">
-                              <SelectValue placeholder="Selecteer dag" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background z-[60] max-h-[200px]">
-                              {availableDays.map((day) => (
-                                <SelectItem key={day} value={day}>
-                                  {day}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      )}
                     </div>
+                    <CalendarComponent
+                      mode="single"
+                      selected={birthDate}
+                      onSelect={setBirthDate}
+                      month={birthCalendarMonth}
+                      onMonthChange={setBirthCalendarMonth}
+                      className="pointer-events-auto"
+                      locale={nl}
+                      disabled={(date) => date > new Date()}
+                    />
                   </PopoverContent>
                 </Popover>
               </div>
