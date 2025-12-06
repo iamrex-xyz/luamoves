@@ -233,29 +233,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete }: 
                 </div>
               </div>
             </div>
-
-            {/* Stats Row */}
-            <div className="flex items-center gap-4 mt-5 pt-5 border-t border-border/50">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-foreground">{completedTasks}</p>
-                  <p className="text-xs text-muted-foreground">voltooid</p>
-                </div>
-              </div>
-              <div className="w-px h-10 bg-border/50" />
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-lg font-semibold text-foreground">{openTasks.length}</p>
-                  <p className="text-xs text-muted-foreground">open</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
