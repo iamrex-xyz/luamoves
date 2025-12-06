@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { 
   Eye, 
   EyeOff, 
@@ -22,13 +24,17 @@ import {
   HardHat,
   Check,
   ArrowRight,
-  Cake
+  Cake,
+  MapPin
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import { z } from "zod";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 
 // Password must be min 8 chars, at least 1 letter and 1 number
 const passwordSchema = z.string()
@@ -65,13 +71,14 @@ export const SignupPromptDialog = ({
   
   // Step 2: Profile fields
   const [phone, setPhone] = useState("");
-  const [oldAddress, setOldAddress] = useState("");
-  const [keyHandoverDate, setKeyHandoverDate] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
+  const [keyHandoverDate, setKeyHandoverDate] = useState<Date | undefined>(undefined);
   const [renovationType, setRenovationType] = useState<"none" | "small" | "large">("none");
   const [adults, setAdults] = useState("1");
   const [children, setChildren] = useState("0");
   const [pets, setPets] = useState("0");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   
   const [isLoading, setIsLoading] = useState(false);
 
@@ -135,18 +142,21 @@ export const SignupPromptDialog = ({
       if (error) throw error;
 
       if (data.user) {
+        // Combine postcode and house number for old_address
+        const oldAddress = postcode && houseNumber ? `${postcode} ${houseNumber}` : null;
+        
         // Update profile with additional info
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
             phone: phone || null,
-            old_address: oldAddress || null,
-            key_handover_date: keyHandoverDate || null,
+            old_address: oldAddress,
+            key_handover_date: keyHandoverDate ? format(keyHandoverDate, "yyyy-MM-dd") : null,
             renovation_type: renovationType,
             adults: parseInt(adults) || 1,
             children: parseInt(children) || 0,
             pets: parseInt(pets) || 0,
-            birth_date: birthDate || null,
+            birth_date: birthDate ? format(birthDate, "yyyy-MM-dd") : null,
           })
           .eq('user_id', data.user.id);
 
@@ -209,7 +219,6 @@ export const SignupPromptDialog = ({
           if (isHardBlock) {
             e.preventDefault();
           }
-          // ESC counts as "Later verder"
         }}
       >
         {currentStep === 1 ? (
@@ -314,38 +323,64 @@ export const SignupPromptDialog = ({
                 <p className="text-sm text-green-700 dark:text-green-300">Wachtwoord opgeslagen</p>
               </div>
 
-              {/* Old Address */}
+              {/* Old Address - Postcode + House Number */}
               <div className="space-y-2">
-                <Label htmlFor="old-address" className="flex items-center gap-2">
-                  <Home className="w-4 h-4 text-muted-foreground" />
+                <Label className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
                   Oud adres
                 </Label>
-                <Input
-                  id="old-address"
-                  type="text"
-                  placeholder="Straatnaam 123, Stad"
-                  value={oldAddress}
-                  onChange={(e) => setOldAddress(e.target.value)}
-                  className="h-12 rounded-xl"
-                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input
+                    type="text"
+                    placeholder="Postcode"
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value.toUpperCase())}
+                    className="h-12 rounded-xl"
+                    maxLength={7}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Huisnummer"
+                    value={houseNumber}
+                    onChange={(e) => setHouseNumber(e.target.value)}
+                    className="h-12 rounded-xl"
+                  />
+                </div>
               </div>
 
-              {/* Key Handover Date */}
+              {/* Key Handover Date - with date picker */}
               <div className="space-y-2">
-                <Label htmlFor="key-date" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
                   Datum sleuteloverdracht
                 </Label>
-                <Input
-                  id="key-date"
-                  type="date"
-                  value={keyHandoverDate}
-                  onChange={(e) => setKeyHandoverDate(e.target.value)}
-                  className="h-12 rounded-xl"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-12 rounded-xl justify-between text-left font-normal",
+                        !keyHandoverDate && "text-muted-foreground"
+                      )}
+                    >
+                      <span>{keyHandoverDate ? format(keyHandoverDate, "dd-MM-yy") : "dd-mm-jj"}</span>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={keyHandoverDate}
+                      onSelect={setKeyHandoverDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                      locale={nl}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
-              {/* Renovation Type */}
+              {/* Renovation Type - matching Settings options */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <HardHat className="w-4 h-4 text-muted-foreground" />
@@ -357,37 +392,37 @@ export const SignupPromptDialog = ({
                   className="grid grid-cols-3 gap-2"
                 >
                   <Label
-                    htmlFor="reno-none"
+                    htmlFor="reno-none-signup"
                     className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                       renovationType === "none" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
                     }`}
                   >
-                    <RadioGroupItem value="none" id="reno-none" className="sr-only" />
-                    <span className="text-sm font-medium">Niets</span>
+                    <RadioGroupItem value="none" id="reno-none-signup" className="sr-only" />
+                    <span className="text-sm font-medium">Geen</span>
                   </Label>
                   <Label
-                    htmlFor="reno-small"
+                    htmlFor="reno-small-signup"
                     className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                       renovationType === "small" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
                     }`}
                   >
-                    <RadioGroupItem value="small" id="reno-small" className="sr-only" />
+                    <RadioGroupItem value="small" id="reno-small-signup" className="sr-only" />
                     <span className="text-sm font-medium">Klein</span>
                   </Label>
                   <Label
-                    htmlFor="reno-large"
+                    htmlFor="reno-large-signup"
                     className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all ${
                       renovationType === "large" 
                         ? "border-primary bg-primary/5" 
                         : "border-border hover:border-primary/50"
                     }`}
                   >
-                    <RadioGroupItem value="large" id="reno-large" className="sr-only" />
-                    <span className="text-sm font-medium">Verbouwing</span>
+                    <RadioGroupItem value="large" id="reno-large-signup" className="sr-only" />
+                    <span className="text-sm font-medium">Groot</span>
                   </Label>
                 </RadioGroup>
               </div>
@@ -454,19 +489,39 @@ export const SignupPromptDialog = ({
                 />
               </div>
 
-              {/* Birth Date */}
+              {/* Birth Date - with date picker */}
               <div className="space-y-2">
-                <Label htmlFor="birth-date" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Cake className="w-4 h-4 text-muted-foreground" />
                   Geboortedatum
                 </Label>
-                <Input
-                  id="birth-date"
-                  type="date"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  className="h-12 rounded-xl"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-12 rounded-xl justify-between text-left font-normal",
+                        !birthDate && "text-muted-foreground"
+                      )}
+                    >
+                      <span>{birthDate ? format(birthDate, "dd-MM-yy") : "dd-mm-jj"}</span>
+                      <Cake className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={birthDate}
+                      onSelect={setBirthDate}
+                      initialFocus
+                      className="pointer-events-auto"
+                      locale={nl}
+                      captionLayout="dropdown-buttons"
+                      fromYear={1920}
+                      toYear={new Date().getFullYear()}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
