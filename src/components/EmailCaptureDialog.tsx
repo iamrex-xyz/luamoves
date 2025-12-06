@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,32 +14,40 @@ type EmailCaptureDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEmailSubmit: (email: string) => void;
+  isHardBlock?: boolean;
 };
 
 export const EmailCaptureDialog = ({
   open,
   onOpenChange,
   onEmailSubmit,
+  isHardBlock = false,
 }: EmailCaptureDialogProps) => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
       trackEvent("email_modal_shown");
+      setEmail("");
+      setEmailError("");
     }
   }, [open]);
 
-  const handleSubmit = async () => {
-    const emailValidation = emailSchema.safeParse(email);
+  const validateEmail = (): boolean => {
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      setEmailError(result.error.errors[0].message);
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
 
-    if (!emailValidation.success) {
-      toast({
-        title: "Ongeldige invoer",
-        description: emailValidation.error.errors[0].message,
-        variant: "destructive",
-      });
+  const handleSubmit = async () => {
+    if (!validateEmail()) {
       return;
     }
 
@@ -56,7 +58,7 @@ export const EmailCaptureDialog = ({
       onEmailSubmit(email);
       toast({
         title: "Top!",
-        description: "We bewaren je voortgang.",
+        description: isHardBlock ? "Nu nog even je account afronden." : "We bewaren je voortgang.",
       });
     } catch (error: any) {
       toast({
@@ -69,77 +71,90 @@ export const EmailCaptureDialog = ({
     }
   };
 
-  // Prevent closing without submitting email
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen && open) {
-      // Don't allow closing - email is required
-      return;
-    }
-    onOpenChange(newOpen);
-  };
+  // Check if email is valid for button state
+  const isEmailValid = emailSchema.safeParse(email).success;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent 
-        className="sm:max-w-md animate-in fade-in-0 zoom-in-95 duration-200"
+    <Sheet open={open} onOpenChange={() => {}}>
+      <SheetContent 
+        side="bottom" 
+        className="h-[100dvh] p-0 flex flex-col"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        <DialogHeader className="text-center space-y-2">
-          <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <DialogTitle className="text-2xl font-bold">
-            Topstart!
-          </DialogTitle>
-          <DialogDescription className="text-base text-muted-foreground">
-            Laat je e-mail achter zodat we je voortgang kunnen bewaren en je niets vergeet.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="capture-email" className="flex items-center gap-2">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              E-mailadres
-            </Label>
-            <Input
-              id="capture-email"
-              type="email"
-              placeholder="jouw@email.nl"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-12 rounded-xl"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSubmit();
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col">
+          {/* Header */}
+          <div className="text-center space-y-3 mb-8">
+            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <Sparkles className="w-7 h-7 text-primary-foreground" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">
+                {isHardBlock ? "Je bent lekker op dreef!" : "Topstart!"}
+              </h2>
+              <p className="text-muted-foreground mt-2">
+                {isHardBlock 
+                  ? "Vul je e-mail in zodat we je voortgang veilig kunnen bewaren."
+                  : "Laat je e-mail achter zodat we je voortgang kunnen bewaren en je niets vergeet."
                 }
-              }}
-            />
+              </p>
+            </div>
+          </div>
+
+          <div className="flex-1 space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="capture-email" className="flex items-center gap-2 text-base">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                E-mailadres
+              </Label>
+              <Input
+                id="capture-email"
+                type="email"
+                placeholder="jouw@email.nl"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError("");
+                }}
+                className={`h-14 rounded-xl text-base ${emailError ? 'border-destructive' : ''}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && isEmailValid) {
+                    handleSubmit();
+                  }
+                }}
+              />
+              {emailError && (
+                <p className="text-sm text-destructive">{emailError}</p>
+              )}
+              <p className="text-sm text-muted-foreground">
+                Lua onthoudt alles voor je, zodat jij je kunt focussen op verhuizen.
+              </p>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="pt-4 mt-auto space-y-3">
+            <Button 
+              onClick={handleSubmit} 
+              disabled={!isEmailValid || isLoading} 
+              className="w-full h-14 rounded-xl text-lg font-semibold"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Bezig...
+                </>
+              ) : (
+                isHardBlock ? "Volgende" : "Opslaan"
+              )}
+            </Button>
+
+            <p className="text-xs text-center text-muted-foreground">
+              We gebruiken je e-mail alleen voor je verhuizing. Geen spam, beloofd.
+            </p>
           </div>
         </div>
-
-        <div className="flex flex-col gap-2 pt-2">
-          <Button 
-            onClick={handleSubmit} 
-            disabled={isLoading} 
-            className="h-12 rounded-xl text-base font-semibold"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Bezig...
-              </>
-            ) : (
-              "Opslaan"
-            )}
-          </Button>
-        </div>
-
-        <p className="text-xs text-center text-muted-foreground pt-1">
-          We gebruiken je e-mail alleen voor je verhuizing. Geen spam, beloofd.
-        </p>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
