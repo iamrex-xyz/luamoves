@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import {
+  MobileModal,
+  MobileModalContent,
+} from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -314,79 +317,81 @@ export const SignupPromptDialog = ({
   };
 
   return (
-    <Sheet open={open} onOpenChange={() => {}}>
-      <SheetContent 
-        side="bottom" 
-        className="h-[100dvh] p-0 flex flex-col"
+    <MobileModal open={open} onOpenChange={() => {}}>
+      <MobileModalContent 
+        className="max-h-[85vh]"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {currentStep === 1 ? (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col">
-            {/* Header */}
-            <div className="text-center space-y-3 mb-6">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <Shield className="w-7 h-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">Beveilig je account</h2>
-                <p className="text-muted-foreground mt-1">
-                  Kies een wachtwoord zodat wij je voortgang veilig kunnen opslaan.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex-1 space-y-6">
-              {/* E-mail display */}
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                <p className="text-sm text-muted-foreground">E-mailadres</p>
-                <p className="font-medium">{capturedEmail}</p>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-2">
-                <Label htmlFor="signup-password" className="flex items-center gap-2 text-base">
-                  <Lock className="w-4 h-4 text-muted-foreground" />
-                  Wachtwoord
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="signup-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Minimaal 8 tekens met 1 cijfer"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (passwordError) setPasswordError("");
-                    }}
-                    className={cn(
-                      "h-14 rounded-xl pr-12 text-base",
-                      passwordError && "border-destructive focus-visible:ring-destructive"
-                    )}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
+          <>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {/* Header */}
+              <div className="text-center space-y-3 mb-6">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                  <Shield className="w-7 h-7 text-primary-foreground" />
                 </div>
-                {passwordError && (
-                  <p className="text-sm text-destructive">{passwordError}</p>
-                )}
-                <p className="text-sm text-muted-foreground">
-                  Lua onthoudt alles voor je, zodat jij je kunt focussen op verhuizen.
-                </p>
+                <div>
+                  <h2 className="text-2xl font-bold">Beveilig je account</h2>
+                  <p className="text-muted-foreground mt-1">
+                    Kies een wachtwoord zodat wij je voortgang veilig kunnen opslaan.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* E-mail display */}
+                <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+                  <p className="text-sm text-muted-foreground">E-mailadres</p>
+                  <p className="font-medium">{capturedEmail}</p>
+                </div>
+
+                {/* Password */}
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password" className="flex items-center gap-2 text-base">
+                    <Lock className="w-4 h-4 text-muted-foreground" />
+                    Wachtwoord
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Minimaal 8 tekens met 1 cijfer"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (passwordError) setPasswordError("");
+                      }}
+                      className={cn(
+                        "h-14 rounded-xl pr-12 text-base",
+                        passwordError && "border-destructive focus-visible:ring-destructive"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  {passwordError && (
+                    <p className="text-sm text-destructive">{passwordError}</p>
+                  )}
+                  <p className="text-sm text-muted-foreground">
+                    Lua onthoudt alles voor je, zodat jij je kunt focussen op verhuizen.
+                  </p>
+                </div>
               </div>
             </div>
 
             {/* CTA */}
-            <div className="pt-4 mt-auto">
+            <div className="p-6 pt-4 border-t bg-background">
               <Button 
                 onClick={handleStep1Next} 
                 disabled={!isPasswordValid || isLoading} 
@@ -396,338 +401,341 @@ export const SignupPromptDialog = ({
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
-          </div>
+          </>
         ) : (
-          <div className="flex-1 overflow-y-auto p-6 flex flex-col">
-            {/* Header */}
-            <div className="text-center space-y-3 mb-4">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <Home className="w-7 h-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold">Maak je account compleet</h2>
-                <p className="text-muted-foreground mt-1">
-                  Vul alle gegevens in zodat Lua al je taken en deadlines kan onthouden.
-                </p>
-              </div>
-            </div>
-
-            {/* Progress indicator */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">{filledFieldsCount}/{totalFields} velden ingevuld</span>
-                <span className="text-sm text-muted-foreground">{Math.round((filledFieldsCount / totalFields) * 100)}%</span>
-              </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
-                  style={{ width: `${(filledFieldsCount / totalFields) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Success indicator for step 1 */}
-            {passwordSet && (
-              <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 flex items-center gap-2 mb-4">
-                <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                <p className="text-sm text-green-700 dark:text-green-300">Wachtwoord opgeslagen</p>
-              </div>
-            )}
-
-            <div className="flex-1 space-y-4">
-              {/* Old Address - Postcode + House Number */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-muted-foreground" />
-                  Oud adres <span className="text-destructive">*</span>
-                </Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Input
-                      type="text"
-                      placeholder="Postcode"
-                      value={postcode}
-                      onChange={(e) => {
-                        const val = e.target.value.toUpperCase();
-                        setPostcode(val);
-                        if (val.trim() && !postcode.trim()) trackFieldComplete("postcode");
-                        if (step2Errors.postcode) {
-                          setStep2Errors(prev => ({ ...prev, postcode: "" }));
-                        }
-                      }}
-                      className={cn("h-12 rounded-xl", step2Errors.postcode && "border-destructive")}
-                      maxLength={7}
-                    />
-                    {step2Errors.postcode && (
-                      <p className="text-xs text-destructive mt-1">{step2Errors.postcode}</p>
-                    )}
-                  </div>
-                  <div>
-                    <Input
-                      type="text"
-                      placeholder="Huisnummer"
-                      value={houseNumber}
-                      onChange={(e) => {
-                        setHouseNumber(e.target.value);
-                        if (e.target.value.trim() && !houseNumber.trim()) trackFieldComplete("houseNumber");
-                        if (step2Errors.houseNumber) {
-                          setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
-                        }
-                      }}
-                      className={cn("h-12 rounded-xl", step2Errors.houseNumber && "border-destructive")}
-                    />
-                    {step2Errors.houseNumber && (
-                      <p className="text-xs text-destructive mt-1">{step2Errors.houseNumber}</p>
-                    )}
-                  </div>
+          <>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {/* Header */}
+              <div className="text-center space-y-3 mb-4">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                  <Home className="w-7 h-7 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold">Je bent lekker op dreef!</h2>
+                  <p className="text-muted-foreground mt-1">
+                    Maak je account compleet — dan kunnen wij jouw verhuizing slim organiseren en alles bijhouden.
+                  </p>
                 </div>
               </div>
 
-              {/* Key Handover Date */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  Datum sleuteloverdracht <span className="text-destructive">*</span>
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full h-12 rounded-xl justify-between text-left font-normal",
-                        !keyHandoverDate && "text-muted-foreground",
-                        step2Errors.keyHandoverDate && "border-destructive"
-                      )}
-                    >
-                      <span>{keyHandoverDate ? format(keyHandoverDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={keyHandoverDate}
-                      onSelect={(date) => {
-                        if (date && !keyHandoverDate) trackFieldComplete("keyHandoverDate");
-                        setKeyHandoverDate(date);
-                        if (step2Errors.keyHandoverDate) {
-                          setStep2Errors(prev => ({ ...prev, keyHandoverDate: "" }));
-                        }
-                      }}
-                      initialFocus
-                      className="pointer-events-auto"
-                      locale={nl}
-                    />
-                  </PopoverContent>
-                </Popover>
-                {step2Errors.keyHandoverDate && (
-                  <p className="text-xs text-destructive">{step2Errors.keyHandoverDate}</p>
-                )}
-              </div>
-
-              {/* Renovation Type */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <HardHat className="w-4 h-4 text-muted-foreground" />
-                  Mate van verbouwing
-                </Label>
-                <RadioGroup 
-                  value={renovationType} 
-                  onValueChange={(val: "none" | "small" | "large") => setRenovationType(val)}
-                  className="grid grid-cols-3 gap-2"
-                >
-                  <Label
-                    htmlFor="reno-none-signup"
-                    className={cn(
-                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
-                      renovationType === "none" 
-                        ? "border-primary bg-primary/5" 
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <RadioGroupItem value="none" id="reno-none-signup" className="sr-only" />
-                    <span className="text-sm font-medium">Niets</span>
-                  </Label>
-                  <Label
-                    htmlFor="reno-small-signup"
-                    className={cn(
-                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
-                      renovationType === "small" 
-                        ? "border-primary bg-primary/5" 
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <RadioGroupItem value="small" id="reno-small-signup" className="sr-only" />
-                    <span className="text-sm font-medium">Klein</span>
-                  </Label>
-                  <Label
-                    htmlFor="reno-large-signup"
-                    className={cn(
-                      "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
-                      renovationType === "large" 
-                        ? "border-primary bg-primary/5" 
-                        : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <RadioGroupItem value="large" id="reno-large-signup" className="sr-only" />
-                    <span className="text-sm font-medium">Groot</span>
-                  </Label>
-                </RadioGroup>
-              </div>
-
-              {/* Household composition */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  Samenstelling huishouden
-                </Label>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="adults" className="text-xs text-muted-foreground">Volwassenen</Label>
-                    <Input
-                      id="adults"
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={adults}
-                      onChange={(e) => setAdults(e.target.value)}
-                      className="h-11 rounded-xl text-center"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="children" className="text-xs text-muted-foreground">Kinderen</Label>
-                    <Input
-                      id="children"
-                      type="number"
-                      min="0"
-                      max="10"
-                      value={children}
-                      onChange={(e) => setChildren(e.target.value)}
-                      className="h-11 rounded-xl text-center"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="pets" className="text-xs text-muted-foreground">Huisdieren</Label>
-                    <Input
-                      id="pets"
-                      type="number"
-                      min="0"
-                      max="10"
-                      value={pets}
-                      onChange={(e) => setPets(e.target.value)}
-                      className="h-11 rounded-xl text-center"
-                    />
-                  </div>
+              {/* Progress indicator */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">{filledFieldsCount}/{totalFields} velden ingevuld</span>
+                  <span className="text-sm text-muted-foreground">{Math.round((filledFieldsCount / totalFields) * 100)}%</span>
+                </div>
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+                    style={{ width: `${(filledFieldsCount / totalFields) * 100}%` }}
+                  />
                 </div>
               </div>
 
-              {/* Phone */}
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  Telefoonnummer <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="06 12345678"
-                  value={phone}
-                  onChange={(e) => {
-                    if (e.target.value.trim() && !phone.trim()) trackFieldComplete("phone");
-                    setPhone(e.target.value);
-                    if (step2Errors.phone) {
-                      setStep2Errors(prev => ({ ...prev, phone: "" }));
-                    }
-                  }}
-                  className={cn("h-12 rounded-xl", step2Errors.phone && "border-destructive")}
-                />
-                {step2Errors.phone && (
-                  <p className="text-xs text-destructive">{step2Errors.phone}</p>
-                )}
-              </div>
+              {/* Success indicator for step 1 */}
+              {passwordSet && (
+                <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 flex items-center gap-2 mb-4">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <p className="text-sm text-green-700 dark:text-green-300">Wachtwoord opgeslagen</p>
+                </div>
+              )}
 
-              {/* Birth Date */}
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Cake className="w-4 h-4 text-muted-foreground" />
-                  Geboortedatum <span className="text-destructive">*</span>
-                </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full h-12 rounded-xl justify-between text-left font-normal",
-                        !birthDate && "text-muted-foreground",
-                        step2Errors.birthDate && "border-destructive"
+              <div className="space-y-4">
+                {/* Old Address - Postcode + House Number */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    Oud adres <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Input
+                        type="text"
+                        placeholder="Postcode"
+                        value={postcode}
+                        onChange={(e) => {
+                          const val = e.target.value.toUpperCase();
+                          setPostcode(val);
+                          if (val.trim() && !postcode.trim()) trackFieldComplete("postcode");
+                          if (step2Errors.postcode) {
+                            setStep2Errors(prev => ({ ...prev, postcode: "" }));
+                          }
+                        }}
+                        className={cn("h-12 rounded-xl", step2Errors.postcode && "border-destructive")}
+                        maxLength={7}
+                      />
+                      {step2Errors.postcode && (
+                        <p className="text-xs text-destructive mt-1">{step2Errors.postcode}</p>
                       )}
-                    >
-                      <span>{birthDate ? format(birthDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
-                    <div className="p-3 space-y-3">
-                      {/* Month and Year selectors */}
-                      <div className="flex gap-2">
-                        <Select 
-                          value={birthCalendarMonth.getMonth().toString()} 
-                          onValueChange={handleBirthMonthChange}
-                        >
-                          <SelectTrigger className="flex-1 h-9 rounded-lg text-sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-background z-[60]">
-                            {monthOptions.map((month) => (
-                              <SelectItem key={month.value} value={month.value}>
-                                {month.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select 
-                          value={birthCalendarMonth.getFullYear().toString()} 
-                          onValueChange={handleBirthYearChange}
-                        >
-                          <SelectTrigger className="w-24 h-9 rounded-lg text-sm">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-background z-[60] max-h-[200px]">
-                            {yearOptions.map((year) => (
-                              <SelectItem key={year} value={year}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
                     </div>
-                    <CalendarComponent
-                      mode="single"
-                      selected={birthDate}
-                      onSelect={(date) => {
-                        if (date && !birthDate) trackFieldComplete("birthDate");
-                        setBirthDate(date);
-                        if (step2Errors.birthDate) {
-                          setStep2Errors(prev => ({ ...prev, birthDate: "" }));
-                        }
-                      }}
-                      month={birthCalendarMonth}
-                      onMonthChange={setBirthCalendarMonth}
-                      className="pointer-events-auto"
-                      locale={nl}
-                      disabled={(date) => date > new Date()}
-                    />
-                  </PopoverContent>
-                </Popover>
-                {step2Errors.birthDate && (
-                  <p className="text-xs text-destructive">{step2Errors.birthDate}</p>
-                )}
+                    <div>
+                      <Input
+                        type="text"
+                        placeholder="Huisnummer"
+                        value={houseNumber}
+                        onChange={(e) => {
+                          setHouseNumber(e.target.value);
+                          if (e.target.value.trim() && !houseNumber.trim()) trackFieldComplete("houseNumber");
+                          if (step2Errors.houseNumber) {
+                            setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
+                          }
+                        }}
+                        className={cn("h-12 rounded-xl", step2Errors.houseNumber && "border-destructive")}
+                      />
+                      {step2Errors.houseNumber && (
+                        <p className="text-xs text-destructive mt-1">{step2Errors.houseNumber}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Key Handover Date */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    Datum sleuteloverdracht <span className="text-destructive">*</span>
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full h-12 rounded-xl justify-between text-left font-normal",
+                          !keyHandoverDate && "text-muted-foreground",
+                          step2Errors.keyHandoverDate && "border-destructive"
+                        )}
+                      >
+                        <span>{keyHandoverDate ? format(keyHandoverDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-background z-[60]" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={keyHandoverDate}
+                        onSelect={(date) => {
+                          if (date && !keyHandoverDate) trackFieldComplete("keyHandoverDate");
+                          setKeyHandoverDate(date);
+                          if (step2Errors.keyHandoverDate) {
+                            setStep2Errors(prev => ({ ...prev, keyHandoverDate: "" }));
+                          }
+                        }}
+                        initialFocus
+                        className="pointer-events-auto"
+                        locale={nl}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {step2Errors.keyHandoverDate && (
+                    <p className="text-xs text-destructive">{step2Errors.keyHandoverDate}</p>
+                  )}
+                </div>
+
+                {/* Renovation Type */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <HardHat className="w-4 h-4 text-muted-foreground" />
+                    Mate van verbouwing
+                  </Label>
+                  <RadioGroup 
+                    value={renovationType} 
+                    onValueChange={(val: "none" | "small" | "large") => setRenovationType(val)}
+                    className="grid grid-cols-3 gap-2"
+                  >
+                    <Label
+                      htmlFor="reno-none-signup"
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                        renovationType === "none" 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:border-primary/50"
+                      )}
+                    >
+                      <RadioGroupItem value="none" id="reno-none-signup" className="sr-only" />
+                      <span className="text-sm font-medium">Niets</span>
+                    </Label>
+                    <Label
+                      htmlFor="reno-small-signup"
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                        renovationType === "small" 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:border-primary/50"
+                      )}
+                    >
+                      <RadioGroupItem value="small" id="reno-small-signup" className="sr-only" />
+                      <span className="text-sm font-medium">Klein</span>
+                    </Label>
+                    <Label
+                      htmlFor="reno-large-signup"
+                      className={cn(
+                        "flex flex-col items-center gap-1 p-3 rounded-xl border-2 cursor-pointer transition-all",
+                        renovationType === "large" 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:border-primary/50"
+                      )}
+                    >
+                      <RadioGroupItem value="large" id="reno-large-signup" className="sr-only" />
+                      <span className="text-sm font-medium">Groot</span>
+                    </Label>
+                  </RadioGroup>
+                </div>
+
+                {/* Household composition */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    Samenstelling huishouden
+                  </Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="adults" className="text-xs text-muted-foreground">Volwassenen</Label>
+                      <Input
+                        id="adults"
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={adults}
+                        onChange={(e) => setAdults(e.target.value)}
+                        className="h-11 rounded-xl text-center"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="children" className="text-xs text-muted-foreground">Kinderen</Label>
+                      <Input
+                        id="children"
+                        type="number"
+                        min="0"
+                        max="10"
+                        value={children}
+                        onChange={(e) => setChildren(e.target.value)}
+                        className="h-11 rounded-xl text-center"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="pets" className="text-xs text-muted-foreground">Huisdieren</Label>
+                      <Input
+                        id="pets"
+                        type="number"
+                        min="0"
+                        max="10"
+                        value={pets}
+                        onChange={(e) => setPets(e.target.value)}
+                        className="h-11 rounded-xl text-center"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    Telefoonnummer <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="06 12345678"
+                    value={phone}
+                    onChange={(e) => {
+                      if (e.target.value.trim() && !phone.trim()) trackFieldComplete("phone");
+                      setPhone(e.target.value);
+                      if (step2Errors.phone) {
+                        setStep2Errors(prev => ({ ...prev, phone: "" }));
+                      }
+                    }}
+                    className={cn("h-12 rounded-xl", step2Errors.phone && "border-destructive")}
+                  />
+                  {step2Errors.phone && (
+                    <p className="text-xs text-destructive">{step2Errors.phone}</p>
+                  )}
+                </div>
+
+                {/* Birth Date */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Cake className="w-4 h-4 text-muted-foreground" />
+                    Geboortedatum <span className="text-destructive">*</span>
+                  </Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full h-12 rounded-xl justify-between text-left font-normal",
+                          !birthDate && "text-muted-foreground",
+                          step2Errors.birthDate && "border-destructive"
+                        )}
+                      >
+                        <span>{birthDate ? format(birthDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-background z-[60]" align="start">
+                      <div className="p-3 space-y-3">
+                        {/* Month and Year selectors */}
+                        <div className="flex gap-2">
+                          <Select 
+                            value={birthCalendarMonth.getMonth().toString()} 
+                            onValueChange={handleBirthMonthChange}
+                          >
+                            <SelectTrigger className="flex-1 h-9 rounded-lg text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background z-[70]">
+                              {monthOptions.map((month) => (
+                                <SelectItem key={month.value} value={month.value}>
+                                  {month.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Select 
+                            value={birthCalendarMonth.getFullYear().toString()} 
+                            onValueChange={handleBirthYearChange}
+                          >
+                            <SelectTrigger className="w-24 h-9 rounded-lg text-sm">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-background z-[70] max-h-[200px]">
+                              {yearOptions.map((year) => (
+                                <SelectItem key={year} value={year}>
+                                  {year}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <CalendarComponent
+                        mode="single"
+                        selected={birthDate}
+                        onSelect={(date) => {
+                          if (date && !birthDate) trackFieldComplete("birthDate");
+                          setBirthDate(date);
+                          if (step2Errors.birthDate) {
+                            setStep2Errors(prev => ({ ...prev, birthDate: "" }));
+                          }
+                        }}
+                        month={birthCalendarMonth}
+                        onMonthChange={setBirthCalendarMonth}
+                        className="pointer-events-auto"
+                        locale={nl}
+                        disabled={(date) => date > new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {step2Errors.birthDate && (
+                    <p className="text-xs text-destructive">{step2Errors.birthDate}</p>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* CTA */}
-            <div className="pt-4 mt-auto space-y-3">
+            <div className="p-6 pt-4 border-t bg-background space-y-3">
               <Button 
                 onClick={handleSignup} 
                 disabled={!isStep2Complete || isLoading} 
@@ -750,9 +758,9 @@ export const SignupPromptDialog = ({
                 <a href="/privacy" className="underline hover:text-foreground">privacyverklaring</a>.
               </p>
             </div>
-          </div>
+          </>
         )}
-      </SheetContent>
-    </Sheet>
+      </MobileModalContent>
+    </MobileModal>
   );
 };
