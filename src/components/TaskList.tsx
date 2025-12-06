@@ -236,14 +236,14 @@ export const TaskList = ({
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-background">
+    <div className="min-h-screen pb-24 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header with Logo */}
       <div className="px-4 pt-4 pb-2">
         <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
       </div>
       
       {/* Compact Header with Search */}
-      <div className="px-4 pb-3 sticky top-0 bg-background/95 backdrop-blur-lg z-10 border-b border-border/50">
+      <div className="px-4 pb-3 sticky top-0 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg z-10 border-b border-border/50">
         <div className="flex items-center gap-3">
           {/* Filter knop */}
           <Popover>
@@ -350,15 +350,15 @@ export const TaskList = ({
       {/* Tasks */}
       <div className="px-4 py-3">
         {isLoading ? (
-          <div className="p-8 text-center">
+          <div className="p-8 text-center rounded-3xl bg-white shadow-lg shadow-primary/10">
             <Loader2 className="w-6 h-6 mx-auto animate-spin text-primary" />
           </div>
         ) : Object.entries(tasksByPhase).length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-8 text-center text-muted-foreground rounded-3xl bg-white shadow-lg shadow-primary/10">
             Geen taken gevonden.
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
             {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
               <div key={phase}>
                 <div className="flex items-center gap-2 mb-2 py-1">
