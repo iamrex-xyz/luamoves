@@ -212,10 +212,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                       <Check className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-foreground">Vandaag</p>
-                      <p className="text-sm text-muted-foreground">3 taken</p>
-                    </div>
+                    <p className="font-semibold text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
                   <div className="space-y-2 overflow-hidden relative h-[120px]">
