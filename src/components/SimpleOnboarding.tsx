@@ -49,27 +49,24 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   const totalSteps = 4; // Welcome, date, address, generating
 
-  // Animate tasks on welcome screen - check off top task periodically
+  // Animate tasks on welcome screen - smooth scrolling feed
   useEffect(() => {
     if (step === 1) {
       const interval = setInterval(() => {
         // Phase 1: Check the task (show checkmark)
         setAnimationPhase('checking');
         
-        // Phase 2: Slide up + color transitions (after checkmark appears)
+        // Phase 2: Slide up (after checkmark appears)
         setTimeout(() => {
           setAnimationPhase('sliding');
-        }, 800);
+        }, 600);
         
-        // Phase 3: Reset - update index AFTER slide completes, then instant reset
+        // Phase 3: Update index and reset instantly
         setTimeout(() => {
           setTaskStartIndex((prev) => (prev + 1) % animatedTasks.length);
-          // Small delay before resetting to idle so the new content is in place
-          requestAnimationFrame(() => {
-            setAnimationPhase('idle');
-          });
-        }, 1500);
-      }, 3500);
+          setAnimationPhase('idle');
+        }, 1000);
+      }, 3000);
       return () => clearInterval(interval);
     }
   }, [step]);
@@ -228,59 +225,79 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="flex flex-col gap-2">
-                    {/* Task 1 - Primary position, gets checked */}
+                  {/* Scrolling task feed container */}
+                  <div className="relative overflow-hidden" style={{ height: '124px' }}>
+                    {/* Task stack with translateY animation */}
                     <div 
-                      className="flex items-center gap-3 py-2.5 px-3 rounded-xl"
+                      className="flex flex-col gap-2"
                       style={{
-                        transition: 'background-color 0.4s ease',
-                        backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
-                          ? 'hsl(var(--primary) / 0.1)' 
-                          : 'hsl(var(--primary-light))',
+                        transition: animationPhase === 'sliding' 
+                          ? 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)' 
+                          : 'none',
+                        transform: animationPhase === 'sliding' 
+                          ? 'translateY(-44px)' 
+                          : 'translateY(0)',
                       }}
                     >
-                      <div 
-                        className="w-5 h-5 shrink-0 flex items-center justify-center"
-                        style={{
-                          transition: 'transform 0.3s ease',
-                          transform: animationPhase === 'checking' ? 'scale(1.2)' : 'scale(1)',
-                        }}
-                      >
-                        {animationPhase === 'checking' || animationPhase === 'sliding' ? (
-                          <CheckCircle2 className="w-5 h-5 text-primary" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-primary" />
-                        )}
-                      </div>
-                      <span 
-                        className="text-sm font-medium"
-                        style={{
-                          transition: 'all 0.3s ease',
-                          textDecoration: animationPhase === 'checking' || animationPhase === 'sliding' ? 'line-through' : 'none',
-                          color: animationPhase === 'checking' || animationPhase === 'sliding' 
-                            ? 'hsl(var(--primary) / 0.5)' 
-                            : 'hsl(var(--foreground))',
-                        }}
-                      >
-                        {animatedTasks[taskStartIndex % animatedTasks.length]}
-                      </span>
+                      {/* Render 4 tasks to enable smooth scrolling */}
+                      {[0, 1, 2, 3].map((offset) => {
+                        const taskIndex = (taskStartIndex + offset) % animatedTasks.length;
+                        const isFirst = offset === 0;
+                        const isChecked = isFirst && (animationPhase === 'checking' || animationPhase === 'sliding');
+                        
+                        // Style based on position
+                        let bgClass = 'bg-secondary/50';
+                        let iconClass = 'text-muted-foreground/30';
+                        let textClass = 'text-muted-foreground/70';
+                        
+                        if (isFirst && !isChecked) {
+                          bgClass = 'bg-primary-light';
+                          iconClass = 'text-primary';
+                          textClass = 'text-foreground font-medium';
+                        } else if (offset === 1) {
+                          bgClass = 'bg-secondary';
+                          iconClass = 'text-muted-foreground/40';
+                          textClass = 'text-muted-foreground';
+                        }
+                        
+                        return (
+                          <div 
+                            key={`task-${taskIndex}-${offset}`}
+                            className={`flex items-center gap-3 py-2.5 px-3 rounded-xl shrink-0 ${
+                              isChecked ? 'bg-primary/10' : bgClass
+                            }`}
+                            style={{ height: '36px' }}
+                          >
+                            <div 
+                              className="w-5 h-5 shrink-0 flex items-center justify-center"
+                              style={{
+                                transition: 'transform 0.2s ease',
+                                transform: isChecked && animationPhase === 'checking' ? 'scale(1.15)' : 'scale(1)',
+                              }}
+                            >
+                              {isChecked ? (
+                                <CheckCircle2 className="w-5 h-5 text-primary" />
+                              ) : (
+                                <Circle className={`w-5 h-5 ${iconClass}`} />
+                              )}
+                            </div>
+                            <span 
+                              className={`text-sm ${isChecked ? 'line-through text-primary/50' : textClass}`}
+                            >
+                              {animatedTasks[taskIndex]}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
                     
-                    {/* Task 2 - Secondary position */}
-                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-secondary">
-                      <Circle className="w-5 h-5 shrink-0 text-muted-foreground/40" />
-                      <span className="text-sm text-muted-foreground">
-                        {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
-                      </span>
-                    </div>
-                    
-                    {/* Task 3 - Tertiary position */}
-                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl bg-secondary/50">
-                      <Circle className="w-5 h-5 shrink-0 text-muted-foreground/30" />
-                      <span className="text-sm text-muted-foreground/70">
-                        {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
-                      </span>
-                    </div>
+                    {/* Fade gradient at bottom for tease effect */}
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none"
+                      style={{
+                        background: 'linear-gradient(to top, white 0%, transparent 100%)',
+                      }}
+                    />
                   </div>
                 </div>
               </div>
