@@ -193,9 +193,9 @@ const Index = () => {
         return;
       }
       
-      // After 2nd task - show full signup dialog (if not already prompted)
-      if (completedCount >= 2 && !sessionStorage.getItem(SIGNUP_PROMPTED_KEY)) {
-        sessionStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
+      // After 2nd task (or any subsequent task) - show full signup dialog
+      // Re-show if user skipped before and completes another task
+      if (completedCount >= 2) {
         setIsHardBlock(false);
         setShowSignupPrompt(true);
         return;
