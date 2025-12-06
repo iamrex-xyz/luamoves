@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
@@ -10,7 +9,6 @@ import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { useNavigate } from "react-router-dom";
 import {
-  Home,
   Clock,
   LogOut,
   User,
@@ -18,6 +16,8 @@ import {
   Plus,
   ExternalLink,
   Circle,
+  Calendar,
+  ArrowRight,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,6 +36,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
   // Filter alleen niet-afgeronde taken voor de homepage
   const openTasks = tasks.filter(t => t.status !== "done");
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+  };
+
+  const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
+    e.stopPropagation();
+    handleTaskToggle(task.id);
+  };
 
   const handleTaskToggle = async (taskId: string) => {
     setCompletingTasks(prev => new Set(prev).add(taskId));
@@ -64,16 +73,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
       (1000 * 60 * 60 * 24)
   );
 
-
-  const getStatusBadge = (task: Task) => {
-    if (task.status === "done") {
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
-    }
-    if (task.status === "in_progress") {
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
-    }
-    return null;
-  };
+  const moveDate = new Date(movingInfo.movingDate);
+  const dayOfWeek = moveDate.toLocaleDateString("nl-NL", { weekday: "short" });
+  const dayNumber = moveDate.getDate();
+  const monthName = moveDate.toLocaleDateString("nl-NL", { month: "long" });
 
   const TaskItem = ({ task }: { task: Task }) => {
     const today = new Date();
@@ -86,231 +89,214 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
 
     return (
       <div 
-        className={`flex items-start gap-3 p-3 rounded-lg border transition-all duration-500 ${
+        className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
           isCompleting 
-            ? "bg-primary/20 border-primary/40 scale-95 -translate-y-2" 
+            ? "bg-primary/10 scale-95 opacity-0" 
             : isOverdue 
-              ? "border-destructive/30 bg-destructive/5 hover:bg-muted/50" 
-              : "border-border bg-card hover:bg-muted/50"
-        } cursor-pointer`}
-        style={isCompleting ? { 
-          opacity: 0,
-          transition: 'opacity 0.3s ease-out 0.3s, transform 0.5s ease-out, background-color 0.5s ease-out, border-color 0.5s ease-out'
-        } : undefined}
-        onClick={() => !isCompleting && handleTaskToggle(task.id)}
+              ? "bg-destructive/5 hover:bg-destructive/10" 
+              : "bg-secondary/50 hover:bg-secondary"
+        }`}
+        onClick={() => !isCompleting && handleTaskClick(task)}
       >
-        <div 
-          className="mt-0.5 shrink-0 cursor-pointer transition-all duration-300 hover:scale-110"
-        >
-          {isCompleting ? (
-            <CheckCircle2 className="h-[18px] w-[18px] text-primary animate-scale-in" />
-          ) : task.status === "done" ? (
-            <CheckCircle2 className="h-[18px] w-[18px] text-primary" />
-          ) : (
-            <Circle className="h-[18px] w-[18px] text-muted-foreground" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 
-              className={`font-medium text-xs md:text-sm ${!isCompleting && "cursor-pointer hover:text-primary"} transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : ""}`}
-              onClick={(e) => {
-                if (!isCompleting) {
-                  e.stopPropagation();
-                  setSelectedTask(task);
-                }
-              }}
-            >
+        <div className="flex items-start gap-4">
+          <div 
+            className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+            onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
+          >
+            {isCompleting ? (
+              <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
+            ) : task.status === "done" ? (
+              <CheckCircle2 className="h-5 w-5 text-primary" />
+            ) : (
+              <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h4 className={`font-medium text-sm mb-1 transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
               {task.title}
             </h4>
-            {getStatusBadge(task) && (
-              <div className="flex-shrink-0">
-                {getStatusBadge(task)}
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" />
-              {task.deadlineLabel}
-              {daysUntil === 0 && " (vandaag)"}
-              {daysUntil === 1 && " (morgen)"}
-              {daysUntil > 1 && ` (${daysUntil} dagen)`}
-              {isOverdue && " (verlopen)"}
-            </span>
-            {task.assignedToEmail && (
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
-                <User className="w-3 h-3" />
-                {task.assignedToEmail}
+                <Clock className="w-3 h-3" />
+                {task.deadlineLabel}
+                {daysUntil === 0 && " (vandaag)"}
+                {daysUntil === 1 && " (morgen)"}
+                {isOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
               </span>
-            )}
+              {task.assignedToEmail && (
+                <span className="flex items-center gap-1">
+                  <User className="w-3 h-3" />
+                  {task.assignedToEmail}
+                </span>
+              )}
+            </div>
           </div>
-          
           {task.affiliateLink && task.status !== "done" && (
             <Button
               size="sm"
-              variant="outline"
-              className="gap-1.5 h-7 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 mt-2 md:hidden"
+              variant="ghost"
+              className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate(`/deals?task=${encodeURIComponent(task.title)}`);
               }}
             >
-              Direct regelen
-              <ExternalLink className="w-3 h-3" />
+              Regelen
+              <ArrowRight className="w-3 h-3 ml-1" />
             </Button>
           )}
         </div>
-        
-        {task.affiliateLink && task.status !== "done" && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1.5 h-6 text-xs bg-accent text-accent-foreground hover:bg-accent/90 border-0 shrink-0 hidden md:flex"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-            }}
-          >
-            Direct regelen
-            <ExternalLink className="w-3 h-3" />
-          </Button>
-        )}
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Sticky Header with Charly */}
-      <div className="bg-primary text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4 md:pt-6 pb-2 md:pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
-                <Home className="w-5 h-5 md:w-6 md:h-6" />
+    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Charly</h1>
+            <p className="text-sm text-muted-foreground">Jouw verhuis concierge</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onLogout}
+            className="h-10 w-10 rounded-full hover:bg-secondary"
+          >
+            <LogOut className="w-5 h-5 text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Moving Date Card */}
+      <div className="px-6 mb-6">
+        <Card className="relative overflow-hidden border-0 shadow-elegant bg-gradient-to-br from-primary/5 via-card to-primary/10">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="relative p-6">
+            <div className="flex items-center gap-6">
+              {/* Date Display */}
+              <div className="flex flex-col items-center justify-center w-20 h-20 rounded-2xl bg-primary text-primary-foreground shadow-lg">
+                <span className="text-xs uppercase tracking-wide opacity-80">{dayOfWeek}</span>
+                <span className="text-3xl font-bold">{dayNumber}</span>
               </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold">Charly</h1>
-                <p className="text-white/80 text-xs md:text-base">
-                  Jouw verhuis concierge
-                </p>
+              
+              {/* Info */}
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Verhuisdatum</p>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{monthName}</h2>
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-primary/10 text-primary border-0 font-medium">
+                    {daysUntilMove} dagen
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Progress Ring */}
+              <div className="relative w-16 h-16">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="hsl(var(--muted))"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="4"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 28}`}
+                    strokeDashoffset={`${2 * Math.PI * 28 * (1 - progressPercentage / 100)}`}
+                    strokeLinecap="round"
+                    className="transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-bold text-foreground">{Math.round(progressPercentage)}%</span>
+                </div>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onLogout}
-              className="text-white hover:bg-white/10 h-10 w-10"
-              title="Uitloggen"
-            >
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      {/* Stats Card - Scrolls naturally with page */}
-      <div className="bg-primary text-white">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 pt-2 md:pt-3 pb-4 md:pb-6">
-          <Card className="p-4 md:p-5 bg-white/10 backdrop-blur border-white/20">
-              <div className="flex items-center gap-4 md:gap-6">
-                {/* Circular Progress */}
-                <div className="relative flex-shrink-0">
-                  <svg className="w-20 h-20 md:w-24 md:h-24 transform -rotate-90" viewBox="0 0 120 120">
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="52"
-                      stroke="rgba(255,255,255,0.2)"
-                      strokeWidth="8"
-                      fill="none"
-                    />
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="52"
-                      stroke="white"
-                      strokeWidth="8"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 52}`}
-                      strokeDashoffset={`${2 * Math.PI * 52 * (1 - progressPercentage / 100)}`}
-                      strokeLinecap="round"
-                      style={{ transition: "stroke-dashoffset 1s ease-out" }}
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="text-xl md:text-2xl font-bold text-white">{Math.round(progressPercentage)}%</div>
-                    </div>
-                  </div>
+            {/* Stats Row */}
+            <div className="flex items-center gap-4 mt-5 pt-5 border-t border-border/50">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4 text-success" />
                 </div>
-
-                {/* Stats */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-3xl md:text-4xl font-bold text-white">{daysUntilMove}</span>
-                    <span className="text-base md:text-lg text-white/80">dagen</span>
-                  </div>
-                  <p className="text-xs md:text-sm text-white/80 mb-3">
-                    tot {new Date(movingInfo.movingDate).toLocaleDateString("nl-NL", {
-                      day: "numeric",
-                      month: "long"
-                    })}
-                  </p>
-                  <div className="flex items-center gap-4 text-xs md:text-sm">
-                    <div>
-                      <CheckCircle2 className="w-3.5 h-3.5 md:w-4 md:h-4 inline mr-1 text-white" />
-                      <span className="font-semibold text-white">{completedTasks}</span>
-                      <span className="text-white/70"> voltooid</span>
-                    </div>
-                  </div>
+                <div>
+                  <p className="text-lg font-semibold text-foreground">{completedTasks}</p>
+                  <p className="text-xs text-muted-foreground">voltooid</p>
                 </div>
               </div>
-          </Card>
-        </div>
+              <div className="w-px h-10 bg-border/50" />
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-foreground">{openTasks.length}</p>
+                  <p className="text-xs text-muted-foreground">open</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-6">
+      {/* Tasks Section */}
+      <div className="px-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Jouw taken</h2>
+            <p className="text-xs text-muted-foreground">Recente taken om te voltooien</p>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => setShowAddTask(true)}
+            className="h-9 px-3 rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Toevoegen
+          </Button>
+        </div>
+
         {isLoading ? (
-          <Card className="p-6">
+          <Card className="p-8 border-0 shadow-soft">
             <p className="text-center text-muted-foreground">Taken laden...</p>
           </Card>
         ) : openTasks.length > 0 ? (
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base md:text-lg font-bold text-foreground">Jouw taken</h2>
-                <Badge variant="secondary" className="text-xs">{openTasks.length}</Badge>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowAddTask(true)}
-                className="flex items-center gap-1.5 h-8 text-xs md:text-sm"
+          <div className="space-y-2">
+            {openTasks.slice(0, 5).map((task) => (
+              <TaskItem key={task.id} task={task} />
+            ))}
+            {openTasks.length > 5 && (
+              <Button
+                variant="ghost"
+                className="w-full h-12 text-sm text-muted-foreground hover:text-foreground"
+                onClick={() => onNavigate("tasks")}
               >
-                <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                <span className="hidden md:inline">Taak toevoegen</span>
-                <span className="md:hidden">Toevoegen</span>
+                Bekijk alle {openTasks.length} taken
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </div>
-            <Card className="p-4">
-              <div className="space-y-3">
-                {openTasks.map((task) => (
-                  <TaskItem key={task.id} task={task} />
-                ))}
-              </div>
-            </Card>
+            )}
           </div>
         ) : (
-          <Card className="p-6 md:p-8 text-center">
-            <CheckCircle2 className="w-10 h-10 md:w-12 md:h-12 text-green-500 mx-auto mb-3" />
-            <h3 className="font-semibold text-base md:text-lg mb-2 text-foreground">Je hebt nog geen taken</h3>
-            <p className="text-sm md:text-base text-muted-foreground mb-4">
-              Voeg je eerste taak toe om te beginnen met de voorbereiding van je verhuizing.
+          <Card className="p-8 text-center border-0 shadow-soft bg-card">
+            <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-success" />
+            </div>
+            <h3 className="font-semibold text-lg mb-2 text-foreground">Alle taken voltooid!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Voeg een nieuwe taak toe om verder te gaan.
             </p>
-            <Button onClick={() => setShowAddTask(true)}>
+            <Button onClick={() => setShowAddTask(true)} className="rounded-full">
               <Plus className="w-4 h-4 mr-2" />
               Taak toevoegen
             </Button>
@@ -329,6 +315,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout }: DashboardProps) 
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
+        onToggleStatus={handleTaskToggle}
       />
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
