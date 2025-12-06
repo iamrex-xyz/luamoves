@@ -350,6 +350,7 @@ const Index = () => {
           onNavigate={setCurrentView}
           onLogout={handleLogout}
           onTaskComplete={handleTaskComplete}
+          onSignupClick={handleBadgeClick}
         />
       )}
       {currentView === "tasks" && movingInfo && (
@@ -362,6 +363,7 @@ const Index = () => {
           isGuest={!user}
           showAccountBadge={showAccountBadge}
           onAccountBadgeClick={handleBadgeClick}
+          onSignupClick={handleBadgeClick}
         />
       )}
       {currentView === "extras" && movingInfo && (

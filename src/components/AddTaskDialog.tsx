@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,12 +7,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock } from "lucide-react";
 
 type AddTaskDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTaskAdded: () => void;
+  onSignupClick?: () => void;
 };
 
 const categories = [
@@ -28,13 +29,25 @@ const categories = [
   "Anders"
 ];
 
-export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded }: AddTaskDialogProps) => {
+export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded, onSignupClick }: AddTaskDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [deadline, setDeadline] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGuest, setIsGuest] = useState<boolean | null>(null);
   const { toast } = useToast();
+
+  // Check if user is logged in when dialog opens
+  useEffect(() => {
+    if (open) {
+      const checkAuth = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        setIsGuest(!user);
+      };
+      checkAuth();
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +119,48 @@ export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded }: AddTaskDialog
       setIsLoading(false);
     }
   };
+
+  // Show guest message if not logged in
+  if (isGuest) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Account vereist</DialogTitle>
+            <DialogDescription>
+              Maak een gratis account om eigen taken toe te voegen
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-primary" />
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              Met een account kun je eigen taken toevoegen, je voortgang bewaren en samenwerken met anderen.
+            </p>
+            <div className="flex flex-col gap-2">
+              <Button 
+                onClick={() => {
+                  onOpenChange(false);
+                  onSignupClick?.();
+                }}
+                className="w-full"
+              >
+                Account aanmaken
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={() => onOpenChange(false)}
+                className="w-full"
+              >
+                Later
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
