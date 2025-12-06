@@ -5,6 +5,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
+import { EmailCaptureDialog } from "@/components/EmailCaptureDialog";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +22,9 @@ export type MovingInfo = {
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
+const EMAIL_PROMPTED_KEY = "lua_email_prompted";
 const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
+const CAPTURED_EMAIL_KEY = "lua_captured_email";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
@@ -30,9 +33,20 @@ const Index = () => {
     "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings"
   >("onboarding");
   const [loading, setLoading] = useState(true);
+  
+  // Email capture dialog (after 1st task)
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  
+  // Full signup dialog (after 2nd task)
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [isHardBlock, setIsHardBlock] = useState(false);
+  
+  // Captured email for signup flow
+  const [capturedEmail, setCapturedEmail] = useState<string>("");
+  
+  // Badge reminder
   const [showAccountBadge, setShowAccountBadge] = useState(false);
+  
   const { toast } = useToast();
 
   // Check for existing data on load
@@ -45,6 +59,12 @@ const Index = () => {
         setUser(session.user);
         await loadUserProfile(session.user.id);
         return;
+      }
+
+      // Load captured email if exists
+      const savedEmail = sessionStorage.getItem(CAPTURED_EMAIL_KEY);
+      if (savedEmail) {
+        setCapturedEmail(savedEmail);
       }
 
       // No user - check sessionStorage for guest data (cleared when browser closes)
@@ -136,7 +156,9 @@ const Index = () => {
 
       // Clear sessionStorage after sync
       sessionStorage.removeItem(LOCAL_STORAGE_KEY);
+      sessionStorage.removeItem(EMAIL_PROMPTED_KEY);
       sessionStorage.removeItem(SIGNUP_PROMPTED_KEY);
+      sessionStorage.removeItem(CAPTURED_EMAIL_KEY);
       
       setCurrentView("dashboard");
     } catch (error) {
@@ -161,7 +183,7 @@ const Index = () => {
   };
 
   const handleTaskComplete = (completedCount: number) => {
-    // Only show signup prompt if not logged in
+    // Only show prompts if not logged in
     if (!user) {
       // Hard block at 6 tasks - must create account
       if (completedCount >= 6) {
@@ -170,19 +192,40 @@ const Index = () => {
         return;
       }
       
-      // Show soft prompt after 2 completed tasks (if not already prompted)
+      // After 2nd task - show full signup dialog (if not already prompted)
       if (completedCount >= 2 && !sessionStorage.getItem(SIGNUP_PROMPTED_KEY)) {
         sessionStorage.setItem(SIGNUP_PROMPTED_KEY, "true");
         setIsHardBlock(false);
         setShowSignupPrompt(true);
+        return;
+      }
+      
+      // After 1st task - show email capture dialog (if not already prompted)
+      if (completedCount >= 1 && !sessionStorage.getItem(EMAIL_PROMPTED_KEY)) {
+        sessionStorage.setItem(EMAIL_PROMPTED_KEY, "true");
+        setShowEmailCapture(true);
+        return;
       }
     }
+  };
+
+  const handleEmailSubmit = (email: string) => {
+    setCapturedEmail(email);
+    sessionStorage.setItem(CAPTURED_EMAIL_KEY, email);
+    setShowEmailCapture(false);
+  };
+
+  const handleEmailSkip = () => {
+    setShowEmailCapture(false);
+    setShowAccountBadge(true); // Show reminder badge
   };
 
   const handleSignupComplete = async () => {
     setShowSignupPrompt(false);
     setShowAccountBadge(false);
     setIsHardBlock(false);
+    setCapturedEmail("");
+    sessionStorage.removeItem(CAPTURED_EMAIL_KEY);
     // User is now signed up, data will sync via auth listener
   };
 
@@ -192,8 +235,13 @@ const Index = () => {
   };
 
   const handleBadgeClick = () => {
-    setIsHardBlock(false);
-    setShowSignupPrompt(true);
+    // If we have an email, show signup prompt, otherwise show email capture
+    if (capturedEmail) {
+      setIsHardBlock(false);
+      setShowSignupPrompt(true);
+    } else {
+      setShowEmailCapture(true);
+    }
   };
 
   const handleUpdateMovingInfo = async (data: Partial<MovingInfo>) => {
@@ -230,8 +278,11 @@ const Index = () => {
     await supabase.auth.signOut();
     setUser(null);
     setMovingInfo(null);
+    setCapturedEmail("");
     sessionStorage.removeItem(LOCAL_STORAGE_KEY);
+    sessionStorage.removeItem(EMAIL_PROMPTED_KEY);
     sessionStorage.removeItem(SIGNUP_PROMPTED_KEY);
+    sessionStorage.removeItem(CAPTURED_EMAIL_KEY);
     setCurrentView("onboarding");
     toast({
       title: "Uitgelogd",
@@ -300,12 +351,22 @@ const Index = () => {
         />
       )}
 
+      {/* Email capture dialog - shown after 1st task */}
+      <EmailCaptureDialog
+        open={showEmailCapture}
+        onOpenChange={setShowEmailCapture}
+        onEmailSubmit={handleEmailSubmit}
+        onSkip={handleEmailSkip}
+      />
+
+      {/* Full signup dialog - shown after 2nd task */}
       <SignupPromptDialog
         open={showSignupPrompt}
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={handleSignupComplete}
         onSkip={handleSignupSkip}
         isHardBlock={isHardBlock}
+        capturedEmail={capturedEmail}
       />
     </div>
   );
