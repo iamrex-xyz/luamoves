@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Check, Circle, CheckCircle2 } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
@@ -26,6 +26,7 @@ const generatingSteps = [
 export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps) => {
   const [step, setStep] = useState(1);
   const [movingDate, setMovingDate] = useState<Date | undefined>(undefined);
+  const [housingType, setHousingType] = useState<'rent' | 'buy' | 'unknown' | null>(null);
   const [postcode, setPostcode] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [streetName, setStreetName] = useState("");
@@ -47,7 +48,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     "Meter standen noteren",
   ];
 
-  const totalSteps = 4; // Welcome, date, address, generating
+  const totalSteps = 5; // Welcome, date, housing type, address, generating
 
   // Animate tasks on welcome screen - smooth scrolling feed
   useEffect(() => {
@@ -114,7 +115,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   // Handle the generating animation
   useEffect(() => {
-    if (step === 4) {
+    if (step === 5) {
       const interval = setInterval(() => {
         setCurrentGeneratingStep((prev) => {
           if (prev < generatingSteps.length - 1) {
@@ -136,7 +137,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           oldAddress: "",
           newAddress: fullAddress,
           movingDate: movingDate ? format(movingDate, "yyyy-MM-dd") : "",
-          type: "rent",
+          type: housingType === 'buy' ? 'buy' : 'rent',
           renovationType: "none",
           needsContractorHelp: false,
         });
@@ -147,7 +148,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         clearTimeout(timeout);
       };
     }
-  }, [step, postcode, houseNumber, movingDate, onComplete]);
+  }, [step, postcode, houseNumber, streetName, cityName, movingDate, housingType, onComplete]);
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -156,7 +157,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   const handleStartGenerating = () => {
-    setStep(4);
+    setStep(5);
   };
 
   const isStepValid = () => {
@@ -166,6 +167,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       case 2:
         return !!movingDate;
       case 3:
+        return !!housingType;
+      case 4:
         return postcode.length >= 4 && houseNumber.length > 0;
       default:
         return false;
@@ -447,12 +450,183 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
             <div className="flex items-center gap-4">
               <div className="flex gap-1">
-                {[1, 2].map((num) => (
+                {[1, 2, 3].map((num) => (
                   <div
                     key={num}
                     className={`w-8 h-1 rounded-full transition-all ${
                       num <= 2 ? "bg-primary" : "bg-muted"
                     }`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {/* Large headline */}
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  Wat voor woning wordt
+                  <br />
+                  <span className="text-primary">jouw nieuwe thuis?</span>
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-md">
+                  Zo maken we jouw verhuis-to-do's 100% relevant. Je kunt dit later altijd aanpassen!
+                </p>
+              </div>
+
+              {/* Housing type options */}
+              <div className="space-y-3">
+                {/* Rent option */}
+                <button
+                  onClick={() => setHousingType('rent')}
+                  className={cn(
+                    "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
+                    housingType === 'rent' 
+                      ? "border-primary bg-primary-light shadow-lg" 
+                      : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
+                  )}
+                >
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-colors",
+                    housingType === 'rent' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
+                  )}>
+                    <Key className={cn(
+                      "w-7 h-7",
+                      housingType === 'rent' ? "text-white" : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className={cn(
+                      "font-semibold text-lg",
+                      housingType === 'rent' ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      Ik ga huren
+                    </p>
+                    <p className="text-sm text-muted-foreground">Huurwoning of appartement</p>
+                  </div>
+                  {housingType === 'rent' && (
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Buy option */}
+                <button
+                  onClick={() => setHousingType('buy')}
+                  className={cn(
+                    "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
+                    housingType === 'buy' 
+                      ? "border-primary bg-primary-light shadow-lg" 
+                      : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
+                  )}
+                >
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-colors",
+                    housingType === 'buy' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
+                  )}>
+                    <Home className={cn(
+                      "w-7 h-7",
+                      housingType === 'buy' ? "text-white" : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className={cn(
+                      "font-semibold text-lg",
+                      housingType === 'buy' ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      Ik ga kopen
+                    </p>
+                    <p className="text-sm text-muted-foreground">Koopwoning met eigen hypotheek</p>
+                  </div>
+                  {housingType === 'buy' && (
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Unknown option */}
+                <button
+                  onClick={() => setHousingType('unknown')}
+                  className={cn(
+                    "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
+                    housingType === 'unknown' 
+                      ? "border-primary bg-primary-light shadow-lg" 
+                      : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
+                  )}
+                >
+                  <div className={cn(
+                    "w-14 h-14 rounded-2xl flex items-center justify-center transition-colors",
+                    housingType === 'unknown' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
+                  )}>
+                    <HelpCircle className={cn(
+                      "w-7 h-7",
+                      housingType === 'unknown' ? "text-white" : "text-muted-foreground"
+                    )} />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className={cn(
+                      "font-semibold text-lg",
+                      housingType === 'unknown' ? "text-foreground" : "text-muted-foreground"
+                    )}>
+                      Dat weet ik nog niet
+                    </p>
+                    <p className="text-sm text-muted-foreground">Nog geen definitieve keuze gemaakt</p>
+                  </div>
+                  {housingType === 'unknown' && (
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </button>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between pt-4">
+                <button 
+                  onClick={() => setStep(step - 1)}
+                  className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span>Terug</span>
+                </button>
+                
+                <button 
+                  onClick={handleNext}
+                  disabled={!isStepValid()}
+                  className={cn(
+                    "flex items-center gap-3 group",
+                    !isStepValid() && "opacity-40 pointer-events-none"
+                  )}
+                >
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : step === 4 ? (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <div className="p-6 flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1">
+                {[1, 2, 3].map((num) => (
+                  <div
+                    key={num}
+                    className={`w-8 h-1 rounded-full transition-all bg-primary`}
                   />
                 ))}
               </div>
