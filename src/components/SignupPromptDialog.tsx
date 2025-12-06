@@ -83,6 +83,7 @@ export const SignupPromptDialog = ({
   const [birthCalendarMonth, setBirthCalendarMonth] = useState<Date>(new Date(1990, 0, 1));
   
   const [isLoading, setIsLoading] = useState(false);
+  const [step2Errors, setStep2Errors] = useState<Record<string, string>>({});
 
   // Generate year options (from 1920 to current year)
   const yearOptions = useMemo(() => {
@@ -152,6 +153,39 @@ export const SignupPromptDialog = ({
     setCurrentStep(2);
   };
 
+  const validateStep2 = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (!postcode.trim()) {
+      errors.postcode = "Postcode is verplicht";
+    }
+    if (!houseNumber.trim()) {
+      errors.houseNumber = "Huisnummer is verplicht";
+    }
+    if (!keyHandoverDate) {
+      errors.keyHandoverDate = "Sleuteloverdracht datum is verplicht";
+    }
+    if (!phone.trim()) {
+      errors.phone = "Telefoonnummer is verplicht";
+    }
+    if (!birthDate) {
+      errors.birthDate = "Geboortedatum is verplicht";
+    }
+    
+    setStep2Errors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: "Vul alle velden in",
+        description: "Sommige verplichte velden zijn nog niet ingevuld.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSignup = async () => {
     if (!capturedEmail) {
       toast({
@@ -159,6 +193,10 @@ export const SignupPromptDialog = ({
         description: "Voer eerst je e-mailadres in.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (!validateStep2()) {
       return;
     }
 
@@ -235,11 +273,8 @@ export const SignupPromptDialog = ({
   };
 
   const handleOpenChange = (newOpen: boolean) => {
+    // Never allow closing the dialog - user must complete the signup
     if (!newOpen && open) {
-      if (isHardBlock) {
-        return;
-      }
-      handleSkip();
       return;
     }
     onOpenChange(newOpen);
@@ -249,12 +284,8 @@ export const SignupPromptDialog = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent 
         className="sm:max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in-0 slide-in-from-bottom-4 duration-300"
-        onPointerDownOutside={(e) => isHardBlock && e.preventDefault()}
-        onEscapeKeyDown={(e) => {
-          if (isHardBlock) {
-            e.preventDefault();
-          }
-        }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         {currentStep === 1 ? (
           <>
@@ -362,24 +393,44 @@ export const SignupPromptDialog = ({
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-muted-foreground" />
-                  Oud adres
+                  Oud adres <span className="text-destructive">*</span>
                 </Label>
                 <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    type="text"
-                    placeholder="Postcode"
-                    value={postcode}
-                    onChange={(e) => setPostcode(e.target.value.toUpperCase())}
-                    className="h-12 rounded-xl"
-                    maxLength={7}
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Huisnummer"
-                    value={houseNumber}
-                    onChange={(e) => setHouseNumber(e.target.value)}
-                    className="h-12 rounded-xl"
-                  />
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Postcode"
+                      value={postcode}
+                      onChange={(e) => {
+                        setPostcode(e.target.value.toUpperCase());
+                        if (step2Errors.postcode) {
+                          setStep2Errors(prev => ({ ...prev, postcode: "" }));
+                        }
+                      }}
+                      className={cn("h-12 rounded-xl", step2Errors.postcode && "border-destructive")}
+                      maxLength={7}
+                    />
+                    {step2Errors.postcode && (
+                      <p className="text-xs text-destructive mt-1">{step2Errors.postcode}</p>
+                    )}
+                  </div>
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Huisnummer"
+                      value={houseNumber}
+                      onChange={(e) => {
+                        setHouseNumber(e.target.value);
+                        if (step2Errors.houseNumber) {
+                          setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
+                        }
+                      }}
+                      className={cn("h-12 rounded-xl", step2Errors.houseNumber && "border-destructive")}
+                    />
+                    {step2Errors.houseNumber && (
+                      <p className="text-xs text-destructive mt-1">{step2Errors.houseNumber}</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -387,7 +438,7 @@ export const SignupPromptDialog = ({
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
-                  Datum sleuteloverdracht
+                  Datum sleuteloverdracht <span className="text-destructive">*</span>
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -395,7 +446,8 @@ export const SignupPromptDialog = ({
                       variant="outline"
                       className={cn(
                         "w-full h-12 rounded-xl justify-between text-left font-normal",
-                        !keyHandoverDate && "text-muted-foreground"
+                        !keyHandoverDate && "text-muted-foreground",
+                        step2Errors.keyHandoverDate && "border-destructive"
                       )}
                     >
                       <span>{keyHandoverDate ? format(keyHandoverDate, "dd-MM-yy") : "dd-mm-jj"}</span>
@@ -406,13 +458,21 @@ export const SignupPromptDialog = ({
                     <CalendarComponent
                       mode="single"
                       selected={keyHandoverDate}
-                      onSelect={setKeyHandoverDate}
+                      onSelect={(date) => {
+                        setKeyHandoverDate(date);
+                        if (step2Errors.keyHandoverDate) {
+                          setStep2Errors(prev => ({ ...prev, keyHandoverDate: "" }));
+                        }
+                      }}
                       initialFocus
                       className="pointer-events-auto"
                       locale={nl}
                     />
                   </PopoverContent>
                 </Popover>
+                {step2Errors.keyHandoverDate && (
+                  <p className="text-xs text-destructive">{step2Errors.keyHandoverDate}</p>
+                )}
               </div>
 
               {/* Renovation Type - matching Settings options */}
@@ -512,23 +572,31 @@ export const SignupPromptDialog = ({
               <div className="space-y-2">
                 <Label htmlFor="phone" className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-muted-foreground" />
-                  Telefoonnummer
+                  Telefoonnummer <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="phone"
                   type="tel"
                   placeholder="06 12345678"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="h-12 rounded-xl"
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (step2Errors.phone) {
+                      setStep2Errors(prev => ({ ...prev, phone: "" }));
+                    }
+                  }}
+                  className={cn("h-12 rounded-xl", step2Errors.phone && "border-destructive")}
                 />
+                {step2Errors.phone && (
+                  <p className="text-xs text-destructive">{step2Errors.phone}</p>
+                )}
               </div>
 
               {/* Birth Date - with calendar and month/year dropdowns */}
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Cake className="w-4 h-4 text-muted-foreground" />
-                  Geboortedatum
+                  Geboortedatum <span className="text-destructive">*</span>
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -536,7 +604,8 @@ export const SignupPromptDialog = ({
                       variant="outline"
                       className={cn(
                         "w-full h-12 rounded-xl justify-between text-left font-normal",
-                        !birthDate && "text-muted-foreground"
+                        !birthDate && "text-muted-foreground",
+                        step2Errors.birthDate && "border-destructive"
                       )}
                     >
                       <span>{birthDate ? format(birthDate, "dd-MM-yy") : "dd-mm-jj"}</span>
@@ -582,7 +651,12 @@ export const SignupPromptDialog = ({
                     <CalendarComponent
                       mode="single"
                       selected={birthDate}
-                      onSelect={setBirthDate}
+                      onSelect={(date) => {
+                        setBirthDate(date);
+                        if (step2Errors.birthDate) {
+                          setStep2Errors(prev => ({ ...prev, birthDate: "" }));
+                        }
+                      }}
                       month={birthCalendarMonth}
                       onMonthChange={setBirthCalendarMonth}
                       className="pointer-events-auto"
@@ -591,6 +665,9 @@ export const SignupPromptDialog = ({
                     />
                   </PopoverContent>
                 </Popover>
+                {step2Errors.birthDate && (
+                  <p className="text-xs text-destructive">{step2Errors.birthDate}</p>
+                )}
               </div>
             </div>
 
@@ -609,16 +686,6 @@ export const SignupPromptDialog = ({
                   "Account afronden"
                 )}
               </Button>
-              {!isHardBlock && (
-                <Button 
-                  variant="ghost" 
-                  onClick={handleSkip} 
-                  disabled={isLoading} 
-                  className="text-muted-foreground h-11"
-                >
-                  Later verder
-                </Button>
-              )}
             </div>
 
             <p className="text-xs text-center text-muted-foreground pt-1">
