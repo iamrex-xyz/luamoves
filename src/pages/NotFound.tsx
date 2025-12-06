@@ -9,7 +9,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
       {/* Header */}
       <div className="p-6">
         <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>

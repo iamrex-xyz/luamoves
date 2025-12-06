@@ -134,7 +134,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {step === 1 ? (
         <div 
           className="min-h-screen flex flex-col cursor-pointer"
@@ -164,7 +164,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
                   Jouw verhuizing,
                   <br />
-                  <span className="text-orange-500">georganiseerd.</span>
+                  <span className="text-primary">georganiseerd.</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-md">
                   Krijg een persoonlijke checklist met slimme deadlines die meetellen naar jouw verhuisdag.
@@ -178,10 +178,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 {/* Middle card */}
                 <div className="absolute top-3 left-2 right-2 h-full bg-white/80 rounded-3xl shadow-lg transform -rotate-1" />
                 {/* Front card */}
-                <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 flex flex-col justify-between">
+                <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                         <Check className="w-5 h-5 text-white" />
                       </div>
                       <div>
@@ -190,14 +190,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-orange-500">42</p>
+                      <p className="text-2xl font-bold text-primary">42</p>
                       <p className="text-xs text-muted-foreground">dagen te gaan</p>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
-                      <div className="w-5 h-5 rounded-full border-2 border-orange-400" />
+                    <div className="flex items-center gap-3 p-3 bg-primary-light rounded-xl">
+                      <div className="w-5 h-5 rounded-full border-2 border-primary" />
                       <span className="text-sm text-foreground">Verhuisbedrijf boeken</span>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
@@ -210,7 +210,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
               {/* CTA */}
               <div className="flex items-center gap-4 pt-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent" />
                 <div className="flex items-center gap-3 group">
                   <span className="text-muted-foreground">Start nu</span>
                   <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -239,7 +239,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <div
                     key={num}
                     className={`w-8 h-1 rounded-full transition-all ${
-                      num <= 1 ? "bg-orange-500" : "bg-muted"
+                      num <= 1 ? "bg-primary" : "bg-muted"
                     }`}
                   />
                 ))}
@@ -255,7 +255,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                   Wanneer is de
                   <br />
-                  <span className="text-orange-500">grote dag?</span>
+                  <span className="text-primary">grote dag?</span>
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-md">
                   We gebruiken je verhuisdatum om slimme deadlines te berekenen.
@@ -264,19 +264,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
               {/* Date picker card */}
               <div className="relative">
-                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
                   <Popover>
                     <PopoverTrigger asChild>
                       <button
                         className={cn(
-                          "w-full flex items-center justify-between p-4 rounded-2xl border-2 border-dashed transition-all hover:border-orange-400 hover:bg-orange-50/50",
-                          movingDate ? "border-orange-400 bg-orange-50/50" : "border-muted"
+                          "w-full flex items-center justify-between p-4 rounded-2xl border-2 border-dashed transition-all hover:border-primary hover:bg-primary-light/50",
+                          movingDate ? "border-primary bg-primary-light/50" : "border-muted"
                         )}
                       >
                         <div className="flex items-center gap-4">
                           <div className={cn(
                             "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
-                            movingDate ? "bg-gradient-to-br from-orange-400 to-orange-500" : "bg-muted"
+                            movingDate ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
                           )}>
                             <CalendarIcon className={cn(
                               "w-6 h-6",
@@ -358,7 +358,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <div
                     key={num}
                     className={`w-8 h-1 rounded-full transition-all ${
-                      num <= 2 ? "bg-orange-500" : "bg-muted"
+                      num <= 2 ? "bg-primary" : "bg-muted"
                     }`}
                   />
                 ))}
@@ -374,7 +374,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                   Waar ga je
                   <br />
-                  <span className="text-orange-500">naartoe?</span>
+                  <span className="text-primary">naartoe?</span>
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-md">
                   Je nieuwe adres helpt ons om relevante taken toe te voegen.
@@ -383,7 +383,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
               {/* Address input card */}
               <div className="relative">
-                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 space-y-4">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="postcode" className="text-sm font-medium text-muted-foreground">Postcode</Label>
@@ -393,7 +393,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         value={postcode}
                         onChange={(e) => setPostcode(e.target.value.toUpperCase())}
                         maxLength={7}
-                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
                       />
                     </div>
                     <div className="space-y-2">
@@ -403,14 +403,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         placeholder="12"
                         value={houseNumber}
                         onChange={(e) => setHouseNumber(e.target.value)}
-                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                        className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
                       />
                     </div>
                   </div>
                   
                   {postcode && houseNumber && (
-                    <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-2xl animate-in fade-in duration-300">
-                      <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center">
+                    <div className="flex items-center gap-3 p-4 bg-primary-light rounded-2xl animate-in fade-in duration-300">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
                         {isLoadingAddress ? (
                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
@@ -476,7 +476,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                   Even
                   <br />
-                  <span className="text-orange-500">geduld...</span>
+                  <span className="text-primary">geduld...</span>
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-md">
                   We maken je persoonlijke verhuischecklist.
@@ -485,30 +485,30 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
               {/* Progress card */}
               <div className="relative">
-                <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+                <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
                   <div className="space-y-3">
                     {generatingSteps.map((stepText, index) => (
                       <div 
                         key={index}
                         className={cn(
                           "flex items-center gap-4 p-4 rounded-2xl transition-all duration-300",
-                          index === currentGeneratingStep && "bg-orange-50",
+                          index === currentGeneratingStep && "bg-primary-light",
                           completedSteps.includes(index) && "opacity-60"
                         )}
                       >
                         <div className={cn(
                           "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
                           completedSteps.includes(index) 
-                            ? "bg-gradient-to-br from-orange-400 to-orange-500" 
+                            ? "bg-gradient-to-br from-primary to-primary/80" 
                             : index === currentGeneratingStep
-                              ? "bg-orange-100 border-2 border-orange-400"
+                              ? "bg-primary-light border-2 border-primary"
                               : "bg-muted"
                         )}>
                           {completedSteps.includes(index) && (
                             <Check className="w-5 h-5 text-white" />
                           )}
                           {index === currentGeneratingStep && (
-                            <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse" />
+                            <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />
                           )}
                         </div>
                         <span className={cn(

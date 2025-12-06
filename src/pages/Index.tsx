@@ -220,9 +220,9 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mx-auto mb-4 animate-pulse">
             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
           </div>
           <p className="text-muted-foreground">Laden...</p>
@@ -244,7 +244,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {currentView === "dashboard" && movingInfo && (
         <Dashboard 
           movingInfo={movingInfo} 

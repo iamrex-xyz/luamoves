@@ -185,7 +185,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Initial screen - only login option
   if (screen === 'initial') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
@@ -199,7 +199,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Welkom
                 <br />
-                <span className="text-orange-500">terug!</span>
+                <span className="text-primary">terug!</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
                 Log in om verder te gaan met je verhuisplanning.
@@ -207,13 +207,13 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
             </div>
 
             {/* Action card */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 space-y-4">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
               <button 
                 onClick={() => setScreen('login')} 
-                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-orange-400 hover:bg-orange-50/50 transition-all"
+                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-primary hover:bg-primary-light/50 transition-all"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                     <UserIcon className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-left">
@@ -226,7 +226,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
 
               <button 
                 onClick={onSignUpRequest} 
-                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-orange-400 hover:bg-orange-50/50 transition-all"
+                className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-primary hover:bg-primary-light/50 transition-all"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
@@ -243,7 +243,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
 
             {onContinueAsGuest && (
               <div className="flex items-center gap-4 pt-4">
-                <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent" />
+                <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent" />
                 <button 
                   onClick={onContinueAsGuest}
                   className="flex items-center gap-3 group"
@@ -266,7 +266,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Password reset screen
   if (screen === 'passwordReset') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
@@ -289,7 +289,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Wachtwoord
                 <br />
-                <span className="text-orange-500">vergeten?</span>
+                <span className="text-primary">vergeten?</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
                 Vul je email in om een reset link te ontvangen.
@@ -297,7 +297,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
             </div>
 
             {/* Form card */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
               <form onSubmit={handlePasswordReset} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
@@ -308,7 +308,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
-                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
                   />
                 </div>
 
@@ -330,7 +330,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
   // Login screen
   if (screen === 'login') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
@@ -350,7 +350,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Welkom
                 <br />
-                <span className="text-orange-500">terug!</span>
+                <span className="text-primary">terug!</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
                 Log in om verder te gaan met je verhuisplanning.
@@ -358,7 +358,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
             </div>
 
             {/* Form card */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
@@ -369,7 +369,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={loading}
-                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400"
+                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={loading}
-                      className="h-14 text-lg rounded-xl border-2 border-muted focus:border-orange-400 pr-12"
+                      className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary pr-12"
                     />
                     <button
                       type="button"
@@ -420,7 +420,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                 <button
                   type="button"
                   onClick={onSignUpRequest}
-                  className="text-sm text-orange-500 hover:text-orange-600 transition-colors block w-full text-center py-2 font-medium"
+                  className="text-sm text-primary hover:text-primary/80 transition-colors block w-full text-center py-2 font-medium"
                   disabled={loading}
                 >
                   Nog geen account? Maak er een aan
