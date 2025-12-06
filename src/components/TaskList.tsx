@@ -32,8 +32,8 @@ import {
   User,
   FileText,
   Search,
-  Package,
-  PackageOpen,
+  Circle,
+  CheckCircle2,
 } from "lucide-react";
 
 type TaskListProps = {
@@ -384,11 +384,11 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                           onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                         >
                           {isCompleting ? (
-                            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
+                            <CheckCircle2 className="h-[18px] w-[18px] text-primary animate-scale-in" />
                           ) : task.status === "done" ? (
-                            <PackageOpen className="h-[16px] w-[16px] text-primary animate-scale-in" />
+                            <CheckCircle2 className="h-[18px] w-[18px] text-primary" />
                           ) : (
-                            <Package className="h-[16px] w-[16px] text-muted-foreground" />
+                            <Circle className="h-[18px] w-[18px] text-muted-foreground" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0 flex items-start justify-between gap-3">
