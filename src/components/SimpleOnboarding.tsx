@@ -218,10 +218,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     {/* Checked task - animates out */}
                     <div 
                       key={`checked-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-green-50 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
+                      className="flex items-center gap-3 p-3 bg-primary/10 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500"
                     >
-                      <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
-                      <span className="text-sm text-green-700 line-through">
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                      <span className="text-sm text-primary/70 line-through">
                         {animatedTasks[(animatedTaskIndex + animatedTasks.length - 1) % animatedTasks.length].title}
                       </span>
                     </div>
@@ -238,7 +238,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     {/* Next task */}
                     <div 
                       key={`next-${animatedTaskIndex}`}
-                      className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200"
+                      className="flex items-center gap-3 p-3 bg-secondary rounded-xl animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200"
                     >
                       <Circle className="w-5 h-5 text-muted-foreground/40 shrink-0" />
                       <span className="text-sm text-muted-foreground">
