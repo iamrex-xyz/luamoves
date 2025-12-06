@@ -41,7 +41,7 @@ type TaskListProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
   onLogout: () => void;
-  onTaskComplete?: () => void;
+  onTaskComplete?: (completedCount: number) => void;
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
   isGuest?: boolean;
   showAccountBadge?: boolean;
@@ -136,7 +136,9 @@ export const TaskList = ({
 
     // Trigger signup prompt if task was completed (not uncompleted)
     if (wasNotDone && onTaskComplete) {
-      onTaskComplete();
+      // Calculate new completed count (current + 1 since we just completed one)
+      const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
+      onTaskComplete(newCompletedCount);
     }
   };
 
