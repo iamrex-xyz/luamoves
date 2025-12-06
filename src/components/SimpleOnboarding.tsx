@@ -223,114 +223,96 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="overflow-hidden relative h-[100px]">
-                    <div className="flex flex-col gap-1.5">
-                      {/* Task 1 - gets checked and fades/slides out */}
-                      <div 
-                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
-                        style={{
-                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                          opacity: animationPhase === 'sliding' ? 0 : 1,
-                          height: animationPhase === 'sliding' ? 0 : 'auto',
-                          padding: animationPhase === 'sliding' ? '0 10px' : '10px',
-                          marginBottom: animationPhase === 'sliding' ? 0 : undefined,
-                          backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
-                            ? 'hsl(var(--primary) / 0.1)' 
-                            : 'hsl(var(--primary-light))',
-                        }}
-                      >
-                        <div 
-                          className="w-4 h-4 shrink-0 flex items-center justify-center"
+                  <div className="overflow-hidden relative h-[114px]">
+                    {/* We render 3 visible tasks, animating their positions */}
+                    {[0, 1, 2].map((offset) => {
+                      const taskIndex = (taskStartIndex + offset) % animatedTasks.length;
+                      const isFirst = offset === 0;
+                      const isSecond = offset === 1;
+                      const isThird = offset === 2;
+                      
+                      // Calculate position based on animation phase
+                      let translateY = offset * 38; // Each task is 38px tall (including gap)
+                      let opacity = 1;
+                      let scale = 1;
+                      
+                      if (animationPhase === 'sliding') {
+                        // First task slides up and fades out
+                        if (isFirst) {
+                          translateY = -38;
+                          opacity = 0;
+                          scale = 0.95;
+                        } else {
+                          // Other tasks slide up one position
+                          translateY = (offset - 1) * 38;
+                        }
+                      }
+                      
+                      // Determine styling based on position and animation phase
+                      const isPrimary = isFirst && animationPhase !== 'sliding';
+                      const becomingPrimary = isSecond && animationPhase === 'sliding';
+                      const isChecked = isFirst && (animationPhase === 'checking' || animationPhase === 'sliding');
+                      
+                      const bgColor = isPrimary || becomingPrimary
+                        ? 'hsl(var(--primary-light))'
+                        : isChecked
+                          ? 'hsl(var(--primary) / 0.1)'
+                          : 'hsl(var(--secondary))';
+                      
+                      const iconColor = isPrimary || becomingPrimary
+                        ? 'hsl(var(--primary))'
+                        : 'hsl(var(--muted-foreground) / 0.4)';
+                      
+                      const textColor = isPrimary || becomingPrimary
+                        ? 'hsl(var(--foreground))'
+                        : 'hsl(var(--muted-foreground))';
+                      
+                      const fontWeight = isPrimary || becomingPrimary ? 500 : 400;
+                      
+                      return (
+                        <div
+                          key={`task-${offset}-${taskIndex}`}
+                          className="absolute left-0 right-0 flex items-center gap-2.5 p-2.5 rounded-lg"
                           style={{
-                            transition: 'transform 0.3s ease',
-                            transform: animationPhase === 'checking' ? 'scale(1.2)' : 'scale(1)',
+                            transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: `translateY(${translateY}px) scale(${scale})`,
+                            opacity,
+                            backgroundColor: isChecked ? 'hsl(var(--primary) / 0.1)' : bgColor,
                           }}
                         >
-                          {animationPhase === 'checking' || animationPhase === 'sliding' ? (
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-primary" />
-                          )}
+                          <div 
+                            className="w-4 h-4 shrink-0 flex items-center justify-center"
+                            style={{
+                              transition: 'transform 0.3s ease',
+                              transform: isChecked ? 'scale(1.2)' : 'scale(1)',
+                            }}
+                          >
+                            {isChecked ? (
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
+                            ) : (
+                              <Circle 
+                                className="w-4 h-4" 
+                                style={{ 
+                                  transition: 'color 0.5s ease',
+                                  color: iconColor 
+                                }} 
+                              />
+                            )}
+                          </div>
+                          <span 
+                            className="text-xs whitespace-nowrap"
+                            style={{
+                              transition: 'all 0.3s ease',
+                              textDecoration: isChecked ? 'line-through' : 'none',
+                              color: isChecked ? 'hsl(var(--primary) / 0.5)' : textColor,
+                              fontWeight: isChecked ? 400 : fontWeight,
+                            }}
+                          >
+                            {animatedTasks[taskIndex]}
+                          </span>
                         </div>
-                        <span 
-                          className="text-xs font-medium whitespace-nowrap"
-                          style={{
-                            transition: 'all 0.3s ease',
-                            textDecoration: animationPhase === 'checking' || animationPhase === 'sliding' ? 'line-through' : 'none',
-                            color: animationPhase === 'checking' || animationPhase === 'sliding' 
-                              ? 'hsl(var(--primary) / 0.5)' 
-                              : 'hsl(var(--foreground))',
-                          }}
-                        >
-                          {animatedTasks[taskStartIndex % animatedTasks.length]}
-                        </span>
-                      </div>
-                      
-                      {/* Task 2 - becomes primary after slide */}
-                      <div 
-                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
-                        style={{
-                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                          backgroundColor: animationPhase === 'sliding' 
-                            ? 'hsl(var(--primary-light))' 
-                            : 'hsl(var(--secondary))',
-                        }}
-                      >
-                        <Circle 
-                          className="w-4 h-4 shrink-0"
-                          style={{
-                            transition: 'color 0.5s ease',
-                            color: animationPhase === 'sliding' 
-                              ? 'hsl(var(--primary))' 
-                              : 'hsl(var(--muted-foreground) / 0.4)',
-                          }}
-                        />
-                        <span 
-                          className="text-xs"
-                          style={{
-                            transition: 'all 0.5s ease',
-                            fontWeight: animationPhase === 'sliding' ? 500 : 400,
-                            color: animationPhase === 'sliding' 
-                              ? 'hsl(var(--foreground))' 
-                              : 'hsl(var(--muted-foreground))',
-                          }}
-                        >
-                          {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
-                        </span>
-                      </div>
-                      
-                      {/* Task 3 - becomes secondary after slide */}
-                      <div 
-                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
-                        style={{
-                          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                          backgroundColor: animationPhase === 'sliding' 
-                            ? 'hsl(var(--secondary))' 
-                            : 'hsl(var(--secondary) / 0.5)',
-                        }}
-                      >
-                        <Circle 
-                          className="w-4 h-4 shrink-0"
-                          style={{
-                            transition: 'color 0.5s ease',
-                            color: animationPhase === 'sliding' 
-                              ? 'hsl(var(--muted-foreground) / 0.4)' 
-                              : 'hsl(var(--muted-foreground) / 0.3)',
-                          }}
-                        />
-                        <span 
-                          className="text-xs"
-                          style={{
-                            transition: 'color 0.5s ease',
-                            color: animationPhase === 'sliding' 
-                              ? 'hsl(var(--muted-foreground))' 
-                              : 'hsl(var(--muted-foreground) / 0.7)',
-                          }}
-                        >
-                          {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
-                        </span>
-                      </div>
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
