@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -17,9 +16,7 @@ import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ReminderSettings } from "@/components/ReminderSettings";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { trackEvent, AnalyticsEvents } from "@/lib/analytics";
 import {
-  ArrowLeft,
   LogOut,
   Home as HomeIcon,
   Calendar,
@@ -29,8 +26,9 @@ import {
   Mail,
   Check,
   X,
-  Settings as SettingsIcon,
-  Shield,
+  ChevronRight,
+  MapPin,
+  UserPlus,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -89,7 +87,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   useEffect(() => {
     loadProfile();
     loadCollaborators();
-    // Load partner consent
     setPartnerConsent(localStorage.getItem(CONSENT_KEY) === "true");
   }, []);
 
@@ -138,7 +135,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Convert date objects to strings
       const movingDateStr = movingDateObj ? format(movingDateObj, "yyyy-MM-dd") : movingDate;
       const keyHandoverDateStr = keyHandoverDateObj ? format(keyHandoverDateObj, "yyyy-MM-dd") : keyHandoverDate;
 
@@ -228,19 +224,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Check if user exists with this email
-      const { data: existingUser } = await supabase
-        .from("profiles")
-        .select("user_id")
-        .eq("user_id", user.id)
-        .single();
-
       const { error } = await supabase
         .from("moving_collaborators")
         .insert({
           owner_user_id: user.id,
           collaborator_email: newCollaboratorEmail,
-          collaborator_user_id: null, // Will be filled when they sign up
+          collaborator_user_id: null,
         });
 
       if (error) throw error;
@@ -290,40 +279,43 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
-      {/* Unified Header */}
-      <header className="bg-primary text-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Instellingen</h1>
+            <p className="text-sm text-muted-foreground">Beheer je verhuizing</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onLogout}
+            className="h-10 w-10 rounded-full hover:bg-secondary"
+          >
+            <LogOut className="w-5 h-5 text-muted-foreground" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="px-6 space-y-6">
+        {/* Moving Details Card */}
+        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+          <div className="p-4 border-b border-border/50">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg backdrop-blur">
-                <SettingsIcon className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <HomeIcon className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold">Instellingen</h1>
-                <p className="text-white/80 text-xs">Beheer je verhuizing</p>
+                <h2 className="font-semibold text-foreground">Verhuizing details</h2>
+                <p className="text-xs text-muted-foreground">Adressen en datums</p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onLogout} className="text-white hover:bg-white/10 h-10 w-10">
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-        {/* Moving Details */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <HomeIcon className="w-4 h-4 text-primary" />
-            </div>
-            <h2 className="text-base font-semibold">Verhuizing details</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div>
-              <Label htmlFor="oldAddress">Oud adres</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Oud adres</Label>
               <AddressAutocomplete
                 label=""
                 placeholder="Begin met typen..."
@@ -333,7 +325,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             </div>
 
             <div>
-              <Label htmlFor="newAddress">Nieuw adres</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Nieuw adres</Label>
               <AddressAutocomplete
                 label=""
                 placeholder="Begin met typen..."
@@ -344,18 +336,18 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="movingDate">Verhuisdatum</Label>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Verhuisdatum</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal rounded-xl h-11",
                         !movingDateObj && "text-muted-foreground"
                       )}
                     >
                       <Calendar className="mr-2 h-4 w-4" />
-                      {movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                      {movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : "Selecteer"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
@@ -374,18 +366,18 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               </div>
 
               <div>
-                <Label htmlFor="keyHandoverDate">Sleuteloverdracht</Label>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Sleuteloverdracht</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
+                        "w-full justify-start text-left font-normal rounded-xl h-11",
                         !keyHandoverDateObj && "text-muted-foreground"
                       )}
                     >
                       <Calendar className="mr-2 h-4 w-4" />
-                      {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : <span>Selecteer datum</span>}
+                      {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : "Selecteer"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
@@ -405,9 +397,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             </div>
 
             <div>
-              <Label htmlFor="renovationType">Verbouwing type</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Verbouwing</Label>
               <Select value={renovationType} onValueChange={(value) => setRenovationType(value as "none" | "small" | "large")}>
-                <SelectTrigger>
+                <SelectTrigger className="rounded-xl h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -418,53 +410,47 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               </Select>
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="contractorHelp"
-                checked={needsContractorHelp}
-                onChange={(e) => setNeedsContractorHelp(e.target.checked)}
-                className="rounded"
-              />
-              <Label htmlFor="contractorHelp">Hulp nodig van aannemer</Label>
-            </div>
-
-            <Button onClick={handleSaveMovingInfo} disabled={isLoading} className="w-full">
-              Verhuizing opslaan
+            <Button onClick={handleSaveMovingInfo} disabled={isLoading} className="w-full rounded-xl h-11">
+              Opslaan
             </Button>
           </div>
-        </Card>
+        </div>
 
-        {/* Household */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Users className="w-4 h-4 text-primary" />
+        {/* Household Card */}
+        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+          <div className="p-4 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-info" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground">Huishouden</h2>
+                <p className="text-xs text-muted-foreground">Bewoners en huisdieren</p>
+              </div>
             </div>
-            <h2 className="text-base font-semibold">Huishouden</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="adults">Volwassenen</Label>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Volwassenen</Label>
                 <Input
-                  id="adults"
                   type="number"
                   min="1"
                   value={adults}
                   onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
+                  className="rounded-xl h-11"
                 />
               </div>
 
               <div>
-                <Label htmlFor="children">Kinderen</Label>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Kinderen</Label>
                 <Input
-                  id="children"
                   type="number"
                   min="0"
                   value={children}
                   onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
+                  className="rounded-xl h-11"
                 />
               </div>
             </div>
@@ -474,162 +460,133 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <PawPrint className="w-4 h-4 text-primary" />
-                <Label>Huisdieren</Label>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisdieren</Label>
               </div>
 
-              <div className="mb-3">
-                <Select value={newPetType} onValueChange={(value) => {
-                  if (value) {
-                    setPetTypes([...petTypes, value]);
-                    setNewPetType("");
-                  }
-                }}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecteer diersoort" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PET_TYPES.map((pet) => (
-                      <SelectItem key={pet.value} value={pet.value}>
-                        {pet.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={newPetType} onValueChange={(value) => {
+                if (value) {
+                  setPetTypes([...petTypes, value]);
+                  setNewPetType("");
+                }
+              }}>
+                <SelectTrigger className="rounded-xl h-11">
+                  <SelectValue placeholder="Voeg huisdier toe" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PET_TYPES.map((pet) => (
+                    <SelectItem key={pet.value} value={pet.value}>
+                      {pet.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              <div className="flex flex-wrap gap-2">
-                {petTypes.map((petType) => {
-                  const pet = PET_TYPES.find(p => p.value === petType);
-                  return (
-                    <Badge key={petType} variant="secondary" className="flex items-center gap-1">
-                      <PawPrint className="w-3 h-3" />
-                      {pet?.label || petType}
-                      <button
-                        onClick={() => handleRemovePet(petType)}
-                        className="ml-1 hover:text-destructive"
+              {petTypes.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {petTypes.map((pet, idx) => (
+                    <Badge 
+                      key={idx} 
+                      variant="secondary" 
+                      className="pl-3 pr-1.5 py-1.5 rounded-full bg-muted/50 gap-1"
+                    >
+                      {PET_TYPES.find(p => p.value === pet)?.label || pet}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5 rounded-full hover:bg-destructive/20"
+                        onClick={() => handleRemovePet(pet)}
                       >
-                        <X className="w-3 h-3" />
-                      </button>
+                        <X className="h-3 w-3" />
+                      </Button>
                     </Badge>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full">
-              Huishouden opslaan
+            <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full rounded-xl h-11">
+              Opslaan
             </Button>
           </div>
-        </Card>
+        </div>
 
-        {/* Reminder Settings */}
-        <ReminderSettings />
-
-        {/* Collaborators */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Users className="w-4 h-4 text-primary" />
+        {/* Collaborators Card */}
+        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+          <div className="p-4 border-b border-border/50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+                <UserPlus className="w-5 h-5 text-success" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-foreground">Huisgenoten</h2>
+                <p className="text-xs text-muted-foreground">Nodig anderen uit</p>
+              </div>
             </div>
-            <h2 className="text-base font-semibold">Partners of huisgenoten</h2>
           </div>
 
-          <div className="space-y-4">
+          <div className="p-4 space-y-4">
             <div className="flex gap-2">
               <Input
                 type="email"
-                placeholder="E-mailadres van huisgenoot"
+                placeholder="E-mailadres"
                 value={newCollaboratorEmail}
                 onChange={(e) => setNewCollaboratorEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleInviteCollaborator()}
+                className="flex-1 rounded-xl h-11"
               />
-              <Button onClick={handleInviteCollaborator} disabled={isLoading}>
+              <Button 
+                onClick={handleInviteCollaborator} 
+                disabled={isLoading || !newCollaboratorEmail}
+                className="rounded-xl h-11 px-4"
+              >
+                <Mail className="w-4 h-4 mr-2" />
                 Uitnodigen
               </Button>
             </div>
 
-            <div className="space-y-2">
-              {collaborators.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Nog geen huisgenoten toegevoegd
-                </p>
-              ) : (
-                collaborators.map((collab) => (
-                  <div
-                    key={collab.id}
-                    className="flex items-center justify-between p-3 border rounded-lg"
+            {collaborators.length > 0 && (
+              <div className="space-y-2">
+                {collaborators.map((collab) => (
+                  <div 
+                    key={collab.id} 
+                    className="flex items-center justify-between p-3 rounded-xl bg-secondary/50"
                   >
                     <div className="flex items-center gap-3">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                      </div>
                       <div>
-                        <p className="font-medium">{collab.collaborator_email}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm font-medium text-foreground">{collab.collaborator_email}</p>
+                        <div className="flex items-center gap-1">
                           {collab.accepted_at ? (
-                            <span className="flex items-center gap-1 text-green-600">
-                              <Check className="w-3 h-3" />
+                            <Badge variant="secondary" className="text-xs bg-success/10 text-success">
+                              <Check className="w-3 h-3 mr-1" />
                               Geaccepteerd
-                            </span>
+                            </Badge>
                           ) : (
-                            "Uitnodiging verstuurd"
+                            <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
+                              Uitgenodigd
+                            </Badge>
                           )}
-                        </p>
+                        </div>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={() => handleRemoveCollaborator(collab.id)}
                     >
-                      <Trash2 className="w-4 h-4 text-destructive" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                ))
-              )}
-            </div>
-          </div>
-        </Card>
-
-        {/* Privacy & Deals */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Shield className="w-4 h-4 text-primary" />
-            </div>
-            <h2 className="text-base font-semibold">Privacy & deals</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <p className="font-medium text-sm">Gepersonaliseerde deals</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Ontvang slimme deals voor je verhuizing. We delen alleen noodzakelijke gegevens (postcode, verhuisdatum, woningtype) met geselecteerde partners.
-                </p>
+                ))}
               </div>
-              <Switch
-                checked={partnerConsent}
-                onCheckedChange={(checked) => {
-                  setPartnerConsent(checked);
-                  localStorage.setItem(CONSENT_KEY, checked ? "true" : "false");
-                  trackEvent(AnalyticsEvents.PARTNER_CONSENT_CHANGED, { consent: checked });
-                  toast({
-                    title: checked ? "Deals ingeschakeld" : "Deals uitgeschakeld",
-                    description: checked 
-                      ? "Je ontvangt nu gepersonaliseerde aanbiedingen." 
-                      : "Je gegevens worden niet meer gedeeld met partners.",
-                  });
-                }}
-              />
-            </div>
-            
-            <Separator />
-            
-            <div className="text-xs text-muted-foreground space-y-2">
-              <p><strong>Welke gegevens?</strong> Postcode, verhuisdatum, woningtype (huur/koop)</p>
-              <p><strong>Geen cookies.</strong> We gebruiken alleen lokale opslag in je browser.</p>
-            </div>
+            )}
           </div>
-        </Card>
+        </div>
+
+        {/* Reminder Settings */}
+        <ReminderSettings />
       </div>
 
       <BottomNav currentView="settings" onNavigate={onNavigate} />

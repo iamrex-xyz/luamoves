@@ -196,50 +196,53 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-background">
-      {/* Countdown Header */}
+    <div className="min-h-screen pb-24 bg-gradient-to-b from-secondary/30 to-background">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Taken</h1>
+            <p className="text-sm text-muted-foreground">
+              {tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowShareDialog(true)}
+              className="h-10 w-10 rounded-full hover:bg-secondary"
+            >
+              <Share2 className="w-5 h-5 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              className="h-10 w-10 rounded-full hover:bg-secondary"
+            >
+              <LogOut className="w-5 h-5 text-muted-foreground" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Countdown Banner */}
       {movingInfo.movingDate && (
-        <div className="bg-gradient-to-r from-primary to-primary/80 text-white">
-          <div className="max-w-4xl mx-auto px-4 py-6 text-center">
-            <p className="text-white/80 text-sm mb-1">
+        <div className="px-6 mb-4">
+          <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20">
+            <p className="text-xs text-muted-foreground mb-1">
               {movingInfo.newAddress && `Verhuizing naar ${movingInfo.newAddress}`}
             </p>
-            <h1 className="text-2xl md:text-3xl font-bold">
+            <p className="text-lg font-semibold text-foreground">
               {getCountdownText()}
-            </h1>
+            </p>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <header className="bg-card border-b sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold">Taken</h2>
-                <p className="text-muted-foreground text-xs">
-                  {tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10">
-                <Share2 className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="icon" onClick={onLogout} className="h-10 w-10">
-                <LogOut className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Search Bar met Filter */}
-      <div className="max-w-4xl mx-auto px-4 py-3 sticky top-[57px] bg-background/95 backdrop-blur-lg z-10 border-b">
+      <div className="px-6 mb-4 sticky top-0 bg-gradient-to-b from-secondary/30 to-background/95 backdrop-blur-lg z-10 pb-4">
         <div className="flex items-center gap-2">
           {/* Filter knop */}
           <Popover>
@@ -247,12 +250,12 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
               <Button 
                 variant="outline" 
                 size="icon"
-                className="h-10 w-10 shrink-0"
+                className="h-11 w-11 shrink-0 rounded-xl border-border/50"
               >
                 <Filter className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 bg-background z-50" align="start">
+            <PopoverContent className="w-72 bg-background z-50 rounded-2xl" align="start">
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-sm mb-3">Status</h3>
@@ -278,7 +281,7 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
                     {categories.map((cat) => (
                       <div 
                         key={cat} 
-                        className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-colors ${
+                        className={`flex items-center space-x-2 p-2 rounded-xl cursor-pointer transition-colors ${
                           selectedCategories.includes(cat) ? "bg-primary/10" : "hover:bg-muted"
                         }`}
                         onClick={() => toggleCategory(cat)}
@@ -298,10 +301,10 @@ export const TaskList = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onU
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Zoek taken op titel, beschrijving of categorie..."
+              placeholder="Zoek taken..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-11 rounded-xl border-border/50"
             />
           </div>
         </div>
