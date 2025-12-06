@@ -505,7 +505,7 @@ export const SignupPromptDialog = ({
                       )}
                     >
                       <span>{birthDate ? format(birthDate, "dd-MM-yy") : "dd-mm-jj"}</span>
-                      <Cake className="h-4 w-4 text-muted-foreground" />
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
