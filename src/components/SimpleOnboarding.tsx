@@ -223,10 +223,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-col gap-2">
                     {/* Task 1 - Primary position, gets checked */}
                     <div 
-                      className="flex items-center gap-3 p-3 rounded-lg"
+                      className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1"
                       style={{
                         transition: 'background-color 0.4s ease',
                         backgroundColor: animationPhase === 'checking' || animationPhase === 'sliding' 
@@ -235,20 +235,20 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                       }}
                     >
                       <div 
-                        className="w-4 h-4 shrink-0 flex items-center justify-center"
+                        className="w-5 h-5 shrink-0 flex items-center justify-center"
                         style={{
                           transition: 'transform 0.3s ease',
                           transform: animationPhase === 'checking' ? 'scale(1.2)' : 'scale(1)',
                         }}
                       >
                         {animationPhase === 'checking' || animationPhase === 'sliding' ? (
-                          <CheckCircle2 className="w-4 h-4 text-primary" />
+                          <CheckCircle2 className="w-5 h-5 text-primary" />
                         ) : (
-                          <Circle className="w-4 h-4 text-primary" />
+                          <Circle className="w-5 h-5 text-primary" />
                         )}
                       </div>
                       <span 
-                        className="text-xs font-medium"
+                        className="text-sm font-medium"
                         style={{
                           transition: 'all 0.3s ease',
                           textDecoration: animationPhase === 'checking' || animationPhase === 'sliding' ? 'line-through' : 'none',
@@ -262,17 +262,17 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     </div>
                     
                     {/* Task 2 - Secondary position */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary">
-                      <Circle className="w-4 h-4 shrink-0 text-muted-foreground/40" />
-                      <span className="text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1 bg-secondary">
+                      <Circle className="w-5 h-5 shrink-0 text-muted-foreground/40" />
+                      <span className="text-sm text-muted-foreground">
                         {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
                       </span>
                     </div>
                     
                     {/* Task 3 - Tertiary position */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50">
-                      <Circle className="w-4 h-4 shrink-0 text-muted-foreground/30" />
-                      <span className="text-xs text-muted-foreground/70">
+                    <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl ml-1 bg-secondary/50">
+                      <Circle className="w-5 h-5 shrink-0 text-muted-foreground/30" />
+                      <span className="text-sm text-muted-foreground/70">
                         {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
                       </span>
                     </div>
