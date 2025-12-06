@@ -254,18 +254,56 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                         </span>
                       </div>
                       
-                      {/* Task 2 */}
-                      <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary">
-                        <Circle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
-                        <span className="text-xs text-muted-foreground">
+                      {/* Task 2 - becomes primary when sliding */}
+                      <div 
+                        style={{
+                          transition: 'background-color 0.5s ease',
+                          backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--primary-light))' : 'hsl(var(--secondary))',
+                        }}
+                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      >
+                        <Circle 
+                          className="w-4 h-4 shrink-0"
+                          style={{
+                            transition: 'color 0.5s ease',
+                            color: animationPhase === 'sliding' ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground) / 0.4)',
+                          }}
+                        />
+                        <span 
+                          className="text-xs"
+                          style={{
+                            transition: 'all 0.5s ease',
+                            fontWeight: animationPhase === 'sliding' ? 500 : 400,
+                            color: animationPhase === 'sliding' ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))',
+                          }}
+                        >
                           {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
                         </span>
                       </div>
                       
-                      {/* Task 3 */}
-                      <div className="flex items-center gap-2.5 p-2.5 rounded-lg bg-secondary/50">
-                        <Circle className="w-4 h-4 text-muted-foreground/30 shrink-0" />
-                        <span className="text-xs text-muted-foreground/70">
+                      {/* Task 3 - becomes secondary when sliding */}
+                      <div 
+                        style={{
+                          transition: 'all 0.5s ease',
+                          backgroundColor: animationPhase === 'sliding' ? 'hsl(var(--secondary))' : 'hsl(var(--secondary) / 0.5)',
+                          opacity: animationPhase === 'sliding' ? 1 : 0.6,
+                        }}
+                        className="flex items-center gap-2.5 p-2.5 rounded-lg"
+                      >
+                        <Circle 
+                          className="w-4 h-4 shrink-0"
+                          style={{
+                            transition: 'color 0.5s ease',
+                            color: animationPhase === 'sliding' ? 'hsl(var(--muted-foreground) / 0.4)' : 'hsl(var(--muted-foreground) / 0.3)',
+                          }}
+                        />
+                        <span 
+                          className="text-xs"
+                          style={{
+                            transition: 'color 0.5s ease',
+                            color: animationPhase === 'sliding' ? 'hsl(var(--muted-foreground))' : 'hsl(var(--muted-foreground) / 0.7)',
+                          }}
+                        >
                           {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
                         </span>
                       </div>
