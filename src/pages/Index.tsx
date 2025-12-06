@@ -25,6 +25,7 @@ const LOCAL_STORAGE_KEY = "lua_moving_info";
 const EMAIL_PROMPTED_KEY = "lua_email_prompted";
 const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
 const CAPTURED_EMAIL_KEY = "lua_captured_email";
+const GUEST_TASKS_KEY = "lua_guest_tasks";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
@@ -279,10 +280,12 @@ const Index = () => {
     setUser(null);
     setMovingInfo(null);
     setCapturedEmail("");
+    // Clear all guest session data including task statuses
     sessionStorage.removeItem(LOCAL_STORAGE_KEY);
     sessionStorage.removeItem(EMAIL_PROMPTED_KEY);
     sessionStorage.removeItem(SIGNUP_PROMPTED_KEY);
     sessionStorage.removeItem(CAPTURED_EMAIL_KEY);
+    sessionStorage.removeItem(GUEST_TASKS_KEY);
     setCurrentView("onboarding");
     toast({
       title: "Uitgelogd",
