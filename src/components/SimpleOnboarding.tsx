@@ -170,7 +170,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           onClick={handleNext}
         >
           {/* Header */}
-          <div className="p-6 flex justify-between items-center">
+          <div className="px-5 pt-5 pb-3 flex justify-between items-center">
             <span className="text-2xl font-light text-foreground tracking-wide">lua</span>
             <Button
               variant="ghost"
@@ -186,39 +186,39 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           </div>
 
           {/* Main content */}
-          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="flex-1 flex flex-col justify-center px-5 pb-8 max-w-2xl mx-auto w-full">
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
               {/* Large headline */}
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
+              <div className="space-y-3">
+                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                   Jouw verhuizing,
                   <br />
                   <span className="text-primary">georganiseerd.</span>
                 </h1>
-                <p className="text-xl text-muted-foreground max-w-md">
+                <p className="text-lg md:text-xl text-muted-foreground max-w-md leading-relaxed">
                   Lua is jouw persoonlijke verhuis assistent. Slim, snel en gratis! Meld je aan voor de slimme verhuis to-do lijst.
                 </p>
               </div>
 
               {/* Stacked preview cards */}
-              <div className="relative h-48 md:h-56 mt-8">
+              <div className="relative h-44 md:h-52">
                 {/* Back card */}
-                <div className="absolute top-6 left-4 right-4 h-full bg-white/60 rounded-3xl shadow-lg transform rotate-2" />
+                <div className="absolute top-5 left-3 right-3 h-full bg-white/60 rounded-2xl shadow-lg transform rotate-2" />
                 {/* Middle card */}
-                <div className="absolute top-3 left-2 right-2 h-full bg-white/80 rounded-3xl shadow-lg transform -rotate-1" />
+                <div className="absolute top-2.5 left-1.5 right-1.5 h-full bg-white/80 rounded-2xl shadow-lg transform -rotate-1" />
                 {/* Front card */}
-                <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 flex flex-col justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                      <Check className="w-5 h-5 text-white" />
+                <div className="absolute inset-0 bg-white rounded-2xl shadow-2xl shadow-primary/20 p-4 md:p-5 flex flex-col justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
                     </div>
-                    <p className="font-semibold text-foreground">Jouw taken voor vandaag</p>
+                    <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
                   </div>
                   
-                  <div className="space-y-2 overflow-hidden relative h-[120px]">
+                  <div className="space-y-1.5 overflow-hidden relative h-[100px]">
                     {/* First task - gets checked off */}
                     <div 
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-500 ease-out ${
+                      className={`flex items-center gap-2.5 p-2.5 rounded-lg transition-all duration-500 ease-out ${
                         isCheckingTask 
                           ? "bg-primary/10 scale-95 opacity-0 -translate-y-2" 
                           : "bg-primary-light"
@@ -226,12 +226,12 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     >
                       <div className="shrink-0 transition-transform duration-300">
                         {isCheckingTask ? (
-                          <CheckCircle2 className="w-5 h-5 text-primary animate-scale-in" />
+                          <CheckCircle2 className="w-4 h-4 text-primary animate-scale-in" />
                         ) : (
-                          <Circle className="w-5 h-5 text-primary" />
+                          <Circle className="w-4 h-4 text-primary" />
                         )}
                       </div>
-                      <span className={`text-sm font-medium transition-all duration-300 ${
+                      <span className={`text-xs font-medium transition-all duration-300 ${
                         isCheckingTask ? "line-through text-primary/60" : "text-foreground"
                       }`}>
                         {animatedTasks[taskStartIndex % animatedTasks.length]}
@@ -240,24 +240,24 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     
                     {/* Second task */}
                     <div 
-                      className={`flex items-center gap-3 p-3 bg-secondary rounded-xl transition-all duration-500 ease-out ${
+                      className={`flex items-center gap-2.5 p-2.5 bg-secondary rounded-lg transition-all duration-500 ease-out ${
                         isCheckingTask ? "-translate-y-1" : ""
                       }`}
                     >
-                      <Circle className="w-5 h-5 text-muted-foreground/40 shrink-0" />
-                      <span className="text-sm text-muted-foreground">
+                      <Circle className="w-4 h-4 text-muted-foreground/40 shrink-0" />
+                      <span className="text-xs text-muted-foreground">
                         {animatedTasks[(taskStartIndex + 1) % animatedTasks.length]}
                       </span>
                     </div>
                     
                     {/* Third task */}
                     <div 
-                      className={`flex items-center gap-3 p-3 bg-secondary/50 rounded-xl transition-all duration-500 ease-out ${
+                      className={`flex items-center gap-2.5 p-2.5 bg-secondary/50 rounded-lg transition-all duration-500 ease-out ${
                         isCheckingTask ? "-translate-y-1 opacity-80" : "opacity-60"
                       }`}
                     >
-                      <Circle className="w-5 h-5 text-muted-foreground/30 shrink-0" />
-                      <span className="text-sm text-muted-foreground/70">
+                      <Circle className="w-4 h-4 text-muted-foreground/30 shrink-0" />
+                      <span className="text-xs text-muted-foreground/70">
                         {animatedTasks[(taskStartIndex + 2) % animatedTasks.length]}
                       </span>
                     </div>
@@ -266,13 +266,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
 
               {/* CTA */}
-              <div className="flex items-center gap-4 pt-4">
+              <div className="flex items-center gap-3 pt-2">
                 <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent" />
-                <div className="flex items-center gap-3 group">
-                  <span className="text-muted-foreground">Start nu</span>
-                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <div className="flex items-center gap-2.5 group">
+                  <span className="text-sm text-muted-foreground">Start nu</span>
+                  <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                     <svg 
-                      className="w-5 h-5 text-background" 
+                      className="w-4 h-4 text-background" 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor"
