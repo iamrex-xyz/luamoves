@@ -89,72 +89,98 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 bg-gradient-to-br from-orange-50 via-amber-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/80 to-white">
       {step === 1 ? (
         <div 
-          className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500 cursor-pointer group"
+          className="min-h-screen flex flex-col cursor-pointer"
           onClick={handleNext}
         >
-          {/* Warm gradient blob background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-orange-200/40 to-amber-100/30 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-tr from-orange-100/30 to-yellow-100/20 rounded-full blur-3xl" />
-          </div>
-
-          <Card className="relative overflow-hidden rounded-3xl border-0 shadow-2xl shadow-orange-200/40 bg-gradient-to-br from-orange-100 via-orange-50 to-white p-8 md:p-10">
-            {/* Arrow button top right */}
-            <div className="absolute top-6 right-6">
-              <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <svg 
-                  className="w-5 h-5 text-background" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-
-            <div className="space-y-6 pt-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-foreground leading-tight">
-                Verhuizen?
-              </h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Plan je verhuizing met een persoonlijke checklist die meeleeft met jouw datum.
-              </p>
-              
-              {/* Feature highlights */}
-              <div className="flex flex-wrap gap-3 pt-2">
-                <span className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-foreground shadow-sm">
-                  📅 Slimme deadlines
-                </span>
-                <span className="px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-foreground shadow-sm">
-                  ✓ Persoonlijke taken
-                </span>
-              </div>
-            </div>
-
-            {/* Bottom section */}
-            <div className="mt-10 pt-6 border-t border-orange-200/50">
-              <p className="text-sm text-muted-foreground">
-                Tik om te starten →
-              </p>
-            </div>
-          </Card>
-
-          {/* Login link below card */}
-          <div className="text-center mt-6">
+          {/* Header */}
+          <div className="p-6 flex justify-between items-center">
+            <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
             <Button
               variant="ghost"
+              size="sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onLogin();
               }}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              Heb je al een account? Log in
+              Inloggen
             </Button>
+          </div>
+
+          {/* Main content */}
+          <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              {/* Large headline */}
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
+                  Jouw verhuizing,
+                  <br />
+                  <span className="text-orange-500">georganiseerd.</span>
+                </h1>
+                <p className="text-xl text-muted-foreground max-w-md">
+                  Krijg een persoonlijke checklist met slimme deadlines die meetellen naar jouw verhuisdag.
+                </p>
+              </div>
+
+              {/* Stacked preview cards */}
+              <div className="relative h-48 md:h-56 mt-8">
+                {/* Back card */}
+                <div className="absolute top-6 left-4 right-4 h-full bg-white/60 rounded-3xl shadow-lg transform rotate-2" />
+                {/* Middle card */}
+                <div className="absolute top-3 left-2 right-2 h-full bg-white/80 rounded-3xl shadow-lg transform -rotate-1" />
+                {/* Front card */}
+                <div className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-orange-200/50 p-6 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center">
+                        <Check className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">Vandaag</p>
+                        <p className="text-sm text-muted-foreground">3 taken</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-orange-500">42</p>
+                      <p className="text-xs text-muted-foreground">dagen te gaan</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
+                      <div className="w-5 h-5 rounded-full border-2 border-orange-400" />
+                      <span className="text-sm text-foreground">Verhuisbedrijf boeken</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-xl">
+                      <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30" />
+                      <span className="text-sm text-muted-foreground">Adreswijziging doorgeven</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="flex items-center gap-4 pt-4">
+                <div className="flex-1 h-px bg-gradient-to-r from-orange-200 to-transparent" />
+                <div className="flex items-center gap-3 group">
+                  <span className="text-muted-foreground">Start nu</span>
+                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg 
+                      className="w-5 h-5 text-background" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
