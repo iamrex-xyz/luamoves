@@ -19,16 +19,20 @@ export const PhotoCard = ({ photo, onDelete }: PhotoCardProps) => {
   const [photoUrl, setPhotoUrl] = useState<string>("");
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    const loadSignedUrl = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
         const filePath = `${user.id}/${photo.name}`;
-        const { data } = supabase.storage
+        const { data, error } = await supabase.storage
           .from("moving_photos")
-          .getPublicUrl(filePath);
-        setPhotoUrl(data.publicUrl);
+          .createSignedUrl(filePath, 3600); // 1 hour expiry
+        if (data && !error) {
+          setPhotoUrl(data.signedUrl);
+        }
       }
-    });
+    };
+    loadSignedUrl();
   }, [photo.name]);
 
   if (!userId || !photoUrl) return null;

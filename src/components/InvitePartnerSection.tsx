@@ -7,6 +7,9 @@ import { Users, UserPlus, Heart, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().email();
 
 type InvitePartnerSectionProps = {
   isGuest?: boolean;
@@ -30,7 +33,8 @@ export const InvitePartnerSection = ({ isGuest, onSignupComplete }: InvitePartne
   };
 
   const handleInvitePartner = async () => {
-    if (!partnerEmail || !partnerEmail.includes("@")) {
+    const validation = emailSchema.safeParse(partnerEmail);
+    if (!validation.success) {
       toast({
         title: "Ongeldig e-mailadres",
         description: "Voer een geldig e-mailadres in.",
