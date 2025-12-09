@@ -240,19 +240,30 @@ const Index = () => {
   };
 
   const handleTaskComplete = (completedCount: number) => {
+    console.log("[handleTaskComplete] Called with count:", completedCount, "user:", !!user, "capturedEmail:", capturedEmail);
+    
     // Only show prompts if not logged in
     if (!user) {
       // Check if account is already complete (signed up)
       const isAccountComplete = sessionStorage.getItem("lua_account_complete") === "true";
-      if (isAccountComplete) return;
+      const emailAlreadyPrompted = sessionStorage.getItem(EMAIL_PROMPTED_KEY) === "true";
+      
+      console.log("[handleTaskComplete] isAccountComplete:", isAccountComplete, "emailAlreadyPrompted:", emailAlreadyPrompted);
+      
+      if (isAccountComplete) {
+        console.log("[handleTaskComplete] Account already complete, skipping");
+        return;
+      }
       
       // After 2nd task - show signup dialog (hard blocking)
       // If no email captured yet, show email capture first (also hard blocking)
       if (completedCount >= 2) {
         if (capturedEmail) {
+          console.log("[handleTaskComplete] Showing signup prompt");
           setShowSignupPrompt(true);
         } else {
           // Force email capture - this is now hard blocking
+          console.log("[handleTaskComplete] Showing email capture (hard block)");
           setIsEmailHardBlock(true);
           setShowEmailCapture(true);
         }
@@ -260,12 +271,15 @@ const Index = () => {
       }
       
       // After 1st task - show email capture dialog (soft, can skip after entering)
-      if (completedCount >= 1 && !sessionStorage.getItem(EMAIL_PROMPTED_KEY)) {
+      if (completedCount >= 1 && !emailAlreadyPrompted) {
+        console.log("[handleTaskComplete] Showing email capture (soft)");
         sessionStorage.setItem(EMAIL_PROMPTED_KEY, "true");
         setIsEmailHardBlock(false);
         setShowEmailCapture(true);
         return;
       }
+      
+      console.log("[handleTaskComplete] No action taken");
     }
   };
 
