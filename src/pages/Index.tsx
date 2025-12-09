@@ -19,6 +19,15 @@ export type MovingInfo = {
   type: "buy" | "rent";
   renovationType?: "none" | "small" | "large";
   needsContractorHelp?: boolean;
+  // Personalisatie velden
+  propertyType?: "apartment" | "house" | "studio";
+  hasGarden?: boolean;
+  hasParking?: boolean;
+  isVve?: boolean;
+  currentSituation?: "rent" | "buy" | "parents" | "other";
+  hasJob?: boolean;
+  children?: number;
+  pets?: number;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -118,6 +127,14 @@ const Index = () => {
         type: (profile.moving_type as "buy" | "rent") || "rent",
         renovationType: (profile.renovation_type as "none" | "small" | "large") || "none",
         needsContractorHelp: profile.needs_contractor_help || false,
+        propertyType: (profile.housing_property_type as "apartment" | "house" | "studio") || undefined,
+        hasGarden: profile.has_garden || false,
+        hasParking: profile.has_parking || false,
+        isVve: profile.is_vve || false,
+        currentSituation: (profile.current_housing_situation as "rent" | "buy" | "parents" | "other") || undefined,
+        hasJob: profile.has_job !== false,
+        children: profile.children || 0,
+        pets: profile.pets || 0,
       });
       setCurrentView("dashboard");
     } else {
@@ -152,6 +169,14 @@ const Index = () => {
           moving_type: info.type,
           renovation_type: info.renovationType || "none",
           needs_contractor_help: info.needsContractorHelp || false,
+          housing_property_type: info.propertyType || null,
+          has_garden: info.hasGarden || false,
+          has_parking: info.hasParking || false,
+          is_vve: info.isVve || false,
+          current_housing_situation: info.currentSituation || null,
+          has_job: info.hasJob !== false,
+          children: info.children || 0,
+          pets: info.pets || 0,
         })
         .eq('user_id', userId);
 
@@ -291,6 +316,14 @@ const Index = () => {
             moving_type: updatedInfo.type || null,
             renovation_type: updatedInfo.renovationType || "none",
             needs_contractor_help: updatedInfo.needsContractorHelp || false,
+            housing_property_type: updatedInfo.propertyType || null,
+            has_garden: updatedInfo.hasGarden || false,
+            has_parking: updatedInfo.hasParking || false,
+            is_vve: updatedInfo.isVve || false,
+            current_housing_situation: updatedInfo.currentSituation || null,
+            has_job: updatedInfo.hasJob !== false,
+            children: updatedInfo.children || 0,
+            pets: updatedInfo.pets || 0,
           })
           .eq('user_id', user.id);
       } catch (error) {
