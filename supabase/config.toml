@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.send-weekly-progress]
 verify_jwt = false
+
+[functions.send-partner-invite]
+verify_jwt = true
