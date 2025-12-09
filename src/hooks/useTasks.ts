@@ -35,13 +35,18 @@ export const useTasks = (movingInfo: MovingInfo) => {
       // Haal profiel op voor household info
       const { data: profile } = await supabase
         .from("profiles")
-        .select("children, pets")
+        .select("children, pets, housing_property_type, has_garden, has_parking, is_vve, has_job")
         .eq("user_id", user.id)
         .single();
 
       const householdInfo: HouseholdInfo = {
         children: profile?.children || 0,
         pets: profile?.pets || 0,
+        propertyType: (profile?.housing_property_type as "apartment" | "house" | "studio") || undefined,
+        hasGarden: profile?.has_garden || false,
+        hasParking: profile?.has_parking || false,
+        isVve: profile?.is_vve || false,
+        hasJob: profile?.has_job !== false,
       };
 
       // Haal opgeslagen task statuses uit database (inclusief assigned info)
@@ -133,9 +138,15 @@ export const useTasks = (movingInfo: MovingInfo) => {
         ? JSON.parse(savedStatuses) 
         : {};
 
+      // Guest mode: use movingInfo fields for household info
       const householdInfo: HouseholdInfo = {
-        children: 0,
-        pets: 0,
+        children: movingInfo.children || 0,
+        pets: movingInfo.pets || 0,
+        propertyType: movingInfo.propertyType,
+        hasGarden: movingInfo.hasGarden || false,
+        hasParking: movingInfo.hasParking || false,
+        isVve: movingInfo.isVve || false,
+        hasJob: movingInfo.hasJob !== false,
       };
 
       // Generate tasks

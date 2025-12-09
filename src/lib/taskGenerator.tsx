@@ -545,6 +545,98 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
     }
   );
 
+  // VvE taken (alleen voor appartementen met VvE)
+  if (householdInfo?.propertyType === "apartment" && householdInfo?.isVve) {
+    tasks.push(
+      {
+        id: "rent-vve-1",
+        title: "Meld verhuizing bij VvE",
+        category: "Administratie",
+        description: "Informeer de VvE over je verhuizing en nieuwe bewoning.",
+        deadline: addDays(movingDate, -14),
+        deadlineLabel: "2 weken voor verhuizing",
+        phase: "Fase 2 - De voorbereidingen beginnen",
+        status: "todo",
+        icon: <FileText className="w-4 h-4" />,
+        priority: 2,
+      },
+      {
+        id: "rent-vve-2",
+        title: "VvE reglement opvragen en lezen",
+        category: "Administratie",
+        description: "Vraag het VvE reglement op en lees de huisregels.",
+        deadline: addDays(keyHandoverDate, 7),
+        deadlineLabel: "Eerste week",
+        phase: "Fase 7 - Aankomen in je nieuwe thuis",
+        status: "todo",
+        icon: <FileText className="w-4 h-4" />,
+        priority: 3,
+      }
+    );
+  }
+
+  // Tuin taken (alleen als er een tuin is)
+  if (householdInfo?.hasGarden) {
+    tasks.push(
+      {
+        id: "rent-garden-1",
+        title: "Plan tuinonderhoud voor nieuwe woning",
+        category: "Huishouden",
+        description: "Inventariseer wat er in de tuin moet gebeuren (snoeien, maaien, opruimen).",
+        deadline: addDays(keyHandoverDate, 7),
+        deadlineLabel: "Eerste week",
+        phase: "Fase 7 - Aankomen in je nieuwe thuis",
+        status: "todo",
+        icon: <Home className="w-4 h-4" />,
+        priority: 3,
+      },
+      {
+        id: "rent-garden-2",
+        title: "Tuingereedschap checken of aanschaffen",
+        category: "Huishouden",
+        description: "Controleer of je tuingereedschap hebt of koop wat je nodig hebt.",
+        deadline: addDays(movingDate, 14),
+        deadlineLabel: "2 weken na verhuizing",
+        phase: "Fase 8 - Alles op orde",
+        status: "todo",
+        icon: <Home className="w-4 h-4" />,
+        priority: 3,
+      }
+    );
+  }
+
+  // Parkeren taken (alleen als er een parkeerplek is)
+  if (householdInfo?.hasParking) {
+    tasks.push({
+      id: "rent-parking-1",
+      title: "Parkeerplaats/garage sleutels ophalen",
+      category: "Administratie",
+      description: "Haal de sleutels of toegangspas voor je parkeerplek op.",
+      deadline: keyHandoverDate,
+      deadlineLabel: "Bij sleuteloverdracht",
+      phase: "Fase 3 - Sleutels in handen",
+      status: "todo",
+      icon: <Key className="w-4 h-4" />,
+      priority: 2,
+    });
+  }
+
+  // Werkgever taken (alleen als iemand een baan heeft)
+  if (householdInfo?.hasJob) {
+    tasks.push({
+      id: "rent-job-1",
+      title: "Adreswijziging doorgeven aan werkgever",
+      category: "Administratie",
+      description: "Meld je nieuwe adres bij je werkgever voor salarisadministratie.",
+      deadline: addDays(movingDate, -7),
+      deadlineLabel: "1 week voor verhuizing",
+      phase: "Fase 2 - De voorbereidingen beginnen",
+      status: "todo",
+      icon: <FileText className="w-4 h-4" />,
+      priority: 2,
+    });
+  }
+
   // FASE 8 – Binnen eerste maand
   tasks.push(
     {
@@ -1364,6 +1456,150 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       icon: <Home className="w-4 h-4" />,
       priority: 2,
     });
+  }
+
+  // VvE taken (alleen voor appartementen met VvE)
+  if (householdInfo?.propertyType === "apartment" && householdInfo?.isVve) {
+    tasks.push(
+      {
+        id: "buy-vve-1",
+        title: "VvE contacteren voor levering",
+        category: "Administratie",
+        description: "Neem contact op met de VvE beheerder over de eigendomsoverdracht.",
+        deadline: addDays(keyHandoverDate, -14),
+        deadlineLabel: "2 weken voor levering",
+        phase: "Fase 2 - Voor sleuteloverdracht",
+        status: "todo",
+        icon: <FileText className="w-4 h-4" />,
+        priority: 2,
+      },
+      {
+        id: "buy-vve-2",
+        title: "VvE vergaderstukken opvragen",
+        category: "Administratie",
+        description: "Vraag notulen, jaarrekening en meerjarenplan op bij de VvE.",
+        deadline: addDays(keyHandoverDate, -7),
+        deadlineLabel: "1 week voor levering",
+        phase: "Fase 2 - Voor sleuteloverdracht",
+        status: "todo",
+        icon: <FileText className="w-4 h-4" />,
+        priority: 2,
+      },
+      {
+        id: "buy-vve-3",
+        title: "VvE bijdrage controleren",
+        category: "Financieel",
+        description: "Controleer de maandelijkse VvE bijdrage en wat deze dekt.",
+        deadline: addDays(movingDate, 14),
+        deadlineLabel: "2 weken na verhuizing",
+        phase: "Fase 8 - Binnen eerste maand",
+        status: "todo",
+        icon: <Euro className="w-4 h-4" />,
+        priority: 2,
+      }
+    );
+  }
+
+  // Tuin taken (alleen als er een tuin is)
+  if (householdInfo?.hasGarden) {
+    tasks.push(
+      {
+        id: "buy-garden-1",
+        title: "Tuin inspecteren en plan maken",
+        category: "Huishouden",
+        description: "Inspecteer de tuin en maak een plan voor onderhoud of herinrichting.",
+        deadline: addDays(keyHandoverDate, 7),
+        deadlineLabel: "Eerste week",
+        phase: "Fase 3 - Na sleuteloverdracht",
+        status: "todo",
+        icon: <Home className="w-4 h-4" />,
+        priority: 3,
+      },
+      {
+        id: "buy-garden-2",
+        title: "Tuingereedschap aanschaffen",
+        category: "Huishouden",
+        description: "Koop benodigd tuingereedschap (grasmaaier, snoeischaar, etc.).",
+        deadline: addDays(movingDate, 21),
+        deadlineLabel: "3 weken na verhuizing",
+        phase: "Fase 8 - Binnen eerste maand",
+        status: "todo",
+        icon: <Home className="w-4 h-4" />,
+        priority: 3,
+      },
+      {
+        id: "buy-garden-3",
+        title: "Tuinafval container regelen",
+        category: "Huishouden",
+        description: "Vraag een GFT container aan bij de gemeente indien nodig.",
+        deadline: addDays(movingDate, 14),
+        deadlineLabel: "2 weken na verhuizing",
+        phase: "Fase 8 - Binnen eerste maand",
+        status: "todo",
+        icon: <Trash2 className="w-4 h-4" />,
+        priority: 3,
+      }
+    );
+  }
+
+  // Parkeren taken (alleen als er een parkeerplek is)
+  if (householdInfo?.hasParking) {
+    tasks.push(
+      {
+        id: "buy-parking-1",
+        title: "Parkeerplaats/garage sleutels ophalen",
+        category: "Administratie",
+        description: "Haal de sleutels of afstandsbediening voor je parkeerplek op.",
+        deadline: keyHandoverDate,
+        deadlineLabel: "Bij sleuteloverdracht",
+        phase: "Fase 3 - Na sleuteloverdracht",
+        status: "todo",
+        icon: <Key className="w-4 h-4" />,
+        priority: 2,
+      },
+      {
+        id: "buy-parking-2",
+        title: "Parkeerplaats verzekering overwegen",
+        category: "Financieel",
+        description: "Overweeg extra verzekering voor je garage/parkeerplek.",
+        deadline: addDays(movingDate, 14),
+        deadlineLabel: "2 weken na verhuizing",
+        phase: "Fase 8 - Binnen eerste maand",
+        status: "todo",
+        icon: <Shield className="w-4 h-4" />,
+        priority: 3,
+      }
+    );
+  }
+
+  // Werkgever taken (alleen als iemand een baan heeft)
+  if (householdInfo?.hasJob) {
+    tasks.push(
+      {
+        id: "buy-job-1",
+        title: "Adreswijziging doorgeven aan werkgever",
+        category: "Administratie",
+        description: "Meld je nieuwe adres bij je werkgever voor salarisadministratie.",
+        deadline: addDays(movingDate, -7),
+        deadlineLabel: "1 week voor verhuizing",
+        phase: "Fase 4 - Voor verhuisdag",
+        status: "todo",
+        icon: <FileText className="w-4 h-4" />,
+        priority: 2,
+      },
+      {
+        id: "buy-job-2",
+        title: "Reiskostenvergoeding aanpassen",
+        category: "Financieel",
+        description: "Vraag aangepaste reiskostenvergoeding aan bij je werkgever.",
+        deadline: addDays(movingDate, 14),
+        deadlineLabel: "2 weken na verhuizing",
+        phase: "Fase 8 - Binnen eerste maand",
+        status: "todo",
+        icon: <Euro className="w-4 h-4" />,
+        priority: 2,
+      }
+    );
   }
 
   // FASE 8 – Binnen eerste maand
