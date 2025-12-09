@@ -84,8 +84,29 @@ export const InvitePartnerDialog = ({
       }
 
       const formattedPhone = formatPhoneNumber(phoneNumber);
+      
+      // Generate invite link
+      const baseUrl = window.location.origin;
+      const inviteLink = `${baseUrl}/?invite=${user.id}`;
 
-      // Create collaborator invite with phone number as email (temporary placeholder)
+      // Send SMS via edge function
+      const { data: smsData, error: smsError } = await supabase.functions.invoke(
+        "send-partner-invite",
+        {
+          body: {
+            phoneNumber: formattedPhone,
+            inviterName: user.email?.split("@")[0] || undefined,
+            inviteLink,
+          },
+        }
+      );
+
+      if (smsError) {
+        console.error("SMS error:", smsError);
+        throw new Error("Kon SMS niet versturen. Controleer het telefoonnummer.");
+      }
+
+      // Create collaborator invite record
       const { error } = await supabase
         .from("moving_collaborators")
         .insert({
