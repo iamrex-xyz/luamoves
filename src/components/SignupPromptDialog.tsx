@@ -77,6 +77,45 @@ export const SignupPromptDialog = ({
   
   const [isLoading, setIsLoading] = useState(false);
   const [step2Errors, setStep2Errors] = useState<Record<string, string>>({});
+  
+  // Get onboarding data from sessionStorage for validation
+  const getOnboardingData = () => {
+    try {
+      const storedData = sessionStorage.getItem("lua_moving_info");
+      if (storedData) {
+        return JSON.parse(storedData);
+      }
+    } catch (e) {
+      console.error("Error parsing onboarding data:", e);
+    }
+    return null;
+  };
+
+  // Check if old address matches new address from onboarding
+  const isSameAsNewAddress = useMemo(() => {
+    const onboardingData = getOnboardingData();
+    if (!onboardingData?.newAddress || !postcode.trim() || !houseNumber.trim()) {
+      return false;
+    }
+    
+    const newAddressLower = onboardingData.newAddress.toLowerCase().replace(/\s+/g, '');
+    const oldAddressLower = `${postcode}${houseNumber}`.toLowerCase().replace(/\s+/g, '');
+    
+    // Check if the postcode and house number appear in the new address
+    return newAddressLower.includes(oldAddressLower) || 
+           newAddressLower.includes(postcode.toLowerCase().replace(/\s+/g, '')) && 
+           newAddressLower.includes(houseNumber.toLowerCase().replace(/\s+/g, ''));
+  }, [postcode, houseNumber]);
+
+  // Check if key handover date is after moving date
+  const isKeyHandoverAfterMovingDate = useMemo(() => {
+    const onboardingData = getOnboardingData();
+    if (!onboardingData?.movingDate || !keyHandoverDate) {
+      return false;
+    }
+    const movingDate = new Date(onboardingData.movingDate);
+    return keyHandoverDate > movingDate;
+  }, [keyHandoverDate]);
 
   // Calculate fields completed for progress indicator
   const filledFieldsCount = useMemo(() => {
@@ -187,9 +226,22 @@ export const SignupPromptDialog = ({
     if (!houseNumber.trim()) {
       errors.houseNumber = "Huisnummer is verplicht";
     }
+    
+    // Check if old address is same as new address
+    if (isSameAsNewAddress) {
+      errors.postcode = "Dit lijkt op je nieuwe adres";
+      errors.houseNumber = "Vul je oude adres in";
+    }
+    
     if (!keyHandoverDate) {
       errors.keyHandoverDate = "Sleuteloverdracht datum is verplicht";
     }
+    
+    // Check if key handover is after moving date
+    if (isKeyHandoverAfterMovingDate) {
+      errors.keyHandoverDate = "De sleutels krijg je toch vóór je verhuist? Pas de datum aan.";
+    }
+    
     if (!phone.trim()) {
       errors.phone = "Telefoonnummer is verplicht";
     }
@@ -200,11 +252,28 @@ export const SignupPromptDialog = ({
     setStep2Errors(errors);
     
     if (Object.keys(errors).length > 0) {
-      toast({
-        title: "Vul alle velden in",
-        description: `Nog ${totalFields - filledFieldsCount} velden te gaan.`,
-        variant: "destructive",
-      });
+      const hasSameAddressError = isSameAsNewAddress;
+      const hasKeyHandoverError = isKeyHandoverAfterMovingDate;
+      
+      if (hasSameAddressError) {
+        toast({
+          title: "Oeps, dat klopt niet helemaal",
+          description: "Dit adres is hetzelfde als je nieuwe adres. Vul je huidige (oude) adres in.",
+          variant: "destructive",
+        });
+      } else if (hasKeyHandoverError) {
+        toast({
+          title: "Hm, dat kan niet kloppen",
+          description: "Je sleuteloverdracht kan niet ná je verhuisdatum liggen. Check even je data!",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Vul alle velden in",
+          description: `Nog ${totalFields - filledFieldsCount} velden te gaan.`,
+          variant: "destructive",
+        });
+      }
       return false;
     }
     
@@ -448,7 +517,7 @@ export const SignupPromptDialog = ({
                     <MapPin className="w-4 h-4 text-muted-foreground" />
                     Oud adres <span className="text-destructive">*</span>
                   </Label>
-                  <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Input
                         type="text"
@@ -462,7 +531,7 @@ export const SignupPromptDialog = ({
                             setStep2Errors(prev => ({ ...prev, postcode: "" }));
                           }
                         }}
-                        className={cn("h-12 rounded-xl", step2Errors.postcode && "border-destructive")}
+                        className={cn("h-12 rounded-xl", (step2Errors.postcode || isSameAsNewAddress) && "border-destructive")}
                         maxLength={7}
                       />
                       {step2Errors.postcode && (
@@ -481,13 +550,18 @@ export const SignupPromptDialog = ({
                             setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
                           }
                         }}
-                        className={cn("h-12 rounded-xl", step2Errors.houseNumber && "border-destructive")}
+                        className={cn("h-12 rounded-xl", (step2Errors.houseNumber || isSameAsNewAddress) && "border-destructive")}
                       />
                       {step2Errors.houseNumber && (
                         <p className="text-xs text-destructive mt-1">{step2Errors.houseNumber}</p>
                       )}
                     </div>
                   </div>
+                  {isSameAsNewAddress && !step2Errors.postcode && !step2Errors.houseNumber && (
+                    <p className="text-xs text-destructive mt-1">
+                      Hé, dit lijkt op je nieuwe adres! Vul hier je huidige (oude) adres in.
+                    </p>
+                  )}
                 </div>
 
                 {/* Key Handover Date */}
@@ -503,7 +577,7 @@ export const SignupPromptDialog = ({
                         className={cn(
                           "w-full h-12 rounded-xl justify-between text-left font-normal",
                           !keyHandoverDate && "text-muted-foreground",
-                          step2Errors.keyHandoverDate && "border-destructive"
+                          (step2Errors.keyHandoverDate || isKeyHandoverAfterMovingDate) && "border-destructive"
                         )}
                       >
                         <span>{keyHandoverDate ? format(keyHandoverDate, "dd MMMM yyyy", { locale: nl }) : "Selecteer datum"}</span>
@@ -524,11 +598,24 @@ export const SignupPromptDialog = ({
                         initialFocus
                         className="pointer-events-auto"
                         locale={nl}
+                        disabled={(date) => {
+                          const onboardingData = getOnboardingData();
+                          if (onboardingData?.movingDate) {
+                            const movingDate = new Date(onboardingData.movingDate);
+                            return date > movingDate;
+                          }
+                          return false;
+                        }}
                       />
                     </PopoverContent>
                   </Popover>
                   {step2Errors.keyHandoverDate && (
                     <p className="text-xs text-destructive">{step2Errors.keyHandoverDate}</p>
+                  )}
+                  {isKeyHandoverAfterMovingDate && !step2Errors.keyHandoverDate && (
+                    <p className="text-xs text-destructive">
+                      De sleutels krijg je toch vóór je verhuist? Pas de datum aan.
+                    </p>
                   )}
                 </div>
 
