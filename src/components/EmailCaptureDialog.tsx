@@ -102,9 +102,9 @@ export const EmailCaptureDialog = ({
                 {isHardBlock ? "Je bent lekker op dreef!" : "Topstart!"}
               </h2>
               <p className="text-muted-foreground mt-2">
-                {isHardBlock 
+{isHardBlock 
                   ? "Vul je e-mail in zodat we je voortgang veilig kunnen bewaren."
-                  : "Laat je e-mail achter — dan bewaren we je voortgang."
+                  : "Laat je e-mail achter, dan bewaren we je voortgang."
                 }
               </p>
             </div>
