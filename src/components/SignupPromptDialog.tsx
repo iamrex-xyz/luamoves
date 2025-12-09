@@ -57,11 +57,12 @@ export const SignupPromptDialog = ({
   // Step tracking
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   
-  // Step 1: Password
+  // Step 1: Password - kept in React state for security (not sessionStorage)
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSet, setPasswordSet] = useState(false);
+  const [storedPassword, setStoredPassword] = useState("");
   
   // Step 2: Profile fields
   const [phone, setPhone] = useState("");
@@ -168,10 +169,8 @@ export const SignupPromptDialog = ({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      // Check if password was already set in this session
-      const wasPasswordSet = sessionStorage.getItem("lua_password_set") === "true";
-      if (wasPasswordSet) {
-        setPasswordSet(true);
+      // Check if password was already set in this session (via React state)
+      if (passwordSet && storedPassword) {
         setCurrentStep(2);
         trackEvent("account_modal_triggered_task3_safeguard");
       } else {
@@ -203,9 +202,8 @@ export const SignupPromptDialog = ({
       return;
     }
     
-    // Store password temporarily and mark as set
-    sessionStorage.setItem("lua_temp_password", password);
-    sessionStorage.setItem("lua_password_set", "true");
+    // Store password in React state (secure - not in sessionStorage)
+    setStoredPassword(password);
     setPasswordSet(true);
     
     trackEvent("password_set");
@@ -299,10 +297,10 @@ export const SignupPromptDialog = ({
       return;
     }
 
-    // Get password from session storage if we're in step 2 safeguard mode
-    const storedPassword = sessionStorage.getItem("lua_temp_password") || password;
+    // Use password from React state
+    const passwordToUse = storedPassword || password;
     
-    if (!storedPassword) {
+    if (!passwordToUse) {
       toast({
         title: "Wachtwoord ontbreekt",
         description: "Er is iets misgegaan. Probeer opnieuw.",
@@ -317,7 +315,7 @@ export const SignupPromptDialog = ({
       const redirectUrl = `${window.location.origin}/`;
       const { data, error } = await supabase.auth.signUp({
         email: capturedEmail,
-        password: storedPassword,
+        password: passwordToUse,
         options: {
           emailRedirectTo: redirectUrl,
         },
@@ -351,9 +349,9 @@ export const SignupPromptDialog = ({
         // Track completion
         trackEvent("account_fully_completed");
         
-        // Clear temporary storage
-        sessionStorage.removeItem("lua_temp_password");
-        sessionStorage.removeItem("lua_password_set");
+        // Clear password from state for security
+        setStoredPassword("");
+        setPassword("");
         
         toast({
           title: "Account aangemaakt! 🎉",
