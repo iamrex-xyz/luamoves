@@ -521,7 +521,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           </div>
 
           <div className="p-4 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label className="text-xs text-muted-foreground uppercase tracking-wide">Volwassenen</Label>
                 <Input
@@ -543,17 +543,17 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                   className="rounded-xl h-11"
                 />
               </div>
-            </div>
 
-            <div>
-              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisdieren</Label>
-              <Input
-                type="number"
-                min="0"
-                value={pets}
-                onChange={(e) => setPets(parseInt(e.target.value) || 0)}
-                className="rounded-xl h-11"
-              />
+              <div>
+                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisdieren</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={pets}
+                  onChange={(e) => setPets(parseInt(e.target.value) || 0)}
+                  className="rounded-xl h-11"
+                />
+              </div>
             </div>
 
             <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full rounded-xl h-11">
