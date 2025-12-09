@@ -29,6 +29,16 @@ export type MovingInfo = {
   hasJob?: boolean;
   children?: number;
   pets?: number;
+  // Smart questions velden
+  hasGas?: "yes" | "no";
+  hasSmartMeter?: "yes" | "no" | "unknown";
+  glasvezel?: "yes" | "no" | "unknown";
+  worksFromHome?: "yes" | "sometimes" | "no";
+  buildingAccess?: "easy" | "medium" | "hard";
+  insuranceValue?: "low" | "medium" | "high";
+  buildingYear?: "new" | "recent" | "older" | "unknown";
+  gardenSize?: "small" | "medium" | "large";
+  childrenAges?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -136,6 +146,16 @@ const Index = () => {
         hasJob: profile.has_job !== false,
         children: profile.children || 0,
         pets: profile.pets || 0,
+        // Smart questions velden
+        hasGas: (profile as any).has_gas as "yes" | "no" | undefined,
+        hasSmartMeter: (profile as any).has_smart_meter as "yes" | "no" | "unknown" | undefined,
+        glasvezel: (profile as any).glasvezel as "yes" | "no" | "unknown" | undefined,
+        worksFromHome: (profile as any).works_from_home as "yes" | "sometimes" | "no" | undefined,
+        buildingAccess: (profile as any).building_access as "easy" | "medium" | "hard" | undefined,
+        insuranceValue: (profile as any).insurance_value as "low" | "medium" | "high" | undefined,
+        buildingYear: (profile as any).building_year as "new" | "recent" | "older" | "unknown" | undefined,
+        gardenSize: (profile as any).garden_size as "small" | "medium" | "large" | undefined,
+        childrenAges: (profile as any).children_ages || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -178,7 +198,17 @@ const Index = () => {
           has_job: info.hasJob !== false,
           children: info.children || 0,
           pets: info.pets || 0,
-        })
+          // Smart questions velden
+          has_gas: info.hasGas || null,
+          has_smart_meter: info.hasSmartMeter || null,
+          glasvezel: info.glasvezel || null,
+          works_from_home: info.worksFromHome || null,
+          building_access: info.buildingAccess || null,
+          insurance_value: info.insuranceValue || null,
+          building_year: info.buildingYear || null,
+          garden_size: info.gardenSize || null,
+          children_ages: info.childrenAges || null,
+        } as any)
         .eq('user_id', userId);
 
       // Clear sessionStorage after sync
@@ -325,7 +355,17 @@ const Index = () => {
             has_job: updatedInfo.hasJob !== false,
             children: updatedInfo.children || 0,
             pets: updatedInfo.pets || 0,
-          })
+            // Smart questions velden
+            has_gas: updatedInfo.hasGas || null,
+            has_smart_meter: updatedInfo.hasSmartMeter || null,
+            glasvezel: updatedInfo.glasvezel || null,
+            works_from_home: updatedInfo.worksFromHome || null,
+            building_access: updatedInfo.buildingAccess || null,
+            insurance_value: updatedInfo.insuranceValue || null,
+            building_year: updatedInfo.buildingYear || null,
+            garden_size: updatedInfo.gardenSize || null,
+            children_ages: updatedInfo.childrenAges || null,
+          } as any)
           .eq('user_id', user.id);
       } catch (error) {
         console.error('Error updating profile:', error);

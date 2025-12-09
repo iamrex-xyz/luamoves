@@ -19,9 +19,7 @@ export type SmartQuestionType =
   | "childrenAges"
   | "hasPets"
   | "householdType"
-  | "hasJob"
-  | "phone"
-  | "birthDate";
+  | "hasJob";
 
 export type SmartQuestion = {
   type: SmartQuestionType;
@@ -29,7 +27,7 @@ export type SmartQuestion = {
   options?: { value: string; label: string }[];
   inputType: "select" | "date" | "text" | "number" | "radio" | "counter";
   placeholder?: string;
-  fieldKey: keyof MovingInfo | "phone" | "birthDate" | "hasGas" | "hasSmartMeter" | "glasvezel" | "worksFromHome" | "buildingAccess" | "insuranceValue" | "buildingYear" | "gardenSize" | "childrenAges";
+  fieldKey: keyof MovingInfo;
 };
 
 // Lua-stijl vriendelijke vragen
@@ -217,19 +215,6 @@ export const smartQuestions: Record<SmartQuestionType, SmartQuestion> = {
       { value: "no", label: "Nee" },
     ],
     fieldKey: "hasJob",
-  },
-  phone: {
-    type: "phone",
-    luaMessage: "Wat is je telefoonnummer? Handig voor herinneringen 📱",
-    inputType: "text",
-    placeholder: "06-12345678",
-    fieldKey: "phone",
-  },
-  birthDate: {
-    type: "birthDate",
-    luaMessage: "Wat is je geboortedatum? Nodig voor sommige aanmeldingen 🎂",
-    inputType: "date",
-    fieldKey: "birthDate",
   },
 };
 
