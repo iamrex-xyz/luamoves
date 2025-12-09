@@ -37,7 +37,7 @@ import {
 
 type TaskListProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   onLogout: () => void;
   onTaskComplete?: (completedCount: number) => void;
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;

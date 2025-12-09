@@ -1,10 +1,10 @@
-import { ListChecks, Home, Settings, Grid3x3 } from "lucide-react";
+import { ListChecks, Home, Settings, Grid3x3, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 type BottomNavProps = {
-  currentView: "dashboard" | "tasks" | "extras" | "settings";
-  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
+  currentView: "dashboard" | "tasks" | "extras" | "settings" | "chat";
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
 };
 
 export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
@@ -13,6 +13,7 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
   const navItems = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
+    { id: "chat", label: "Chat", icon: MessageCircle },
     { id: "extras", label: "Extra", icon: Grid3x3 },
     { id: "settings", label: "Instellingen", icon: Settings },
   ] as const;
@@ -24,23 +25,23 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
-            const showBadge = item.id === "extras" && unreadCount > 0;
+            const showBadge = (item.id === "extras" || item.id === "chat") && unreadCount > 0;
             
             return (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[60px] relative active:scale-95",
+                  "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-[50px] relative active:scale-95",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground active:bg-muted/50"
                 )}
               >
                 <Icon className={cn("w-5 h-5", isActive && "stroke-[2.5]")} />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <span className="text-[9px] font-medium">{item.label}</span>
                 {showBadge && (
-                  <span className="absolute -top-0.5 right-1 bg-primary text-primary-foreground text-[9px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center px-1">
+                  <span className="absolute -top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}

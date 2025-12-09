@@ -5,6 +5,7 @@ import { Dashboard } from "@/components/Dashboard";
 import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
+import { ChatHome } from "@/components/ChatHome";
 import { EmailCaptureDialog } from "@/components/EmailCaptureDialog";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
 import { User } from "@supabase/supabase-js";
@@ -40,7 +41,7 @@ const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [currentView, setCurrentView] = useState<
-    "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings"
+    "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings" | "chat"
   >("onboarding");
   const [loading, setLoading] = useState(true);
   
@@ -411,6 +412,14 @@ const Index = () => {
           onNavigate={setCurrentView}
           onLogout={handleLogout}
           onUpdate={setMovingInfo}
+        />
+      )}
+      {currentView === "chat" && movingInfo && (
+        <ChatHome 
+          movingInfo={movingInfo}
+          onNavigate={setCurrentView}
+          isGuest={!user}
+          onSignupClick={handleBadgeClick}
         />
       )}
 
