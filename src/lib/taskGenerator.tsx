@@ -39,6 +39,11 @@ export type Task = {
 export type HouseholdInfo = {
   children: number;
   pets: number;
+  propertyType?: "apartment" | "house" | "studio";
+  hasGarden?: boolean;
+  hasParking?: boolean;
+  isVve?: boolean;
+  hasJob?: boolean;
 };
 
 export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: HouseholdInfo): Task[] => {

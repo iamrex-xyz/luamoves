@@ -221,8 +221,14 @@ export type Database = {
           birth_date: string | null
           children: number | null
           created_at: string
+          current_housing_situation: string | null
+          has_garden: boolean | null
+          has_job: boolean | null
+          has_parking: boolean | null
           household_type: string | null
+          housing_property_type: string | null
           id: string
+          is_vve: boolean | null
           key_handover_date: string | null
           moving_date: string | null
           moving_type: string | null
@@ -241,8 +247,14 @@ export type Database = {
           birth_date?: string | null
           children?: number | null
           created_at?: string
+          current_housing_situation?: string | null
+          has_garden?: boolean | null
+          has_job?: boolean | null
+          has_parking?: boolean | null
           household_type?: string | null
+          housing_property_type?: string | null
           id?: string
+          is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
@@ -261,8 +273,14 @@ export type Database = {
           birth_date?: string | null
           children?: number | null
           created_at?: string
+          current_housing_situation?: string | null
+          has_garden?: boolean | null
+          has_job?: boolean | null
+          has_parking?: boolean | null
           household_type?: string | null
+          housing_property_type?: string | null
           id?: string
+          is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
