@@ -1,4 +1,4 @@
-import { ListChecks, Home, Settings, Grid3x3, MessageCircle } from "lucide-react";
+import { ListChecks, Home, Settings, FileText, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
@@ -14,7 +14,7 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
     { id: "chat", label: "Chat", icon: MessageCircle },
-    { id: "extras", label: "Extra", icon: Grid3x3 },
+    { id: "extras", label: "Documenten", icon: FileText },
     { id: "settings", label: "Instellingen", icon: Settings },
   ] as const;
 
