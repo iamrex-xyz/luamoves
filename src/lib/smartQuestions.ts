@@ -264,12 +264,31 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
   },
 
   // ===== INTERNET & TV =====
-  // Internet: woningType
+  // Internet: woningType + glasvezel + worksFromHome
   {
     taskIdPatterns: ["internet", "wifi", "provider"],
-    titlePatterns: ["internet", "telefoon", "wifi", "provider", "glasvezel"],
+    titlePatterns: ["internet", "telefoon", "wifi", "provider", "glasvezel", "internetprovider"],
     requiredQuestions: ["propertyType"],
     checkField: (info) => isEmpty(info.propertyType),
+  },
+  {
+    taskIdPatterns: ["internet", "wifi", "provider"],
+    titlePatterns: ["internet", "telefoon", "wifi", "provider", "glasvezel", "internetprovider"],
+    requiredQuestions: ["glasvezel"],
+    checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.glasvezel),
+  },
+  {
+    taskIdPatterns: ["internet", "wifi", "provider"],
+    titlePatterns: ["internet", "telefoon", "wifi", "provider", "glasvezel", "internetprovider"],
+    requiredQuestions: ["worksFromHome"],
+    checkField: (info) => !isEmpty(info.propertyType) && !isEmpty(info.glasvezel) && isEmpty(info.worksFromHome),
+  },
+  // Mobiel bereik / Thuiswerken
+  {
+    taskIdPatterns: ["mobiel", "bereik", "thuiswerk"],
+    titlePatterns: ["mobiel", "bereik", "thuiswerk", "thuiswerken"],
+    requiredQuestions: ["worksFromHome"],
+    checkField: (info) => isEmpty(info.worksFromHome),
   },
 
   // ===== VERHUISBEDRIJF / HELPERS =====
@@ -311,7 +330,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
   },
 
   // ===== VERBOUWING =====
-  // Aannemer/klusmateriaal: renovationType
+  // Aannemer/klusmateriaal: renovationType + needsContractor
   {
     taskIdPatterns: ["aannemer", "klus", "verbouw", "materiaal"],
     titlePatterns: ["aannemer", "klus", "verbouw", "materiaal", "gereedschap"],
@@ -326,12 +345,18 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
   },
 
   // ===== TUIN =====
-  // Tuinmateriaal/tuingereedschap: hasGarden
+  // Tuinmateriaal/tuingereedschap: hasGarden + gardenSize
   {
     taskIdPatterns: ["tuin", "garden"],
     titlePatterns: ["tuin", "tuingereedschap", "tuinmateriaal", "gazon"],
     requiredQuestions: ["hasGarden"],
     checkField: (info) => isEmpty(info.hasGarden),
+  },
+  {
+    taskIdPatterns: ["tuin", "garden"],
+    titlePatterns: ["tuin", "tuingereedschap", "tuinmateriaal", "gazon"],
+    requiredQuestions: ["gardenSize"],
+    checkField: (info) => info.hasGarden === true && isEmpty(info.gardenSize),
   },
 
   // ===== KINDEREN =====
@@ -359,6 +384,22 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     titlePatterns: ["werkgever", "werk informeren", "salarisadministratie"],
     requiredQuestions: ["hasJob"],
     checkField: (info) => isEmpty(info.hasJob),
+  },
+
+  // ===== SCHOONMAAK & ONDERHOUD =====
+  // Schoonmaak nieuwe woning: buildingYear (nieuwbouw vs bewoond)
+  {
+    taskIdPatterns: ["schoonmaak", "schoonmaken"],
+    titlePatterns: ["schoonmaak", "schoonmaken", "reinigen"],
+    requiredQuestions: ["buildingYear"],
+    checkField: (info) => isEmpty(info.buildingYear),
+  },
+  // Rookmelders checken: buildingYear
+  {
+    taskIdPatterns: ["rookmelder", "rookmelders", "brandmelder"],
+    titlePatterns: ["rookmelder", "rookmelders", "brandmelder"],
+    requiredQuestions: ["buildingYear"],
+    checkField: (info) => isEmpty(info.buildingYear),
   },
 ];
 
@@ -475,6 +516,31 @@ export const shouldShowTask = (
   // Parkeervergunning verbergen als niet nodig
   if ((idLower.includes("parkeervergunning") || titleLower.includes("parkeervergunning")) && 
       movingInfo.hasParking === false) {
+    return false;
+  }
+
+  // Rookmelders verbergen bij nieuwbouw (al geïnstalleerd)
+  if ((idLower.includes("rookmelder") || idLower.includes("brandmelder") || 
+       titleLower.includes("rookmelder") || titleLower.includes("brandmelder")) && 
+      movingInfo.buildingYear === "new") {
+    return false;
+  }
+
+  // Schoonmaak nieuwe woning verbergen bij nieuwbouw (al schoon)
+  if ((idLower.includes("schoonmaak") || titleLower.includes("schoonmaak")) && 
+      movingInfo.buildingYear === "new") {
+    return false;
+  }
+
+  // Verhuislift verbergen als begane grond/makkelijk bereikbaar
+  if ((idLower.includes("verhuislift") || titleLower.includes("verhuislift")) && 
+      movingInfo.buildingAccess === "easy") {
+    return false;
+  }
+
+  // Glasvezel taken verbergen als geen glasvezel beschikbaar
+  if ((idLower.includes("glasvezel") || titleLower.includes("glasvezel")) && 
+      movingInfo.glasvezel === "no") {
     return false;
   }
 
