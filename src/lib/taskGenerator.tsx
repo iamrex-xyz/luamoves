@@ -131,6 +131,19 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       priority: 3,
     },
     {
+      id: "rent-phase1-5",
+      title: "Vergelijk en kies energieleverancier",
+      category: "Nutsvoorzieningen",
+      description: "Vergelijk energieleveranciers en kies de beste deal voor je nieuwe woning.",
+      deadline: adjustDeadline(addDays(movingDate, -30), 'normal'),
+      deadlineLabel: "Binnenkort",
+      phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+      status: "todo",
+      icon: <Zap className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.independer.nl/energie/intro.aspx",
+    },
+    {
       id: "rent-phase1-6",
       title: "Regel verhuisbedrijf of helpers",
       category: "Verhuizing",
@@ -141,7 +154,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
       priority: 1,
-      affiliateLink: "https://example.com/verhuizers",
+      affiliateLink: "https://www.verhuisofferte.nl/",
     },
     {
       id: "rent-phase1-7",
@@ -154,7 +167,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Package className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://example.com/dozen",
+      affiliateLink: "https://www.verhuisdozen.nl/",
     },
     {
       id: "rent-phase1-9",
@@ -167,7 +180,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://example.com/verzekering",
+      affiliateLink: "https://www.independer.nl/inboedelverzekering/intro.aspx",
     }
   );
 
@@ -220,7 +233,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Mail className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://example.com/postnl",
+      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
     },
     {
       id: "rent-phase2-5",
@@ -245,7 +258,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Wifi className="w-4 h-4" />,
       priority: 1,
-      affiliateLink: "https://example.com/internet",
+      affiliateLink: "https://www.independer.nl/internet/intro.aspx",
     },
     {
       id: "rent-phase2-12",
@@ -369,7 +382,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Sparkles className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://example.com/schoonmaak",
+      affiliateLink: "https://www.zoofy.nl/schoonmaak",
     },
     {
       id: "rent-phase3-9",
@@ -530,6 +543,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
       priority: 1,
+      affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=rookmelder",
     },
     {
       id: "rent-phase7-8",
@@ -601,6 +615,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
         status: "todo",
         icon: <Home className="w-4 h-4" />,
         priority: 3,
+        affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=tuingereedschap",
       }
     );
   }
@@ -716,6 +731,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
           status: "todo",
           icon: <Package className="w-4 h-4" />,
           priority: 2,
+          affiliateLink: "https://www.praxis.nl/",
         },
         {
           id: "reno-small-3",
@@ -759,6 +775,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
             status: "todo",
             icon: <Users className="w-4 h-4" />,
             priority: 1,
+            affiliateLink: "https://www.werkspot.nl/",
           },
           {
             id: "reno-large-3",
@@ -902,6 +919,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.degoedkoopstenotaris.nl/",
     },
     {
       id: "buy-phase1-8",
@@ -914,6 +932,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
       priority: 1,
+      affiliateLink: "https://www.independer.nl/hypotheek/intro.aspx",
     },
     {
       id: "buy-phase1-11",
@@ -962,6 +981,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <ClipboardCheck className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.bouwkundigekeuring.com/",
     }
   );
 
@@ -990,6 +1010,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <ClipboardCheck className="w-4 h-4" />,
       priority: 1,
+      affiliateLink: "https://www.taxatiewijzer.nl/",
     },
     {
       id: "buy-phase2-5",
@@ -1077,6 +1098,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Package className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.verhuisdozen.nl/",
     },
     {
       id: "buy-phase2-20",
@@ -1154,6 +1176,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
       priority: 1,
+      affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=rookmelder",
     },
     {
       id: "buy-phase3-15",
@@ -1166,6 +1189,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Sparkles className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.zoofy.nl/schoonmaak",
     },
     {
       id: "buy-phase3-21",
@@ -1178,6 +1202,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Shield className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=slotcilinder",
     }
   );
 
@@ -1194,6 +1219,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Mail className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
     },
     {
       id: "buy-phase4-9",
@@ -1526,6 +1552,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
         status: "todo",
         icon: <Home className="w-4 h-4" />,
         priority: 3,
+        affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=tuingereedschap",
       },
       {
         id: "buy-garden-3",
@@ -1669,6 +1696,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
           status: "todo",
           icon: <Package className="w-4 h-4" />,
           priority: 2,
+          affiliateLink: "https://www.praxis.nl/",
         },
         {
           id: "buy-reno-small-3",
@@ -1712,6 +1740,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
             status: "todo",
             icon: <Users className="w-4 h-4" />,
             priority: 1,
+            affiliateLink: "https://www.werkspot.nl/",
           },
           {
             id: "buy-reno-large-3",
@@ -1763,6 +1792,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
             status: "todo",
             icon: <Package className="w-4 h-4" />,
             priority: 1,
+            affiliateLink: "https://www.praxis.nl/",
           },
           {
             id: "buy-reno-large-diy-2",
