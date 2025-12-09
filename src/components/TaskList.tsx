@@ -16,10 +16,13 @@ import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
+import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
+import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
+import { getSmartQuestionForTask, shouldShowTask, SmartQuestionType } from "@/lib/smartQuestions";
 import {
   ExternalLink,
   Filter,
@@ -67,6 +70,11 @@ export const TaskList = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
+  const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task } | null>(null);
+  const [showPartnerInvite, setShowPartnerInvite] = useState(false);
+  const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
+    sessionStorage.getItem("lua_partner_invite_shown") === "true"
+  );
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -93,12 +101,24 @@ export const TaskList = ({
 
   const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
-    // Check if this task requires additional info
-    const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
-    if (requiredPrompt && task.status !== "done") {
-      setContextualPrompt({ type: requiredPrompt, task });
-      return;
+    
+    // Only ask questions when completing a task (not when un-completing)
+    if (task.status !== "done") {
+      // First check for smart questions (new system)
+      const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
+      if (smartQuestionType) {
+        setSmartQuestion({ type: smartQuestionType, task });
+        return;
+      }
+      
+      // Fallback to old contextual prompts
+      const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
+      if (requiredPrompt) {
+        setContextualPrompt({ type: requiredPrompt, task });
+        return;
+      }
     }
+    
     // Otherwise toggle the task
     handleTaskToggle(task.id);
   };
@@ -108,6 +128,31 @@ export const TaskList = ({
       onUpdateMovingInfo(data);
     }
     setContextualPrompt(null);
+  };
+
+  const handleSmartQuestionComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+    
+    // After answering, complete the task
+    if (smartQuestion) {
+      handleTaskToggle(smartQuestion.task.id);
+    }
+    setSmartQuestion(null);
+    
+    // Show partner invite after first few tasks if not shown yet
+    const completedCount = tasks.filter(t => t.status === "done").length;
+    if (completedCount >= 3 && !partnerInviteShown && !isGuest) {
+      const hasPartner = (data as any).currentSituation === "partner" || 
+                         (data as any).currentSituation === "family" ||
+                         (data as any).currentSituation === "roommates";
+      if (hasPartner) {
+        setShowPartnerInvite(true);
+        setPartnerInviteShown(true);
+        sessionStorage.setItem("lua_partner_invite_shown", "true");
+      }
+    }
   };
 
   const handleTaskToggle = async (taskId: string) => {
@@ -152,9 +197,14 @@ export const TaskList = ({
     );
   };
 
-  // Filter taken
+  // Filter taken - inclusief dynamische filtering op basis van profiel
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
+      // Dynamische filtering op basis van profiel data
+      if (!shouldShowTask(task.id, task.title, movingInfo)) {
+        return false;
+      }
+      
       // Filter logica voor Open en Afgerond
       const statusMatch = 
         filter === "done"
@@ -171,7 +221,7 @@ export const TaskList = ({
       
       return statusMatch && categoryMatch && searchMatch;
     });
-  }, [tasks, filter, selectedCategories, searchQuery]);
+  }, [tasks, filter, selectedCategories, searchQuery, movingInfo]);
 
   // Groepeer taken per fase met correcte volgorde
   const tasksByPhase = useMemo(() => {
@@ -460,6 +510,20 @@ export const TaskList = ({
         promptType={contextualPrompt?.type || "oldAddress"}
         taskTitle={contextualPrompt?.task.title}
         onComplete={handleContextualPromptComplete}
+      />
+
+      <SmartQuestionDialog
+        open={!!smartQuestion}
+        onOpenChange={(open) => !open && setSmartQuestion(null)}
+        questionType={smartQuestion?.type || null}
+        taskTitle={smartQuestion?.task.title}
+        onComplete={handleSmartQuestionComplete}
+      />
+
+      <InvitePartnerDialog
+        open={showPartnerInvite}
+        onOpenChange={setShowPartnerInvite}
+        onInviteSent={() => setShowPartnerInvite(false)}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
