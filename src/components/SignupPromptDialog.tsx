@@ -74,6 +74,7 @@ export const SignupPromptDialog = ({
   const [pets, setPets] = useState("0");
   const [birthDate, setBirthDate] = useState<Date | undefined>(undefined);
   const [birthCalendarMonth, setBirthCalendarMonth] = useState<Date>(new Date(1990, 0, 1));
+  const [showBirthDayPicker, setShowBirthDayPicker] = useState(false);
   
   const [isLoading, setIsLoading] = useState(false);
   const [step2Errors, setStep2Errors] = useState<Record<string, string>>({});
@@ -746,7 +747,9 @@ export const SignupPromptDialog = ({
                     <Cake className="w-4 h-4 text-muted-foreground" />
                     Geboortedatum <span className="text-destructive">*</span>
                   </Label>
-                  <Popover>
+                  <Popover onOpenChange={(open) => {
+                    if (!open) setShowBirthDayPicker(false);
+                  }}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -761,57 +764,86 @@ export const SignupPromptDialog = ({
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 bg-background z-[60]" align="start">
-                      <div className="p-3 space-y-3">
-                        {/* Month and Year selectors */}
-                        <div className="flex gap-2">
-                          <Select 
-                            value={birthCalendarMonth.getMonth().toString()} 
-                            onValueChange={handleBirthMonthChange}
+                      {!showBirthDayPicker ? (
+                        <div className="p-4 space-y-4">
+                          <p className="text-sm font-medium text-center">Kies eerst maand en jaar</p>
+                          {/* Month selector */}
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Maand</Label>
+                            <Select 
+                              value={birthCalendarMonth.getMonth().toString()} 
+                              onValueChange={handleBirthMonthChange}
+                            >
+                              <SelectTrigger className="w-full h-10 rounded-lg">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-background z-[70]">
+                                {monthOptions.map((month) => (
+                                  <SelectItem key={month.value} value={month.value}>
+                                    {month.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {/* Year selector */}
+                          <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground">Jaar</Label>
+                            <Select 
+                              value={birthCalendarMonth.getFullYear().toString()} 
+                              onValueChange={handleBirthYearChange}
+                            >
+                              <SelectTrigger className="w-full h-10 rounded-lg">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-background z-[70] max-h-[200px]">
+                                {yearOptions.map((year) => (
+                                  <SelectItem key={year} value={year}>
+                                    {year}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Button 
+                            onClick={() => setShowBirthDayPicker(true)} 
+                            className="w-full"
                           >
-                            <SelectTrigger className="flex-1 h-9 rounded-lg text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background z-[70]">
-                              {monthOptions.map((month) => (
-                                <SelectItem key={month.value} value={month.value}>
-                                  {month.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <Select 
-                            value={birthCalendarMonth.getFullYear().toString()} 
-                            onValueChange={handleBirthYearChange}
-                          >
-                            <SelectTrigger className="w-24 h-9 rounded-lg text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-background z-[70] max-h-[200px]">
-                              {yearOptions.map((year) => (
-                                <SelectItem key={year} value={year}>
-                                  {year}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            Kies dag
+                          </Button>
                         </div>
-                      </div>
-                      <CalendarComponent
-                        mode="single"
-                        selected={birthDate}
-                        onSelect={(date) => {
-                          if (date && !birthDate) trackFieldComplete("birthDate");
-                          setBirthDate(date);
-                          if (step2Errors.birthDate) {
-                            setStep2Errors(prev => ({ ...prev, birthDate: "" }));
-                          }
-                        }}
-                        month={birthCalendarMonth}
-                        onMonthChange={setBirthCalendarMonth}
-                        className="pointer-events-auto"
-                        locale={nl}
-                        disabled={(date) => date > new Date()}
-                      />
+                      ) : (
+                        <div>
+                          <div className="p-3 border-b flex items-center justify-between">
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setShowBirthDayPicker(false)}
+                            >
+                              ← Terug
+                            </Button>
+                            <span className="text-sm font-medium">
+                              {monthOptions.find(m => m.value === birthCalendarMonth.getMonth().toString())?.label} {birthCalendarMonth.getFullYear()}
+                            </span>
+                          </div>
+                          <CalendarComponent
+                            mode="single"
+                            selected={birthDate}
+                            onSelect={(date) => {
+                              if (date && !birthDate) trackFieldComplete("birthDate");
+                              setBirthDate(date);
+                              if (step2Errors.birthDate) {
+                                setStep2Errors(prev => ({ ...prev, birthDate: "" }));
+                              }
+                            }}
+                            month={birthCalendarMonth}
+                            onMonthChange={setBirthCalendarMonth}
+                            className="pointer-events-auto"
+                            locale={nl}
+                            disabled={(date) => date > new Date()}
+                          />
+                        </div>
+                      )}
                     </PopoverContent>
                   </Popover>
                   {step2Errors.birthDate && (
