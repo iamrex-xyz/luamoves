@@ -222,6 +222,11 @@ export type TaskQuestionTrigger = {
   checkField: (movingInfo: MovingInfo & Record<string, any>) => boolean;
 };
 
+// Helper functie om te checken of een veld leeg is (undefined, null, of "")
+const isEmpty = (value: any): boolean => {
+  return value === undefined || value === null || value === "";
+};
+
 export const taskQuestionTriggers: TaskQuestionTrigger[] = [
   // ===== ENERGIE & NUTS =====
   // Energiecontract: keyHandoverDate + gasConnection
@@ -229,33 +234,33 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["energy", "energieleverancier", "energie"],
     titlePatterns: ["energie", "energieleverancier", "energiecontract"],
     requiredQuestions: ["keyHandoverDate"],
-    checkField: (info) => !info.keyHandoverDate,
+    checkField: (info) => isEmpty(info.keyHandoverDate),
   },
   {
     taskIdPatterns: ["energy", "energieleverancier", "energie"],
     titlePatterns: ["energie", "energieleverancier", "energiecontract"],
     requiredQuestions: ["hasGas"],
-    checkField: (info) => !!info.keyHandoverDate && info.hasGas === undefined,
+    checkField: (info) => !isEmpty(info.keyHandoverDate) && isEmpty(info.hasGas),
   },
   // Water/elektra activatie: keyHandoverDate
   {
     taskIdPatterns: ["water", "elektra"],
     titlePatterns: ["water", "elektra", "activatie"],
     requiredQuestions: ["keyHandoverDate"],
-    checkField: (info) => !info.keyHandoverDate,
+    checkField: (info) => isEmpty(info.keyHandoverDate),
   },
   // Meterstanden: keyHandoverDate + hasSmartMeter
   {
     taskIdPatterns: ["meter"],
     titlePatterns: ["meterstanden", "meter"],
     requiredQuestions: ["keyHandoverDate"],
-    checkField: (info) => !info.keyHandoverDate,
+    checkField: (info) => isEmpty(info.keyHandoverDate),
   },
   {
     taskIdPatterns: ["meter"],
     titlePatterns: ["meterstanden", "meter"],
     requiredQuestions: ["hasSmartMeter"],
-    checkField: (info) => !!info.keyHandoverDate && info.hasSmartMeter === undefined,
+    checkField: (info) => !isEmpty(info.keyHandoverDate) && isEmpty(info.hasSmartMeter),
   },
 
   // ===== INTERNET & TV =====
@@ -264,7 +269,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["internet", "wifi", "provider"],
     titlePatterns: ["internet", "telefoon", "wifi", "provider", "glasvezel"],
     requiredQuestions: ["propertyType"],
-    checkField: (info) => !info.propertyType,
+    checkField: (info) => isEmpty(info.propertyType),
   },
 
   // ===== VERHUISBEDRIJF / HELPERS =====
@@ -273,20 +278,20 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["verhuisbedrijf", "verhuizers", "verhuislift"],
     titlePatterns: ["verhuisbedrijf", "verhuizers", "verhuislift", "helpers"],
     requiredQuestions: ["propertyType"],
-    checkField: (info) => !info.propertyType,
+    checkField: (info) => isEmpty(info.propertyType),
   },
   {
     taskIdPatterns: ["verhuisbedrijf", "verhuizers", "verhuislift"],
     titlePatterns: ["verhuisbedrijf", "verhuizers", "verhuislift", "helpers"],
     requiredQuestions: ["buildingAccess"],
-    checkField: (info) => !!info.propertyType && info.buildingAccess === undefined,
+    checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.buildingAccess),
   },
   // Parkeervergunning: parkingPermitNeeded
   {
     taskIdPatterns: ["parkeer", "vergunning"],
     titlePatterns: ["parkeer", "vergunning"],
     requiredQuestions: ["parkingPermitNeeded"],
-    checkField: (info) => info.hasParking === undefined,
+    checkField: (info) => isEmpty(info.hasParking),
   },
 
   // ===== VERZEKERINGEN =====
@@ -295,14 +300,14 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["inboedel"],
     titlePatterns: ["inboedelverzekering", "inboedel"],
     requiredQuestions: ["insuranceValue"],
-    checkField: (info) => info.insuranceValue === undefined,
+    checkField: (info) => isEmpty(info.insuranceValue),
   },
   // Opstalverzekering (alleen koop): buildingYear
   {
     taskIdPatterns: ["opstal"],
     titlePatterns: ["opstalverzekering", "opstal"],
     requiredQuestions: ["buildingYear"],
-    checkField: (info) => info.type === "buy" && info.buildingYear === undefined,
+    checkField: (info) => info.type === "buy" && isEmpty(info.buildingYear),
   },
 
   // ===== VERBOUWING =====
@@ -311,13 +316,13 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["aannemer", "klus", "verbouw", "materiaal"],
     titlePatterns: ["aannemer", "klus", "verbouw", "materiaal", "gereedschap"],
     requiredQuestions: ["renovationType"],
-    checkField: (info) => info.renovationType === undefined,
+    checkField: (info) => isEmpty(info.renovationType),
   },
   {
     taskIdPatterns: ["aannemer"],
     titlePatterns: ["aannemer"],
     requiredQuestions: ["needsContractor"],
-    checkField: (info) => info.renovationType !== undefined && info.renovationType !== "none" && info.needsContractorHelp === undefined,
+    checkField: (info) => !isEmpty(info.renovationType) && info.renovationType !== "none" && isEmpty(info.needsContractorHelp),
   },
 
   // ===== TUIN =====
@@ -326,7 +331,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["tuin", "garden"],
     titlePatterns: ["tuin", "tuingereedschap", "tuinmateriaal", "gazon"],
     requiredQuestions: ["hasGarden"],
-    checkField: (info) => info.hasGarden === undefined,
+    checkField: (info) => isEmpty(info.hasGarden),
   },
 
   // ===== KINDEREN =====
@@ -335,7 +340,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["school", "kinderopvang", "onderwijs"],
     titlePatterns: ["school", "kinderopvang", "onderwijs", "basisschool", "middelbaar"],
     requiredQuestions: ["hasChildren"],
-    checkField: (info) => info.children === undefined,
+    checkField: (info) => isEmpty(info.children),
   },
 
   // ===== HUISDIEREN =====
@@ -344,7 +349,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["dierenarts", "huisdier", "pet"],
     titlePatterns: ["dierenarts", "huisdier", "hond", "kat", "chippen"],
     requiredQuestions: ["hasPets"],
-    checkField: (info) => info.pets === undefined,
+    checkField: (info) => isEmpty(info.pets),
   },
 
   // ===== WERK =====
@@ -353,7 +358,7 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     taskIdPatterns: ["werkgever"],
     titlePatterns: ["werkgever", "werk informeren", "salarisadministratie"],
     requiredQuestions: ["hasJob"],
-    checkField: (info) => info.hasJob === undefined,
+    checkField: (info) => isEmpty(info.hasJob),
   },
 ];
 
@@ -366,10 +371,19 @@ export const getSmartQuestionForTask = (
   const titleLower = taskTitle.toLowerCase();
   const idLower = taskId.toLowerCase();
 
+  console.log("getSmartQuestionForTask called:", { taskId, taskTitle, movingInfo });
+
   for (const trigger of taskQuestionTriggers) {
     // Check of task ID of titel matched
     const idMatch = trigger.taskIdPatterns.some((p) => idLower.includes(p));
     const titleMatch = trigger.titlePatterns.some((p) => titleLower.includes(p));
+
+    console.log("Checking trigger:", { 
+      patterns: trigger.taskIdPatterns, 
+      idMatch, 
+      titleMatch, 
+      checkResult: (idMatch || titleMatch) ? trigger.checkField(movingInfo) : "skipped"
+    });
 
     if ((idMatch || titleMatch) && trigger.checkField(movingInfo)) {
       // Return eerste vraag die nog niet beantwoord is
@@ -379,13 +393,17 @@ export const getSmartQuestionForTask = (
         
         // Check of het veld al ingevuld is
         const value = movingInfo[fieldKey as keyof MovingInfo];
-        if (value === undefined || value === null || value === "") {
+        console.log("Checking field:", { questionType, fieldKey, value, isEmpty: isEmpty(value) });
+        
+        if (isEmpty(value)) {
+          console.log("Returning question:", questionType);
           return questionType;
         }
       }
     }
   }
 
+  console.log("No smart question found");
   return null;
 };
 
