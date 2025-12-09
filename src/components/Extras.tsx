@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { FileText, Upload, Trash2, Download, LogOut, FolderOpen, ArrowLeft, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch documents (own + from collaborators)
   const { data: documents = [], isLoading } = useQuery({
@@ -169,7 +171,10 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
         </div>
 
         {/* Upload Button */}
-        <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+        <Dialog open={uploadDialogOpen} onOpenChange={(open) => {
+          setUploadDialogOpen(open);
+          if (!open) setSelectedFile(null);
+        }}>
           <DialogTrigger asChild>
             <Button className="w-full h-12 rounded-xl gap-2 mb-6">
               <Upload className="h-4 w-4" />
@@ -185,19 +190,44 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
               onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
-                const file = formData.get("file") as File;
                 const category = formData.get("category") as string;
                 const description = formData.get("description") as string;
 
-                if (file && category) {
-                  uploadDocument.mutate({ file, category, description });
+                if (selectedFile && category) {
+                  uploadDocument.mutate({ file: selectedFile, category, description });
+                  setSelectedFile(null);
                 }
               }}
               className="space-y-4"
             >
               <div>
-                <Label htmlFor="file">Bestand</Label>
-                <Input id="file" name="file" type="file" required className="rounded-xl" />
+                <Label className="text-sm font-medium mb-2 block">Bestand</Label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  name="file"
+                  required
+                  className="hidden"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-24 rounded-xl border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-primary/5 transition-colors flex flex-col items-center justify-center gap-2"
+                >
+                  {selectedFile ? (
+                    <>
+                      <FileText className="h-6 w-6 text-primary" />
+                      <span className="text-sm font-medium text-foreground truncate max-w-[200px]">{selectedFile.name}</span>
+                      <span className="text-xs text-muted-foreground">Klik om te wijzigen</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">Klik om een bestand te kiezen</span>
+                    </>
+                  )}
+                </button>
               </div>
               <div>
                 <Label htmlFor="category">Categorie</Label>
