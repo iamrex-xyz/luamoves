@@ -483,7 +483,7 @@ export const SignupPromptDialog = ({
                 <div>
                   <h2 className="text-2xl font-bold">Je bent lekker op dreef!</h2>
                   <p className="text-muted-foreground mt-1">
-                    Maak je account compleet — dan kunnen wij jouw verhuizing slim organiseren en alles bijhouden.
+                    Maak je account compleet, dan kunnen wij jouw verhuizing slim organiseren en alles bijhouden.
                   </p>
                 </div>
               </div>
