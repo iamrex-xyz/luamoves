@@ -163,7 +163,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">

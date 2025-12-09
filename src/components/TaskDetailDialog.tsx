@@ -156,12 +156,12 @@ export const TaskDetailDialog = ({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
+      <DrawerContent className="h-[85dvh] max-h-[85dvh] rounded-t-[24px]">
         {/* Fixed Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
           <DrawerTitle className="text-lg font-semibold">Taak details</DrawerTitle>
           <DrawerClose asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl">
               <X className="h-5 w-5" />
             </Button>
           </DrawerClose>
@@ -269,12 +269,12 @@ export const TaskDetailDialog = ({
         </div>
 
         {/* Fixed Footer with Actions */}
-        <div className="border-t bg-background px-4 py-4 space-y-2 sticky bottom-0">
+        <div className="border-t bg-background px-4 py-3 space-y-2 sticky bottom-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <Button
             onClick={handleSaveNotes}
             disabled={isSaving}
             variant="outline"
-            className="w-full h-12 rounded-xl"
+            className="w-full h-12 rounded-xl active:scale-[0.98] transition-transform"
           >
             <Save className="w-4 h-4 mr-2" />
             {isSaving ? "Opslaan..." : "Notities opslaan"}
@@ -285,7 +285,7 @@ export const TaskDetailDialog = ({
                 onToggleStatus(task.id);
                 onOpenChange(false);
               }}
-              className="w-full h-12 rounded-xl"
+              className="w-full h-12 rounded-xl active:scale-[0.98] transition-transform"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
               {task.status === "done" ? "Markeer als open" : "Markeer als voltooid"}

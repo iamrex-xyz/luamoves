@@ -238,7 +238,7 @@ export const TaskList = ({
   };
 
   return (
-    <div className="min-h-screen pb-24 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header with Logo */}
       <div className="px-4 pt-4 pb-2">
         <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
