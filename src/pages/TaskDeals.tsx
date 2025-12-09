@@ -48,30 +48,30 @@ export const TaskDeals = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white pb-[env(safe-area-inset-bottom)]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-gradient-to-br from-primary-light via-primary-light/80 to-white border-b border-primary/10">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 py-4">
+      <div className="sticky top-0 z-10 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg border-b border-primary/10">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
-              className="h-10 w-10 rounded-full hover:bg-primary-light"
+              className="h-10 w-10 rounded-full hover:bg-primary-light active:scale-95 transition-transform"
               onClick={() => navigate("/", { replace: true })}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold text-foreground">Kies de beste optie</h1>
-              <p className="text-sm text-muted-foreground">{taskTitle}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-bold text-foreground">Kies de beste optie</h1>
+              <p className="text-sm text-muted-foreground truncate">{taskTitle}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Deals List */}
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-4 space-y-3">
-        <p className="text-xs text-muted-foreground mb-3">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-3">
+        <p className="text-xs text-muted-foreground mb-2">
           Vergelijk de opties en kies wat het beste bij jouw situatie past
         </p>
 
@@ -137,7 +137,7 @@ export const TaskDeals = () => {
                   <p className="text-[10px] text-muted-foreground">per dienst</p>
                 </div>
                 <Button
-                  className="gap-1.5 text-xs h-8 px-3 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                  className="gap-1.5 text-xs h-9 px-4 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 active:scale-95 transition-transform"
                   onClick={() => {
                     window.open(deal.url, "_blank");
                   }}
