@@ -141,7 +141,56 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
     }
   };
 
+  // Extract postcode and house number from addresses for validation
+  const extractAddressParts = (address: string) => {
+    // Try to extract postcode (format: 1234AB or 1234 AB)
+    const postcodeMatch = address.match(/\b(\d{4}\s?[A-Za-z]{2})\b/);
+    // Try to extract house number
+    const houseNumberMatch = address.match(/\b(\d+)\b/);
+    return {
+      postcode: postcodeMatch ? postcodeMatch[1].replace(/\s/g, '').toUpperCase() : '',
+      houseNumber: houseNumberMatch ? houseNumberMatch[1] : ''
+    };
+  };
+
+  const isSameAddress = () => {
+    const oldParts = extractAddressParts(oldAddress);
+    const newParts = extractAddressParts(newAddress);
+    
+    // Check if both have valid postcode and house number, and they're the same
+    if (oldParts.postcode && newParts.postcode && oldParts.houseNumber && newParts.houseNumber) {
+      return oldParts.postcode === newParts.postcode && oldParts.houseNumber === newParts.houseNumber;
+    }
+    return false;
+  };
+
+  const isKeyHandoverAfterMoving = () => {
+    if (!keyHandoverDateObj || !movingDateObj) return false;
+    return keyHandoverDateObj > movingDateObj;
+  };
+
+  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving();
+
   const handleSaveMovingInfo = async () => {
+    // Validate before saving
+    if (isSameAddress()) {
+      toast({
+        title: "Fout",
+        description: "Het oude adres mag niet hetzelfde zijn als het nieuwe adres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isKeyHandoverAfterMoving()) {
+      toast({
+        title: "Fout",
+        description: "De sleuteloverdracht kan niet na de verhuisdatum liggen.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -338,6 +387,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                 value={oldAddress}
                 onChange={setOldAddress}
               />
+              {isSameAddress() && (
+                <p className="text-xs text-destructive mt-1">Oud adres mag niet hetzelfde zijn als nieuw adres</p>
+              )}
             </div>
 
             <div>
@@ -389,7 +441,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal rounded-xl h-11",
-                        !keyHandoverDateObj && "text-muted-foreground"
+                        !keyHandoverDateObj && "text-muted-foreground",
+                        isKeyHandoverAfterMoving() && "border-destructive"
                       )}
                     >
                       <Calendar className="mr-2 h-4 w-4" />
@@ -404,11 +457,15 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                         setKeyHandoverDateObj(date);
                         if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
                       }}
+                      disabled={(date) => movingDateObj ? date > movingDateObj : false}
                       initialFocus
                       className="pointer-events-auto"
                     />
                   </PopoverContent>
                 </Popover>
+                {isKeyHandoverAfterMoving() && (
+                  <p className="text-xs text-destructive mt-1">Kan niet na verhuisdatum</p>
+                )}
               </div>
             </div>
 
@@ -426,7 +483,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               </Select>
             </div>
 
-            <Button onClick={handleSaveMovingInfo} disabled={isLoading} className="w-full rounded-xl h-11">
+            <Button onClick={handleSaveMovingInfo} disabled={isLoading || hasValidationErrors} className="w-full rounded-xl h-11">
               Opslaan
             </Button>
           </div>
@@ -575,6 +632,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                       setBirthDateObj(date);
                       if (date) setBirthDate(format(date, "yyyy-MM-dd"));
                     }}
+                    disabled={(date) => date > new Date()}
+                    defaultMonth={birthDateObj || new Date(1990, 0, 1)}
                     initialFocus
                     className="pointer-events-auto"
                     captionLayout="dropdown-buttons"
