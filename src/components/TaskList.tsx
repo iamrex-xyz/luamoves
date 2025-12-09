@@ -108,7 +108,11 @@ export const TaskList = ({
       // Gasten moeten eerst email/account aanmaken via de email/signup flow
       if (!isGuest) {
         // First check for smart questions (new system)
+        console.log("Checking smart question for task:", task.id, task.title);
+        console.log("movingInfo:", movingInfo);
+        console.log("isGuest:", isGuest);
         const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
+        console.log("smartQuestionType result:", smartQuestionType);
         if (smartQuestionType) {
           setSmartQuestion({ type: smartQuestionType, task });
           return;
