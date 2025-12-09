@@ -181,6 +181,19 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       icon: <Shield className="w-4 h-4" />,
       priority: 2,
       affiliateLink: "https://www.independer.nl/inboedelverzekering/intro.aspx",
+    },
+    {
+      id: "rent-phase1-10",
+      title: "Controleer aansprakelijkheidsverzekering",
+      category: "Financieel",
+      description: "Zorg dat je aansprakelijkheidsverzekering ook geldt tijdens de verhuizing.",
+      deadline: adjustDeadline(addDays(movingDate, -21), 'normal'),
+      deadlineLabel: "Binnenkort",
+      phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+      status: "todo",
+      icon: <Shield className="w-4 h-4" />,
+      priority: 3,
+      affiliateLink: "https://www.independer.nl/aansprakelijkheidsverzekering/intro.aspx",
     }
   );
 
@@ -214,13 +227,14 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       id: "rent-phase2-3",
       title: "Meld verhuizing bij gemeente",
       category: "Administratie",
-      description: "Geef je nieuwe adres door aan de gemeente.",
+      description: "Geef je nieuwe adres door aan de gemeente (verplicht binnen 5 dagen na verhuizing).",
       deadline: adjustDeadline(addDays(movingDate, -7), 'urgent'),
       deadlineLabel: "Voor verhuizing",
       phase: "Fase 2 - De voorbereidingen beginnen",
       status: "todo",
       icon: <MapPin className="w-4 h-4" />,
       priority: 1,
+      affiliateLink: "https://www.rijksoverheid.nl/onderwerpen/verhuizen/vraag-en-antwoord/verhuizing-doorgeven-aan-gemeente",
     },
     {
       id: "rent-phase2-4",
@@ -246,6 +260,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
     },
     {
       id: "rent-phase2-9",
@@ -323,12 +338,25 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       id: "rent-phase2-15",
       title: "Regel parkeervergunning of verhuislift indien nodig",
       category: "Verhuizing",
-      description: "Vraag parkeervergunning aan voor verhuiswagen indien nodig.",
+      description: "Vraag parkeervergunning aan voor verhuiswagen of huur een verhuislift.",
       deadline: addDays(movingDate, -14),
       deadlineLabel: "2 weken voor verhuizing",
       phase: "Fase 2 - De voorbereidingen beginnen",
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.verhuislift-huren.nl/",
+    },
+    {
+      id: "rent-phase2-16",
+      title: "Vraag verhuisverlof aan bij werkgever",
+      category: "Administratie",
+      description: "Veel werkgevers geven bijzonder verlof voor verhuizing. Vraag dit op tijd aan.",
+      deadline: addDays(movingDate, -14),
+      deadlineLabel: "2 weken voor verhuizing",
+      phase: "Fase 2 - De voorbereidingen beginnen",
+      status: "todo",
+      icon: <FileText className="w-4 h-4" />,
       priority: 2,
     }
   );
@@ -423,6 +451,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Sparkles className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.zoofy.nl/schoonmaak",
     },
     {
       id: "rent-phase4-5",
@@ -1247,15 +1276,16 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
     },
     {
       id: "buy-phase4-12",
-      title: "Parkeervergunning verhuisdag aanvragen",
+      title: "Parkeervergunning of verhuislift regelen",
       category: "Verhuizing",
-      description: "Vraag een parkeervergunning aan voor de verhuisdag.",
+      description: "Vraag een parkeervergunning aan of huur een verhuislift voor de verhuisdag.",
       deadline: adjustDeadline(addDays(movingDate, -14), 'normal'),
       deadlineLabel: "2 weken voor verhuizing",
       phase: "Fase 4 - Voor verhuisdag",
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.verhuislift-huren.nl/",
     },
     {
       id: "buy-phase4-15",
@@ -1324,6 +1354,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Sparkles className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.zoofy.nl/schoonmaak",
     }
   );
 
@@ -1465,6 +1496,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Home className="w-4 h-4" />,
       priority: 2,
+      affiliateLink: "https://www.bol.com/nl/nl/s/?searchtext=lamp",
     }
   );
 
