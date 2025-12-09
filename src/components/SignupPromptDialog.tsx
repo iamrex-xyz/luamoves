@@ -92,6 +92,32 @@ export const SignupPromptDialog = ({
     return null;
   };
 
+  // Extract postcode and house number from a full address string
+  const extractAddressParts = (address: string): { postcode: string; houseNumber: string } => {
+    if (!address) return { postcode: "", houseNumber: "" };
+    
+    // Dutch postcode pattern: 4 digits + 2 letters (e.g., 1234AB or 1234 AB)
+    const postcodeMatch = address.match(/(\d{4}\s?[A-Za-z]{2})/);
+    const postcode = postcodeMatch ? postcodeMatch[1].replace(/\s/g, '').toUpperCase() : "";
+    
+    // House number: look for a number that's likely the house number
+    // Usually appears after street name, often followed by postcode
+    const houseNumberMatch = address.match(/\b(\d+[A-Za-z]?(?:\s*[-\/]\s*\d+[A-Za-z]?)?)\b(?=\s|,|$)/);
+    const houseNumber = houseNumberMatch ? houseNumberMatch[1] : "";
+    
+    return { postcode, houseNumber };
+  };
+
+  // Pre-fill old address from onboarding data on mount
+  useEffect(() => {
+    const onboardingData = getOnboardingData();
+    if (onboardingData?.oldAddress && !postcode && !houseNumber) {
+      const { postcode: extractedPostcode, houseNumber: extractedHouseNumber } = extractAddressParts(onboardingData.oldAddress);
+      if (extractedPostcode) setPostcode(extractedPostcode);
+      if (extractedHouseNumber) setHouseNumber(extractedHouseNumber);
+    }
+  }, []);
+
   // Check if old address matches new address from onboarding
   const isSameAsNewAddress = useMemo(() => {
     const onboardingData = getOnboardingData();
@@ -326,6 +352,20 @@ export const SignupPromptDialog = ({
       if (data.user) {
         // Combine postcode and house number for old_address
         const oldAddress = postcode && houseNumber ? `${postcode} ${houseNumber}` : null;
+        
+        // Also update sessionStorage so the address syncs properly
+        if (oldAddress) {
+          try {
+            const storedData = sessionStorage.getItem("lua_moving_info");
+            if (storedData) {
+              const movingInfo = JSON.parse(storedData);
+              movingInfo.oldAddress = oldAddress;
+              sessionStorage.setItem("lua_moving_info", JSON.stringify(movingInfo));
+            }
+          } catch (e) {
+            console.error("Error updating sessionStorage:", e);
+          }
+        }
         
         // Update profile with additional info
         const { error: profileError } = await supabase
