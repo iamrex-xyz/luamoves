@@ -13,7 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { BottomNav } from "@/components/BottomNav";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
-import { ReminderSettings } from "@/components/ReminderSettings";
+import { ReminderSettingsListItem, ReminderSettingsSheet } from "@/components/ReminderSettings";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
@@ -90,6 +90,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   // Partner consent state
   const [partnerConsent, setPartnerConsent] = useState(false);
   const CONSENT_KEY = "partnerConsent";
+  
+  // Reminder settings sheet state
+  const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -753,9 +756,14 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
             )}
           </div>
         </div>
+        {/* Other Settings */}
+        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+          <div className="p-4 space-y-1">
+            <ReminderSettingsListItem onClick={() => setReminderSheetOpen(true)} />
+          </div>
+        </div>
 
-        {/* Reminder Settings */}
-        <ReminderSettings />
+        <ReminderSettingsSheet open={reminderSheetOpen} onOpenChange={setReminderSheetOpen} />
       </div>
 
       <BottomNav currentView="settings" onNavigate={onNavigate} />
