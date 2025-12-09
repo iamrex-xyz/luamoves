@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { MovingInfo } from "@/pages/Index";
@@ -21,11 +19,9 @@ import {
   Home as HomeIcon,
   Calendar,
   Users,
-  PawPrint,
   Trash2,
   Mail,
   Check,
-  X,
   ChevronRight,
   MapPin,
   UserPlus,
@@ -48,12 +44,6 @@ type Collaborator = {
   invited_at: string;
 };
 
-const PET_TYPES = [
-  { value: "dog", label: "Hond" },
-  { value: "cat", label: "Kat" },
-  { value: "other", label: "Anders" },
-];
-
 export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: SettingsProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -75,13 +65,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   // Household state
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
-  const [petTypes, setPetTypes] = useState<string[]>([]);
+  const [pets, setPets] = useState(0);
   
   // Personal info state
   const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthDateObj, setBirthDateObj] = useState<Date | undefined>(undefined);
-  const [newPetType, setNewPetType] = useState("");
   
   // Collaborators state
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
@@ -115,7 +104,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         // Household data
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
-        setPetTypes(profile.pet_types || []);
+        setPets(profile.pets || 0);
         
         // Personal info
         setPhone(profile.phone || "");
@@ -284,8 +273,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         .update({
           adults,
           children,
-          pets: petTypes.length,
-          pet_types: petTypes,
+          pets,
           phone: phone || null,
           birth_date: birthDateStr || null,
         })
@@ -309,9 +297,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
     }
   };
 
-  const handleRemovePet = (petType: string) => {
-    setPetTypes(petTypes.filter(p => p !== petType));
-  };
 
   const handleInviteCollaborator = async () => {
     if (!newCollaboratorEmail) return;
@@ -560,53 +545,15 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
               </div>
             </div>
 
-            <Separator />
-
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <PawPrint className="w-4 h-4 text-primary" />
-                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisdieren</Label>
-              </div>
-
-              <Select value={newPetType} onValueChange={(value) => {
-                if (value) {
-                  setPetTypes([...petTypes, value]);
-                  setNewPetType("");
-                }
-              }}>
-                <SelectTrigger className="rounded-xl h-11">
-                  <SelectValue placeholder="Voeg huisdier toe" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PET_TYPES.map((pet) => (
-                    <SelectItem key={pet.value} value={pet.value}>
-                      {pet.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {petTypes.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {petTypes.map((pet, idx) => (
-                    <Badge 
-                      key={idx} 
-                      variant="secondary" 
-                      className="pl-3 pr-1.5 py-1.5 rounded-full bg-muted/50 gap-1"
-                    >
-                      {PET_TYPES.find(p => p.value === pet)?.label || pet}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-5 w-5 rounded-full hover:bg-destructive/20"
-                        onClick={() => handleRemovePet(pet)}
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisdieren</Label>
+              <Input
+                type="number"
+                min="0"
+                value={pets}
+                onChange={(e) => setPets(parseInt(e.target.value) || 0)}
+                className="rounded-xl h-11"
+              />
             </div>
 
             <Button onClick={handleSaveHousehold} disabled={isLoading} className="w-full rounded-xl h-11">
