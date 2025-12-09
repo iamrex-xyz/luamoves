@@ -1,142 +1,281 @@
-import { Card } from "@/components/ui/card";
+import { useState, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { Bell, Mail, Smartphone, BellRing, Info } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { ChevronRight } from "lucide-react";
 import { useReminderPreferences } from "@/hooks/useReminderPreferences";
-import { Skeleton } from "@/components/ui/skeleton";
+import { trackEvent } from "@/lib/analytics";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
-export const ReminderSettings = () => {
-  const { preferences, isLoading, pushSupported, updatePreferences } = useReminderPreferences();
+const ACCOUNT_CREATED_KEY = "lua_account_created_at";
+const REMINDER_TIME_KEY = "lua_reminder_time";
+const REMINDER_FREQUENCY_KEY = "lua_reminder_frequency";
 
-  if (isLoading) {
-    return (
-      <Card className="p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Skeleton className="h-8 w-8 rounded-lg" />
-          <Skeleton className="h-5 w-32" />
-        </div>
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </Card>
-    );
-  }
+type TimePreference = "morning" | "afternoon" | "evening";
+type FrequencyPreference = "daily" | "deadlines_only";
+
+export const ReminderSettingsListItem = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between py-4 text-left hover:bg-muted/50 transition-colors rounded-lg px-2 -mx-2"
+    >
+      <div>
+        <p className="font-medium text-sm">Herinneringen beheren</p>
+        <p className="text-xs text-muted-foreground mt-0.5">Houd je netjes op schema</p>
+      </div>
+      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+    </button>
+  );
+};
+
+export const ReminderSettingsSheet = ({ 
+  open, 
+  onOpenChange 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+}) => {
+  const { toast } = useToast();
+  const { preferences, updatePreferences } = useReminderPreferences();
+  
+  // Local state for the form
+  const [remindersEnabled, setRemindersEnabled] = useState(true);
+  const [timePreference, setTimePreference] = useState<TimePreference>("morning");
+  const [frequencyPreference, setFrequencyPreference] = useState<FrequencyPreference>("deadlines_only");
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  // Check if user is within first 2 weeks
+  const isWithinTwoWeeks = useMemo(() => {
+    const createdAt = localStorage.getItem(ACCOUNT_CREATED_KEY);
+    if (!createdAt) {
+      // If no creation date stored, store it now and consider them new
+      localStorage.setItem(ACCOUNT_CREATED_KEY, new Date().toISOString());
+      return true;
+    }
+    const createdDate = new Date(createdAt);
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    return createdDate > twoWeeksAgo;
+  }, []);
+
+  // Load preferences when sheet opens
+  useEffect(() => {
+    if (open) {
+      trackEvent("reminder_settings_viewed");
+      
+      // Load from preferences
+      const allEnabled = preferences.email_enabled || preferences.in_app_enabled;
+      setRemindersEnabled(allEnabled);
+      
+      // Load local preferences
+      const savedTime = localStorage.getItem(REMINDER_TIME_KEY) as TimePreference | null;
+      const savedFrequency = localStorage.getItem(REMINDER_FREQUENCY_KEY) as FrequencyPreference | null;
+      
+      if (savedTime) setTimePreference(savedTime);
+      if (savedFrequency) setFrequencyPreference(savedFrequency);
+      
+      setHasChanges(false);
+    }
+  }, [open, preferences]);
+
+  const handleToggleReminders = (checked: boolean) => {
+    if (!checked && isWithinTwoWeeks) {
+      // Show confirmation dialog for users trying to disable within 2 weeks
+      trackEvent("reminder_disabled_attempt_blocked");
+      setShowDisableConfirm(true);
+    } else {
+      setRemindersEnabled(checked);
+      setHasChanges(true);
+    }
+  };
+
+  const handleConfirmDisable = () => {
+    setRemindersEnabled(false);
+    setHasChanges(true);
+    setShowDisableConfirm(false);
+  };
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    try {
+      // Save to Supabase
+      await updatePreferences({
+        email_enabled: remindersEnabled,
+        in_app_enabled: remindersEnabled,
+      });
+      
+      // Save local preferences
+      localStorage.setItem(REMINDER_TIME_KEY, timePreference);
+      localStorage.setItem(REMINDER_FREQUENCY_KEY, frequencyPreference);
+      
+      trackEvent("reminder_settings_changed", {
+        enabled: remindersEnabled,
+        time: timePreference,
+        frequency: frequencyPreference,
+      });
+      
+      toast({
+        title: "Opgeslagen",
+        description: "Je herinneringsinstellingen zijn bijgewerkt.",
+      });
+      
+      setHasChanges(false);
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Fout",
+        description: "Kon instellingen niet opslaan. Probeer opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="p-2 bg-primary/10 rounded-lg">
-          <Bell className="w-4 h-4 text-primary" />
-        </div>
-        <h2 className="text-base font-semibold">Herinneringen</h2>
-      </div>
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent side="bottom" className="rounded-t-2xl h-auto max-h-[85vh]">
+          <SheetHeader className="text-left pb-4">
+            <SheetTitle>Herinneringen beheren</SheetTitle>
+          </SheetHeader>
+          
+          <div className="space-y-6 pb-6">
+            {/* Main toggle */}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="reminders-toggle" className="text-base font-medium">
+                  Herinneringen ontvangen
+                </Label>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Lua helpt je alles op tijd te regelen
+                </p>
+              </div>
+              <Switch
+                id="reminders-toggle"
+                checked={remindersEnabled}
+                onCheckedChange={handleToggleReminders}
+              />
+            </div>
 
-      <div className="space-y-4">
-        {/* Email Reminders */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="p-2 bg-muted rounded-lg shrink-0">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-medium text-sm">E-mail herinneringen</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                7 en 2 dagen voor deadline
-              </p>
-            </div>
+            {remindersEnabled && (
+              <>
+                {/* Time preference */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Tijdvoorkeur</Label>
+                  <Select 
+                    value={timePreference} 
+                    onValueChange={(val: TimePreference) => {
+                      setTimePreference(val);
+                      setHasChanges(true);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-12 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-[60]">
+                      <SelectItem value="morning">Ochtend (8:00 - 10:00)</SelectItem>
+                      <SelectItem value="afternoon">Middag (12:00 - 14:00)</SelectItem>
+                      <SelectItem value="evening">Avond (18:00 - 20:00)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Frequency preference */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Frequentie</Label>
+                  <Select 
+                    value={frequencyPreference} 
+                    onValueChange={(val: FrequencyPreference) => {
+                      setFrequencyPreference(val);
+                      setHasChanges(true);
+                    }}
+                  >
+                    <SelectTrigger className="w-full h-12 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background z-[60]">
+                      <SelectItem value="deadlines_only">Alleen bij deadlines</SelectItem>
+                      <SelectItem value="daily">Dagelijks overzicht</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            )}
+
+            {/* Save button */}
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving || !hasChanges}
+              className="w-full h-12 rounded-xl text-base font-medium"
+            >
+              {isSaving ? "Opslaan..." : "Opslaan"}
+            </Button>
           </div>
-          <Switch
-            checked={preferences.email_enabled}
-            onCheckedChange={(checked) => updatePreferences({ email_enabled: checked })}
-          />
-        </div>
+        </SheetContent>
+      </Sheet>
 
-        <Separator />
+      {/* Confirmation dialog for disabling within 2 weeks */}
+      <AlertDialog open={showDisableConfirm} onOpenChange={setShowDisableConfirm}>
+        <AlertDialogContent className="max-w-sm rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Zeker weten?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We helpen je graag alles op tijd te regelen. Je kunt dit later altijd uitzetten.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col gap-2 sm:flex-col">
+            <AlertDialogAction 
+              onClick={handleConfirmDisable}
+              className="w-full"
+            >
+              Toch uitzetten
+            </AlertDialogAction>
+            <AlertDialogCancel className="w-full mt-0">
+              Annuleren
+            </AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
 
-        {/* Browser Push */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="p-2 bg-muted rounded-lg shrink-0">
-              <Smartphone className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-medium text-sm flex items-center gap-1">
-                Browser notificaties
-                {!pushSupported && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Info className="w-3 h-3 text-muted-foreground" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Niet beschikbaar in deze browser</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                )}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Op de dag van de deadline
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={preferences.push_enabled}
-            onCheckedChange={(checked) => updatePreferences({ push_enabled: checked })}
-            disabled={!pushSupported}
-          />
-        </div>
-
-        <Separator />
-
-        {/* In-app Alerts */}
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-start gap-3 flex-1">
-            <div className="p-2 bg-muted rounded-lg shrink-0">
-              <BellRing className="w-4 h-4 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="font-medium text-sm">In-app meldingen</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Banner met deadline taken
-              </p>
-            </div>
-          </div>
-          <Switch
-            checked={preferences.in_app_enabled}
-            onCheckedChange={(checked) => updatePreferences({ in_app_enabled: checked })}
-          />
-        </div>
-
-        <Separator />
-
-        {/* Info section */}
-        <div className="bg-muted/50 rounded-lg p-3">
-          <p className="text-xs text-muted-foreground">
-            <strong>Slimme herinneringen</strong>
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Timing is afgestemd op taaktype:
-          </p>
-          <ul className="text-xs text-muted-foreground mt-2 space-y-1 list-disc list-inside">
-            <li><strong>Energie/internet:</strong> 10, 6 en 2 dagen voor</li>
-            <li><strong>Verhuisbedrijf:</strong> 14, 7 en 2 dagen voor</li>
-            <li><strong>Inspectie:</strong> 7, 3 en 1 dag voor</li>
-            <li><strong>Overige:</strong> 7 en 2 dagen voor deadline</li>
-          </ul>
-          <p className="text-xs text-muted-foreground mt-2">
-            Je kunt per taak herinneringen uitschakelen via de taakdetails.
-          </p>
-        </div>
-      </div>
-    </Card>
+// Legacy export for backwards compatibility
+export const ReminderSettings = () => {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  
+  return (
+    <>
+      <ReminderSettingsListItem onClick={() => setSheetOpen(true)} />
+      <ReminderSettingsSheet open={sheetOpen} onOpenChange={setSheetOpen} />
+    </>
   );
 };
