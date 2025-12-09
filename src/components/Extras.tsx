@@ -17,7 +17,7 @@ import { BottomNav } from "./BottomNav";
 import { ChatAccessGate } from "./ChatAccessGate";
 
 type ExtrasProps = {
-  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   onLogout: () => void;
 };
 

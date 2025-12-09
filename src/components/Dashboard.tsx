@@ -24,7 +24,7 @@ import { useState } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
-  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings") => void;
+  onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   onLogout: () => void;
   onTaskComplete?: (completedCount: number) => void;
   onSignupClick?: () => void;
