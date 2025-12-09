@@ -219,15 +219,23 @@ export type Database = {
         Row: {
           adults: number | null
           birth_date: string | null
+          building_access: string | null
+          building_year: string | null
           children: number | null
+          children_ages: string | null
           created_at: string
           current_housing_situation: string | null
+          garden_size: string | null
+          glasvezel: string | null
           has_garden: boolean | null
+          has_gas: string | null
           has_job: boolean | null
           has_parking: boolean | null
+          has_smart_meter: string | null
           household_type: string | null
           housing_property_type: string | null
           id: string
+          insurance_value: string | null
           is_vve: boolean | null
           key_handover_date: string | null
           moving_date: string | null
@@ -241,19 +249,28 @@ export type Database = {
           renovation_type: string | null
           updated_at: string
           user_id: string
+          works_from_home: string | null
         }
         Insert: {
           adults?: number | null
           birth_date?: string | null
+          building_access?: string | null
+          building_year?: string | null
           children?: number | null
+          children_ages?: string | null
           created_at?: string
           current_housing_situation?: string | null
+          garden_size?: string | null
+          glasvezel?: string | null
           has_garden?: boolean | null
+          has_gas?: string | null
           has_job?: boolean | null
           has_parking?: boolean | null
+          has_smart_meter?: string | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
+          insurance_value?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
@@ -267,19 +284,28 @@ export type Database = {
           renovation_type?: string | null
           updated_at?: string
           user_id: string
+          works_from_home?: string | null
         }
         Update: {
           adults?: number | null
           birth_date?: string | null
+          building_access?: string | null
+          building_year?: string | null
           children?: number | null
+          children_ages?: string | null
           created_at?: string
           current_housing_situation?: string | null
+          garden_size?: string | null
+          glasvezel?: string | null
           has_garden?: boolean | null
+          has_gas?: string | null
           has_job?: boolean | null
           has_parking?: boolean | null
+          has_smart_meter?: string | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
+          insurance_value?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
@@ -293,6 +319,7 @@ export type Database = {
           renovation_type?: string | null
           updated_at?: string
           user_id?: string
+          works_from_home?: string | null
         }
         Relationships: []
       }
