@@ -109,13 +109,42 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         .single();
 
       if (profile) {
+        // Household data
         setAdults(profile.adults || 1);
         setChildren(profile.children || 0);
         setPetTypes(profile.pet_types || []);
+        
+        // Personal info
         setPhone(profile.phone || "");
         if (profile.birth_date) {
           setBirthDate(profile.birth_date);
           setBirthDateObj(new Date(profile.birth_date));
+        }
+        
+        // Moving info from profile (set during signup)
+        if (profile.old_address && !oldAddress) {
+          setOldAddress(profile.old_address);
+        }
+        if (profile.key_handover_date && !keyHandoverDate) {
+          setKeyHandoverDate(profile.key_handover_date);
+          setKeyHandoverDateObj(new Date(profile.key_handover_date));
+        }
+        if (profile.renovation_type && renovationType === "none") {
+          setRenovationType(profile.renovation_type as "none" | "small" | "large");
+        }
+        if (profile.new_address && !newAddress) {
+          setNewAddress(profile.new_address);
+        }
+        if (profile.moving_date && !movingDate) {
+          setMovingDate(profile.moving_date);
+          setMovingDateObj(new Date(profile.moving_date));
+        }
+        if (profile.moving_type && !movingInfo.type) {
+          // Update movingInfo with type from profile
+          onUpdate({
+            ...movingInfo,
+            type: profile.moving_type as "rent" | "buy",
+          });
         }
       }
     } catch (error) {
