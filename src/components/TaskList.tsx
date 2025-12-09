@@ -16,10 +16,8 @@ import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
-import { PartnerDealsSection } from "@/components/PartnerDealsSection";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
-import { InvitePartnerSection } from "@/components/InvitePartnerSection";
 import { BottomNav } from "@/components/BottomNav";
 import { useNavigate } from "react-router-dom";
 import {
@@ -69,7 +67,6 @@ export const TaskList = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
-  const [dealsRef, setDealsRef] = useState<HTMLDivElement | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -88,10 +85,6 @@ export const TaskList = ({
     moveDate.setHours(0, 0, 0, 0);
     return Math.ceil((moveDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   }, [movingInfo.movingDate]);
-
-  const handleViewDeals = () => {
-    dealsRef?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const handleTaskClick = (task: Task) => {
     // Open the task detail dialog instead of toggling status
@@ -435,18 +428,6 @@ export const TaskList = ({
           </div>
         )}
 
-        {/* Invite Partner Section */}
-        <div className="mb-6">
-          <InvitePartnerSection 
-            isGuest={isGuest} 
-            onSignupComplete={() => window.location.reload()} 
-          />
-        </div>
-
-        {/* Partner Deals Section */}
-        <div ref={setDealsRef}>
-          <PartnerDealsSection movingInfo={movingInfo} />
-        </div>
       </div>
 
       {/* Dialogs */}
