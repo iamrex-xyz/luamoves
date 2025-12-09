@@ -57,7 +57,7 @@ export const TaskDeals = () => {
               variant="ghost"
               size="icon"
               className="h-10 w-10 rounded-full hover:bg-primary-light"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate("/", { replace: true })}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
