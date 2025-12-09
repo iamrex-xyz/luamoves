@@ -70,7 +70,7 @@ export const TaskList = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
-  const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task } | null>(null);
+  const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task; afterQuestions?: 'deal' | 'complete' } | null>(null);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -101,34 +101,26 @@ export const TaskList = ({
 
   const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
+    // Checkbox alleen voor afvinken, geen smart questions hier
+    handleTaskToggle(task.id);
+  };
+
+  // Regelen knop: eerst smart questions, daarna deals
+  const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
+    e.stopPropagation();
     
-    // Only ask questions when completing a task (not when un-completing)
-    if (task.status !== "done") {
-      // Smart questions alleen tonen als gebruiker NIET guest is (ingelogd)
-      // Gasten moeten eerst email/account aanmaken via de email/signup flow
-      if (!isGuest) {
-        // First check for smart questions (new system)
-        console.log("Checking smart question for task:", task.id, task.title);
-        console.log("movingInfo:", movingInfo);
-        console.log("isGuest:", isGuest);
-        const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
-        console.log("smartQuestionType result:", smartQuestionType);
-        if (smartQuestionType) {
-          setSmartQuestion({ type: smartQuestionType, task });
-          return;
-        }
-        
-        // Fallback to old contextual prompts
-        const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
-        if (requiredPrompt) {
-          setContextualPrompt({ type: requiredPrompt, task });
-          return;
-        }
+    // Check of er nog smart questions nodig zijn
+    if (!isGuest) {
+      const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
+      if (smartQuestionType) {
+        // Na beantwoording → toon deals
+        setSmartQuestion({ type: smartQuestionType, task, afterQuestions: 'deal' });
+        return;
       }
     }
     
-    // Otherwise toggle the task
-    handleTaskToggle(task.id);
+    // Geen vragen nodig → direct naar deals
+    navigate(`/deals?task=${encodeURIComponent(task.title)}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -143,11 +135,26 @@ export const TaskList = ({
       onUpdateMovingInfo(data as Partial<MovingInfo>);
     }
     
-    // After answering, complete the task
-    if (smartQuestion) {
-      handleTaskToggle(smartQuestion.task.id);
-    }
+    const currentTask = smartQuestion?.task;
+    const afterAction = smartQuestion?.afterQuestions;
     setSmartQuestion(null);
+    
+    if (currentTask) {
+      // Check of er nog meer vragen zijn voor deze taak
+      const nextQuestion = getSmartQuestionForTask(currentTask.id, currentTask.title, { ...movingInfo, ...data });
+      
+      if (nextQuestion) {
+        // Nog een vraag nodig
+        setSmartQuestion({ type: nextQuestion, task: currentTask, afterQuestions: afterAction });
+        return;
+      }
+      
+      // Alle vragen beantwoord
+      if (afterAction === 'deal') {
+        // Navigeer naar deals pagina
+        navigate(`/deals?task=${encodeURIComponent(currentTask.title)}`);
+      }
+    }
     
     // Show partner invite after first few tasks if not shown yet
     const completedCount = tasks.filter(t => t.status === "done").length;
@@ -468,10 +475,7 @@ export const TaskList = ({
                             size="sm"
                             variant="ghost"
                             className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-                            }}
+                            onClick={(e) => handleRegelenClick(e, task)}
                           >
                             Regelen
                             <ArrowRight className="w-3 h-3 ml-1" />

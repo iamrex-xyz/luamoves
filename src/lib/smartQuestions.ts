@@ -371,19 +371,10 @@ export const getSmartQuestionForTask = (
   const titleLower = taskTitle.toLowerCase();
   const idLower = taskId.toLowerCase();
 
-  console.log("getSmartQuestionForTask called:", { taskId, taskTitle, movingInfo });
-
   for (const trigger of taskQuestionTriggers) {
     // Check of task ID of titel matched
     const idMatch = trigger.taskIdPatterns.some((p) => idLower.includes(p));
     const titleMatch = trigger.titlePatterns.some((p) => titleLower.includes(p));
-
-    console.log("Checking trigger:", { 
-      patterns: trigger.taskIdPatterns, 
-      idMatch, 
-      titleMatch, 
-      checkResult: (idMatch || titleMatch) ? trigger.checkField(movingInfo) : "skipped"
-    });
 
     if ((idMatch || titleMatch) && trigger.checkField(movingInfo)) {
       // Return eerste vraag die nog niet beantwoord is
@@ -393,17 +384,14 @@ export const getSmartQuestionForTask = (
         
         // Check of het veld al ingevuld is
         const value = movingInfo[fieldKey as keyof MovingInfo];
-        console.log("Checking field:", { questionType, fieldKey, value, isEmpty: isEmpty(value) });
         
         if (isEmpty(value)) {
-          console.log("Returning question:", questionType);
           return questionType;
         }
       }
     }
   }
 
-  console.log("No smart question found");
   return null;
 };
 
