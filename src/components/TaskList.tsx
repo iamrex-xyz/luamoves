@@ -104,18 +104,22 @@ export const TaskList = ({
     
     // Only ask questions when completing a task (not when un-completing)
     if (task.status !== "done") {
-      // First check for smart questions (new system)
-      const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
-      if (smartQuestionType) {
-        setSmartQuestion({ type: smartQuestionType, task });
-        return;
-      }
-      
-      // Fallback to old contextual prompts
-      const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
-      if (requiredPrompt) {
-        setContextualPrompt({ type: requiredPrompt, task });
-        return;
+      // Smart questions alleen tonen als gebruiker NIET guest is (ingelogd)
+      // Gasten moeten eerst email/account aanmaken via de email/signup flow
+      if (!isGuest) {
+        // First check for smart questions (new system)
+        const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
+        if (smartQuestionType) {
+          setSmartQuestion({ type: smartQuestionType, task });
+          return;
+        }
+        
+        // Fallback to old contextual prompts
+        const requiredPrompt = getRequiredPromptForTask(task.id, task.title, movingInfo);
+        if (requiredPrompt) {
+          setContextualPrompt({ type: requiredPrompt, task });
+          return;
+        }
       }
     }
     
