@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -66,8 +67,7 @@ export const SignupPromptDialog = ({
   
   // Step 2: Profile fields
   const [phone, setPhone] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [houseNumber, setHouseNumber] = useState("");
+  const [oldAddress, setOldAddress] = useState("");
   const [keyHandoverDate, setKeyHandoverDate] = useState<Date | undefined>(undefined);
   const [renovationType, setRenovationType] = useState<"none" | "small" | "large">("none");
   const [adults, setAdults] = useState("1");
@@ -92,47 +92,29 @@ export const SignupPromptDialog = ({
     return null;
   };
 
-  // Extract postcode and house number from a full address string
-  const extractAddressParts = (address: string): { postcode: string; houseNumber: string } => {
-    if (!address) return { postcode: "", houseNumber: "" };
-    
-    // Dutch postcode pattern: 4 digits + 2 letters (e.g., 1234AB or 1234 AB)
-    const postcodeMatch = address.match(/(\d{4}\s?[A-Za-z]{2})/);
-    const postcode = postcodeMatch ? postcodeMatch[1].replace(/\s/g, '').toUpperCase() : "";
-    
-    // House number: look for a number that's likely the house number
-    // Usually appears after street name, often followed by postcode
-    const houseNumberMatch = address.match(/\b(\d+[A-Za-z]?(?:\s*[-\/]\s*\d+[A-Za-z]?)?)\b(?=\s|,|$)/);
-    const houseNumber = houseNumberMatch ? houseNumberMatch[1] : "";
-    
-    return { postcode, houseNumber };
-  };
-
   // Pre-fill old address from onboarding data on mount
   useEffect(() => {
     const onboardingData = getOnboardingData();
-    if (onboardingData?.oldAddress && !postcode && !houseNumber) {
-      const { postcode: extractedPostcode, houseNumber: extractedHouseNumber } = extractAddressParts(onboardingData.oldAddress);
-      if (extractedPostcode) setPostcode(extractedPostcode);
-      if (extractedHouseNumber) setHouseNumber(extractedHouseNumber);
+    if (onboardingData?.oldAddress && !oldAddress) {
+      setOldAddress(onboardingData.oldAddress);
     }
   }, []);
 
   // Check if old address matches new address from onboarding
   const isSameAsNewAddress = useMemo(() => {
     const onboardingData = getOnboardingData();
-    if (!onboardingData?.newAddress || !postcode.trim() || !houseNumber.trim()) {
+    if (!onboardingData?.newAddress || !oldAddress.trim()) {
       return false;
     }
     
     const newAddressLower = onboardingData.newAddress.toLowerCase().replace(/\s+/g, '');
-    const oldAddressLower = `${postcode}${houseNumber}`.toLowerCase().replace(/\s+/g, '');
+    const oldAddressLower = oldAddress.toLowerCase().replace(/\s+/g, '');
     
-    // Check if the postcode and house number appear in the new address
-    return newAddressLower.includes(oldAddressLower) || 
-           newAddressLower.includes(postcode.toLowerCase().replace(/\s+/g, '')) && 
-           newAddressLower.includes(houseNumber.toLowerCase().replace(/\s+/g, ''));
-  }, [postcode, houseNumber]);
+    // Check if addresses are substantially similar
+    return newAddressLower === oldAddressLower || 
+           newAddressLower.includes(oldAddressLower) ||
+           oldAddressLower.includes(newAddressLower);
+  }, [oldAddress]);
 
   // Check if key handover date is after moving date
   const isKeyHandoverAfterMovingDate = useMemo(() => {
@@ -147,17 +129,16 @@ export const SignupPromptDialog = ({
   // Calculate fields completed for progress indicator
   const filledFieldsCount = useMemo(() => {
     let count = 0;
-    if (postcode.trim()) count++;
-    if (houseNumber.trim()) count++;
+    if (oldAddress.trim()) count++;
     if (keyHandoverDate) count++;
     if (phone.trim()) count++;
     if (birthDate) count++;
     // renovationType always has a value so count it as done
     count++;
     return count;
-  }, [postcode, houseNumber, keyHandoverDate, phone, birthDate]);
+  }, [oldAddress, keyHandoverDate, phone, birthDate]);
 
-  const totalFields = 6;
+  const totalFields = 5;
 
   // Generate year options (from 1920 to current year)
   const yearOptions = useMemo(() => {
@@ -244,17 +225,13 @@ export const SignupPromptDialog = ({
   const validateStep2 = (): boolean => {
     const errors: Record<string, string> = {};
     
-    if (!postcode.trim()) {
-      errors.postcode = "Postcode is verplicht";
-    }
-    if (!houseNumber.trim()) {
-      errors.houseNumber = "Huisnummer is verplicht";
+    if (!oldAddress.trim()) {
+      errors.oldAddress = "Oud adres is verplicht";
     }
     
     // Check if old address is same as new address
     if (isSameAsNewAddress) {
-      errors.postcode = "Dit lijkt op je nieuwe adres";
-      errors.houseNumber = "Vul je oude adres in";
+      errors.oldAddress = "Dit lijkt op je nieuwe adres. Vul je huidige (oude) adres in.";
     }
     
     if (!keyHandoverDate) {
@@ -306,8 +283,8 @@ export const SignupPromptDialog = ({
 
   // Check if all step 2 fields are filled
   const isStep2Complete = useMemo(() => {
-    return postcode.trim() && houseNumber.trim() && keyHandoverDate && phone.trim() && birthDate;
-  }, [postcode, houseNumber, keyHandoverDate, phone, birthDate]);
+    return oldAddress.trim() && keyHandoverDate && phone.trim() && birthDate;
+  }, [oldAddress, keyHandoverDate, phone, birthDate]);
 
   const handleSignup = async () => {
     if (!capturedEmail) {
@@ -350,16 +327,21 @@ export const SignupPromptDialog = ({
       if (error) throw error;
 
       if (data.user) {
-        // Combine postcode and house number for old_address
-        const oldAddress = postcode && houseNumber ? `${postcode} ${houseNumber}` : null;
+        // Use the full old address
+        const oldAddressValue = oldAddress.trim() || null;
         
         // Also update sessionStorage so the address syncs properly
-        if (oldAddress) {
+        if (oldAddressValue) {
           try {
             const storedData = sessionStorage.getItem("lua_moving_info");
             if (storedData) {
               const movingInfo = JSON.parse(storedData);
-              movingInfo.oldAddress = oldAddress;
+              movingInfo.oldAddress = oldAddressValue;
+              // Also sync key handover date and renovation type
+              if (keyHandoverDate) {
+                movingInfo.keyHandoverDate = format(keyHandoverDate, "yyyy-MM-dd");
+              }
+              movingInfo.renovationType = renovationType;
               sessionStorage.setItem("lua_moving_info", JSON.stringify(movingInfo));
             }
           } catch (e) {
@@ -372,7 +354,7 @@ export const SignupPromptDialog = ({
           .from('profiles')
           .update({
             phone: phone || null,
-            old_address: oldAddress,
+            old_address: oldAddressValue,
             key_handover_date: keyHandoverDate ? format(keyHandoverDate, "yyyy-MM-dd") : null,
             renovation_type: renovationType,
             adults: parseInt(adults) || 1,
@@ -549,53 +531,28 @@ export const SignupPromptDialog = ({
               )}
 
               <div className="space-y-4">
-                {/* Old Address - Postcode + House Number */}
+                {/* Old Address - Full address with autocomplete */}
                 <div className="space-y-2">
                   <Label className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-muted-foreground" />
                     Oud adres <span className="text-destructive">*</span>
                   </Label>
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Input
-                        type="text"
-                        placeholder="Postcode"
-                        value={postcode}
-                        onChange={(e) => {
-                          const val = e.target.value.toUpperCase();
-                          setPostcode(val);
-                          if (val.trim() && !postcode.trim()) trackFieldComplete("postcode");
-                          if (step2Errors.postcode) {
-                            setStep2Errors(prev => ({ ...prev, postcode: "" }));
-                          }
-                        }}
-                        className={cn("h-12 rounded-xl", (step2Errors.postcode || isSameAsNewAddress) && "border-destructive")}
-                        maxLength={7}
-                      />
-                      {step2Errors.postcode && (
-                        <p className="text-xs text-destructive mt-1">{step2Errors.postcode}</p>
-                      )}
-                    </div>
-                    <div>
-                      <Input
-                        type="text"
-                        placeholder="Huisnummer"
-                        value={houseNumber}
-                        onChange={(e) => {
-                          setHouseNumber(e.target.value);
-                          if (e.target.value.trim() && !houseNumber.trim()) trackFieldComplete("houseNumber");
-                          if (step2Errors.houseNumber) {
-                            setStep2Errors(prev => ({ ...prev, houseNumber: "" }));
-                          }
-                        }}
-                        className={cn("h-12 rounded-xl", (step2Errors.houseNumber || isSameAsNewAddress) && "border-destructive")}
-                      />
-                      {step2Errors.houseNumber && (
-                        <p className="text-xs text-destructive mt-1">{step2Errors.houseNumber}</p>
-                      )}
-                    </div>
-                  </div>
-                  {isSameAsNewAddress && !step2Errors.postcode && !step2Errors.houseNumber && (
+                  <AddressAutocomplete
+                    label=""
+                    placeholder="Begin met typen..."
+                    value={oldAddress}
+                    onChange={(address) => {
+                      setOldAddress(address);
+                      if (address.trim() && !oldAddress.trim()) trackFieldComplete("oldAddress");
+                      if (step2Errors.oldAddress) {
+                        setStep2Errors(prev => ({ ...prev, oldAddress: "" }));
+                      }
+                    }}
+                  />
+                  {step2Errors.oldAddress && (
+                    <p className="text-xs text-destructive mt-1">{step2Errors.oldAddress}</p>
+                  )}
+                  {isSameAsNewAddress && !step2Errors.oldAddress && (
                     <p className="text-xs text-destructive mt-1">
                       Hé, dit lijkt op je nieuwe adres! Vul hier je huidige (oude) adres in.
                     </p>
