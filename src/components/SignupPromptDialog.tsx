@@ -78,6 +78,8 @@ export const SignupPromptDialog = ({
   
   const [isLoading, setIsLoading] = useState(false);
   const [step2Errors, setStep2Errors] = useState<Record<string, string>>({});
+  const [keyHandoverCalendarOpen, setKeyHandoverCalendarOpen] = useState(false);
+  const [birthDateCalendarOpen, setBirthDateCalendarOpen] = useState(false);
   
   // Get onboarding data from sessionStorage for validation
   const getOnboardingData = () => {
@@ -565,7 +567,7 @@ export const SignupPromptDialog = ({
                     <Calendar className="w-4 h-4 text-muted-foreground" />
                     Datum sleuteloverdracht <span className="text-destructive">*</span>
                   </Label>
-                  <Popover>
+                  <Popover open={keyHandoverCalendarOpen} onOpenChange={setKeyHandoverCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -589,6 +591,8 @@ export const SignupPromptDialog = ({
                           if (step2Errors.keyHandoverDate) {
                             setStep2Errors(prev => ({ ...prev, keyHandoverDate: "" }));
                           }
+                          // Close popover after date selection
+                          setKeyHandoverCalendarOpen(false);
                         }}
                         initialFocus
                         className="pointer-events-auto"
@@ -741,7 +745,7 @@ export const SignupPromptDialog = ({
                     <Cake className="w-4 h-4 text-muted-foreground" />
                     Geboortedatum <span className="text-destructive">*</span>
                   </Label>
-                  <Popover>
+                  <Popover open={birthDateCalendarOpen} onOpenChange={setBirthDateCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -800,6 +804,8 @@ export const SignupPromptDialog = ({
                           if (step2Errors.birthDate) {
                             setStep2Errors(prev => ({ ...prev, birthDate: "" }));
                           }
+                          // Close popover after date selection
+                          setBirthDateCalendarOpen(false);
                         }}
                         month={birthCalendarMonth}
                         onMonthChange={setBirthCalendarMonth}
