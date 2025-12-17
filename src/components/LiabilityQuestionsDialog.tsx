@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Shield, Baby, PawPrint, ArrowRight } from "lucide-react";
+import { Shield, Baby, PawPrint, ArrowRight, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 
 type LiabilityQuestionsDialogProps = {
@@ -18,6 +18,11 @@ type LiabilityQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+};
+
+const stepExplanations = {
+  children: "Kinderen zijn vaak meeverzekerd. Dit bepaalt je dekking en premie.",
+  pets: "Huisdieren kunnen schade veroorzaken. Dit is belangrijk voor je aansprakelijkheidsdekking.",
 };
 
 export const LiabilityQuestionsDialog = ({
@@ -99,9 +104,10 @@ export const LiabilityQuestionsDialog = ({
                 <Baby className="h-5 w-5 text-primary" />
                 Heb je kinderen?
               </div>
-              <p className="text-sm text-muted-foreground">
-                Dit is relevant voor je aansprakelijkheidsverzekering.
-              </p>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations.children}</p>
+              </div>
               
               <div className="space-y-3">
                 <RadioGroup
@@ -143,9 +149,10 @@ export const LiabilityQuestionsDialog = ({
                 <PawPrint className="h-5 w-5 text-primary" />
                 Heb je huisdieren?
               </div>
-              <p className="text-sm text-muted-foreground">
-                Huisdieren kunnen invloed hebben op je aansprakelijkheidsverzekering.
-              </p>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations.pets}</p>
+              </div>
               
               <RadioGroup value={hasPets} onValueChange={(v) => setHasPets(v as "yes" | "no")}>
                 <div className="flex items-center space-x-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer">

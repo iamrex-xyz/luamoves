@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Info } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,11 @@ const budgetOptions = [
   { value: "15k_50k", label: "€15.000 - €50.000" },
   { value: "over_50k", label: "Meer dan €50.000" },
 ];
+
+const stepExplanations = {
+  1: "Dit helpt aannemers om passende offertes te maken voor jouw project.",
+  2: "Zo kunnen we aannemers vinden die beschikbaar zijn wanneer jij wilt starten.",
+};
 
 export function RenovationQuestionsDialog({
   open,
@@ -104,11 +109,15 @@ export function RenovationQuestionsDialog({
           {step === 1 && needsBudget && (
             <div className="space-y-4">
               <Label className="text-base font-medium">Wat is je budgetindicatie?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[1]}</p>
+              </div>
               <RadioGroup value={budget} onValueChange={setBudget}>
                 {budgetOptions.map((option) => (
-                  <div key={option.value} className="flex items-center space-x-2">
+                  <div key={option.value} className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
                     <RadioGroupItem value={option.value} id={`budget-${option.value}`} />
-                    <Label htmlFor={`budget-${option.value}`} className="cursor-pointer">
+                    <Label htmlFor={`budget-${option.value}`} className="cursor-pointer flex-1">
                       {option.label}
                     </Label>
                   </div>
@@ -120,6 +129,10 @@ export function RenovationQuestionsDialog({
           {step === 2 && needsStartDate && (
             <div className="space-y-4">
               <Label className="text-base font-medium">Wanneer wil je starten?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[2]}</p>
+              </div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
