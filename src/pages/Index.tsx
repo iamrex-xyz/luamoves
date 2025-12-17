@@ -73,6 +73,8 @@ export type MovingInfo = {
   renovationBudget?: string;
   renovationStartDate?: string;
   housingPropertyType?: string;
+  // Contact veld
+  phone?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -309,6 +311,7 @@ const Index = () => {
           // Renovation velden
           renovation_budget: (info as any).renovationBudget || null,
           renovation_start_date: (info as any).renovationStartDate || null,
+          phone: info.phone || null,
         } as any)
         .eq('user_id', userId);
 
