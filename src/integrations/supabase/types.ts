@@ -260,7 +260,9 @@ export type Database = {
           pet_types: string[] | null
           pets: number | null
           phone: string | null
+          preferred_service_date: string | null
           renovation_type: string | null
+          service_type: string | null
           special_items: string[] | null
           updated_at: string
           user_id: string
@@ -310,7 +312,9 @@ export type Database = {
           pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
+          preferred_service_date?: string | null
           renovation_type?: string | null
+          service_type?: string | null
           special_items?: string[] | null
           updated_at?: string
           user_id: string
@@ -360,7 +364,9 @@ export type Database = {
           pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
+          preferred_service_date?: string | null
           renovation_type?: string | null
+          service_type?: string | null
           special_items?: string[] | null
           updated_at?: string
           user_id?: string
