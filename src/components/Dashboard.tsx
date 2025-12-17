@@ -181,7 +181,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
   };
 
   return (
-    <PullToRefresh onRefresh={refreshTasks} className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+      <PullToRefresh onRefresh={refreshTasks} className="min-h-screen">
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       {/* Header */}
@@ -328,7 +329,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
         onToggleStatus={handleTaskToggle}
       />
 
+      </PullToRefresh>
+
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
-    </PullToRefresh>
+    </div>
   );
 };
