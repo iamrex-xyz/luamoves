@@ -51,6 +51,8 @@ export type MovingInfo = {
   hasElevator?: string;
   numberOfRooms?: string;
   specialItems?: string[];
+  // Boxes questions velden
+  hasFragileItems?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -180,6 +182,8 @@ const Index = () => {
         hasElevator: (profile as any).has_elevator || undefined,
         numberOfRooms: (profile as any).number_of_rooms || undefined,
         specialItems: (profile as any).special_items || [],
+        // Boxes questions velden
+        hasFragileItems: (profile as any).has_fragile_items || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -244,6 +248,8 @@ const Index = () => {
           has_elevator: info.hasElevator || null,
           number_of_rooms: info.numberOfRooms || null,
           special_items: info.specialItems || [],
+          // Boxes questions velden
+          has_fragile_items: info.hasFragileItems || null,
         } as any)
         .eq('user_id', userId);
 

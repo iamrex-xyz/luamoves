@@ -20,6 +20,7 @@ import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
 import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
 import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
 import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
+import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -77,6 +78,7 @@ export const TaskList = ({
   const [showEnergyQuestions, setShowEnergyQuestions] = useState(false);
   const [showInternetQuestions, setShowInternetQuestions] = useState(false);
   const [showMovingQuestions, setShowMovingQuestions] = useState(false);
+  const [showBoxesQuestions, setShowBoxesQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -164,6 +166,23 @@ export const TaskList = ({
     return !info.floorLevel || !info.hasElevator || !info.numberOfRooms || !info.specialItems || info.specialItems.length === 0;
   };
 
+  // Helper function to check if task is boxes task
+  const isBoxesTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("verhuisdozen") ||
+      (titleLower.includes("bestel") && titleLower.includes("dozen")) ||
+      idLower.includes("boxes") ||
+      idLower.includes("dozen")
+    );
+  };
+
+  // Check if boxes questions are needed
+  const needsBoxesQuestions = (info: MovingInfo) => {
+    return !info.numberOfRooms || !info.hasFragileItems;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -197,6 +216,17 @@ export const TaskList = ({
         return;
       }
       // All moving questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a boxes task
+    if (isBoxesTask(task)) {
+      if (needsBoxesQuestions(movingInfo)) {
+        setShowBoxesQuestions(true);
+        return;
+      }
+      // All boxes questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -243,6 +273,16 @@ export const TaskList = ({
 
   const handleMovingRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Regel verhuisbedrijf of helpers")}`);
+  };
+
+  const handleBoxesQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleBoxesRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Bestel verhuisdozen")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -676,6 +716,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleMovingQuestionsComplete}
         onRedirect={handleMovingRedirect}
+      />
+
+      <BoxesQuestionsDialog
+        open={showBoxesQuestions}
+        onOpenChange={setShowBoxesQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleBoxesQuestionsComplete}
+        onRedirect={handleBoxesRedirect}
       />
 
       <InvitePartnerDialog

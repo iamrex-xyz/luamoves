@@ -232,6 +232,7 @@ export type Database = {
           glasvezel: string | null
           has_elevator: string | null
           has_fiber: string | null
+          has_fragile_items: string | null
           has_garden: boolean | null
           has_gas: string | null
           has_job: boolean | null
@@ -276,6 +277,7 @@ export type Database = {
           glasvezel?: string | null
           has_elevator?: string | null
           has_fiber?: string | null
+          has_fragile_items?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
           has_job?: boolean | null
@@ -320,6 +322,7 @@ export type Database = {
           glasvezel?: string | null
           has_elevator?: string | null
           has_fiber?: string | null
+          has_fragile_items?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
           has_job?: boolean | null
