@@ -18,6 +18,7 @@ import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
 import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
 import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
+import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -73,6 +74,7 @@ export const TaskList = ({
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
   const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task; afterQuestions?: 'deal' | 'complete' } | null>(null);
   const [showEnergyQuestions, setShowEnergyQuestions] = useState(false);
+  const [showInternetQuestions, setShowInternetQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -122,12 +124,28 @@ export const TaskList = ({
     );
   };
 
+  // Helper function to check if task is internet task
+  const isInternetTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("internet") ||
+      (titleLower.includes("regel") && titleLower.includes("telefoon")) ||
+      idLower.includes("internet")
+    );
+  };
+
   // Check if energy questions are needed
   const needsEnergyQuestions = (info: MovingInfo) => {
     return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
   };
 
-  // Regelen knop: eerst smart questions (of energy questions voor energietaak), daarna deals
+  // Check if internet questions are needed
+  const needsInternetQuestions = (info: MovingInfo) => {
+    return !info.hasFiber || !info.internetSpeedPreference || !info.internetBundle;
+  };
+
+  // Regelen knop: eerst smart questions (of energy/internet questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     
@@ -138,6 +156,17 @@ export const TaskList = ({
         return;
       }
       // All energy questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is an internet task
+    if (isInternetTask(task)) {
+      if (needsInternetQuestions(movingInfo)) {
+        setShowInternetQuestions(true);
+        return;
+      }
+      // All internet questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -164,6 +193,16 @@ export const TaskList = ({
 
   const handleEnergyRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Vergelijk en kies energieleverancier")}`);
+  };
+
+  const handleInternetQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleInternetRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Regel internet en telefoon")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -581,6 +620,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleEnergyQuestionsComplete}
         onRedirect={handleEnergyRedirect}
+      />
+
+      <InternetQuestionsDialog
+        open={showInternetQuestions}
+        onOpenChange={setShowInternetQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleInternetQuestionsComplete}
+        onRedirect={handleInternetRedirect}
       />
 
       <InvitePartnerDialog

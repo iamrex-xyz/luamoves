@@ -62,7 +62,7 @@ const categories = [
   {
     id: "internet" as Category,
     title: "Internet",
-    subtitle: "Verbinding & thuiswerken",
+    subtitle: "Snelheid & bundel",
     icon: Wifi,
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
@@ -106,6 +106,9 @@ export const ExtraInfoSheet = ({
   const [gardenSize, setGardenSize] = useState("");
   const [buildingAccess, setBuildingAccess] = useState("");
   
+  const [hasFiber, setHasFiber] = useState("");
+  const [internetSpeedPreference, setInternetSpeedPreference] = useState("");
+  const [internetBundle, setInternetBundle] = useState("");
   const [glasvezel, setGlasvezel] = useState("");
   const [worksFromHome, setWorksFromHome] = useState("");
   
@@ -132,6 +135,9 @@ export const ExtraInfoSheet = ({
         setHasGarden(movingInfo.hasGarden === true ? "yes" : movingInfo.hasGarden === false ? "no" : "");
         setGardenSize(movingInfo.gardenSize || "");
         setBuildingAccess(movingInfo.buildingAccess || "");
+        setHasFiber(movingInfo.hasFiber || "");
+        setInternetSpeedPreference(movingInfo.internetSpeedPreference || "");
+        setInternetBundle(movingInfo.internetBundle || "");
         setGlasvezel(movingInfo.glasvezel || "");
         setWorksFromHome(movingInfo.worksFromHome || "");
         setInsuranceValue(movingInfo.insuranceValue || "");
@@ -154,6 +160,9 @@ export const ExtraInfoSheet = ({
         setHasGarden(profile.has_garden === true ? "yes" : profile.has_garden === false ? "no" : "");
         setGardenSize((profile as any).garden_size || "");
         setBuildingAccess((profile as any).building_access || "");
+        setHasFiber((profile as any).has_fiber || "");
+        setInternetSpeedPreference((profile as any).internet_speed_preference || "");
+        setInternetBundle((profile as any).internet_bundle || "");
         setGlasvezel((profile as any).glasvezel || "");
         setWorksFromHome((profile as any).works_from_home || "");
         setInsuranceValue((profile as any).insurance_value || "");
@@ -177,6 +186,9 @@ export const ExtraInfoSheet = ({
         hasGarden: hasGarden === "yes" ? true : hasGarden === "no" ? false : undefined,
         gardenSize: gardenSize as any || undefined,
         buildingAccess: buildingAccess as any || undefined,
+        hasFiber: hasFiber as any || undefined,
+        internetSpeedPreference: internetSpeedPreference as any || undefined,
+        internetBundle: internetBundle as any || undefined,
         glasvezel: glasvezel as any || undefined,
         worksFromHome: worksFromHome as any || undefined,
         insuranceValue: insuranceValue as any || undefined,
@@ -197,6 +209,9 @@ export const ExtraInfoSheet = ({
             has_garden: hasGarden === "yes" ? true : hasGarden === "no" ? false : null,
             garden_size: gardenSize || null,
             building_access: buildingAccess || null,
+            has_fiber: hasFiber || null,
+            internet_speed_preference: internetSpeedPreference || null,
+            internet_bundle: internetBundle || null,
             glasvezel: glasvezel || null,
             works_from_home: worksFromHome || null,
             insurance_value: insuranceValue || null,
@@ -231,7 +246,7 @@ export const ExtraInfoSheet = ({
       case "woning":
         return [propertyType, buildingYear, hasGarden, buildingAccess].filter(Boolean).length;
       case "internet":
-        return [glasvezel, worksFromHome].filter(Boolean).length;
+        return [hasFiber, internetSpeedPreference, internetBundle].filter(Boolean).length;
       case "verzekering":
         return [insuranceValue].filter(Boolean).length;
     }
@@ -241,7 +256,7 @@ export const ExtraInfoSheet = ({
     switch (categoryId) {
       case "energie": return 3;
       case "woning": return 4;
-      case "internet": return 2;
+      case "internet": return 3;
       case "verzekering": return 1;
     }
   };
@@ -406,27 +421,40 @@ export const ExtraInfoSheet = ({
                     <>
                       <div>
                         <Label className="text-xs text-muted-foreground uppercase tracking-wide">Glasvezel beschikbaar</Label>
-                        <Select value={glasvezel} onValueChange={setGlasvezel}>
+                        <Select value={hasFiber} onValueChange={setHasFiber}>
                           <SelectTrigger className="rounded-xl h-11 mt-1">
                             <SelectValue placeholder="Selecteer" />
                           </SelectTrigger>
                           <SelectContent className="bg-background z-50">
-                            <SelectItem value="yes">Ja, glasvezel</SelectItem>
-                            <SelectItem value="no">Nee, kabel/DSL</SelectItem>
+                            <SelectItem value="yes">Ja, glasvezel beschikbaar</SelectItem>
+                            <SelectItem value="no">Nee, geen glasvezel</SelectItem>
                             <SelectItem value="unknown">Weet ik niet</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Thuiswerken</Label>
-                        <Select value={worksFromHome} onValueChange={setWorksFromHome}>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Gewenste snelheid</Label>
+                        <Select value={internetSpeedPreference} onValueChange={setInternetSpeedPreference}>
                           <SelectTrigger className="rounded-xl h-11 mt-1">
                             <SelectValue placeholder="Selecteer" />
                           </SelectTrigger>
                           <SelectContent className="bg-background z-50">
-                            <SelectItem value="yes">Ja, regelmatig</SelectItem>
-                            <SelectItem value="sometimes">Soms</SelectItem>
-                            <SelectItem value="no">Nee, nooit</SelectItem>
+                            <SelectItem value="basic">Basis (mail & browsen)</SelectItem>
+                            <SelectItem value="medium">Gemiddeld (streamen)</SelectItem>
+                            <SelectItem value="high">Veel (thuiswerken/gamen)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Bundel</Label>
+                        <Select value={internetBundle} onValueChange={setInternetBundle}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="internet_only">Alleen internet</SelectItem>
+                            <SelectItem value="internet_tv">Internet + tv</SelectItem>
+                            <SelectItem value="internet_tv_mobile">Internet + tv + mobiel</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

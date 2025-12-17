@@ -229,6 +229,7 @@ export type Database = {
           energy_current_supplier: string | null
           garden_size: string | null
           glasvezel: string | null
+          has_fiber: string | null
           has_garden: boolean | null
           has_gas: string | null
           has_job: boolean | null
@@ -238,6 +239,8 @@ export type Database = {
           housing_property_type: string | null
           id: string
           insurance_value: string | null
+          internet_bundle: string | null
+          internet_speed_preference: string | null
           is_vve: boolean | null
           key_handover_date: string | null
           moving_date: string | null
@@ -266,6 +269,7 @@ export type Database = {
           energy_current_supplier?: string | null
           garden_size?: string | null
           glasvezel?: string | null
+          has_fiber?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
           has_job?: boolean | null
@@ -275,6 +279,8 @@ export type Database = {
           housing_property_type?: string | null
           id?: string
           insurance_value?: string | null
+          internet_bundle?: string | null
+          internet_speed_preference?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
@@ -303,6 +309,7 @@ export type Database = {
           energy_current_supplier?: string | null
           garden_size?: string | null
           glasvezel?: string | null
+          has_fiber?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
           has_job?: boolean | null
@@ -312,6 +319,8 @@ export type Database = {
           housing_property_type?: string | null
           id?: string
           insurance_value?: string | null
+          internet_bundle?: string | null
+          internet_speed_preference?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
           moving_date?: string | null
