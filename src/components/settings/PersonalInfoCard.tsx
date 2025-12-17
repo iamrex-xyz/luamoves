@@ -9,11 +9,19 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Phone, Cake } from "lucide-react";
+import { z } from "zod";
+
+const phoneSchema = z.string()
+  .transform(val => val.replace(/\s/g, ''))
+  .refine(val => val === '' || /^(\+31|0)[1-9][0-9]{8}$/.test(val), {
+    message: "Voer een geldig Nederlands telefoonnummer in (bijv. 0612345678)"
+  });
 
 export const PersonalInfoCard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [birthDateObj, setBirthDateObj] = useState<Date | undefined>(undefined);
 
@@ -44,17 +52,33 @@ export const PersonalInfoCard = () => {
     }
   };
 
+  const validatePhone = (value: string) => {
+    const result = phoneSchema.safeParse(value);
+    if (!result.success) {
+      setPhoneError(result.error.errors[0]?.message || "Ongeldig telefoonnummer");
+      return false;
+    }
+    setPhoneError(null);
+    return true;
+  };
+
   const handleSave = async () => {
+    if (phone && !validatePhone(phone)) {
+      toast({ title: "Fout", description: "Corrigeer het telefoonnummer.", variant: "destructive" });
+      return;
+    }
+
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
+      const cleanPhone = phone.replace(/\s/g, '');
 
       const { error } = await supabase
         .from("profiles")
-        .update({ phone: phone || null, birth_date: birthDateStr || null })
+        .update({ phone: cleanPhone || null, birth_date: birthDateStr || null })
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -89,9 +113,14 @@ export const PersonalInfoCard = () => {
             type="tel"
             placeholder="06 12345678"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="rounded-xl h-11"
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (phoneError) validatePhone(e.target.value);
+            }}
+            onBlur={() => phone && validatePhone(phone)}
+            className={cn("rounded-xl h-11", phoneError && "border-destructive")}
           />
+          {phoneError && <p className="text-xs text-destructive mt-1">{phoneError}</p>}
         </div>
 
         <div>
@@ -126,7 +155,7 @@ export const PersonalInfoCard = () => {
           </Popover>
         </div>
 
-        <Button onClick={handleSave} disabled={isLoading} className="w-full rounded-xl h-11">
+        <Button onClick={handleSave} disabled={isLoading || !!phoneError} className="w-full rounded-xl h-11">
           Opslaan
         </Button>
       </div>

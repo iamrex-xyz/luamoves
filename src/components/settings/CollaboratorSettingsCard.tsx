@@ -5,6 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Check, Trash2 } from "lucide-react";
+import { z } from "zod";
+import { cn } from "@/lib/utils";
+
+const emailSchema = z.string().email({ message: "Voer een geldig e-mailadres in" });
 
 type Collaborator = {
   id: string;
@@ -19,6 +23,7 @@ export const CollaboratorSettingsCard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [newCollaboratorEmail, setNewCollaboratorEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   useEffect(() => {
     loadCollaborators();
@@ -42,8 +47,23 @@ export const CollaboratorSettingsCard = () => {
     }
   };
 
+  const validateEmail = (value: string) => {
+    const result = emailSchema.safeParse(value);
+    if (!result.success) {
+      setEmailError(result.error.errors[0]?.message || "Ongeldig e-mailadres");
+      return false;
+    }
+    setEmailError(null);
+    return true;
+  };
+
   const handleInvite = async () => {
     if (!newCollaboratorEmail) return;
+    
+    if (!validateEmail(newCollaboratorEmail)) {
+      toast({ title: "Fout", description: "Voer een geldig e-mailadres in.", variant: "destructive" });
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -54,7 +74,7 @@ export const CollaboratorSettingsCard = () => {
         .from("moving_collaborators")
         .insert({
           owner_user_id: user.id,
-          collaborator_email: newCollaboratorEmail,
+          collaborator_email: newCollaboratorEmail.trim().toLowerCase(),
           collaborator_user_id: null,
         });
 
@@ -62,6 +82,7 @@ export const CollaboratorSettingsCard = () => {
 
       toast({ title: "Uitnodiging verzonden", description: `${newCollaboratorEmail} is uitgenodigd.` });
       setNewCollaboratorEmail("");
+      setEmailError(null);
       loadCollaborators();
     } catch (error) {
       console.error("Error inviting:", error);
@@ -103,22 +124,29 @@ export const CollaboratorSettingsCard = () => {
       </div>
 
       <div className="p-4 space-y-4">
-        <div className="flex gap-2 items-center">
-          <Input
-            type="email"
-            placeholder="E-mailadres"
-            value={newCollaboratorEmail}
-            onChange={(e) => setNewCollaboratorEmail(e.target.value)}
-            className="flex-1 rounded-full h-11"
-          />
-          <Button 
-            onClick={handleInvite} 
-            disabled={isLoading || !newCollaboratorEmail}
-            size="icon"
-            className="rounded-full h-11 w-11 shrink-0 bg-orange-200 hover:bg-orange-300 text-orange-700"
-          >
-            <Mail className="w-4 h-4" />
-          </Button>
+        <div>
+          <div className="flex gap-2 items-center">
+            <Input
+              type="email"
+              placeholder="E-mailadres"
+              value={newCollaboratorEmail}
+              onChange={(e) => {
+                setNewCollaboratorEmail(e.target.value);
+                if (emailError) validateEmail(e.target.value);
+              }}
+              onBlur={() => newCollaboratorEmail && validateEmail(newCollaboratorEmail)}
+              className={cn("flex-1 rounded-full h-11", emailError && "border-destructive")}
+            />
+            <Button 
+              onClick={handleInvite} 
+              disabled={isLoading || !newCollaboratorEmail || !!emailError}
+              size="icon"
+              className="rounded-full h-11 w-11 shrink-0 bg-orange-200 hover:bg-orange-300 text-orange-700"
+            >
+              <Mail className="w-4 h-4" />
+            </Button>
+          </div>
+          {emailError && <p className="text-xs text-destructive mt-1">{emailError}</p>}
         </div>
 
         {collaborators.length > 0 && (
