@@ -227,8 +227,10 @@ export type Database = {
           current_housing_situation: string | null
           energy_connection_type: string | null
           energy_current_supplier: string | null
+          floor_level: string | null
           garden_size: string | null
           glasvezel: string | null
+          has_elevator: string | null
           has_fiber: string | null
           has_garden: boolean | null
           has_gas: string | null
@@ -247,11 +249,13 @@ export type Database = {
           moving_type: string | null
           needs_contractor_help: boolean | null
           new_address: string | null
+          number_of_rooms: string | null
           old_address: string | null
           pet_types: string[] | null
           pets: number | null
           phone: string | null
           renovation_type: string | null
+          special_items: string[] | null
           updated_at: string
           user_id: string
           works_from_home: string | null
@@ -267,8 +271,10 @@ export type Database = {
           current_housing_situation?: string | null
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
+          floor_level?: string | null
           garden_size?: string | null
           glasvezel?: string | null
+          has_elevator?: string | null
           has_fiber?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
@@ -287,11 +293,13 @@ export type Database = {
           moving_type?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          number_of_rooms?: string | null
           old_address?: string | null
           pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
           renovation_type?: string | null
+          special_items?: string[] | null
           updated_at?: string
           user_id: string
           works_from_home?: string | null
@@ -307,8 +315,10 @@ export type Database = {
           current_housing_situation?: string | null
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
+          floor_level?: string | null
           garden_size?: string | null
           glasvezel?: string | null
+          has_elevator?: string | null
           has_fiber?: string | null
           has_garden?: boolean | null
           has_gas?: string | null
@@ -327,11 +337,13 @@ export type Database = {
           moving_type?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          number_of_rooms?: string | null
           old_address?: string | null
           pet_types?: string[] | null
           pets?: number | null
           phone?: string | null
           renovation_type?: string | null
+          special_items?: string[] | null
           updated_at?: string
           user_id?: string
           works_from_home?: string | null

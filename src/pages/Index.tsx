@@ -46,6 +46,11 @@ export type MovingInfo = {
   hasFiber?: "yes" | "no" | "unknown";
   internetSpeedPreference?: "basic" | "medium" | "high";
   internetBundle?: "internet_only" | "internet_tv" | "internet_tv_mobile";
+  // Moving helper questions velden
+  floorLevel?: string;
+  hasElevator?: string;
+  numberOfRooms?: string;
+  specialItems?: string[];
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -166,6 +171,15 @@ const Index = () => {
         // Energy questions velden
         energyCurrentSupplier: (profile as any).energy_current_supplier || undefined,
         energyConnectionType: (profile as any).energy_connection_type as "gas_stroom" | "alleen_stroom" | undefined,
+        // Internet questions velden
+        hasFiber: (profile as any).has_fiber as "yes" | "no" | "unknown" | undefined,
+        internetSpeedPreference: (profile as any).internet_speed_preference as "basic" | "medium" | "high" | undefined,
+        internetBundle: (profile as any).internet_bundle as "internet_only" | "internet_tv" | "internet_tv_mobile" | undefined,
+        // Moving helper questions velden
+        floorLevel: (profile as any).floor_level || undefined,
+        hasElevator: (profile as any).has_elevator || undefined,
+        numberOfRooms: (profile as any).number_of_rooms || undefined,
+        specialItems: (profile as any).special_items || [],
       });
       setCurrentView("dashboard");
     } else {
@@ -221,6 +235,15 @@ const Index = () => {
           // Energy questions velden
           energy_current_supplier: info.energyCurrentSupplier || null,
           energy_connection_type: info.energyConnectionType || null,
+          // Internet questions velden
+          has_fiber: info.hasFiber || null,
+          internet_speed_preference: info.internetSpeedPreference || null,
+          internet_bundle: info.internetBundle || null,
+          // Moving helper questions velden
+          floor_level: info.floorLevel || null,
+          has_elevator: info.hasElevator || null,
+          number_of_rooms: info.numberOfRooms || null,
+          special_items: info.specialItems || [],
         } as any)
         .eq('user_id', userId);
 
