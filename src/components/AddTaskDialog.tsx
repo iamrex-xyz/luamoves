@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, Lock, X, Plus } from "lucide-react";
 
 type AddTaskDialogProps = {
   open: boolean;
@@ -123,58 +129,68 @@ export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded, onSignupClick }
   // Show guest message if not logged in
   if (isGuest) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[400px]">
-          <DialogHeader>
-            <DialogTitle>Account vereist</DialogTitle>
-            <DialogDescription>
-              Maak een gratis account om eigen taken toe te voegen
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-6 text-center">
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="max-h-[85dvh] rounded-t-[24px]">
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
+            <DrawerTitle className="text-lg font-semibold">Account vereist</DrawerTitle>
+            <DrawerClose asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl">
+                <X className="h-5 w-5" />
+              </Button>
+            </DrawerClose>
+          </div>
+          
+          <div className="p-6 text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-primary" />
             </div>
+            <h3 className="font-semibold text-lg mb-2">Maak een gratis account</h3>
             <p className="text-sm text-muted-foreground mb-6">
               Met een account kun je eigen taken toevoegen, je voortgang bewaren en samenwerken met anderen.
             </p>
-            <div className="flex flex-col gap-2">
-              <Button 
-                onClick={() => {
-                  onOpenChange(false);
-                  onSignupClick?.();
-                }}
-                className="w-full"
-              >
-                Account aanmaken
-              </Button>
-              <Button 
-                variant="ghost" 
-                onClick={() => onOpenChange(false)}
-                className="w-full"
-              >
-                Later
-              </Button>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+          
+          <div className="p-6 pt-0 space-y-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+            <Button 
+              onClick={() => {
+                onOpenChange(false);
+                onSignupClick?.();
+              }}
+              className="w-full h-12 rounded-xl"
+            >
+              Account aanmaken
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              className="w-full h-12 rounded-xl"
+            >
+              Later
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Handmatig taak toevoegen</DialogTitle>
-          <DialogDescription>
-            Voeg een eigen taak toe aan je verhuischecklist
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <DrawerContent className="max-h-[90dvh] rounded-t-[24px]">
+        {/* Fixed Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
+          <DrawerTitle className="text-lg font-semibold">Taak toevoegen</DrawerTitle>
+          <DrawerClose asChild>
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl">
+              <X className="h-5 w-5" />
+            </Button>
+          </DrawerClose>
+        </div>
+
+        {/* Scrollable Content */}
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Titel *</Label>
+              <Label htmlFor="title" className="text-sm font-medium">Titel *</Label>
               <Input
                 id="title"
                 value={title}
@@ -182,11 +198,12 @@ export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded, onSignupClick }
                 placeholder="Bijv. Extra verhuisdozen bestellen"
                 maxLength={100}
                 required
+                className="h-12 rounded-xl"
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="description">Beschrijving</Label>
+              <Label htmlFor="description" className="text-sm font-medium">Beschrijving</Label>
               <Textarea
                 id="description"
                 value={description}
@@ -194,18 +211,19 @@ export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded, onSignupClick }
                 placeholder="Optionele beschrijving van de taak"
                 maxLength={500}
                 rows={3}
+                className="rounded-xl resize-none"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Categorie *</Label>
+              <Label htmlFor="category" className="text-sm font-medium">Categorie *</Label>
               <Select value={category} onValueChange={setCategory} required>
-                <SelectTrigger id="category">
+                <SelectTrigger id="category" className="h-12 rounded-xl">
                   <SelectValue placeholder="Selecteer een categorie" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-background z-50">
                   {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
+                    <SelectItem key={cat} value={cat} className="py-3">
                       {cat}
                     </SelectItem>
                   ))}
@@ -214,33 +232,49 @@ export const AddTaskDialog = ({ open, onOpenChange, onTaskAdded, onSignupClick }
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deadline">Deadline *</Label>
+              <Label htmlFor="deadline" className="text-sm font-medium">Deadline *</Label>
               <Input
                 id="deadline"
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 required
+                className="h-12 rounded-xl"
               />
             </div>
           </div>
 
-          <DialogFooter>
+          {/* Fixed Footer */}
+          <div className="border-t bg-background px-4 py-3 space-y-2 sticky bottom-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+            <Button 
+              type="submit" 
+              disabled={isLoading} 
+              className="w-full h-12 rounded-xl"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Toevoegen...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Taak toevoegen
+                </>
+              )}
+            </Button>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
+              className="w-full h-12 rounded-xl"
             >
               Annuleren
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Taak toevoegen
-            </Button>
-          </DialogFooter>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 };
