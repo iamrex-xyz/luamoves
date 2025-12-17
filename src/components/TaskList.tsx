@@ -953,7 +953,7 @@ export const TaskList = ({
                         disabled={task.status === "done" || isCompleting}
                       >
                         <div
-                          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
+                          className={`group relative p-3 rounded-xl transition-all duration-300 cursor-pointer ${
                             isCompleting 
                               ? "bg-primary animate-task-complete" 
                               : isTaskOverdue 
@@ -962,9 +962,9 @@ export const TaskList = ({
                           }`}
                           onClick={() => !isCompleting && handleTaskClick(task)}
                         >
-                          <div className="flex items-start gap-4">
+                          <div className="flex items-start gap-3">
                             <div 
-                              className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+                              className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 pt-0.5"
                               onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                             >
                               {isCompleting ? (
@@ -976,7 +976,7 @@ export const TaskList = ({
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className={`font-medium text-sm mb-2 transition-all duration-200 ${
+                              <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
                                 isCompleting 
                                   ? "line-through text-primary-foreground" 
                                   : task.status === "done" 
@@ -985,19 +985,19 @@ export const TaskList = ({
                               }`}>
                                 {task.title}
                               </h4>
-                              <div className="flex items-center justify-between gap-2">
-                                <div className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+                              <div className="flex items-center justify-between gap-2 mt-1">
+                                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
                                   isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
                                 }`}>
                                   <Clock className="w-3 h-3" />
-                                  <span>{task.deadlineLabel}</span>
+                                  {task.deadlineLabel}
                                   {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
-                                </div>
+                                </span>
                                 {task.affiliateLink && task.status !== "done" && !isCompleting && (
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="shrink-0 h-7 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10 -mr-2"
+                                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 -my-1 -mr-1"
                                     onClick={(e) => handleRegelenClick(e, task)}
                                   >
                                     Regelen
