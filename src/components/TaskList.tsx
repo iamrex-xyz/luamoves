@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
+import { supabase } from "@/integrations/supabase/client";
 import { useMilestones } from "@/hooks/useMilestones";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
@@ -103,6 +104,9 @@ export const TaskList = ({
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
+  );
+  const [taskPartnerInviteShown, setTaskPartnerInviteShown] = useState(() =>
+    sessionStorage.getItem("lua_task_partner_invite_shown") === "true"
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
@@ -701,6 +705,32 @@ export const TaskList = ({
       // Calculate new completed count (current + 1 since we just completed one)
       const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
       onTaskComplete(newCompletedCount);
+    }
+
+    // Check if we should show partner invite after completing energy or moving tasks
+    if (wasNotDone && task && !taskPartnerInviteShown && !isGuest) {
+      const isRelevantTask = isEnergyTask(task) || isMovingTask(task);
+      if (isRelevantTask) {
+        // Check if user already has a partner
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: collaborators } = await supabase
+            .from("moving_collaborators")
+            .select("id")
+            .or(`owner_user_id.eq.${user.id},collaborator_user_id.eq.${user.id}`)
+            .limit(1);
+          
+          // Only show if no partner yet
+          if (!collaborators || collaborators.length === 0) {
+            // Small delay so the completion animation finishes
+            setTimeout(() => {
+              setShowPartnerInvite(true);
+              setTaskPartnerInviteShown(true);
+              sessionStorage.setItem("lua_task_partner_invite_shown", "true");
+            }, 800);
+          }
+        }
+      }
     }
   };
 
