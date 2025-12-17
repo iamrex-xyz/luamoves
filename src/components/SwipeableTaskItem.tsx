@@ -1,6 +1,7 @@
 import { useState, useRef, ReactNode } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 type SwipeableTaskItemProps = {
   children: ReactNode;
@@ -11,6 +12,21 @@ type SwipeableTaskItemProps = {
 
 const SWIPE_THRESHOLD = 100; // pixels to trigger complete
 const RESISTANCE = 0.5; // resistance factor for overscroll
+
+// Haptic feedback helper with web fallback
+const triggerHaptic = async (style: "light" | "medium" | "heavy" = "medium") => {
+  try {
+    const impactStyle = style === "light" ? ImpactStyle.Light 
+      : style === "heavy" ? ImpactStyle.Heavy 
+      : ImpactStyle.Medium;
+    await Haptics.impact({ style: impactStyle });
+  } catch {
+    // Fallback to web Vibration API
+    if (navigator.vibrate) {
+      navigator.vibrate(style === "light" ? 10 : style === "heavy" ? 30 : 20);
+    }
+  }
+};
 
 export const SwipeableTaskItem = ({
   children,
@@ -24,12 +40,14 @@ export const SwipeableTaskItem = ({
   const currentXRef = useRef(0);
   const isDraggingRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasReachedThresholdRef = useRef(false);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (disabled) return;
     startXRef.current = e.touches[0].clientX;
     currentXRef.current = e.touches[0].clientX;
     isDraggingRef.current = true;
+    hasReachedThresholdRef.current = false;
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -41,6 +59,14 @@ export const SwipeableTaskItem = ({
     // Only allow swipe right (positive direction)
     if (diff < 0) {
       diff = 0;
+    }
+    
+    // Trigger haptic when reaching threshold
+    if (diff >= SWIPE_THRESHOLD && !hasReachedThresholdRef.current) {
+      hasReachedThresholdRef.current = true;
+      triggerHaptic("light");
+    } else if (diff < SWIPE_THRESHOLD && hasReachedThresholdRef.current) {
+      hasReachedThresholdRef.current = false;
     }
     
     // Add resistance after threshold
@@ -58,6 +84,9 @@ export const SwipeableTaskItem = ({
     const diff = currentXRef.current - startXRef.current;
     
     if (diff >= SWIPE_THRESHOLD) {
+      // Trigger success haptic
+      triggerHaptic("heavy");
+      
       // Trigger complete animation
       setIsCompleting(true);
       setTranslateX(window.innerWidth); // Slide out completely
