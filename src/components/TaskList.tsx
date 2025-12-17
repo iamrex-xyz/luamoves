@@ -953,7 +953,7 @@ export const TaskList = ({
                         disabled={task.status === "done" || isCompleting}
                       >
                         <div
-                          className={`group relative p-3 rounded-xl transition-all duration-300 cursor-pointer ${
+                          className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                             isCompleting 
                               ? "bg-primary animate-task-complete" 
                               : isTaskOverdue 
@@ -985,7 +985,7 @@ export const TaskList = ({
                               }`}>
                                 {task.title}
                               </h4>
-                              <div className="flex items-center justify-between gap-2 mt-1">
+                              <div className="flex items-center justify-between gap-2 mt-0.5">
                                 <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
                                   isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
                                 }`}>
@@ -997,7 +997,7 @@ export const TaskList = ({
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 -my-1 -mr-1"
+                                    className="shrink-0 h-5 px-0 text-xs text-primary hover:text-primary hover:bg-transparent font-medium"
                                     onClick={(e) => handleRegelenClick(e, task)}
                                   >
                                     Regelen
