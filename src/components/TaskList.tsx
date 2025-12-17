@@ -22,6 +22,7 @@ import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
 import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
 import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
+import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -81,6 +82,7 @@ export const TaskList = ({
   const [showMovingQuestions, setShowMovingQuestions] = useState(false);
   const [showBoxesQuestions, setShowBoxesQuestions] = useState(false);
   const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
+  const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -202,6 +204,24 @@ export const TaskList = ({
     return !info.homeSizeM2 || !info.insuranceValue;
   };
 
+  // Helper function to check if task is liability insurance task
+  const isLiabilityTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("aansprakelijkheidsverzekering") ||
+      (titleLower.includes("aansprakelijkheid") && titleLower.includes("verzekering")) ||
+      idLower.includes("liability") ||
+      idLower.includes("aansprakelijkheid")
+    );
+  };
+
+  // Check if liability questions are needed
+  const needsLiabilityQuestions = (info: MovingInfo) => {
+    return info.children === undefined || info.children === null || 
+           info.pets === undefined || info.pets === null;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -257,6 +277,17 @@ export const TaskList = ({
         return;
       }
       // All insurance questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a liability insurance task
+    if (isLiabilityTask(task)) {
+      if (needsLiabilityQuestions(movingInfo)) {
+        setShowLiabilityQuestions(true);
+        return;
+      }
+      // All liability questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -323,6 +354,16 @@ export const TaskList = ({
 
   const handleInsuranceRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Controleer inboedelverzekering")}`);
+  };
+
+  const handleLiabilityQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleLiabilityRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Controleer aansprakelijkheidsverzekering")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -772,6 +813,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleInsuranceQuestionsComplete}
         onRedirect={handleInsuranceRedirect}
+      />
+
+      <LiabilityQuestionsDialog
+        open={showLiabilityQuestions}
+        onOpenChange={setShowLiabilityQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleLiabilityQuestionsComplete}
+        onRedirect={handleLiabilityRedirect}
       />
 
       <InvitePartnerDialog
