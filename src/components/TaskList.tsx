@@ -34,6 +34,7 @@ import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { useNavigate } from "react-router-dom";
 import { getSmartQuestionForTask, shouldShowTask, SmartQuestionType } from "@/lib/smartQuestions";
 import {
@@ -904,8 +905,8 @@ export const TaskList = ({
         </div>
       </div>
 
-      {/* Tasks */}
-      <div className="px-4 py-3">
+      {/* Tasks with Pull to Refresh */}
+      <PullToRefresh onRefresh={refreshTasks} className="px-4 py-3">
         {isLoading ? (
           <div className="p-8 text-center rounded-3xl bg-white shadow-lg shadow-primary/10">
             <Loader2 className="w-6 h-6 mx-auto animate-spin text-primary" />
@@ -991,8 +992,7 @@ export const TaskList = ({
             ))}
           </div>
         )}
-
-      </div>
+      </PullToRefresh>
 
       {/* Dialogs */}
       <AddTaskDialog 
