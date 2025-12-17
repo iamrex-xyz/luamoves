@@ -26,6 +26,7 @@ import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog"
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
 import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
+import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -89,6 +90,7 @@ export const TaskList = ({
   const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
   const [showParkingQuestions, setShowParkingQuestions] = useState(false);
   const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
+  const [showSmokeDetectorQuestions, setShowSmokeDetectorQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -282,6 +284,23 @@ export const TaskList = ({
     return !(info as any).serviceType || !info.homeSizeM2 || !(info as any).preferredServiceDate;
   };
 
+  // Helper function to check if task is smoke detector task
+  const isSmokeDetectorTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("rookmelder") ||
+      titleLower.includes("smoke detector") ||
+      idLower.includes("rookmelder") ||
+      idLower.includes("smoke")
+    );
+  };
+
+  // Check if smoke detector questions are needed
+  const needsSmokeDetectorQuestions = (info: MovingInfo) => {
+    return !(info as any).numberOfFloors || !(info as any).numberOfBedrooms;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -381,6 +400,17 @@ export const TaskList = ({
         return;
       }
       // All cleaning questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a smoke detector task
+    if (isSmokeDetectorTask(task)) {
+      if (needsSmokeDetectorQuestions(movingInfo)) {
+        setShowSmokeDetectorQuestions(true);
+        return;
+      }
+      // All smoke detector questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -487,6 +517,16 @@ export const TaskList = ({
 
   const handleCleaningRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Plan schoonmaak of schilderwerk")}`);
+  };
+
+  const handleSmokeDetectorQuestionsComplete = (data: Partial<MovingInfo>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+  };
+
+  const handleSmokeDetectorRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Controleer rookmelders")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -972,6 +1012,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleCleaningQuestionsComplete}
         onRedirect={handleCleaningRedirect}
+      />
+
+      <SmokeDetectorQuestionsDialog
+        open={showSmokeDetectorQuestions}
+        onOpenChange={setShowSmokeDetectorQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleSmokeDetectorQuestionsComplete}
+        onRedirect={handleSmokeDetectorRedirect}
       />
 
       <InvitePartnerDialog
