@@ -53,6 +53,8 @@ export type MovingInfo = {
   specialItems?: string[];
   // Boxes questions velden
   hasFragileItems?: string;
+  // Insurance questions velden
+  homeSizeM2?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -184,6 +186,8 @@ const Index = () => {
         specialItems: (profile as any).special_items || [],
         // Boxes questions velden
         hasFragileItems: (profile as any).has_fragile_items || undefined,
+        // Insurance questions velden (homeSizeM2 nieuw, insuranceValue bestaat al)
+        homeSizeM2: (profile as any).home_size_m2 || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -250,6 +254,8 @@ const Index = () => {
           special_items: info.specialItems || [],
           // Boxes questions velden
           has_fragile_items: info.hasFragileItems || null,
+          // Insurance questions velden
+          home_size_m2: info.homeSizeM2 || null,
         } as any)
         .eq('user_id', userId);
 
