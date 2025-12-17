@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { LuaLogo } from "@/components/LuaLogo";
+import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -100,65 +101,70 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
     const isCompleting = completingTasks.has(task.id);
 
     return (
-      <div 
-        className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
-          isCompleting 
-            ? "bg-primary/10 scale-95 opacity-0" 
-            : isOverdue 
-              ? "bg-destructive/5 hover:bg-destructive/10" 
-              : "bg-secondary/50 hover:bg-secondary"
-        }`}
-        onClick={() => !isCompleting && handleTaskClick(task)}
+      <SwipeableTaskItem
+        onSwipeComplete={() => handleTaskToggle(task.id)}
+        disabled={task.status === "done" || isCompleting}
       >
-        <div className="flex items-start gap-4">
-          <div 
-            className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
-            onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
-          >
-            {isCompleting ? (
-              <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
-            ) : task.status === "done" ? (
-              <CheckCircle2 className="h-5 w-5 text-primary" />
-            ) : (
-              <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className={`font-medium text-sm mb-1 transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
-              {task.title}
-            </h4>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {task.deadlineLabel}
-                {daysUntil === 0 && " (vandaag)"}
-                {daysUntil === 1 && " (morgen)"}
-                {isOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
-              </span>
-              {task.assignedToEmail && (
-                <span className="flex items-center gap-1">
-                  <User className="w-3 h-3" />
-                  {task.assignedToEmail}
-                </span>
+        <div 
+          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
+            isCompleting 
+              ? "bg-primary/10 scale-95 opacity-0" 
+              : isOverdue 
+                ? "bg-destructive/5 hover:bg-destructive/10" 
+                : "bg-secondary/50 hover:bg-secondary"
+          }`}
+          onClick={() => !isCompleting && handleTaskClick(task)}
+        >
+          <div className="flex items-start gap-4">
+            <div 
+              className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+              onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
+            >
+              {isCompleting ? (
+                <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
+              ) : task.status === "done" ? (
+                <CheckCircle2 className="h-5 w-5 text-primary" />
+              ) : (
+                <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
               )}
             </div>
+            <div className="flex-1 min-w-0">
+              <h4 className={`font-medium text-sm mb-1 transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                {task.title}
+              </h4>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {task.deadlineLabel}
+                  {daysUntil === 0 && " (vandaag)"}
+                  {daysUntil === 1 && " (morgen)"}
+                  {isOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
+                </span>
+                {task.assignedToEmail && (
+                  <span className="flex items-center gap-1">
+                    <User className="w-3 h-3" />
+                    {task.assignedToEmail}
+                  </span>
+                )}
+              </div>
+            </div>
+            {task.affiliateLink && task.status !== "done" && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+                }}
+              >
+                Regelen
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
+            )}
           </div>
-          {task.affiliateLink && task.status !== "done" && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-              }}
-            >
-              Regelen
-              <ArrowRight className="w-3 h-3 ml-1" />
-            </Button>
-          )}
         </div>
-      </div>
+      </SwipeableTaskItem>
     );
   };
 
