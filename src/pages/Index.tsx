@@ -42,6 +42,10 @@ export type MovingInfo = {
   // Energy questions velden
   energyCurrentSupplier?: string;
   energyConnectionType?: "gas_stroom" | "alleen_stroom";
+  // Internet questions velden
+  hasFiber?: "yes" | "no" | "unknown";
+  internetSpeedPreference?: "basic" | "medium" | "high";
+  internetBundle?: "internet_only" | "internet_tv" | "internet_tv_mobile";
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
