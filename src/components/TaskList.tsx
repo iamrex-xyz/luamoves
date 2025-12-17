@@ -751,14 +751,14 @@ export const TaskList = ({
   // Groepeer taken per fase met correcte volgorde
   const tasksByPhase = useMemo(() => {
     const phaseOrder = [
-      "Direct regelen",
-      "6-8 weken voor",
-      "4-6 weken voor",
-      "2-4 weken voor",
-      "1-2 weken voor",
-      "Laatste week",
-      "Verhuisdag",
-      "Na de verhuizing"
+      "Fase 1 - Je nieuwe thuis is bevestigd",
+      "Fase 2 - De voorbereidingen beginnen",
+      "Fase 3 - Sleutels in handen",
+      "Fase 4 - De laatste voorbereidingen",
+      "Fase 5 - Afscheid van je oude plek",
+      "Fase 6 - De grote dag",
+      "Fase 7 - Thuis in je nieuwe woning",
+      "Eigen taken"
     ];
     
     const phases: { [key: string]: Task[] } = {};
