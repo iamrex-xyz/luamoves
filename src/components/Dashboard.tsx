@@ -45,6 +45,26 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
   // Filter alleen niet-afgeronde taken voor de homepage
   const openTasks = tasks.filter(t => t.status !== "done");
 
+  // Ensure at least 1 affiliate task is visible in the first 5 tasks
+  const displayTasks = (() => {
+    const first5 = openTasks.slice(0, 5);
+    const hasAffiliateInFirst5 = first5.some(t => t.affiliateLink);
+    
+    if (hasAffiliateInFirst5 || first5.length < 5) {
+      return first5;
+    }
+    
+    // Find first affiliate task not in first 5
+    const firstAffiliateAfter5 = openTasks.slice(5).find(t => t.affiliateLink);
+    
+    if (firstAffiliateAfter5) {
+      // Replace the 5th task with the affiliate task
+      return [...first5.slice(0, 4), firstAffiliateAfter5];
+    }
+    
+    return first5;
+  })();
+
   // Detect when all tasks become completed
   useEffect(() => {
     if (prevOpenTasksCount !== null && prevOpenTasksCount > 0 && openTasks.length === 0 && tasks.length > 0) {
@@ -291,7 +311,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
           </div>
         ) : openTasks.length > 0 ? (
           <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
-            {openTasks.slice(0, 5).map((task) => (
+            {displayTasks.map((task) => (
               <TaskItem key={task.id} task={task} />
             ))}
             {openTasks.length > 5 && (
