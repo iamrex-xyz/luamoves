@@ -61,6 +61,9 @@ export type MovingInfo = {
   householdNames?: string[];
   // Parking/lift velden
   municipality?: string;
+  // Cleaning/painting velden
+  serviceType?: string;
+  preferredServiceDate?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -200,6 +203,9 @@ const Index = () => {
         householdNames: (profile as any).household_names || [],
         // Parking/lift velden
         municipality: (profile as any).municipality || undefined,
+        // Cleaning/painting velden
+        serviceType: (profile as any).service_type || undefined,
+        preferredServiceDate: (profile as any).preferred_service_date || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -274,6 +280,9 @@ const Index = () => {
           household_names: info.householdNames || [],
           // Parking/lift velden
           municipality: info.municipality || null,
+          // Cleaning/painting velden
+          service_type: info.serviceType || null,
+          preferred_service_date: info.preferredServiceDate || null,
         } as any)
         .eq('user_id', userId);
 
@@ -457,6 +466,9 @@ const Index = () => {
             household_names: updatedInfo.householdNames || [],
             // Parking/lift velden
             municipality: (updatedInfo as any).municipality || null,
+            // Cleaning/painting velden
+            service_type: (updatedInfo as any).serviceType || null,
+            preferred_service_date: (updatedInfo as any).preferredServiceDate || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

@@ -25,6 +25,7 @@ import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog"
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
 import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
+import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -87,6 +88,7 @@ export const TaskList = ({
   const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
   const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
   const [showParkingQuestions, setShowParkingQuestions] = useState(false);
+  const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -262,6 +264,24 @@ export const TaskList = ({
     return !info.propertyType || !info.floorLevel || !(info as any).municipality;
   };
 
+  // Helper function to check if task is cleaning/painting task
+  const isCleaningTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("schoonmaak") ||
+      titleLower.includes("schilderwerk") ||
+      (titleLower.includes("plan") && (titleLower.includes("cleaning") || titleLower.includes("painting"))) ||
+      idLower.includes("cleaning") ||
+      idLower.includes("schilderwerk")
+    );
+  };
+
+  // Check if cleaning questions are needed
+  const needsCleaningQuestions = (info: MovingInfo) => {
+    return !(info as any).serviceType || !info.homeSizeM2 || !(info as any).preferredServiceDate;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -350,6 +370,17 @@ export const TaskList = ({
         return;
       }
       // All parking questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a cleaning/painting task
+    if (isCleaningTask(task)) {
+      if (needsCleaningQuestions(movingInfo)) {
+        setShowCleaningQuestions(true);
+        return;
+      }
+      // All cleaning questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -446,6 +477,16 @@ export const TaskList = ({
 
   const handleParkingRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Regel parkeervergunning of verhuislift")}`);
+  };
+
+  const handleCleaningQuestionsComplete = (data: Partial<MovingInfo>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+  };
+
+  const handleCleaningRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Plan schoonmaak of schilderwerk")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -923,6 +964,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleParkingQuestionsComplete}
         onRedirect={handleParkingRedirect}
+      />
+
+      <CleaningQuestionsDialog
+        open={showCleaningQuestions}
+        onOpenChange={setShowCleaningQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleCleaningQuestionsComplete}
+        onRedirect={handleCleaningRedirect}
       />
 
       <InvitePartnerDialog
