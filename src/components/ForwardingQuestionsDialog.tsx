@@ -116,7 +116,7 @@ export function ForwardingQuestionsDialog({
         <div className="space-y-4 py-4">
           {step === 1 && (
             <div className="space-y-4">
-              <Label>Wanneer moet de post doorgestuurd worden?</Label>
+              <Label>Vanaf wanneer moet de post doorgestuurd worden?</Label>
               <Input
                 type="date"
                 value={forwardingStartDate}
