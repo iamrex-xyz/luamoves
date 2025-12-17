@@ -11,6 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Home as HomeIcon, Calendar } from "lucide-react";
+import { z } from "zod";
+
+const postcodeSchema = z.string()
+  .transform(val => val.replace(/\s/g, '').toUpperCase())
+  .refine(val => val === '' || /^\d{4}[A-Z]{2}$/.test(val), {
+    message: "Voer een geldige postcode in (bijv. 1234 AB)"
+  });
 
 type MovingSettingsCardProps = {
   movingInfo: MovingInfo;
@@ -20,6 +27,8 @@ type MovingSettingsCardProps = {
 export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardProps) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [oldAddressError, setOldAddressError] = useState<string | null>(null);
+  const [newAddressError, setNewAddressError] = useState<string | null>(null);
   
   const [oldAddress, setOldAddress] = useState(movingInfo.oldAddress);
   const [newAddress, setNewAddress] = useState(movingInfo.newAddress);
@@ -77,6 +86,35 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     };
   };
 
+  const validatePostcode = (address: string, setError: (error: string | null) => void) => {
+    if (!address) {
+      setError(null);
+      return true;
+    }
+    const { postcode } = extractAddressParts(address);
+    if (!postcode) {
+      setError("Adres moet een geldige postcode bevatten (bijv. 1234 AB)");
+      return false;
+    }
+    const result = postcodeSchema.safeParse(postcode);
+    if (!result.success) {
+      setError(result.error.errors[0]?.message || "Ongeldige postcode");
+      return false;
+    }
+    setError(null);
+    return true;
+  };
+
+  const handleOldAddressChange = (value: string) => {
+    setOldAddress(value);
+    if (oldAddressError) validatePostcode(value, setOldAddressError);
+  };
+
+  const handleNewAddressChange = (value: string) => {
+    setNewAddress(value);
+    if (newAddressError) validatePostcode(value, setNewAddressError);
+  };
+
   const isSameAddress = () => {
     const oldParts = extractAddressParts(oldAddress);
     const newParts = extractAddressParts(newAddress);
@@ -91,9 +129,17 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     return keyHandoverDateObj > movingDateObj;
   };
 
-  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving();
+  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving() || !!oldAddressError || !!newAddressError;
 
   const handleSave = async () => {
+    const oldValid = validatePostcode(oldAddress, setOldAddressError);
+    const newValid = validatePostcode(newAddress, setNewAddressError);
+    
+    if (!oldValid || !newValid) {
+      toast({ title: "Fout", description: "Corrigeer de adresgegevens.", variant: "destructive" });
+      return;
+    }
+
     if (isSameAddress()) {
       toast({ title: "Fout", description: "Het oude adres mag niet hetzelfde zijn als het nieuwe adres.", variant: "destructive" });
       return;
@@ -160,13 +206,25 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
       <div className="p-4 space-y-4">
         <div>
           <Label className="text-xs text-muted-foreground uppercase tracking-wide">Oud adres</Label>
-          <AddressAutocomplete label="" placeholder="Begin met typen..." value={oldAddress} onChange={setOldAddress} />
-          {isSameAddress() && <p className="text-xs text-destructive mt-1">Oud adres mag niet hetzelfde zijn als nieuw adres</p>}
+          <AddressAutocomplete 
+            label="" 
+            placeholder="Begin met typen..." 
+            value={oldAddress} 
+            onChange={handleOldAddressChange}
+          />
+          {oldAddressError && <p className="text-xs text-destructive mt-1">{oldAddressError}</p>}
+          {!oldAddressError && isSameAddress() && <p className="text-xs text-destructive mt-1">Oud adres mag niet hetzelfde zijn als nieuw adres</p>}
         </div>
 
         <div>
           <Label className="text-xs text-muted-foreground uppercase tracking-wide">Nieuw adres</Label>
-          <AddressAutocomplete label="" placeholder="Begin met typen..." value={newAddress} onChange={setNewAddress} />
+          <AddressAutocomplete 
+            label="" 
+            placeholder="Begin met typen..." 
+            value={newAddress} 
+            onChange={handleNewAddressChange}
+          />
+          {newAddressError && <p className="text-xs text-destructive mt-1">{newAddressError}</p>}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
