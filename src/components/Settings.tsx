@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BottomNav } from "@/components/BottomNav";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { ReminderSettingsListItem, ReminderSettingsSheet } from "@/components/ReminderSettings";
+import { ExtraInfoSheet } from "@/components/ExtraInfoSheet";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
@@ -27,7 +28,7 @@ import {
   UserPlus,
   Phone,
   Cake,
-  Zap,
+  Sparkles,
 } from "lucide-react";
 
 type SettingsProps = {
@@ -81,13 +82,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
   const [partnerConsent, setPartnerConsent] = useState(false);
   const CONSENT_KEY = "partnerConsent";
   
-  // Energy preferences state
-  const [energyCurrentSupplier, setEnergyCurrentSupplier] = useState("");
-  const [hasSmartMeter, setHasSmartMeter] = useState("");
-  const [energyConnectionType, setEnergyConnectionType] = useState("");
-  
-  // Reminder settings sheet state
+  // Sheet states
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
+  const [extraInfoSheetOpen, setExtraInfoSheetOpen] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -118,11 +115,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           setBirthDate(profile.birth_date);
           setBirthDateObj(new Date(profile.birth_date));
         }
-        
-        // Energy preferences
-        setEnergyCurrentSupplier((profile as any).energy_current_supplier || "");
-        setHasSmartMeter((profile as any).has_smart_meter || "");
-        setEnergyConnectionType((profile as any).energy_connection_type || "");
         
         // Moving info from profile (set during signup)
         if (profile.old_address && !oldAddress) {
@@ -301,47 +293,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
       toast({
         title: "Fout",
         description: "Kon huishouden details niet opslaan.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSaveEnergy = async () => {
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          energy_current_supplier: energyCurrentSupplier || null,
-          has_smart_meter: hasSmartMeter || null,
-          energy_connection_type: energyConnectionType || null,
-        } as any)
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      // Also update movingInfo
-      onUpdate({
-        ...movingInfo,
-        energyCurrentSupplier: energyCurrentSupplier || undefined,
-        hasSmartMeter: hasSmartMeter as "yes" | "no" | "unknown" | undefined,
-        energyConnectionType: energyConnectionType as "gas_stroom" | "alleen_stroom" | undefined,
-      });
-
-      toast({
-        title: "Opgeslagen",
-        description: "Energie voorkeuren zijn bijgewerkt.",
-      });
-    } catch (error) {
-      console.error("Error saving energy preferences:", error);
-      toast({
-        title: "Fout",
-        description: "Kon energie voorkeuren niet opslaan.",
         variant: "destructive",
       });
     } finally {
@@ -681,82 +632,20 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           </div>
         </div>
 
-        {/* Energy Preferences Card */}
-        <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
-          <div className="p-4 border-b border-border/50">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-warning" />
-              </div>
-              <div>
-                <h2 className="font-semibold text-foreground">Energie</h2>
-                <p className="text-xs text-muted-foreground">Leverancier en aansluiting</p>
-              </div>
-            </div>
+        {/* Extra Info Button */}
+        <button
+          onClick={() => setExtraInfoSheetOpen(true)}
+          className="w-full flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 hover:border-primary/40 transition-all"
+        >
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
-
-          <div className="p-4 space-y-4">
-            <div>
-              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huidige leverancier</Label>
-              <Select value={energyCurrentSupplier} onValueChange={setEnergyCurrentSupplier}>
-                <SelectTrigger className="rounded-xl h-11">
-                  <SelectValue placeholder="Selecteer leverancier" />
-                </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  <SelectItem value="Vattenfall">Vattenfall</SelectItem>
-                  <SelectItem value="Eneco">Eneco</SelectItem>
-                  <SelectItem value="Essent">Essent</SelectItem>
-                  <SelectItem value="Budget Energie">Budget Energie</SelectItem>
-                  <SelectItem value="Greenchoice">Greenchoice</SelectItem>
-                  <SelectItem value="Vandebron">Vandebron</SelectItem>
-                  <SelectItem value="Oxxio">Oxxio</SelectItem>
-                  <SelectItem value="Engie">Engie</SelectItem>
-                  <SelectItem value="Innova Energie">Innova Energie</SelectItem>
-                  <SelectItem value="Pure Energie">Pure Energie</SelectItem>
-                  <SelectItem value="NLE">NLE</SelectItem>
-                  <SelectItem value="Mega">Mega</SelectItem>
-                  <SelectItem value="ANWB Energie">ANWB Energie</SelectItem>
-                  <SelectItem value="United Consumers">United Consumers</SelectItem>
-                  <SelectItem value="Coolblue Energie">Coolblue Energie</SelectItem>
-                  <SelectItem value="Tibber">Tibber</SelectItem>
-                  <SelectItem value="Frank Energie">Frank Energie</SelectItem>
-                  <SelectItem value="unknown">Weet ik niet / heb ik niet</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Slimme meter</Label>
-              <Select value={hasSmartMeter} onValueChange={setHasSmartMeter}>
-                <SelectTrigger className="rounded-xl h-11">
-                  <SelectValue placeholder="Selecteer" />
-                </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  <SelectItem value="yes">Ja, slimme meter</SelectItem>
-                  <SelectItem value="no">Nee, normale meter</SelectItem>
-                  <SelectItem value="unknown">Weet ik niet</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aansluiting</Label>
-              <Select value={energyConnectionType} onValueChange={setEnergyConnectionType}>
-                <SelectTrigger className="rounded-xl h-11">
-                  <SelectValue placeholder="Selecteer" />
-                </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  <SelectItem value="gas_stroom">Gas & stroom</SelectItem>
-                  <SelectItem value="alleen_stroom">Alleen stroom</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button onClick={handleSaveEnergy} disabled={isLoading} className="w-full rounded-xl h-11">
-              Opslaan
-            </Button>
+          <div className="flex-1 text-left">
+            <p className="font-medium text-foreground">Extra info over je verhuizing</p>
+            <p className="text-xs text-muted-foreground">Energie, woning, internet & meer</p>
           </div>
-        </div>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
 
         {/* Collaborators Card */}
         <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
@@ -840,6 +729,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
         </div>
 
         <ReminderSettingsSheet open={reminderSheetOpen} onOpenChange={setReminderSheetOpen} />
+        <ExtraInfoSheet 
+          open={extraInfoSheetOpen} 
+          onOpenChange={setExtraInfoSheetOpen}
+          movingInfo={movingInfo}
+          onUpdate={onUpdate}
+        />
       </div>
 
       <BottomNav currentView="settings" onNavigate={onNavigate} />
