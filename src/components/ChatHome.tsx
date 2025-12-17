@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { CollaboratorChat } from "@/components/CollaboratorChat";
 import { LuaAIChat } from "@/components/LuaAIChat";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
+import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { Users, Sparkles, UserPlus, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MovingInfo } from "@/pages/Index";
@@ -22,6 +23,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
   const [activeTab, setActiveTab] = useState<"partner" | "lua">("lua");
   const [hasPartner, setHasPartner] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -141,7 +143,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
                 <p className="text-muted-foreground text-sm mb-4">
                   Nodig iemand uit om samen jullie verhuizing te regelen. Alles op één plek, nooit gedoe.
                 </p>
-                <Button onClick={handleAddPartner} className="gap-2">
+                <Button onClick={() => setShowPartnerInvite(true)} className="gap-2">
                   <UserPlus className="w-4 h-4" />
                   Huisgenoot toevoegen
                 </Button>
@@ -162,6 +164,16 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
           window.location.reload();
         }}
         capturedEmail=""
+      />
+
+      {/* Partner invite dialog */}
+      <InvitePartnerDialog
+        open={showPartnerInvite}
+        onOpenChange={setShowPartnerInvite}
+        onInviteSent={() => {
+          setShowPartnerInvite(false);
+          checkPartnerStatus();
+        }}
       />
 
       <BottomNav currentView="chat" onNavigate={onNavigate} />
