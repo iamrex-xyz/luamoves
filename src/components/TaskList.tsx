@@ -21,6 +21,7 @@ import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
 import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
 import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
 import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
+import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -79,6 +80,7 @@ export const TaskList = ({
   const [showInternetQuestions, setShowInternetQuestions] = useState(false);
   const [showMovingQuestions, setShowMovingQuestions] = useState(false);
   const [showBoxesQuestions, setShowBoxesQuestions] = useState(false);
+  const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -183,6 +185,23 @@ export const TaskList = ({
     return !info.numberOfRooms || !info.hasFragileItems;
   };
 
+  // Helper function to check if task is insurance task
+  const isInsuranceTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("inboedelverzekering") ||
+      (titleLower.includes("controleer") && titleLower.includes("verzekering")) ||
+      idLower.includes("insurance") ||
+      idLower.includes("inboedel")
+    );
+  };
+
+  // Check if insurance questions are needed
+  const needsInsuranceQuestions = (info: MovingInfo) => {
+    return !info.homeSizeM2 || !info.insuranceValue;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -227,6 +246,17 @@ export const TaskList = ({
         return;
       }
       // All boxes questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is an insurance task
+    if (isInsuranceTask(task)) {
+      if (needsInsuranceQuestions(movingInfo)) {
+        setShowInsuranceQuestions(true);
+        return;
+      }
+      // All insurance questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -283,6 +313,16 @@ export const TaskList = ({
 
   const handleBoxesRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Bestel verhuisdozen")}`);
+  };
+
+  const handleInsuranceQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleInsuranceRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Controleer inboedelverzekering")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -724,6 +764,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleBoxesQuestionsComplete}
         onRedirect={handleBoxesRedirect}
+      />
+
+      <InsuranceQuestionsDialog
+        open={showInsuranceQuestions}
+        onOpenChange={setShowInsuranceQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleInsuranceQuestionsComplete}
+        onRedirect={handleInsuranceRedirect}
       />
 
       <InvitePartnerDialog

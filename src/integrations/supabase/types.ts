@@ -238,6 +238,7 @@ export type Database = {
           has_job: boolean | null
           has_parking: boolean | null
           has_smart_meter: string | null
+          home_size_m2: string | null
           household_type: string | null
           housing_property_type: string | null
           id: string
@@ -283,6 +284,7 @@ export type Database = {
           has_job?: boolean | null
           has_parking?: boolean | null
           has_smart_meter?: string | null
+          home_size_m2?: string | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
@@ -328,6 +330,7 @@ export type Database = {
           has_job?: boolean | null
           has_parking?: boolean | null
           has_smart_meter?: string | null
+          home_size_m2?: string | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
