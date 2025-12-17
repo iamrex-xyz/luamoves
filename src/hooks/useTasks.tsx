@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Task, generateTasksForRenter, generateTasksForBuyer, HouseholdInfo } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { Package } from "lucide-react";
 
 const GUEST_TASKS_KEY = "lua_guest_tasks";
@@ -170,8 +171,12 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
   const updateTaskStatus = async (
     taskId: string,
-    newStatus: "todo" | "in_progress" | "done"
+    newStatus: "todo" | "in_progress" | "done",
+    showUndo: boolean = true
   ) => {
+    const task = tasks.find((t) => t.id === taskId);
+    const previousStatus = task?.status || "todo";
+
     try {
       // Optimistic update
       setTasks((prevTasks) =>
@@ -190,9 +195,21 @@ export const useTasks = (movingInfo: MovingInfo) => {
         statusMap[taskId] = newStatus;
         sessionStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
         
-        toast({
-          title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
-        });
+        // Show toast with undo option when completing a task
+        if (newStatus === "done" && showUndo) {
+          toast({
+            title: "Taak afgerond!",
+            action: (
+              <ToastAction altText="Ongedaan maken" onClick={() => updateTaskStatus(taskId, previousStatus, false)}>
+                Ongedaan maken
+              </ToastAction>
+            ),
+          });
+        } else {
+          toast({
+            title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
+          });
+        }
         return;
       }
 
@@ -216,10 +233,23 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
       if (error) throw error;
 
-      toast({
-        title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
-        description: "Je voortgang is opgeslagen.",
-      });
+      // Show toast with undo option when completing a task
+      if (newStatus === "done" && showUndo) {
+        toast({
+          title: "Taak afgerond!",
+          description: "Je voortgang is opgeslagen.",
+          action: (
+            <ToastAction altText="Ongedaan maken" onClick={() => updateTaskStatus(taskId, previousStatus, false)}>
+              Ongedaan maken
+            </ToastAction>
+          ),
+        });
+      } else {
+        toast({
+          title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
+          description: "Je voortgang is opgeslagen.",
+        });
+      }
     } catch (error) {
       console.error("Error updating task:", error);
       
