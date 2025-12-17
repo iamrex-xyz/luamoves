@@ -1,8 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -12,11 +10,13 @@ import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
 import { supabase } from "@/integrations/supabase/client";
 import { useMilestones } from "@/hooks/useMilestones";
+import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
+import { isEnergyTask, isMovingTask } from "@/lib/taskTypeHelpers";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
-import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
+import { ContextualPromptDialog } from "@/components/ContextualPromptDialog";
 import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
 import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
 import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
@@ -32,26 +32,19 @@ import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestion
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
-import { InAppReminderBanner } from "@/components/InAppReminderBanner";
-import { ProgressBanner } from "@/components/ProgressBanner";
 import { BottomNav } from "@/components/BottomNav";
-import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
+import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { useNavigate } from "react-router-dom";
-import { getSmartQuestionForTask, shouldShowTask, SmartQuestionType } from "@/lib/smartQuestions";
+import { shouldShowTask } from "@/lib/smartQuestions";
 import {
-  ExternalLink,
   Filter,
-  Clock,
   Loader2,
   LogOut,
   Share2,
   User,
-  FileText,
   Search,
-  Circle,
-  CheckCircle2,
   ArrowRight,
 } from "lucide-react";
 
@@ -86,47 +79,34 @@ export const TaskList = ({
   const [dealTask, setDealTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
-  const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
-  const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task; afterQuestions?: 'deal' | 'complete' } | null>(null);
-  const [showEnergyQuestions, setShowEnergyQuestions] = useState(false);
-  const [showInternetQuestions, setShowInternetQuestions] = useState(false);
-  const [showMovingQuestions, setShowMovingQuestions] = useState(false);
-  const [showBoxesQuestions, setShowBoxesQuestions] = useState(false);
-  const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
-  const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
-  const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
-  const [showPostNLPreparation, setShowPostNLPreparation] = useState(false);
-  const [showParkingQuestions, setShowParkingQuestions] = useState(false);
-  const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
-  const [showSmokeDetectorQuestions, setShowSmokeDetectorQuestions] = useState(false);
-  const [showGardenQuestions, setShowGardenQuestions] = useState(false);
-  const [showRenovationQuestions, setShowRenovationQuestions] = useState(false);
-  const [showPartnerInvite, setShowPartnerInvite] = useState(false);
-  const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
-    sessionStorage.getItem("lua_partner_invite_shown") === "true"
-  );
   const [taskPartnerInviteShown, setTaskPartnerInviteShown] = useState(() =>
     sessionStorage.getItem("lua_task_partner_invite_shown") === "true"
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
 
-  // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const navigate = useNavigate();
+
+  // Use the question dialogs hook
+  const {
+    activeDialog,
+    setActiveDialog,
+    smartQuestion,
+    setSmartQuestion,
+    contextualPrompt,
+    setContextualPrompt,
+    handleRegelenClick,
+    handleDialogComplete,
+    handleDialogRedirect,
+    handleSmartQuestionComplete,
+    handleContextualPromptComplete,
+  } = useQuestionDialogs(movingInfo, onUpdateMovingInfo, isGuest);
 
   // Milestone celebrations
   const completedTasksCount = tasks.filter(t => t.status === "done").length;
   const openTasksCount = tasks.filter(t => t.status !== "done").length;
   useMilestones(completedTasksCount, tasks.length);
-
-  // Detect when all tasks become completed
-  useEffect(() => {
-    if (prevOpenTasksCount !== null && prevOpenTasksCount > 0 && openTasksCount === 0 && tasks.length > 0) {
-      setShowConfetti(true);
-    }
-    setPrevOpenTasksCount(openTasksCount);
-  }, [openTasksCount, tasks.length, prevOpenTasksCount]);
 
   // Calculate days until move
   const daysUntilMove = useMemo(() => {
@@ -138,547 +118,21 @@ export const TaskList = ({
     return Math.ceil((moveDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   }, [movingInfo.movingDate]);
 
+  // Detect when all tasks become completed
+  useEffect(() => {
+    if (prevOpenTasksCount !== null && prevOpenTasksCount > 0 && openTasksCount === 0 && tasks.length > 0) {
+      setShowConfetti(true);
+    }
+    setPrevOpenTasksCount(openTasksCount);
+  }, [openTasksCount, tasks.length, prevOpenTasksCount]);
+
   const handleTaskClick = (task: Task) => {
-    // Open the task detail dialog instead of toggling status
     setSelectedTask(task);
   };
 
   const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
-    // Checkbox alleen voor afvinken, geen smart questions hier
     handleTaskToggle(task.id);
-  };
-
-  // Helper function to check if task is energy comparison/contract task
-  const isEnergyTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      (titleLower.includes("energieleverancier") && titleLower.includes("vergelijk")) ||
-      (titleLower.includes("energie") && titleLower.includes("vergelijk")) ||
-      (titleLower.includes("energiecontract") && titleLower.includes("kiezen")) ||
-      titleLower === "energiecontract kiezen" ||
-      idLower.includes("energie-vergelijk") ||
-      idLower.includes("energy-compare") ||
-      idLower.includes("buy-phase2-12") // Energiecontract kiezen for buyers
-    );
-  };
-
-  // Helper function to check if task is internet task
-  const isInternetTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("internet") ||
-      (titleLower.includes("regel") && titleLower.includes("telefoon")) ||
-      idLower.includes("internet")
-    );
-  };
-
-  // Helper function to check if task is moving company/helpers task
-  const isMovingTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      (titleLower.includes("verhuisbedrijf") || titleLower.includes("helpers")) ||
-      (titleLower.includes("regel") && (titleLower.includes("verhuis") || titleLower.includes("helpers"))) ||
-      idLower.includes("verhuisbedrijf") ||
-      idLower.includes("moving-company")
-    );
-  };
-
-  // Check if energy questions are needed
-  const needsEnergyQuestions = (info: MovingInfo) => {
-    return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
-  };
-
-  // Check if internet questions are needed
-  const needsInternetQuestions = (info: MovingInfo) => {
-    return !info.hasFiber || !info.internetSpeedPreference || !info.internetBundle;
-  };
-
-  // Check if moving questions are needed
-  const needsMovingQuestions = (info: MovingInfo) => {
-    return !info.floorLevel || !info.hasElevator || !info.numberOfRooms || !info.specialItems || info.specialItems.length === 0;
-  };
-
-  // Helper function to check if task is boxes task
-  const isBoxesTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("verhuisdozen") ||
-      (titleLower.includes("bestel") && titleLower.includes("dozen")) ||
-      idLower.includes("boxes") ||
-      idLower.includes("dozen")
-    );
-  };
-
-  // Check if boxes questions are needed
-  const needsBoxesQuestions = (info: MovingInfo) => {
-    return !info.numberOfRooms || !info.hasFragileItems;
-  };
-
-  // Helper function to check if task is insurance task
-  const isInsuranceTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("inboedelverzekering") ||
-      (titleLower.includes("controleer") && titleLower.includes("verzekering")) ||
-      idLower.includes("insurance") ||
-      idLower.includes("inboedel")
-    );
-  };
-
-  // Check if insurance questions are needed
-  const needsInsuranceQuestions = (info: MovingInfo) => {
-    return !info.homeSizeM2 || !info.insuranceValue;
-  };
-
-  // Helper function to check if task is liability insurance task
-  const isLiabilityTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("aansprakelijkheidsverzekering") ||
-      (titleLower.includes("aansprakelijkheid") && titleLower.includes("verzekering")) ||
-      idLower.includes("liability") ||
-      idLower.includes("aansprakelijkheid")
-    );
-  };
-
-  // Check if liability questions are needed
-  const needsLiabilityQuestions = (info: MovingInfo) => {
-    return info.children === undefined || info.children === null || 
-           info.pets === undefined || info.pets === null;
-  };
-
-  // Helper function to check if task is forwarding/PostNL task
-  const isForwardingTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("postnl") ||
-      titleLower.includes("doorstuur") ||
-      (titleLower.includes("post") && titleLower.includes("doorsturen")) ||
-      idLower.includes("forwarding") ||
-      idLower.includes("postnl")
-    );
-  };
-
-  // Check if forwarding questions are needed
-  const needsForwardingQuestions = (info: MovingInfo) => {
-    return !info.forwardingStartDate || !info.forwardingDuration || !info.householdNames || info.householdNames.length === 0;
-  };
-
-  // Helper function to check if task is parking/lift task
-  const isParkingTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("parkeervergunning") ||
-      titleLower.includes("verhuislift") ||
-      (titleLower.includes("parking") && titleLower.includes("permit")) ||
-      idLower.includes("parking") ||
-      idLower.includes("verhuislift")
-    );
-  };
-
-  // Check if parking questions are needed
-  const needsParkingQuestions = (info: MovingInfo) => {
-    return !info.propertyType || !info.floorLevel || !(info as any).municipality;
-  };
-
-  // Helper function to check if task is cleaning/painting task
-  const isCleaningTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("schoonmaak") ||
-      titleLower.includes("schilderwerk") ||
-      (titleLower.includes("plan") && (titleLower.includes("cleaning") || titleLower.includes("painting"))) ||
-      idLower.includes("cleaning") ||
-      idLower.includes("schilderwerk")
-    );
-  };
-
-  // Check if cleaning questions are needed
-  const needsCleaningQuestions = (info: MovingInfo) => {
-    return !(info as any).serviceType || !info.homeSizeM2 || !(info as any).preferredServiceDate;
-  };
-
-  // Helper function to check if task is smoke detector task
-  const isSmokeDetectorTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("rookmelder") ||
-      titleLower.includes("smoke detector") ||
-      idLower.includes("rookmelder") ||
-      idLower.includes("smoke")
-    );
-  };
-
-  // Check if smoke detector questions are needed
-  const needsSmokeDetectorQuestions = (info: MovingInfo) => {
-    return !(info as any).numberOfFloors || !(info as any).numberOfBedrooms;
-  };
-
-  // Helper function to check if task is garden task
-  const isGardenTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("tuinonderhoud") ||
-      titleLower.includes("tuin") ||
-      (titleLower.includes("garden") && titleLower.includes("maintenance")) ||
-      idLower.includes("garden") ||
-      idLower.includes("tuin")
-    );
-  };
-
-  // Check if garden questions are needed
-  const needsGardenQuestions = (info: MovingInfo) => {
-    return info.hasGarden === undefined || info.hasGarden === null || 
-           (info.hasGarden && (!info.gardenSize || !(info as any).gardenServiceType));
-  };
-
-  // Helper function to check if task is renovation task
-  const isRenovationTask = (task: Task) => {
-    const titleLower = task.title.toLowerCase();
-    const idLower = task.id.toLowerCase();
-    return (
-      titleLower.includes("aannemer") ||
-      titleLower.includes("materialen inkopen") ||
-      (titleLower.includes("vergelijk") && titleLower.includes("aannemer")) ||
-      idLower.includes("contractor") ||
-      idLower.includes("materialen")
-    );
-  };
-
-  // Check if renovation questions are needed
-  const needsRenovationQuestions = (info: MovingInfo) => {
-    return !(info as any).renovationBudget || 
-           !(info as any).renovationStartDate || 
-           !(info as any).housingPropertyType;
-  };
-
-  // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
-  const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
-    e.stopPropagation();
-    
-    // Check if this is an energy task (both rent and buy)
-    if (isEnergyTask(task)) {
-      if (needsEnergyQuestions(movingInfo)) {
-        setShowEnergyQuestions(true);
-        return;
-      }
-      // All energy questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is an internet task
-    if (isInternetTask(task)) {
-      if (needsInternetQuestions(movingInfo)) {
-        setShowInternetQuestions(true);
-        return;
-      }
-      // All internet questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a moving company/helpers task
-    if (isMovingTask(task)) {
-      if (needsMovingQuestions(movingInfo)) {
-        setShowMovingQuestions(true);
-        return;
-      }
-      // All moving questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a boxes task
-    if (isBoxesTask(task)) {
-      if (needsBoxesQuestions(movingInfo)) {
-        setShowBoxesQuestions(true);
-        return;
-      }
-      // All boxes questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is an insurance task
-    if (isInsuranceTask(task)) {
-      if (needsInsuranceQuestions(movingInfo)) {
-        setShowInsuranceQuestions(true);
-        return;
-      }
-      // All insurance questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a liability insurance task
-    if (isLiabilityTask(task)) {
-      if (needsLiabilityQuestions(movingInfo)) {
-        setShowLiabilityQuestions(true);
-        return;
-      }
-      // All liability questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a forwarding/PostNL task - show preparation dialog
-    if (isForwardingTask(task)) {
-      setShowPostNLPreparation(true);
-      return;
-    }
-    
-    // Check if this is a parking/lift task
-    if (isParkingTask(task)) {
-      if (needsParkingQuestions(movingInfo)) {
-        setShowParkingQuestions(true);
-        return;
-      }
-      // All parking questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a cleaning/painting task
-    if (isCleaningTask(task)) {
-      if (needsCleaningQuestions(movingInfo)) {
-        setShowCleaningQuestions(true);
-        return;
-      }
-      // All cleaning questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a smoke detector task
-    if (isSmokeDetectorTask(task)) {
-      if (needsSmokeDetectorQuestions(movingInfo)) {
-        setShowSmokeDetectorQuestions(true);
-        return;
-      }
-      // All smoke detector questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a garden task
-    if (isGardenTask(task)) {
-      if (needsGardenQuestions(movingInfo)) {
-        setShowGardenQuestions(true);
-        return;
-      }
-      // All garden questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    
-    // Check if this is a renovation task (aannemers vergelijken or materialen inkopen)
-    if (isRenovationTask(task)) {
-      if (needsRenovationQuestions(movingInfo)) {
-        setShowRenovationQuestions(true);
-        return;
-      }
-      // All renovation questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-      return;
-    }
-    // Check of er nog smart questions nodig zijn (for other tasks)
-    if (!isGuest) {
-      const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
-      if (smartQuestionType) {
-        // Na beantwoording → toon deals
-        setSmartQuestion({ type: smartQuestionType, task, afterQuestions: 'deal' });
-        return;
-      }
-    }
-    
-    // Geen vragen nodig → direct naar deals
-    navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-  };
-
-  const handleEnergyQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleEnergyRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Vergelijk en kies energieleverancier")}`);
-  };
-
-  const handleInternetQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleInternetRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Regel internet en telefoon")}`);
-  };
-
-  const handleMovingQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleMovingRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Regel verhuisbedrijf of helpers")}`);
-  };
-
-  const handleBoxesQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleBoxesRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Bestel verhuisdozen")}`);
-  };
-
-  const handleInsuranceQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleInsuranceRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Controleer inboedelverzekering")}`);
-  };
-
-  const handleLiabilityQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-  };
-
-  const handleLiabilityRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Controleer aansprakelijkheidsverzekering")}`);
-  };
-
-  const handleForwardingQuestionsComplete = (data: { forwardingStartDate: string; forwardingDuration: string; householdNames: string[] }) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-  };
-
-  const handleForwardingRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Vraag PostNL doorstuurservice aan")}`);
-  };
-
-  const handleParkingQuestionsComplete = (data: Partial<MovingInfo>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-  };
-
-  const handleParkingRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Regel parkeervergunning of verhuislift")}`);
-  };
-
-  const handleCleaningQuestionsComplete = (data: Partial<MovingInfo>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-  };
-
-  const handleCleaningRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Plan schoonmaak of schilderwerk")}`);
-  };
-
-  const handleSmokeDetectorQuestionsComplete = (data: Partial<MovingInfo>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-  };
-
-  const handleSmokeDetectorRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Controleer rookmelders")}`);
-  };
-
-  const handleGardenQuestionsComplete = (data: Partial<MovingInfo>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-  };
-
-  const handleGardenRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Plan tuinonderhoud")}`);
-  };
-
-  const handleRenovationQuestionsComplete = (data: {
-    renovationBudget?: string;
-    renovationStartDate?: Date;
-  }) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo({
-        renovationBudget: data.renovationBudget,
-        renovationStartDate: data.renovationStartDate?.toISOString().split('T')[0],
-      } as Partial<MovingInfo>);
-    }
-  };
-
-  const handleRenovationRedirect = () => {
-    navigate(`/deals?task=${encodeURIComponent("Aannemers vergelijken")}`);
-  };
-
-  const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data);
-    }
-    setContextualPrompt(null);
-  };
-
-  const handleSmartQuestionComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
-    if (onUpdateMovingInfo) {
-      onUpdateMovingInfo(data as Partial<MovingInfo>);
-    }
-    
-    const currentTask = smartQuestion?.task;
-    const afterAction = smartQuestion?.afterQuestions;
-    setSmartQuestion(null);
-    
-    if (currentTask) {
-      // Check of er nog meer vragen zijn voor deze taak
-      const nextQuestion = getSmartQuestionForTask(currentTask.id, currentTask.title, { ...movingInfo, ...data });
-      
-      if (nextQuestion) {
-        // Nog een vraag nodig
-        setSmartQuestion({ type: nextQuestion, task: currentTask, afterQuestions: afterAction });
-        return;
-      }
-      
-      // Alle vragen beantwoord
-      if (afterAction === 'deal') {
-        // Navigeer naar deals pagina
-        navigate(`/deals?task=${encodeURIComponent(currentTask.title)}`);
-      }
-    }
-    
-    // Show partner invite after first few tasks if not shown yet
-    const completedCount = tasks.filter(t => t.status === "done").length;
-    if (completedCount >= 3 && !partnerInviteShown && !isGuest) {
-      const hasPartner = (data as any).currentSituation === "partner" || 
-                         (data as any).currentSituation === "family" ||
-                         (data as any).currentSituation === "roommates";
-      if (hasPartner) {
-        setShowPartnerInvite(true);
-        setPartnerInviteShown(true);
-        sessionStorage.setItem("lua_partner_invite_shown", "true");
-      }
-    }
   };
 
   const handleTaskToggle = async (taskId: string) => {
@@ -687,22 +141,16 @@ export const TaskList = ({
     
     setCompletingTasks(prev => new Set(prev).add(taskId));
     
-    // Wacht op animatie
     await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Update status
     await toggleTaskStatus(taskId);
     
-    // Verwijder uit animating set
     setCompletingTasks(prev => {
       const newSet = new Set(prev);
       newSet.delete(taskId);
       return newSet;
     });
 
-    // Trigger signup prompt if task was completed (not uncompleted)
     if (wasNotDone && onTaskComplete) {
-      // Calculate new completed count (current + 1 since we just completed one)
       const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
       onTaskComplete(newCompletedCount);
     }
@@ -711,20 +159,15 @@ export const TaskList = ({
     if (wasNotDone && task && !taskPartnerInviteShown && !isGuest) {
       const isRelevantTask = isEnergyTask(task) || isMovingTask(task);
       if (isRelevantTask) {
-        // Check if user already has a partner or lives alone
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          // Check household type first
           const { data: profile } = await supabase
             .from("profiles")
             .select("household_type")
             .eq("user_id", user.id)
             .single();
           
-          // Skip if user indicated they live alone
-          if (profile?.household_type === "single") {
-            return;
-          }
+          if (profile?.household_type === "single") return;
 
           const { data: collaborators } = await supabase
             .from("moving_collaborators")
@@ -732,11 +175,9 @@ export const TaskList = ({
             .or(`owner_user_id.eq.${user.id},collaborator_user_id.eq.${user.id}`)
             .limit(1);
           
-          // Only show if no partner yet
           if (!collaborators || collaborators.length === 0) {
-            // Small delay so the completion animation finishes
             setTimeout(() => {
-              setShowPartnerInvite(true);
+              setActiveDialog("partnerInvite");
               setTaskPartnerInviteShown(true);
               sessionStorage.setItem("lua_task_partner_invite_shown", "true");
             }, 800);
@@ -746,13 +187,12 @@ export const TaskList = ({
     }
   };
 
-  // Bereken categorieën
+  // Calculate categories
   const categories = useMemo(() => {
     const cats = new Set(tasks.map((t) => t.category));
     return Array.from(cats);
   }, [tasks]);
 
-  // Toggle category selection
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
       prev.includes(category) 
@@ -761,23 +201,13 @@ export const TaskList = ({
     );
   };
 
-  // Filter taken - inclusief dynamische filtering op basis van profiel
+  // Filter tasks
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      // Dynamische filtering op basis van profiel data
-      if (!shouldShowTask(task.id, task.title, movingInfo)) {
-        return false;
-      }
+      if (!shouldShowTask(task.id, task.title, movingInfo)) return false;
       
-      // Filter logica voor Open en Afgerond
-      const statusMatch = 
-        filter === "done"
-          ? task.status === "done"
-          : task.status !== "done"; // "open" toont todo + in_progress
-      
+      const statusMatch = filter === "done" ? task.status === "done" : task.status !== "done";
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
-      
-      // Zoek filter
       const searchMatch = searchQuery === "" || 
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -787,7 +217,7 @@ export const TaskList = ({
     });
   }, [tasks, filter, selectedCategories, searchQuery, movingInfo]);
 
-  // Groepeer taken per fase met correcte volgorde
+  // Group tasks by phase
   const tasksByPhase = useMemo(() => {
     const phaseOrder = [
       "Fase 1 - Je nieuwe thuis is bevestigd",
@@ -802,39 +232,20 @@ export const TaskList = ({
     
     const phases: { [key: string]: Task[] } = {};
     filteredTasks.forEach((task) => {
-      if (!phases[task.phase]) {
-        phases[task.phase] = [];
-      }
+      if (!phases[task.phase]) phases[task.phase] = [];
       phases[task.phase].push(task);
     });
     
-    // Sorteer de phases op volgorde
     const sortedPhases: { [key: string]: Task[] } = {};
     phaseOrder.forEach(phase => {
-      if (phases[phase]) {
-        sortedPhases[phase] = phases[phase];
-      }
+      if (phases[phase]) sortedPhases[phase] = phases[phase];
     });
-    // Voeg eventuele onbekende phases toe aan het einde
     Object.keys(phases).forEach(phase => {
-      if (!sortedPhases[phase]) {
-        sortedPhases[phase] = phases[phase];
-      }
+      if (!sortedPhases[phase]) sortedPhases[phase] = phases[phase];
     });
     
     return sortedPhases;
   }, [filteredTasks]);
-
-
-  const getStatusBadge = (task: Task) => {
-    if (task.status === "done") {
-      return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 min-w-[75px] justify-center text-xs">Voltooid</Badge>;
-    }
-    if (task.status === "in_progress") {
-      return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 min-w-[75px] justify-center text-xs">Bezig</Badge>;
-    }
-    return null;
-  };
 
   const getCountdownText = () => {
     if (!movingInfo.movingDate) return null;
@@ -856,14 +267,10 @@ export const TaskList = ({
       {/* Compact Header with Search */}
       <div className="px-4 pb-3 sticky top-0 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg z-10 border-b border-border/50">
         <div className="flex items-center gap-3">
-          {/* Filter knop */}
+          {/* Filter button */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="h-10 w-10 shrink-0 rounded-xl"
-              >
+              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl">
                 <Filter className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
@@ -898,9 +305,7 @@ export const TaskList = ({
                         }`}
                         onClick={() => toggleCategory(cat)}
                       >
-                        <Label htmlFor={cat} className="text-sm cursor-pointer flex-1">
-                          {cat}
-                        </Label>
+                        <Label htmlFor={cat} className="text-sm cursor-pointer flex-1">{cat}</Label>
                       </div>
                     ))}
                   </div>
@@ -909,7 +314,7 @@ export const TaskList = ({
             </PopoverContent>
           </Popover>
           
-          {/* Zoekbalk */}
+          {/* Search bar */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -921,20 +326,10 @@ export const TaskList = ({
           </div>
 
           {/* Action buttons */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowShareDialog(true)}
-            className="h-10 w-10 rounded-xl"
-          >
+          <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10 rounded-xl">
             <Share2 className="w-4 h-4 text-muted-foreground" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="h-10 w-10 rounded-xl"
-          >
+          <Button variant="ghost" size="icon" onClick={onLogout} className="h-10 w-10 rounded-xl">
             <LogOut className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
@@ -979,80 +374,17 @@ export const TaskList = ({
                 </div>
 
                 <div className="space-y-2">
-                  {phaseTasks.map((task) => {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const deadline = new Date(task.deadline);
-                    deadline.setHours(0, 0, 0, 0);
-                    const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                    const isTaskOverdue = deadline < today && task.status !== "done";
-                    const isCompleting = completingTasks.has(task.id);
-
-                    return (
-                      <SwipeableTaskItem
-                        key={task.id}
-                        onSwipeComplete={() => handleTaskToggle(task.id)}
-                        disabled={task.status === "done" || isCompleting}
-                      >
-                        <div
-                          className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
-                            isCompleting 
-                              ? "bg-primary animate-task-complete" 
-                              : isTaskOverdue 
-                                ? "bg-destructive/5 hover:bg-destructive/10" 
-                                : "bg-secondary/50 hover:bg-secondary"
-                          }`}
-                          onClick={() => !isCompleting && handleTaskClick(task)}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div 
-                              className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 pt-0.5"
-                              onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
-                            >
-                              {isCompleting ? (
-                                <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
-                              ) : task.status === "done" ? (
-                                <CheckCircle2 className="h-5 w-5 text-primary" />
-                              ) : (
-                                <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
-                                isCompleting 
-                                  ? "line-through text-primary-foreground" 
-                                  : task.status === "done" 
-                                    ? "line-through text-muted-foreground" 
-                                    : "text-foreground"
-                              }`}>
-                                {task.title}
-                              </h4>
-                              <div className="flex items-center justify-between gap-2 mt-0.5">
-                                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                                  isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
-                                }`}>
-                                  <Clock className="w-3 h-3" />
-                                  {task.deadlineLabel}
-                                  {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
-                                </span>
-                                {task.affiliateLink && task.status !== "done" && !isCompleting && (
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="shrink-0 h-5 px-0 text-xs text-primary hover:text-primary hover:bg-transparent font-medium"
-                                    onClick={(e) => handleRegelenClick(e, task)}
-                                  >
-                                    Regelen
-                                    <ArrowRight className="w-3 h-3 ml-1" />
-                                  </Button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </SwipeableTaskItem>
-                    );
-                  })}
+                  {phaseTasks.map((task) => (
+                    <TaskListItem
+                      key={task.id}
+                      task={task}
+                      isCompleting={completingTasks.has(task.id)}
+                      onTaskClick={handleTaskClick}
+                      onCheckboxClick={handleCheckboxClick}
+                      onRegelenClick={handleRegelenClick}
+                      onSwipeComplete={handleTaskToggle}
+                    />
+                  ))}
                 </div>
               </div>
             ))}
@@ -1067,10 +399,7 @@ export const TaskList = ({
         onTaskAdded={refreshTasks}
         onSignupClick={onSignupClick}
       />
-      <ShareMovingDialog
-        open={showShareDialog}
-        onOpenChange={setShowShareDialog}
-      />
+      <ShareMovingDialog open={showShareDialog} onOpenChange={setShowShareDialog} />
       <TaskDetailDialog
         task={selectedTask}
         open={!!selectedTask}
@@ -1078,11 +407,7 @@ export const TaskList = ({
         onTaskUpdate={refreshTasks}
         onToggleStatus={handleTaskToggle}
       />
-      <TaskDealDialog
-        task={dealTask}
-        open={!!dealTask}
-        onOpenChange={(open) => !open && setDealTask(null)}
-      />
+      <TaskDealDialog task={dealTask} open={!!dealTask} onOpenChange={(open) => !open && setDealTask(null)} />
       
       <ContextualPromptDialog
         open={!!contextualPrompt}
@@ -1101,58 +426,58 @@ export const TaskList = ({
       />
 
       <EnergyQuestionsDialog
-        open={showEnergyQuestions}
-        onOpenChange={setShowEnergyQuestions}
+        open={activeDialog === "energy"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleEnergyQuestionsComplete}
-        onRedirect={handleEnergyRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("energy")}
       />
 
       <InternetQuestionsDialog
-        open={showInternetQuestions}
-        onOpenChange={setShowInternetQuestions}
+        open={activeDialog === "internet"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleInternetQuestionsComplete}
-        onRedirect={handleInternetRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("internet")}
       />
 
       <MovingQuestionsDialog
-        open={showMovingQuestions}
-        onOpenChange={setShowMovingQuestions}
+        open={activeDialog === "moving"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleMovingQuestionsComplete}
-        onRedirect={handleMovingRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("moving")}
       />
 
       <BoxesQuestionsDialog
-        open={showBoxesQuestions}
-        onOpenChange={setShowBoxesQuestions}
+        open={activeDialog === "boxes"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleBoxesQuestionsComplete}
-        onRedirect={handleBoxesRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("boxes")}
       />
 
       <InsuranceQuestionsDialog
-        open={showInsuranceQuestions}
-        onOpenChange={setShowInsuranceQuestions}
+        open={activeDialog === "insurance"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleInsuranceQuestionsComplete}
-        onRedirect={handleInsuranceRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("insurance")}
       />
 
       <LiabilityQuestionsDialog
-        open={showLiabilityQuestions}
-        onOpenChange={setShowLiabilityQuestions}
+        open={activeDialog === "liability"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleLiabilityQuestionsComplete}
-        onRedirect={handleLiabilityRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("liability")}
       />
 
       <ForwardingQuestionsDialog
-        open={showForwardingQuestions}
-        onOpenChange={setShowForwardingQuestions}
-        onComplete={handleForwardingQuestionsComplete}
-        onRedirect={handleForwardingRedirect}
+        open={activeDialog === "forwarding"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onComplete={(data) => handleDialogComplete(data)}
+        onRedirect={() => handleDialogRedirect("forwarding")}
         existingData={{
           forwardingStartDate: movingInfo.forwardingStartDate,
           forwardingDuration: movingInfo.forwardingDuration,
@@ -1161,8 +486,8 @@ export const TaskList = ({
       />
 
       <PostNLPreparationDialog
-        open={showPostNLPreparation}
-        onOpenChange={setShowPostNLPreparation}
+        open={activeDialog === "postNLPreparation"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={{
           oldAddress: movingInfo.oldAddress,
           newAddress: movingInfo.newAddress,
@@ -1178,42 +503,49 @@ export const TaskList = ({
       />
 
       <ParkingQuestionsDialog
-        open={showParkingQuestions}
-        onOpenChange={setShowParkingQuestions}
+        open={activeDialog === "parking"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleParkingQuestionsComplete}
-        onRedirect={handleParkingRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("parking")}
       />
 
       <CleaningQuestionsDialog
-        open={showCleaningQuestions}
-        onOpenChange={setShowCleaningQuestions}
+        open={activeDialog === "cleaning"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleCleaningQuestionsComplete}
-        onRedirect={handleCleaningRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("cleaning")}
       />
 
       <SmokeDetectorQuestionsDialog
-        open={showSmokeDetectorQuestions}
-        onOpenChange={setShowSmokeDetectorQuestions}
+        open={activeDialog === "smokeDetector"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleSmokeDetectorQuestionsComplete}
-        onRedirect={handleSmokeDetectorRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("smokeDetector")}
       />
 
       <GardenQuestionsDialog
-        open={showGardenQuestions}
-        onOpenChange={setShowGardenQuestions}
+        open={activeDialog === "garden"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         movingInfo={movingInfo}
-        onComplete={handleGardenQuestionsComplete}
-        onRedirect={handleGardenRedirect}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("garden")}
       />
 
       <RenovationQuestionsDialog
-        open={showRenovationQuestions}
-        onOpenChange={setShowRenovationQuestions}
-        onComplete={handleRenovationQuestionsComplete}
-        onRedirect={handleRenovationRedirect}
+        open={activeDialog === "renovation"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onComplete={(data) => {
+          if (onUpdateMovingInfo) {
+            onUpdateMovingInfo({
+              renovationBudget: data.renovationBudget,
+              renovationStartDate: data.renovationStartDate?.toISOString().split('T')[0],
+            } as Partial<MovingInfo>);
+          }
+        }}
+        onRedirect={() => handleDialogRedirect("renovation")}
         existingData={{
           renovationBudget: (movingInfo as any).renovationBudget,
           renovationStartDate: (movingInfo as any).renovationStartDate ? new Date((movingInfo as any).renovationStartDate) : undefined,
@@ -1221,9 +553,9 @@ export const TaskList = ({
       />
 
       <InvitePartnerDialog
-        open={showPartnerInvite}
-        onOpenChange={setShowPartnerInvite}
-        onInviteSent={() => setShowPartnerInvite(false)}
+        open={activeDialog === "partnerInvite"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        onInviteSent={() => setActiveDialog(null)}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
