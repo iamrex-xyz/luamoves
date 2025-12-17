@@ -1121,6 +1121,13 @@ export const TaskList = ({
           newAddress: movingInfo.newAddress,
           movingDate: movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined,
         }}
+        onUpdateMovingInfo={onUpdateMovingInfo ? (data) => {
+          const updateData: Partial<MovingInfo> = {};
+          if (data.oldAddress) updateData.oldAddress = data.oldAddress;
+          if (data.newAddress) updateData.newAddress = data.newAddress;
+          if (data.movingDate) updateData.movingDate = data.movingDate.toISOString();
+          onUpdateMovingInfo(updateData);
+        } : undefined}
       />
 
       <ParkingQuestionsDialog
