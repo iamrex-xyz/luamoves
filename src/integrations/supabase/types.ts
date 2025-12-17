@@ -264,6 +264,8 @@ export type Database = {
           pets: number | null
           phone: string | null
           preferred_service_date: string | null
+          renovation_budget: string | null
+          renovation_start_date: string | null
           renovation_type: string | null
           service_type: string | null
           special_items: string[] | null
@@ -319,6 +321,8 @@ export type Database = {
           pets?: number | null
           phone?: string | null
           preferred_service_date?: string | null
+          renovation_budget?: string | null
+          renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
           special_items?: string[] | null
@@ -374,6 +378,8 @@ export type Database = {
           pets?: number | null
           phone?: string | null
           preferred_service_date?: string | null
+          renovation_budget?: string | null
+          renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
           special_items?: string[] | null

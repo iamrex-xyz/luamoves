@@ -69,6 +69,10 @@ export type MovingInfo = {
   numberOfBedrooms?: string;
   // Garden velden
   gardenServiceType?: string;
+  // Renovation velden
+  renovationBudget?: string;
+  renovationStartDate?: string;
+  housingPropertyType?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -216,6 +220,10 @@ const Index = () => {
         numberOfBedrooms: (profile as any).number_of_bedrooms || undefined,
         // Garden velden
         gardenServiceType: (profile as any).garden_service_type || undefined,
+        // Renovation velden
+        renovationBudget: (profile as any).renovation_budget || undefined,
+        renovationStartDate: (profile as any).renovation_start_date || undefined,
+        housingPropertyType: (profile as any).housing_property_type || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -298,6 +306,9 @@ const Index = () => {
           number_of_bedrooms: info.numberOfBedrooms || null,
           // Garden velden
           garden_service_type: info.gardenServiceType || null,
+          // Renovation velden
+          renovation_budget: (info as any).renovationBudget || null,
+          renovation_start_date: (info as any).renovationStartDate || null,
         } as any)
         .eq('user_id', userId);
 
@@ -489,6 +500,9 @@ const Index = () => {
             number_of_bedrooms: (updatedInfo as any).numberOfBedrooms || null,
             // Garden velden
             garden_service_type: (updatedInfo as any).gardenServiceType || null,
+            // Renovation velden
+            renovation_budget: (updatedInfo as any).renovationBudget || null,
+            renovation_start_date: (updatedInfo as any).renovationStartDate || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

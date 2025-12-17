@@ -28,6 +28,7 @@ import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
+import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -93,6 +94,7 @@ export const TaskList = ({
   const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
   const [showSmokeDetectorQuestions, setShowSmokeDetectorQuestions] = useState(false);
   const [showGardenQuestions, setShowGardenQuestions] = useState(false);
+  const [showRenovationQuestions, setShowRenovationQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -322,6 +324,26 @@ export const TaskList = ({
            (info.hasGarden && (!info.gardenSize || !(info as any).gardenServiceType));
   };
 
+  // Helper function to check if task is renovation task
+  const isRenovationTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("aannemer") ||
+      titleLower.includes("materialen inkopen") ||
+      (titleLower.includes("vergelijk") && titleLower.includes("aannemer")) ||
+      idLower.includes("contractor") ||
+      idLower.includes("materialen")
+    );
+  };
+
+  // Check if renovation questions are needed
+  const needsRenovationQuestions = (info: MovingInfo) => {
+    return !(info as any).renovationBudget || 
+           !(info as any).renovationStartDate || 
+           !(info as any).housingPropertyType;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -447,6 +469,16 @@ export const TaskList = ({
       return;
     }
     
+    // Check if this is a renovation task (aannemers vergelijken or materialen inkopen)
+    if (isRenovationTask(task)) {
+      if (needsRenovationQuestions(movingInfo)) {
+        setShowRenovationQuestions(true);
+        return;
+      }
+      // All renovation questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
     // Check of er nog smart questions nodig zijn (for other tasks)
     if (!isGuest) {
       const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
@@ -569,6 +601,24 @@ export const TaskList = ({
 
   const handleGardenRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Plan tuinonderhoud")}`);
+  };
+
+  const handleRenovationQuestionsComplete = (data: {
+    renovationBudget?: string;
+    renovationStartDate?: Date;
+    housingPropertyType?: string;
+  }) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo({
+        renovationBudget: data.renovationBudget,
+        renovationStartDate: data.renovationStartDate?.toISOString().split('T')[0],
+        housingPropertyType: data.housingPropertyType,
+      } as Partial<MovingInfo>);
+    }
+  };
+
+  const handleRenovationRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Aannemers vergelijken")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -1070,6 +1120,18 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleGardenQuestionsComplete}
         onRedirect={handleGardenRedirect}
+      />
+
+      <RenovationQuestionsDialog
+        open={showRenovationQuestions}
+        onOpenChange={setShowRenovationQuestions}
+        onComplete={handleRenovationQuestionsComplete}
+        onRedirect={handleRenovationRedirect}
+        existingData={{
+          renovationBudget: (movingInfo as any).renovationBudget,
+          renovationStartDate: (movingInfo as any).renovationStartDate ? new Date((movingInfo as any).renovationStartDate) : undefined,
+          housingPropertyType: (movingInfo as any).housingPropertyType,
+        }}
       />
 
       <InvitePartnerDialog
