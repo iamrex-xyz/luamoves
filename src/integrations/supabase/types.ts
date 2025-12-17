@@ -230,6 +230,7 @@ export type Database = {
           floor_level: string | null
           forwarding_duration: string | null
           forwarding_start_date: string | null
+          garden_service_type: string | null
           garden_size: string | null
           glasvezel: string | null
           has_elevator: string | null
@@ -284,6 +285,7 @@ export type Database = {
           floor_level?: string | null
           forwarding_duration?: string | null
           forwarding_start_date?: string | null
+          garden_service_type?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_elevator?: string | null
@@ -338,6 +340,7 @@ export type Database = {
           floor_level?: string | null
           forwarding_duration?: string | null
           forwarding_start_date?: string | null
+          garden_service_type?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_elevator?: string | null
