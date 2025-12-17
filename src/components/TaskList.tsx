@@ -711,9 +711,21 @@ export const TaskList = ({
     if (wasNotDone && task && !taskPartnerInviteShown && !isGuest) {
       const isRelevantTask = isEnergyTask(task) || isMovingTask(task);
       if (isRelevantTask) {
-        // Check if user already has a partner
+        // Check if user already has a partner or lives alone
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          // Check household type first
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("household_type")
+            .eq("user_id", user.id)
+            .single();
+          
+          // Skip if user indicated they live alone
+          if (profile?.household_type === "single") {
+            return;
+          }
+
           const { data: collaborators } = await supabase
             .from("moving_collaborators")
             .select("id")
