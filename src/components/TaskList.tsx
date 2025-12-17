@@ -24,6 +24,7 @@ import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
+import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
 import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
@@ -93,6 +94,7 @@ export const TaskList = ({
   const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
   const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
   const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
+  const [showPostNLPreparation, setShowPostNLPreparation] = useState(false);
   const [showParkingQuestions, setShowParkingQuestions] = useState(false);
   const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
   const [showSmokeDetectorQuestions, setShowSmokeDetectorQuestions] = useState(false);
@@ -428,9 +430,9 @@ export const TaskList = ({
       return;
     }
     
-    // Check if this is a forwarding/PostNL task - direct redirect to PostNL
+    // Check if this is a forwarding/PostNL task - show preparation dialog
     if (isForwardingTask(task)) {
-      window.open("https://doorzenden.postnl.nl/van-naar#/van-naar", "_blank");
+      setShowPostNLPreparation(true);
       return;
     }
     
@@ -1108,6 +1110,16 @@ export const TaskList = ({
           forwardingStartDate: movingInfo.forwardingStartDate,
           forwardingDuration: movingInfo.forwardingDuration,
           householdNames: movingInfo.householdNames
+        }}
+      />
+
+      <PostNLPreparationDialog
+        open={showPostNLPreparation}
+        onOpenChange={setShowPostNLPreparation}
+        movingInfo={{
+          oldAddress: movingInfo.oldAddress,
+          newAddress: movingInfo.newAddress,
+          movingDate: movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined,
         }}
       />
 
