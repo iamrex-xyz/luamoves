@@ -32,9 +32,14 @@ import {
   Sparkles,
   Truck,
   Wrench,
+  Mail,
+  Sparkle,
+  X,
+  Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 type ExtraInfoSheetProps = {
   open: boolean;
@@ -43,7 +48,7 @@ type ExtraInfoSheetProps = {
   onUpdate: (info: MovingInfo) => void;
 };
 
-type Category = "energie" | "woning" | "internet" | "verzekering" | "verhuizing" | "renovatie";
+type Category = "energie" | "woning" | "internet" | "verzekering" | "verhuizing" | "renovatie" | "post" | "schoonmaak";
 
 const categories = [
   {
@@ -73,7 +78,7 @@ const categories = [
   {
     id: "verzekering" as Category,
     title: "Verzekering",
-    subtitle: "Inboedel & opstal",
+    subtitle: "Inboedel, huisdieren & gezin",
     icon: Shield,
     color: "text-green-500",
     bgColor: "bg-green-500/10",
@@ -85,6 +90,22 @@ const categories = [
     icon: Truck,
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
+  },
+  {
+    id: "post" as Category,
+    title: "Post",
+    subtitle: "Doorsturen & huisgenoten",
+    icon: Mail,
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-500/10",
+  },
+  {
+    id: "schoonmaak" as Category,
+    title: "Schoonmaak & klussen",
+    subtitle: "Service & planning",
+    icon: Sparkle,
+    color: "text-pink-500",
+    bgColor: "bg-pink-500/10",
   },
   {
     id: "renovatie" as Category,
@@ -124,6 +145,7 @@ export const ExtraInfoSheet = ({
   const [hasGarden, setHasGarden] = useState("");
   const [gardenSize, setGardenSize] = useState("");
   const [buildingAccess, setBuildingAccess] = useState("");
+  const [municipality, setMunicipality] = useState("");
   
   const [hasFiber, setHasFiber] = useState("");
   const [internetSpeedPreference, setInternetSpeedPreference] = useState("");
@@ -132,21 +154,32 @@ export const ExtraInfoSheet = ({
   const [worksFromHome, setWorksFromHome] = useState("");
   
   const [insuranceValue, setInsuranceValue] = useState("");
+  const [children, setChildren] = useState("");
+  const [pets, setPets] = useState("");
   
   const [floorLevel, setFloorLevel] = useState("");
   const [hasElevator, setHasElevator] = useState("");
   const [numberOfRooms, setNumberOfRooms] = useState("");
   const [specialItems, setSpecialItems] = useState<string[]>([]);
   
-  // New fields for woning
+  // Woning fields
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [numberOfBedrooms, setNumberOfBedrooms] = useState("");
   const [homeSizeM2, setHomeSizeM2] = useState("");
-  const [municipality, setMunicipality] = useState("");
   
   // Renovatie fields
   const [renovationBudget, setRenovationBudget] = useState("");
   const [renovationStartDate, setRenovationStartDate] = useState("");
+  
+  // Post fields
+  const [forwardingStartDate, setForwardingStartDate] = useState("");
+  const [forwardingDuration, setForwardingDuration] = useState("");
+  const [householdNames, setHouseholdNames] = useState<string[]>([]);
+  const [newHouseholdName, setNewHouseholdName] = useState("");
+  
+  // Schoonmaak fields
+  const [serviceType, setServiceType] = useState("");
+  const [preferredServiceDate, setPreferredServiceDate] = useState("");
 
   // Load data when sheet opens
   useEffect(() => {
@@ -169,23 +202,29 @@ export const ExtraInfoSheet = ({
         setHasGarden(movingInfo.hasGarden === true ? "yes" : movingInfo.hasGarden === false ? "no" : "");
         setGardenSize(movingInfo.gardenSize || "");
         setBuildingAccess(movingInfo.buildingAccess || "");
+        setMunicipality(movingInfo.municipality || "");
         setHasFiber(movingInfo.hasFiber || "");
         setInternetSpeedPreference(movingInfo.internetSpeedPreference || "");
         setInternetBundle(movingInfo.internetBundle || "");
         setGlasvezel(movingInfo.glasvezel || "");
         setWorksFromHome(movingInfo.worksFromHome || "");
         setInsuranceValue(movingInfo.insuranceValue || "");
+        setChildren(movingInfo.children?.toString() || "");
+        setPets(movingInfo.pets?.toString() || "");
         setFloorLevel(movingInfo.floorLevel || "");
         setHasElevator(movingInfo.hasElevator || "");
         setNumberOfRooms(movingInfo.numberOfRooms || "");
         setSpecialItems(movingInfo.specialItems || []);
-        // New fields
-        setNumberOfFloors((movingInfo as any).numberOfFloors || "");
-        setNumberOfBedrooms((movingInfo as any).numberOfBedrooms || "");
-        setHomeSizeM2((movingInfo as any).homeSizeM2 || "");
-        setMunicipality((movingInfo as any).municipality || "");
-        setRenovationBudget((movingInfo as any).renovationBudget || "");
-        setRenovationStartDate((movingInfo as any).renovationStartDate || "");
+        setNumberOfFloors(movingInfo.numberOfFloors || "");
+        setNumberOfBedrooms(movingInfo.numberOfBedrooms || "");
+        setHomeSizeM2(movingInfo.homeSizeM2 || "");
+        setRenovationBudget(movingInfo.renovationBudget || "");
+        setRenovationStartDate(movingInfo.renovationStartDate || "");
+        setForwardingStartDate(movingInfo.forwardingStartDate || "");
+        setForwardingDuration(movingInfo.forwardingDuration || "");
+        setHouseholdNames(movingInfo.householdNames || []);
+        setServiceType(movingInfo.serviceType || "");
+        setPreferredServiceDate(movingInfo.preferredServiceDate || "");
         return;
       }
 
@@ -205,23 +244,29 @@ export const ExtraInfoSheet = ({
         setHasGarden(profile.has_garden === true ? "yes" : profile.has_garden === false ? "no" : "");
         setGardenSize((profile as any).garden_size || "");
         setBuildingAccess((profile as any).building_access || "");
+        setMunicipality((profile as any).municipality || "");
         setHasFiber((profile as any).has_fiber || "");
         setInternetSpeedPreference((profile as any).internet_speed_preference || "");
         setInternetBundle((profile as any).internet_bundle || "");
         setGlasvezel((profile as any).glasvezel || "");
         setWorksFromHome((profile as any).works_from_home || "");
         setInsuranceValue((profile as any).insurance_value || "");
+        setChildren(profile.children?.toString() || "");
+        setPets(profile.pets?.toString() || "");
         setFloorLevel((profile as any).floor_level || "");
         setHasElevator((profile as any).has_elevator || "");
         setNumberOfRooms((profile as any).number_of_rooms || "");
         setSpecialItems((profile as any).special_items || []);
-        // New fields
         setNumberOfFloors((profile as any).number_of_floors || "");
         setNumberOfBedrooms((profile as any).number_of_bedrooms || "");
         setHomeSizeM2((profile as any).home_size_m2 || "");
-        setMunicipality((profile as any).municipality || "");
         setRenovationBudget((profile as any).renovation_budget || "");
         setRenovationStartDate((profile as any).renovation_start_date || "");
+        setForwardingStartDate((profile as any).forwarding_start_date || "");
+        setForwardingDuration((profile as any).forwarding_duration || "");
+        setHouseholdNames((profile as any).household_names || []);
+        setServiceType((profile as any).service_type || "");
+        setPreferredServiceDate((profile as any).preferred_service_date || "");
       }
     } catch (error) {
       console.error("Error loading extra info:", error);
@@ -242,23 +287,29 @@ export const ExtraInfoSheet = ({
         hasGarden: hasGarden === "yes" ? true : hasGarden === "no" ? false : undefined,
         gardenSize: gardenSize as any || undefined,
         buildingAccess: buildingAccess as any || undefined,
+        municipality: municipality || undefined,
         hasFiber: hasFiber as any || undefined,
         internetSpeedPreference: internetSpeedPreference as any || undefined,
         internetBundle: internetBundle as any || undefined,
         glasvezel: glasvezel as any || undefined,
         worksFromHome: worksFromHome as any || undefined,
         insuranceValue: insuranceValue as any || undefined,
+        children: children ? parseInt(children) : undefined,
+        pets: pets ? parseInt(pets) : undefined,
         floorLevel: floorLevel || undefined,
         hasElevator: hasElevator || undefined,
         numberOfRooms: numberOfRooms || undefined,
         specialItems: specialItems.length > 0 ? specialItems : undefined,
-        // New fields
         numberOfFloors: numberOfFloors || undefined,
         numberOfBedrooms: numberOfBedrooms || undefined,
         homeSizeM2: homeSizeM2 || undefined,
-        municipality: municipality || undefined,
         renovationBudget: renovationBudget || undefined,
         renovationStartDate: renovationStartDate || undefined,
+        forwardingStartDate: forwardingStartDate || undefined,
+        forwardingDuration: forwardingDuration || undefined,
+        householdNames: householdNames.length > 0 ? householdNames : undefined,
+        serviceType: serviceType || undefined,
+        preferredServiceDate: preferredServiceDate || undefined,
       } as Partial<MovingInfo>;
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -276,23 +327,29 @@ export const ExtraInfoSheet = ({
             has_garden: hasGarden === "yes" ? true : hasGarden === "no" ? false : null,
             garden_size: gardenSize || null,
             building_access: buildingAccess || null,
+            municipality: municipality || null,
             has_fiber: hasFiber || null,
             internet_speed_preference: internetSpeedPreference || null,
             internet_bundle: internetBundle || null,
             glasvezel: glasvezel || null,
             works_from_home: worksFromHome || null,
             insurance_value: insuranceValue || null,
+            children: children ? parseInt(children) : null,
+            pets: pets ? parseInt(pets) : null,
             floor_level: floorLevel || null,
             has_elevator: hasElevator || null,
             number_of_rooms: numberOfRooms || null,
             special_items: specialItems.length > 0 ? specialItems : [],
-            // New fields
             number_of_floors: numberOfFloors || null,
             number_of_bedrooms: numberOfBedrooms || null,
             home_size_m2: homeSizeM2 || null,
-            municipality: municipality || null,
             renovation_budget: renovationBudget || null,
             renovation_start_date: renovationStartDate || null,
+            forwarding_start_date: forwardingStartDate || null,
+            forwarding_duration: forwardingDuration || null,
+            household_names: householdNames.length > 0 ? householdNames : null,
+            service_type: serviceType || null,
+            preferred_service_date: preferredServiceDate || null,
           } as any)
           .eq("user_id", user.id);
 
@@ -317,20 +374,35 @@ export const ExtraInfoSheet = ({
     }
   };
 
+  const addHouseholdName = () => {
+    if (newHouseholdName.trim() && !householdNames.includes(newHouseholdName.trim())) {
+      setHouseholdNames([...householdNames, newHouseholdName.trim()]);
+      setNewHouseholdName("");
+    }
+  };
+
+  const removeHouseholdName = (name: string) => {
+    setHouseholdNames(householdNames.filter(n => n !== name));
+  };
+
   const getCompletionStatus = (categoryId: Category) => {
     switch (categoryId) {
       case "energie":
         return [energyCurrentSupplier, hasSmartMeter, energyConnectionType].filter(Boolean).length;
       case "woning":
-        return [propertyType, buildingYear, hasGarden, buildingAccess, numberOfFloors, numberOfBedrooms, homeSizeM2].filter(Boolean).length;
+        return [propertyType, buildingYear, hasGarden, buildingAccess, numberOfFloors, numberOfBedrooms, homeSizeM2, municipality].filter(Boolean).length;
       case "internet":
         return [hasFiber, internetSpeedPreference, internetBundle].filter(Boolean).length;
       case "verzekering":
-        return [insuranceValue].filter(Boolean).length;
+        return [insuranceValue, children, pets].filter(Boolean).length;
       case "verhuizing":
         return [floorLevel, hasElevator, numberOfRooms, specialItems.length > 0 ? "filled" : ""].filter(Boolean).length;
       case "renovatie":
         return [renovationBudget, renovationStartDate].filter(Boolean).length;
+      case "post":
+        return [forwardingStartDate, forwardingDuration, householdNames.length > 0 ? "filled" : ""].filter(Boolean).length;
+      case "schoonmaak":
+        return [serviceType, preferredServiceDate].filter(Boolean).length;
       default:
         return 0;
     }
@@ -339,11 +411,13 @@ export const ExtraInfoSheet = ({
   const getTotalFields = (categoryId: Category) => {
     switch (categoryId) {
       case "energie": return 3;
-      case "woning": return 7;
+      case "woning": return 8;
       case "internet": return 3;
-      case "verzekering": return 1;
+      case "verzekering": return 3;
       case "verhuizing": return 4;
       case "renovatie": return 2;
+      case "post": return 3;
+      case "schoonmaak": return 2;
       default: return 0;
     }
   };
@@ -540,6 +614,16 @@ export const ExtraInfoSheet = ({
                           className="rounded-xl h-11 mt-1"
                         />
                       </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Gemeente</Label>
+                        <Input
+                          type="text"
+                          value={municipality}
+                          onChange={(e) => setMunicipality(e.target.value)}
+                          placeholder="bijv. Amsterdam"
+                          className="rounded-xl h-11 mt-1"
+                        />
+                      </div>
                     </>
                   )}
 
@@ -588,19 +672,50 @@ export const ExtraInfoSheet = ({
                   )}
 
                   {category.id === "verzekering" && (
-                    <div>
-                      <Label className="text-xs text-muted-foreground uppercase tracking-wide">Geschatte inboedelwaarde</Label>
-                      <Select value={insuranceValue} onValueChange={setInsuranceValue}>
-                        <SelectTrigger className="rounded-xl h-11 mt-1">
-                          <SelectValue placeholder="Selecteer" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background z-50">
-                          <SelectItem value="low">Tot €25.000</SelectItem>
-                          <SelectItem value="medium">€25.000 - €75.000</SelectItem>
-                          <SelectItem value="high">Meer dan €75.000</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Geschatte inboedelwaarde</Label>
+                        <Select value={insuranceValue} onValueChange={setInsuranceValue}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="low">Tot €25.000</SelectItem>
+                            <SelectItem value="medium">€25.000 - €75.000</SelectItem>
+                            <SelectItem value="high">Meer dan €75.000</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aantal kinderen</Label>
+                        <Select value={children} onValueChange={setChildren}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="0">Geen kinderen</SelectItem>
+                            <SelectItem value="1">1 kind</SelectItem>
+                            <SelectItem value="2">2 kinderen</SelectItem>
+                            <SelectItem value="3">3 kinderen</SelectItem>
+                            <SelectItem value="4+">4 of meer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aantal huisdieren</Label>
+                        <Select value={pets} onValueChange={setPets}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="0">Geen huisdieren</SelectItem>
+                            <SelectItem value="1">1 huisdier</SelectItem>
+                            <SelectItem value="2">2 huisdieren</SelectItem>
+                            <SelectItem value="3+">3 of meer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
                   )}
 
                   {category.id === "verhuizing" && (
@@ -686,6 +801,100 @@ export const ExtraInfoSheet = ({
                             </button>
                           ))}
                         </div>
+                      </div>
+                    </>
+                  )}
+
+                  {category.id === "post" && (
+                    <>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Startdatum doorsturen</Label>
+                        <Input
+                          type="date"
+                          value={forwardingStartDate}
+                          onChange={(e) => setForwardingStartDate(e.target.value)}
+                          className="rounded-xl h-11 mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Duur doorsturen</Label>
+                        <Select value={forwardingDuration} onValueChange={setForwardingDuration}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="3_months">3 maanden</SelectItem>
+                            <SelectItem value="6_months">6 maanden</SelectItem>
+                            <SelectItem value="12_months">12 maanden</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Huisgenoten</Label>
+                        <div className="space-y-2 mt-2">
+                          {householdNames.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {householdNames.map((name) => (
+                                <Badge key={name} variant="secondary" className="flex items-center gap-1">
+                                  {name}
+                                  <button
+                                    type="button"
+                                    onClick={() => removeHouseholdName(name)}
+                                    className="ml-1 hover:text-destructive"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          <div className="flex gap-2">
+                            <Input
+                              type="text"
+                              value={newHouseholdName}
+                              onChange={(e) => setNewHouseholdName(e.target.value)}
+                              placeholder="Naam toevoegen"
+                              className="rounded-xl h-11 flex-1"
+                              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addHouseholdName())}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={addHouseholdName}
+                              className="h-11 w-11 rounded-xl"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {category.id === "schoonmaak" && (
+                    <>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Type service</Label>
+                        <Select value={serviceType} onValueChange={setServiceType}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="cleaning">Schoonmaak</SelectItem>
+                            <SelectItem value="painting">Schilderwerk</SelectItem>
+                            <SelectItem value="both">Beide</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Gewenste datum</Label>
+                        <Input
+                          type="date"
+                          value={preferredServiceDate}
+                          onChange={(e) => setPreferredServiceDate(e.target.value)}
+                          className="rounded-xl h-11 mt-1"
+                        />
                       </div>
                     </>
                   )}
