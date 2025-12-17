@@ -936,7 +936,7 @@ export const TaskList = ({
                   <span className="text-xs text-muted-foreground">({phaseTasks.length})</span>
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {phaseTasks.map((task) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -953,55 +953,60 @@ export const TaskList = ({
                         disabled={task.status === "done" || isCompleting}
                       >
                         <div
-                          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer ${
+                          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
                             isCompleting 
                               ? "bg-primary animate-task-complete" 
                               : isTaskOverdue 
                                 ? "bg-destructive/5 hover:bg-destructive/10" 
-                                : "bg-background hover:bg-secondary/50"
+                                : "bg-secondary/50 hover:bg-secondary"
                           }`}
                           onClick={() => !isCompleting && handleTaskClick(task)}
                         >
-                          <div 
-                            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
-                            onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
-                          >
-                            {isCompleting ? (
-                              <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
-                            ) : task.status === "done" ? (
-                              <CheckCircle2 className="h-5 w-5 text-primary" />
-                            ) : (
-                              <Circle className="h-5 w-5 text-muted-foreground/40" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm transition-all duration-200 ${
-                              isCompleting 
-                                ? "line-through text-primary-foreground" 
-                                : task.status === "done" 
-                                  ? "line-through text-muted-foreground" 
-                                  : "text-foreground"
-                            }`}>
-                              {task.title}
-                            </p>
-                            <p className={`text-xs mt-0.5 transition-colors duration-200 ${
-                              isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
-                            }`}>
-                              {task.deadlineLabel}
-                              {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
-                            </p>
-                          </div>
-                          {task.affiliateLink && task.status !== "done" && !isCompleting && (
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                              onClick={(e) => handleRegelenClick(e, task)}
+                          <div className="flex items-start gap-4">
+                            <div 
+                              className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+                              onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                             >
-                              Regelen
-                              <ArrowRight className="w-3 h-3 ml-1" />
-                            </Button>
-                          )}
+                              {isCompleting ? (
+                                <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
+                              ) : task.status === "done" ? (
+                                <CheckCircle2 className="h-5 w-5 text-primary" />
+                              ) : (
+                                <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className={`font-medium text-sm mb-2 transition-all duration-200 ${
+                                isCompleting 
+                                  ? "line-through text-primary-foreground" 
+                                  : task.status === "done" 
+                                    ? "line-through text-muted-foreground" 
+                                    : "text-foreground"
+                              }`}>
+                                {task.title}
+                              </h4>
+                              <div className="flex items-center justify-between gap-2">
+                                <div className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+                                  isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
+                                }`}>
+                                  <Clock className="w-3 h-3" />
+                                  <span>{task.deadlineLabel}</span>
+                                  {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
+                                </div>
+                                {task.affiliateLink && task.status !== "done" && !isCompleting && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="shrink-0 h-7 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10 -mr-2"
+                                    onClick={(e) => handleRegelenClick(e, task)}
+                                  >
+                                    Regelen
+                                    <ArrowRight className="w-3 h-3 ml-1" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </SwipeableTaskItem>
                     );
