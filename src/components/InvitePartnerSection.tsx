@@ -120,46 +120,36 @@ export const InvitePartnerSection = ({ isGuest, onSignupComplete }: InvitePartne
 
             {showInviteForm ? (
               <div className="mt-4 space-y-3">
-                <div className="space-y-2">
-                  <Label htmlFor="partner-email" className="text-pink-800 dark:text-pink-200">
-                    E-mailadres van je partner
-                  </Label>
+                <div className="flex gap-2 items-center">
                   <Input
                     id="partner-email"
                     type="email"
-                    placeholder="partner@email.nl"
+                    placeholder="E-mailadres"
                     value={partnerEmail}
                     onChange={(e) => setPartnerEmail(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleInvitePartner()}
-                    className="bg-white dark:bg-background"
+                    className="bg-white dark:bg-background flex-1"
                   />
-                </div>
-                <div className="flex gap-2">
                   <Button 
                     onClick={handleInvitePartner} 
                     disabled={isLoading}
-                    className="bg-pink-600 hover:bg-pink-700 text-white"
+                    size="icon"
+                    className="bg-orange-200 hover:bg-orange-300 text-orange-700 shrink-0 h-10 w-10 rounded-full"
                   >
                     {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Verzenden...
-                      </>
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <>
-                        <UserPlus className="w-4 h-4 mr-2" />
-                        Uitnodigen
-                      </>
+                      <UserPlus className="w-4 h-4" />
                     )}
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    onClick={() => setShowInviteForm(false)}
-                    className="text-pink-700 dark:text-pink-300"
-                  >
-                    Annuleren
-                  </Button>
                 </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setShowInviteForm(false)}
+                  className="text-pink-700 dark:text-pink-300 text-sm p-0 h-auto"
+                >
+                  Annuleren
+                </Button>
               </div>
             ) : invited ? (
               <div className="mt-3 flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
