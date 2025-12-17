@@ -9,6 +9,7 @@ import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { LuaLogo } from "@/components/LuaLogo";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
+import { PullToRefresh } from "@/components/PullToRefresh";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -169,7 +170,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <PullToRefresh onRefresh={refreshTasks} className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
@@ -315,6 +316,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
       />
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
-    </div>
+    </PullToRefresh>
   );
 };
