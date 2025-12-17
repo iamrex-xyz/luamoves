@@ -430,12 +430,12 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal rounded-xl h-11",
+                        "w-full justify-start text-left font-normal rounded-xl h-11 text-xs",
                         !movingDateObj && "text-muted-foreground"
                       )}
                     >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : "Selecteer"}
+                      <Calendar className="mr-1.5 h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{movingDateObj ? format(movingDateObj, "dd-MM-yyyy") : "Selecteer"}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
@@ -460,13 +460,13 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal rounded-xl h-11",
+                        "w-full justify-start text-left font-normal rounded-xl h-11 text-xs",
                         !keyHandoverDateObj && "text-muted-foreground",
                         isKeyHandoverAfterMoving() && "border-destructive"
                       )}
                     >
-                      <Calendar className="mr-2 h-4 w-4" />
-                      {keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : "Selecteer"}
+                      <Calendar className="mr-1.5 h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{keyHandoverDateObj ? format(keyHandoverDateObj, "dd-MM-yyyy") : "Selecteer"}</span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0 bg-background z-50" align="start">
