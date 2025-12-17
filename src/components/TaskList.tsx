@@ -23,6 +23,7 @@ import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
 import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
+import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -83,6 +84,7 @@ export const TaskList = ({
   const [showBoxesQuestions, setShowBoxesQuestions] = useState(false);
   const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
   const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
+  const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -222,6 +224,24 @@ export const TaskList = ({
            info.pets === undefined || info.pets === null;
   };
 
+  // Helper function to check if task is forwarding/PostNL task
+  const isForwardingTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("postnl") ||
+      titleLower.includes("doorstuur") ||
+      (titleLower.includes("post") && titleLower.includes("doorsturen")) ||
+      idLower.includes("forwarding") ||
+      idLower.includes("postnl")
+    );
+  };
+
+  // Check if forwarding questions are needed
+  const needsForwardingQuestions = (info: MovingInfo) => {
+    return !info.forwardingStartDate || !info.forwardingDuration || !info.householdNames || info.householdNames.length === 0;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -288,6 +308,17 @@ export const TaskList = ({
         return;
       }
       // All liability questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a forwarding/PostNL task
+    if (isForwardingTask(task)) {
+      if (needsForwardingQuestions(movingInfo)) {
+        setShowForwardingQuestions(true);
+        return;
+      }
+      // All forwarding questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -364,6 +395,16 @@ export const TaskList = ({
 
   const handleLiabilityRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Controleer aansprakelijkheidsverzekering")}`);
+  };
+
+  const handleForwardingQuestionsComplete = (data: { forwardingStartDate: string; forwardingDuration: string; householdNames: string[] }) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+  };
+
+  const handleForwardingRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Vraag PostNL doorstuurservice aan")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -821,6 +862,18 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleLiabilityQuestionsComplete}
         onRedirect={handleLiabilityRedirect}
+      />
+
+      <ForwardingQuestionsDialog
+        open={showForwardingQuestions}
+        onOpenChange={setShowForwardingQuestions}
+        onComplete={handleForwardingQuestionsComplete}
+        onRedirect={handleForwardingRedirect}
+        existingData={{
+          forwardingStartDate: movingInfo.forwardingStartDate,
+          forwardingDuration: movingInfo.forwardingDuration,
+          householdNames: movingInfo.householdNames
+        }}
       />
 
       <InvitePartnerDialog
