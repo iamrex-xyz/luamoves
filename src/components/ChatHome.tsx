@@ -22,6 +22,7 @@ type ChatHomeProps = {
 export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: ChatHomeProps) => {
   const [activeTab, setActiveTab] = useState<"partner" | "lua">("lua");
   const [hasPartner, setHasPartner] = useState(false);
+  const [livesAlone, setLivesAlone] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,15 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
         setLoading(false);
         return;
       }
+
+      // Check household type (lives alone?)
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("household_type")
+        .eq("user_id", user.id)
+        .single();
+      
+      setLivesAlone(profile?.household_type === "single");
 
       // Check if user has any collaborators
       const { data: collaborators } = await supabase
@@ -134,7 +144,21 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
           </TabsContent>
 
           <TabsContent value="partner" className="mt-0">
-            {!hasPartner ? (
+            {livesAlone && !hasPartner ? (
+              <Card className="p-6 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                  <Users className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Je verhuist alleen</h3>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Je hebt aangegeven dat je alleen verhuist. Toch iemand willen uitnodigen?
+                </p>
+                <Button variant="outline" onClick={() => setShowPartnerInvite(true)} className="gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Toch iemand uitnodigen
+                </Button>
+              </Card>
+            ) : !hasPartner ? (
               <Card className="p-6 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <Users className="w-8 h-8 text-primary" />

@@ -27,9 +27,23 @@ export const InvitePartnerDialog = ({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLivingChoice = (alone: boolean) => {
+  const handleLivingChoice = async (alone: boolean) => {
     setLivingAlone(alone);
+    
     if (alone) {
+      // Save "single" household type to profile
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from("profiles")
+            .update({ household_type: "single" })
+            .eq("user_id", user.id);
+        }
+      } catch (error) {
+        console.error("Error saving household type:", error);
+      }
+      
       // Close dialog, no partner needed
       toast({
         title: "Prima! 👍",
@@ -37,6 +51,18 @@ export const InvitePartnerDialog = ({
       });
       onOpenChange(false);
     } else {
+      // Save "partner" household type
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase
+            .from("profiles")
+            .update({ household_type: "partner" })
+            .eq("user_id", user.id);
+        }
+      } catch (error) {
+        console.error("Error saving household type:", error);
+      }
       // Show phone input
       setStep(2);
     }
