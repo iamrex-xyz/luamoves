@@ -59,6 +59,8 @@ export type MovingInfo = {
   forwardingStartDate?: string;
   forwardingDuration?: string;
   householdNames?: string[];
+  // Parking/lift velden
+  municipality?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -196,6 +198,8 @@ const Index = () => {
         forwardingStartDate: (profile as any).forwarding_start_date || undefined,
         forwardingDuration: (profile as any).forwarding_duration || undefined,
         householdNames: (profile as any).household_names || [],
+        // Parking/lift velden
+        municipality: (profile as any).municipality || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -268,6 +272,8 @@ const Index = () => {
           forwarding_start_date: info.forwardingStartDate || null,
           forwarding_duration: info.forwardingDuration || null,
           household_names: info.householdNames || [],
+          // Parking/lift velden
+          municipality: info.municipality || null,
         } as any)
         .eq('user_id', userId);
 
@@ -449,6 +455,8 @@ const Index = () => {
             forwarding_start_date: updatedInfo.forwardingStartDate || null,
             forwarding_duration: updatedInfo.forwardingDuration || null,
             household_names: updatedInfo.householdNames || [],
+            // Parking/lift velden
+            municipality: (updatedInfo as any).municipality || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

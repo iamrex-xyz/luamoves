@@ -24,6 +24,7 @@ import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
+import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -85,6 +86,7 @@ export const TaskList = ({
   const [showInsuranceQuestions, setShowInsuranceQuestions] = useState(false);
   const [showLiabilityQuestions, setShowLiabilityQuestions] = useState(false);
   const [showForwardingQuestions, setShowForwardingQuestions] = useState(false);
+  const [showParkingQuestions, setShowParkingQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -242,6 +244,24 @@ export const TaskList = ({
     return !info.forwardingStartDate || !info.forwardingDuration || !info.householdNames || info.householdNames.length === 0;
   };
 
+  // Helper function to check if task is parking/lift task
+  const isParkingTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("parkeervergunning") ||
+      titleLower.includes("verhuislift") ||
+      (titleLower.includes("parking") && titleLower.includes("permit")) ||
+      idLower.includes("parking") ||
+      idLower.includes("verhuislift")
+    );
+  };
+
+  // Check if parking questions are needed
+  const needsParkingQuestions = (info: MovingInfo) => {
+    return !info.propertyType || !info.floorLevel || !(info as any).municipality;
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -319,6 +339,17 @@ export const TaskList = ({
         return;
       }
       // All forwarding questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a parking/lift task
+    if (isParkingTask(task)) {
+      if (needsParkingQuestions(movingInfo)) {
+        setShowParkingQuestions(true);
+        return;
+      }
+      // All parking questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -405,6 +436,16 @@ export const TaskList = ({
 
   const handleForwardingRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Vraag PostNL doorstuurservice aan")}`);
+  };
+
+  const handleParkingQuestionsComplete = (data: Partial<MovingInfo>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+  };
+
+  const handleParkingRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Regel parkeervergunning of verhuislift")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -874,6 +915,14 @@ export const TaskList = ({
           forwardingDuration: movingInfo.forwardingDuration,
           householdNames: movingInfo.householdNames
         }}
+      />
+
+      <ParkingQuestionsDialog
+        open={showParkingQuestions}
+        onOpenChange={setShowParkingQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleParkingQuestionsComplete}
+        onRedirect={handleParkingRedirect}
       />
 
       <InvitePartnerDialog

@@ -252,6 +252,7 @@ export type Database = {
           key_handover_date: string | null
           moving_date: string | null
           moving_type: string | null
+          municipality: string | null
           needs_contractor_help: boolean | null
           new_address: string | null
           number_of_rooms: string | null
@@ -301,6 +302,7 @@ export type Database = {
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
+          municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
           number_of_rooms?: string | null
@@ -350,6 +352,7 @@ export type Database = {
           key_handover_date?: string | null
           moving_date?: string | null
           moving_type?: string | null
+          municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
           number_of_rooms?: string | null
