@@ -10,6 +10,7 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { LuaLogo } from "@/components/LuaLogo";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
@@ -22,7 +23,7 @@ import {
   Calendar,
   ArrowRight,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -37,10 +38,20 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const navigate = useNavigate();
 
   // Filter alleen niet-afgeronde taken voor de homepage
   const openTasks = tasks.filter(t => t.status !== "done");
+
+  // Detect when all tasks become completed
+  useEffect(() => {
+    if (prevOpenTasksCount !== null && prevOpenTasksCount > 0 && openTasks.length === 0 && tasks.length > 0) {
+      setShowConfetti(true);
+    }
+    setPrevOpenTasksCount(openTasks.length);
+  }, [openTasks.length, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -171,6 +182,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
 
   return (
     <PullToRefresh onRefresh={refreshTasks} className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+      <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
+      
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">

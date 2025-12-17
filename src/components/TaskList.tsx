@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +35,7 @@ import { ProgressBanner } from "@/components/ProgressBanner";
 import { BottomNav } from "@/components/BottomNav";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
+import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { useNavigate } from "react-router-dom";
 import { getSmartQuestionForTask, shouldShowTask, SmartQuestionType } from "@/lib/smartQuestions";
 import {
@@ -101,6 +102,8 @@ export const TaskList = ({
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
   );
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
 
   // Gebruik de custom hook voor task management
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
@@ -108,7 +111,16 @@ export const TaskList = ({
 
   // Milestone celebrations
   const completedTasksCount = tasks.filter(t => t.status === "done").length;
+  const openTasksCount = tasks.filter(t => t.status !== "done").length;
   useMilestones(completedTasksCount, tasks.length);
+
+  // Detect when all tasks become completed
+  useEffect(() => {
+    if (prevOpenTasksCount !== null && prevOpenTasksCount > 0 && openTasksCount === 0 && tasks.length > 0) {
+      setShowConfetti(true);
+    }
+    setPrevOpenTasksCount(openTasksCount);
+  }, [openTasksCount, tasks.length, prevOpenTasksCount]);
 
   // Calculate days until move
   const daysUntilMove = useMemo(() => {
@@ -795,6 +807,8 @@ export const TaskList = ({
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+      <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
+      
       {/* Header with Logo */}
       <div className="px-4 pt-4 pb-2">
         <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>

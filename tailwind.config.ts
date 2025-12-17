@@ -126,12 +126,23 @@ export default {
             transform: "scale(1)",
           },
         },
+        "confetti-fall": {
+          "0%": {
+            transform: "translateY(0) rotate(0deg)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateY(100vh) rotate(720deg)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.25s ease-out",
         "accordion-up": "accordion-up 0.25s ease-out",
         "fade-in": "fade-in 0.35s ease-out",
         "scale-in": "scale-in 0.35s ease-out",
+        "confetti-fall": "confetti-fall 3s ease-out forwards",
       },
     },
   },
