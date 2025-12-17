@@ -30,6 +30,7 @@ import {
   ChevronDown,
   Check,
   Sparkles,
+  Truck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +41,7 @@ type ExtraInfoSheetProps = {
   onUpdate: (info: MovingInfo) => void;
 };
 
-type Category = "energie" | "woning" | "internet" | "verzekering";
+type Category = "energie" | "woning" | "internet" | "verzekering" | "verhuizing";
 
 const categories = [
   {
@@ -74,6 +75,14 @@ const categories = [
     icon: Shield,
     color: "text-green-500",
     bgColor: "bg-green-500/10",
+  },
+  {
+    id: "verhuizing" as Category,
+    title: "Verhuizing",
+    subtitle: "Verdieping & spullen",
+    icon: Truck,
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
   },
 ];
 
@@ -113,6 +122,11 @@ export const ExtraInfoSheet = ({
   const [worksFromHome, setWorksFromHome] = useState("");
   
   const [insuranceValue, setInsuranceValue] = useState("");
+  
+  const [floorLevel, setFloorLevel] = useState("");
+  const [hasElevator, setHasElevator] = useState("");
+  const [numberOfRooms, setNumberOfRooms] = useState("");
+  const [specialItems, setSpecialItems] = useState<string[]>([]);
 
   // Load data when sheet opens
   useEffect(() => {
@@ -141,6 +155,10 @@ export const ExtraInfoSheet = ({
         setGlasvezel(movingInfo.glasvezel || "");
         setWorksFromHome(movingInfo.worksFromHome || "");
         setInsuranceValue(movingInfo.insuranceValue || "");
+        setFloorLevel(movingInfo.floorLevel || "");
+        setHasElevator(movingInfo.hasElevator || "");
+        setNumberOfRooms(movingInfo.numberOfRooms || "");
+        setSpecialItems(movingInfo.specialItems || []);
         return;
       }
 
@@ -166,6 +184,10 @@ export const ExtraInfoSheet = ({
         setGlasvezel((profile as any).glasvezel || "");
         setWorksFromHome((profile as any).works_from_home || "");
         setInsuranceValue((profile as any).insurance_value || "");
+        setFloorLevel((profile as any).floor_level || "");
+        setHasElevator((profile as any).has_elevator || "");
+        setNumberOfRooms((profile as any).number_of_rooms || "");
+        setSpecialItems((profile as any).special_items || []);
       }
     } catch (error) {
       console.error("Error loading extra info:", error);
@@ -192,6 +214,10 @@ export const ExtraInfoSheet = ({
         glasvezel: glasvezel as any || undefined,
         worksFromHome: worksFromHome as any || undefined,
         insuranceValue: insuranceValue as any || undefined,
+        floorLevel: floorLevel || undefined,
+        hasElevator: hasElevator || undefined,
+        numberOfRooms: numberOfRooms || undefined,
+        specialItems: specialItems.length > 0 ? specialItems : undefined,
       };
 
       const { data: { user } } = await supabase.auth.getUser();
@@ -215,6 +241,10 @@ export const ExtraInfoSheet = ({
             glasvezel: glasvezel || null,
             works_from_home: worksFromHome || null,
             insurance_value: insuranceValue || null,
+            floor_level: floorLevel || null,
+            has_elevator: hasElevator || null,
+            number_of_rooms: numberOfRooms || null,
+            special_items: specialItems.length > 0 ? specialItems : [],
           } as any)
           .eq("user_id", user.id);
 
@@ -249,6 +279,8 @@ export const ExtraInfoSheet = ({
         return [hasFiber, internetSpeedPreference, internetBundle].filter(Boolean).length;
       case "verzekering":
         return [insuranceValue].filter(Boolean).length;
+      case "verhuizing":
+        return [floorLevel, hasElevator, numberOfRooms, specialItems.length > 0 ? "filled" : ""].filter(Boolean).length;
     }
   };
 
@@ -258,6 +290,7 @@ export const ExtraInfoSheet = ({
       case "woning": return 4;
       case "internet": return 3;
       case "verzekering": return 1;
+      case "verhuizing": return 4;
     }
   };
 
@@ -475,6 +508,93 @@ export const ExtraInfoSheet = ({
                         </SelectContent>
                       </Select>
                     </div>
+                  )}
+
+                  {category.id === "verhuizing" && (
+                    <>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Verdieping</Label>
+                        <Select value={floorLevel} onValueChange={setFloorLevel}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="begane-grond">Begane grond</SelectItem>
+                            <SelectItem value="1">1e verdieping</SelectItem>
+                            <SelectItem value="2">2e verdieping</SelectItem>
+                            <SelectItem value="3">3e verdieping</SelectItem>
+                            <SelectItem value="4+">4e of hoger</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Lift aanwezig</Label>
+                        <Select value={hasElevator} onValueChange={setHasElevator}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="ja">Ja, er is een lift</SelectItem>
+                            <SelectItem value="nee">Nee, geen lift</SelectItem>
+                            <SelectItem value="nvt">Niet van toepassing</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aantal kamers</Label>
+                        <Select value={numberOfRooms} onValueChange={setNumberOfRooms}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="1-2">1-2 kamers</SelectItem>
+                            <SelectItem value="3-4">3-4 kamers</SelectItem>
+                            <SelectItem value="5-6">5-6 kamers</SelectItem>
+                            <SelectItem value="7+">7 of meer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Speciale items</Label>
+                        <div className="space-y-2 mt-2">
+                          {[
+                            { value: "piano", label: "Piano/Vleugel" },
+                            { value: "witgoed", label: "Witgoed" },
+                            { value: "inpakservice", label: "Inpakservice nodig" },
+                          ].map((item) => (
+                            <button
+                              key={item.value}
+                              type="button"
+                              onClick={() => {
+                                setSpecialItems(prev =>
+                                  prev.includes(item.value)
+                                    ? prev.filter(i => i !== item.value)
+                                    : [...prev, item.value]
+                                );
+                              }}
+                              className={cn(
+                                "w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left",
+                                specialItems.includes(item.value)
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-primary/50"
+                              )}
+                            >
+                              <div className={cn(
+                                "w-5 h-5 rounded-full border-2 flex items-center justify-center",
+                                specialItems.includes(item.value)
+                                  ? "border-primary bg-primary"
+                                  : "border-muted-foreground"
+                              )}>
+                                {specialItems.includes(item.value) && (
+                                  <Check className="w-3 h-3 text-white" />
+                                )}
+                              </div>
+                              <span className="text-sm">{item.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
                   )}
                 </CollapsibleContent>
               </Collapsible>

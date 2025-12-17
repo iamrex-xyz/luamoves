@@ -19,6 +19,7 @@ import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/
 import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
 import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
 import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
+import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -75,6 +76,7 @@ export const TaskList = ({
   const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task; afterQuestions?: 'deal' | 'complete' } | null>(null);
   const [showEnergyQuestions, setShowEnergyQuestions] = useState(false);
   const [showInternetQuestions, setShowInternetQuestions] = useState(false);
+  const [showMovingQuestions, setShowMovingQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -135,6 +137,18 @@ export const TaskList = ({
     );
   };
 
+  // Helper function to check if task is moving company/helpers task
+  const isMovingTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      (titleLower.includes("verhuisbedrijf") || titleLower.includes("helpers")) ||
+      (titleLower.includes("regel") && (titleLower.includes("verhuis") || titleLower.includes("helpers"))) ||
+      idLower.includes("verhuisbedrijf") ||
+      idLower.includes("moving-company")
+    );
+  };
+
   // Check if energy questions are needed
   const needsEnergyQuestions = (info: MovingInfo) => {
     return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
@@ -145,7 +159,12 @@ export const TaskList = ({
     return !info.hasFiber || !info.internetSpeedPreference || !info.internetBundle;
   };
 
-  // Regelen knop: eerst smart questions (of energy/internet questions), daarna deals
+  // Check if moving questions are needed
+  const needsMovingQuestions = (info: MovingInfo) => {
+    return !info.floorLevel || !info.hasElevator || !info.numberOfRooms || !info.specialItems || info.specialItems.length === 0;
+  };
+
+  // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     
@@ -167,6 +186,17 @@ export const TaskList = ({
         return;
       }
       // All internet questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a moving company/helpers task
+    if (isMovingTask(task)) {
+      if (needsMovingQuestions(movingInfo)) {
+        setShowMovingQuestions(true);
+        return;
+      }
+      // All moving questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -203,6 +233,16 @@ export const TaskList = ({
 
   const handleInternetRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Regel internet en telefoon")}`);
+  };
+
+  const handleMovingQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleMovingRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Regel verhuisbedrijf of helpers")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -628,6 +668,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleInternetQuestionsComplete}
         onRedirect={handleInternetRedirect}
+      />
+
+      <MovingQuestionsDialog
+        open={showMovingQuestions}
+        onOpenChange={setShowMovingQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleMovingQuestionsComplete}
+        onRedirect={handleMovingRedirect}
       />
 
       <InvitePartnerDialog
