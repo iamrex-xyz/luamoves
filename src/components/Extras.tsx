@@ -310,7 +310,7 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 rounded-xl text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="h-9 w-9 rounded-xl text-destructive hover:text-destructive"
                             onClick={() => deleteDocument.mutate({ id: doc.id, file_path: doc.file_path })}
                           >
                             <Trash2 className="h-4 w-4" />
