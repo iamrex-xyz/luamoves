@@ -67,6 +67,8 @@ export type MovingInfo = {
   // Smoke detector velden
   numberOfFloors?: string;
   numberOfBedrooms?: string;
+  // Garden velden
+  gardenServiceType?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -212,6 +214,8 @@ const Index = () => {
         // Smoke detector velden
         numberOfFloors: (profile as any).number_of_floors || undefined,
         numberOfBedrooms: (profile as any).number_of_bedrooms || undefined,
+        // Garden velden
+        gardenServiceType: (profile as any).garden_service_type || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -292,6 +296,8 @@ const Index = () => {
           // Smoke detector velden
           number_of_floors: info.numberOfFloors || null,
           number_of_bedrooms: info.numberOfBedrooms || null,
+          // Garden velden
+          garden_service_type: info.gardenServiceType || null,
         } as any)
         .eq('user_id', userId);
 
@@ -481,6 +487,8 @@ const Index = () => {
             // Smoke detector velden
             number_of_floors: (updatedInfo as any).numberOfFloors || null,
             number_of_bedrooms: (updatedInfo as any).numberOfBedrooms || null,
+            // Garden velden
+            garden_service_type: (updatedInfo as any).gardenServiceType || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

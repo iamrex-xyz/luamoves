@@ -27,6 +27,7 @@ import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialo
 import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
+import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -91,6 +92,7 @@ export const TaskList = ({
   const [showParkingQuestions, setShowParkingQuestions] = useState(false);
   const [showCleaningQuestions, setShowCleaningQuestions] = useState(false);
   const [showSmokeDetectorQuestions, setShowSmokeDetectorQuestions] = useState(false);
+  const [showGardenQuestions, setShowGardenQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -301,6 +303,25 @@ export const TaskList = ({
     return !(info as any).numberOfFloors || !(info as any).numberOfBedrooms;
   };
 
+  // Helper function to check if task is garden task
+  const isGardenTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      titleLower.includes("tuinonderhoud") ||
+      titleLower.includes("tuin") ||
+      (titleLower.includes("garden") && titleLower.includes("maintenance")) ||
+      idLower.includes("garden") ||
+      idLower.includes("tuin")
+    );
+  };
+
+  // Check if garden questions are needed
+  const needsGardenQuestions = (info: MovingInfo) => {
+    return info.hasGarden === undefined || info.hasGarden === null || 
+           (info.hasGarden && (!info.gardenSize || !(info as any).gardenServiceType));
+  };
+
   // Regelen knop: eerst smart questions (of energy/internet/moving questions), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
@@ -411,6 +432,17 @@ export const TaskList = ({
         return;
       }
       // All smoke detector questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check if this is a garden task
+    if (isGardenTask(task)) {
+      if (needsGardenQuestions(movingInfo)) {
+        setShowGardenQuestions(true);
+        return;
+      }
+      // All garden questions answered, go to affiliate
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
@@ -527,6 +559,16 @@ export const TaskList = ({
 
   const handleSmokeDetectorRedirect = () => {
     navigate(`/deals?task=${encodeURIComponent("Controleer rookmelders")}`);
+  };
+
+  const handleGardenQuestionsComplete = (data: Partial<MovingInfo>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data);
+    }
+  };
+
+  const handleGardenRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Plan tuinonderhoud")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -1020,6 +1062,14 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleSmokeDetectorQuestionsComplete}
         onRedirect={handleSmokeDetectorRedirect}
+      />
+
+      <GardenQuestionsDialog
+        open={showGardenQuestions}
+        onOpenChange={setShowGardenQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleGardenQuestionsComplete}
+        onRedirect={handleGardenRedirect}
       />
 
       <InvitePartnerDialog
