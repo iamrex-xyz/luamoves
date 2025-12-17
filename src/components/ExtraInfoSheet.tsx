@@ -31,8 +31,10 @@ import {
   Check,
   Sparkles,
   Truck,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 type ExtraInfoSheetProps = {
   open: boolean;
@@ -41,7 +43,7 @@ type ExtraInfoSheetProps = {
   onUpdate: (info: MovingInfo) => void;
 };
 
-type Category = "energie" | "woning" | "internet" | "verzekering" | "verhuizing";
+type Category = "energie" | "woning" | "internet" | "verzekering" | "verhuizing" | "renovatie";
 
 const categories = [
   {
@@ -55,7 +57,7 @@ const categories = [
   {
     id: "woning" as Category,
     title: "Woning",
-    subtitle: "Type & kenmerken",
+    subtitle: "Type, grootte & kenmerken",
     icon: Home,
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
@@ -83,6 +85,14 @@ const categories = [
     icon: Truck,
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
+  },
+  {
+    id: "renovatie" as Category,
+    title: "Renovatie",
+    subtitle: "Budget & planning",
+    icon: Wrench,
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
   },
 ];
 
@@ -127,6 +137,16 @@ export const ExtraInfoSheet = ({
   const [hasElevator, setHasElevator] = useState("");
   const [numberOfRooms, setNumberOfRooms] = useState("");
   const [specialItems, setSpecialItems] = useState<string[]>([]);
+  
+  // New fields for woning
+  const [numberOfFloors, setNumberOfFloors] = useState("");
+  const [numberOfBedrooms, setNumberOfBedrooms] = useState("");
+  const [homeSizeM2, setHomeSizeM2] = useState("");
+  const [municipality, setMunicipality] = useState("");
+  
+  // Renovatie fields
+  const [renovationBudget, setRenovationBudget] = useState("");
+  const [renovationStartDate, setRenovationStartDate] = useState("");
 
   // Load data when sheet opens
   useEffect(() => {
@@ -159,6 +179,13 @@ export const ExtraInfoSheet = ({
         setHasElevator(movingInfo.hasElevator || "");
         setNumberOfRooms(movingInfo.numberOfRooms || "");
         setSpecialItems(movingInfo.specialItems || []);
+        // New fields
+        setNumberOfFloors((movingInfo as any).numberOfFloors || "");
+        setNumberOfBedrooms((movingInfo as any).numberOfBedrooms || "");
+        setHomeSizeM2((movingInfo as any).homeSizeM2 || "");
+        setMunicipality((movingInfo as any).municipality || "");
+        setRenovationBudget((movingInfo as any).renovationBudget || "");
+        setRenovationStartDate((movingInfo as any).renovationStartDate || "");
         return;
       }
 
@@ -188,6 +215,13 @@ export const ExtraInfoSheet = ({
         setHasElevator((profile as any).has_elevator || "");
         setNumberOfRooms((profile as any).number_of_rooms || "");
         setSpecialItems((profile as any).special_items || []);
+        // New fields
+        setNumberOfFloors((profile as any).number_of_floors || "");
+        setNumberOfBedrooms((profile as any).number_of_bedrooms || "");
+        setHomeSizeM2((profile as any).home_size_m2 || "");
+        setMunicipality((profile as any).municipality || "");
+        setRenovationBudget((profile as any).renovation_budget || "");
+        setRenovationStartDate((profile as any).renovation_start_date || "");
       }
     } catch (error) {
       console.error("Error loading extra info:", error);
@@ -218,7 +252,14 @@ export const ExtraInfoSheet = ({
         hasElevator: hasElevator || undefined,
         numberOfRooms: numberOfRooms || undefined,
         specialItems: specialItems.length > 0 ? specialItems : undefined,
-      };
+        // New fields
+        numberOfFloors: numberOfFloors || undefined,
+        numberOfBedrooms: numberOfBedrooms || undefined,
+        homeSizeM2: homeSizeM2 || undefined,
+        municipality: municipality || undefined,
+        renovationBudget: renovationBudget || undefined,
+        renovationStartDate: renovationStartDate || undefined,
+      } as Partial<MovingInfo>;
 
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -245,6 +286,13 @@ export const ExtraInfoSheet = ({
             has_elevator: hasElevator || null,
             number_of_rooms: numberOfRooms || null,
             special_items: specialItems.length > 0 ? specialItems : [],
+            // New fields
+            number_of_floors: numberOfFloors || null,
+            number_of_bedrooms: numberOfBedrooms || null,
+            home_size_m2: homeSizeM2 || null,
+            municipality: municipality || null,
+            renovation_budget: renovationBudget || null,
+            renovation_start_date: renovationStartDate || null,
           } as any)
           .eq("user_id", user.id);
 
@@ -274,23 +322,29 @@ export const ExtraInfoSheet = ({
       case "energie":
         return [energyCurrentSupplier, hasSmartMeter, energyConnectionType].filter(Boolean).length;
       case "woning":
-        return [propertyType, buildingYear, hasGarden, buildingAccess].filter(Boolean).length;
+        return [propertyType, buildingYear, hasGarden, buildingAccess, numberOfFloors, numberOfBedrooms, homeSizeM2].filter(Boolean).length;
       case "internet":
         return [hasFiber, internetSpeedPreference, internetBundle].filter(Boolean).length;
       case "verzekering":
         return [insuranceValue].filter(Boolean).length;
       case "verhuizing":
         return [floorLevel, hasElevator, numberOfRooms, specialItems.length > 0 ? "filled" : ""].filter(Boolean).length;
+      case "renovatie":
+        return [renovationBudget, renovationStartDate].filter(Boolean).length;
+      default:
+        return 0;
     }
   };
 
   const getTotalFields = (categoryId: Category) => {
     switch (categoryId) {
       case "energie": return 3;
-      case "woning": return 4;
+      case "woning": return 7;
       case "internet": return 3;
       case "verzekering": return 1;
       case "verhuizing": return 4;
+      case "renovatie": return 2;
+      default: return 0;
     }
   };
 
@@ -447,6 +501,45 @@ export const ExtraInfoSheet = ({
                           </SelectContent>
                         </Select>
                       </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aantal verdiepingen</Label>
+                        <Select value={numberOfFloors} onValueChange={setNumberOfFloors}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="1">1 verdieping</SelectItem>
+                            <SelectItem value="2">2 verdiepingen</SelectItem>
+                            <SelectItem value="3">3 verdiepingen</SelectItem>
+                            <SelectItem value="4+">4 of meer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Aantal slaapkamers</Label>
+                        <Select value={numberOfBedrooms} onValueChange={setNumberOfBedrooms}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="1">1 slaapkamer</SelectItem>
+                            <SelectItem value="2">2 slaapkamers</SelectItem>
+                            <SelectItem value="3">3 slaapkamers</SelectItem>
+                            <SelectItem value="4">4 slaapkamers</SelectItem>
+                            <SelectItem value="5+">5 of meer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Woonoppervlakte (m²)</Label>
+                        <Input
+                          type="text"
+                          value={homeSizeM2}
+                          onChange={(e) => setHomeSizeM2(e.target.value)}
+                          placeholder="bijv. 80"
+                          className="rounded-xl h-11 mt-1"
+                        />
+                      </div>
                     </>
                   )}
 
@@ -593,6 +686,34 @@ export const ExtraInfoSheet = ({
                             </button>
                           ))}
                         </div>
+                      </div>
+                    </>
+                  )}
+
+                  {category.id === "renovatie" && (
+                    <>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Budgetindicatie</Label>
+                        <Select value={renovationBudget} onValueChange={setRenovationBudget}>
+                          <SelectTrigger className="rounded-xl h-11 mt-1">
+                            <SelectValue placeholder="Selecteer" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="under_5k">Minder dan €5.000</SelectItem>
+                            <SelectItem value="5k_15k">€5.000 - €15.000</SelectItem>
+                            <SelectItem value="15k_50k">€15.000 - €50.000</SelectItem>
+                            <SelectItem value="over_50k">Meer dan €50.000</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wide">Startdatum renovatie</Label>
+                        <Input
+                          type="date"
+                          value={renovationStartDate}
+                          onChange={(e) => setRenovationStartDate(e.target.value)}
+                          className="rounded-xl h-11 mt-1"
+                        />
                       </div>
                     </>
                   )}
