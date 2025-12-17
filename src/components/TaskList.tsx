@@ -956,13 +956,13 @@ export const TaskList = ({
                         disabled={task.status === "done" || isCompleting}
                       >
                         <div
-                          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 ${
+                          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-200 cursor-pointer ${
                             isCompleting 
-                              ? "bg-primary/10 scale-95 opacity-0" 
+                              ? "bg-primary animate-task-complete" 
                               : isTaskOverdue 
                                 ? "bg-destructive/5 hover:bg-destructive/10" 
                                 : "bg-background hover:bg-secondary/50"
-                          } cursor-pointer`}
+                          }`}
                           onClick={() => !isCompleting && handleTaskClick(task)}
                         >
                           <div 
@@ -970,7 +970,7 @@ export const TaskList = ({
                             onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
                           >
                             {isCompleting ? (
-                              <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
+                              <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
                             ) : task.status === "done" ? (
                               <CheckCircle2 className="h-5 w-5 text-primary" />
                             ) : (
@@ -978,15 +978,23 @@ export const TaskList = ({
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`text-sm ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                            <p className={`text-sm transition-all duration-200 ${
+                              isCompleting 
+                                ? "line-through text-primary-foreground" 
+                                : task.status === "done" 
+                                  ? "line-through text-muted-foreground" 
+                                  : "text-foreground"
+                            }`}>
                               {task.title}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
+                            <p className={`text-xs mt-0.5 transition-colors duration-200 ${
+                              isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
+                            }`}>
                               {task.deadlineLabel}
-                              {isTaskOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
+                              {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
                             </p>
                           </div>
-                          {task.affiliateLink && task.status !== "done" && (
+                          {task.affiliateLink && task.status !== "done" && !isCompleting && (
                             <Button
                               size="sm"
                               variant="ghost"
