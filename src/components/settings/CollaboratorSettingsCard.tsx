@@ -1,0 +1,163 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { UserPlus, Mail, Check, Trash2 } from "lucide-react";
+
+type Collaborator = {
+  id: string;
+  collaborator_email: string;
+  collaborator_user_id: string | null;
+  accepted_at: string | null;
+  invited_at: string;
+};
+
+export const CollaboratorSettingsCard = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [newCollaboratorEmail, setNewCollaboratorEmail] = useState("");
+
+  useEffect(() => {
+    loadCollaborators();
+  }, []);
+
+  const loadCollaborators = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("moving_collaborators")
+        .select("*")
+        .eq("owner_user_id", user.id)
+        .order("invited_at", { ascending: false });
+
+      if (error) throw error;
+      setCollaborators(data || []);
+    } catch (error) {
+      console.error("Error loading collaborators:", error);
+    }
+  };
+
+  const handleInvite = async () => {
+    if (!newCollaboratorEmail) return;
+
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("moving_collaborators")
+        .insert({
+          owner_user_id: user.id,
+          collaborator_email: newCollaboratorEmail,
+          collaborator_user_id: null,
+        });
+
+      if (error) throw error;
+
+      toast({ title: "Uitnodiging verzonden", description: `${newCollaboratorEmail} is uitgenodigd.` });
+      setNewCollaboratorEmail("");
+      loadCollaborators();
+    } catch (error) {
+      console.error("Error inviting:", error);
+      toast({ title: "Fout", description: "Kon uitnodiging niet verzenden.", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemove = async (collaboratorId: string) => {
+    try {
+      const { error } = await supabase
+        .from("moving_collaborators")
+        .delete()
+        .eq("id", collaboratorId);
+
+      if (error) throw error;
+
+      toast({ title: "Verwijderd", description: "Huisgenoot is verwijderd." });
+      loadCollaborators();
+    } catch (error) {
+      console.error("Error removing:", error);
+      toast({ title: "Fout", description: "Kon huisgenoot niet verwijderen.", variant: "destructive" });
+    }
+  };
+
+  return (
+    <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+      <div className="p-4 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+            <UserPlus className="w-5 h-5 text-success" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-foreground">Huisgenoten</h2>
+            <p className="text-xs text-muted-foreground">Nodig anderen uit</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        <div className="flex gap-2 items-center">
+          <Input
+            type="email"
+            placeholder="E-mailadres"
+            value={newCollaboratorEmail}
+            onChange={(e) => setNewCollaboratorEmail(e.target.value)}
+            className="flex-1 rounded-full h-11"
+          />
+          <Button 
+            onClick={handleInvite} 
+            disabled={isLoading || !newCollaboratorEmail}
+            size="icon"
+            className="rounded-full h-11 w-11 shrink-0 bg-orange-200 hover:bg-orange-300 text-orange-700"
+          >
+            <Mail className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {collaborators.length > 0 && (
+          <div className="space-y-2">
+            {collaborators.map((collab) => (
+              <div key={collab.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{collab.collaborator_email}</p>
+                    <div className="flex items-center gap-1">
+                      {collab.accepted_at ? (
+                        <Badge variant="secondary" className="text-xs bg-success/10 text-success">
+                          <Check className="w-3 h-3 mr-1" />
+                          Geaccepteerd
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
+                          Uitgenodigd
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => handleRemove(collab.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
