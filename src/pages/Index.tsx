@@ -39,6 +39,9 @@ export type MovingInfo = {
   buildingYear?: "new" | "recent" | "older" | "unknown";
   gardenSize?: "small" | "medium" | "large";
   childrenAges?: string;
+  // Energy questions velden
+  energyCurrentSupplier?: string;
+  energyConnectionType?: "gas_stroom" | "alleen_stroom";
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -156,6 +159,9 @@ const Index = () => {
         buildingYear: (profile as any).building_year as "new" | "recent" | "older" | "unknown" | undefined,
         gardenSize: (profile as any).garden_size as "small" | "medium" | "large" | undefined,
         childrenAges: (profile as any).children_ages || undefined,
+        // Energy questions velden
+        energyCurrentSupplier: (profile as any).energy_current_supplier || undefined,
+        energyConnectionType: (profile as any).energy_connection_type as "gas_stroom" | "alleen_stroom" | undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -208,6 +214,9 @@ const Index = () => {
           building_year: info.buildingYear || null,
           garden_size: info.gardenSize || null,
           children_ages: info.childrenAges || null,
+          // Energy questions velden
+          energy_current_supplier: info.energyCurrentSupplier || null,
+          energy_connection_type: info.energyConnectionType || null,
         } as any)
         .eq('user_id', userId);
 
@@ -369,6 +378,9 @@ const Index = () => {
             building_year: updatedInfo.buildingYear || null,
             garden_size: updatedInfo.gardenSize || null,
             children_ages: updatedInfo.childrenAges || null,
+            // Energy questions velden
+            energy_current_supplier: updatedInfo.energyCurrentSupplier || null,
+            energy_connection_type: updatedInfo.energyConnectionType || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

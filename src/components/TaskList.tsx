@@ -17,6 +17,7 @@ import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { TaskDealDialog } from "@/components/TaskDealDialog";
 import { ContextualPromptDialog, getRequiredPromptForTask, PromptType } from "@/components/ContextualPromptDialog";
 import { SmartQuestionDialog } from "@/components/SmartQuestionDialog";
+import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InAppReminderBanner } from "@/components/InAppReminderBanner";
 import { ProgressBanner } from "@/components/ProgressBanner";
@@ -71,6 +72,7 @@ export const TaskList = ({
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [contextualPrompt, setContextualPrompt] = useState<{ type: PromptType; task: Task } | null>(null);
   const [smartQuestion, setSmartQuestion] = useState<{ type: SmartQuestionType; task: Task; afterQuestions?: 'deal' | 'complete' } | null>(null);
+  const [showEnergyQuestions, setShowEnergyQuestions] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [partnerInviteShown, setPartnerInviteShown] = useState(() => 
     sessionStorage.getItem("lua_partner_invite_shown") === "true"
@@ -105,11 +107,39 @@ export const TaskList = ({
     handleTaskToggle(task.id);
   };
 
-  // Regelen knop: eerst smart questions, daarna deals
+  // Helper function to check if task is energy comparison task
+  const isEnergyComparisonTask = (task: Task) => {
+    const titleLower = task.title.toLowerCase();
+    const idLower = task.id.toLowerCase();
+    return (
+      (titleLower.includes("energieleverancier") && titleLower.includes("vergelijk")) ||
+      (titleLower.includes("energie") && titleLower.includes("vergelijk")) ||
+      idLower.includes("energie-vergelijk") ||
+      idLower.includes("energy-compare")
+    );
+  };
+
+  // Check if energy questions are needed
+  const needsEnergyQuestions = (info: MovingInfo) => {
+    return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
+  };
+
+  // Regelen knop: eerst smart questions (of energy questions voor energietaak), daarna deals
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     
-    // Check of er nog smart questions nodig zijn
+    // Check if this is the energy comparison task
+    if (isEnergyComparisonTask(task)) {
+      if (needsEnergyQuestions(movingInfo)) {
+        setShowEnergyQuestions(true);
+        return;
+      }
+      // All energy questions answered, go to affiliate
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // Check of er nog smart questions nodig zijn (for other tasks)
     if (!isGuest) {
       const smartQuestionType = getSmartQuestionForTask(task.id, task.title, movingInfo);
       if (smartQuestionType) {
@@ -121,6 +151,16 @@ export const TaskList = ({
     
     // Geen vragen nodig → direct naar deals
     navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+  };
+
+  const handleEnergyQuestionsComplete = (data: Partial<MovingInfo> & Record<string, any>) => {
+    if (onUpdateMovingInfo) {
+      onUpdateMovingInfo(data as Partial<MovingInfo>);
+    }
+  };
+
+  const handleEnergyRedirect = () => {
+    navigate(`/deals?task=${encodeURIComponent("Vergelijk en kies energieleverancier")}`);
   };
 
   const handleContextualPromptComplete = (data: Partial<MovingInfo>) => {
@@ -530,6 +570,14 @@ export const TaskList = ({
         questionType={smartQuestion?.type || null}
         taskTitle={smartQuestion?.task.title}
         onComplete={handleSmartQuestionComplete}
+      />
+
+      <EnergyQuestionsDialog
+        open={showEnergyQuestions}
+        onOpenChange={setShowEnergyQuestions}
+        movingInfo={movingInfo}
+        onComplete={handleEnergyQuestionsComplete}
+        onRedirect={handleEnergyRedirect}
       />
 
       <InvitePartnerDialog
