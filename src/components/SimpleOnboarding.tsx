@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
@@ -44,6 +44,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [childrenCount, setChildrenCount] = useState(0);
   const [petsCount, setPetsCount] = useState(0);
   const [hasJob, setHasJob] = useState(true);
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const animatedTasks = [
     "Verhuisbedrijf boeken",
@@ -56,7 +57,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     "Meter standen noteren",
   ];
 
-  const totalSteps = 6; // Welcome, date, housing type, property details, address, generating
+  const totalSteps = 7; // Welcome, date, housing type, property details, address, phone, generating
 
   // Animate tasks on welcome screen
   useEffect(() => {
@@ -109,7 +110,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   // Handle the generating animation
   useEffect(() => {
-    if (step === 6) {
+    if (step === 7) {
       const interval = setInterval(() => {
         setCurrentGeneratingStep((prev) => {
           if (prev < generatingSteps.length - 1) {
@@ -139,6 +140,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           hasJob,
           children: childrenCount,
           pets: petsCount,
+          phone: phoneNumber || undefined,
         });
       }, generatingSteps.length * 800 + 500);
 
@@ -147,7 +149,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         clearTimeout(timeout);
       };
     }
-  }, [step, postcode, houseNumber, streetName, cityName, movingDate, housingType, propertyType, hasGarden, hasParking, hasJob, childrenCount, petsCount, onComplete]);
+  }, [step, postcode, houseNumber, streetName, cityName, movingDate, housingType, propertyType, hasGarden, hasParking, hasJob, childrenCount, petsCount, phoneNumber, onComplete]);
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -156,7 +158,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   const handleStartGenerating = () => {
-    setStep(6);
+    setStep(7);
   };
 
   const isStepValid = () => {
@@ -166,6 +168,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       case 3: return !!housingType;
       case 4: return !!propertyType;
       case 5: return postcode.length >= 4 && houseNumber.length > 0;
+      case 6: return phoneNumber.length >= 10;
       default: return false;
     }
   };
@@ -578,6 +581,75 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 <span>Terug</span>
               </button>
+              <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
+                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+                <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Step 6: Phone number
+  if (step === 6) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
+        <div className="p-6 flex justify-between items-center">
+          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <div key={num} className="w-8 h-1 rounded-full bg-primary" />
+            ))}
+          </div>
+        </div>
+        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Hoe kunnen we<br /><span className="text-primary">je bereiken?</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-md">We sturen je handige tips en reminders via WhatsApp.</p>
+            </div>
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">Telefoonnummer</Label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                    <Phone className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-muted-foreground">+31</span>
+                  </div>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="6 12345678"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary pl-24"
+                    maxLength={10}
+                  />
+                </div>
+              </div>
+              {phoneNumber.length >= 9 && (
+                <div className="flex items-center gap-3 p-4 bg-primary-light rounded-2xl animate-in fade-in duration-300">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+                    <Check className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">+31 {phoneNumber}</p>
+                    <p className="text-sm text-muted-foreground">Je ontvangt handige tips via WhatsApp</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between pt-4">
+              <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                <span>Terug</span>
+              </button>
               <button onClick={handleStartGenerating} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
                 <span className="text-muted-foreground group-hover:text-foreground transition-colors">Genereer checklist</span>
                 <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -591,7 +663,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     );
   }
 
-  // Step 6: Generating
+  // Step 7: Generating
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
       <div className="p-6 flex justify-between items-center">
