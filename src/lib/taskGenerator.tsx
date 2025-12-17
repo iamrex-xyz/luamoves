@@ -247,7 +247,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Mail className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
+      affiliateLink: "https://doorzenden.postnl.nl/van-naar#/van-naar",
     },
     {
       id: "rent-phase2-5",
@@ -260,7 +260,7 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
+      affiliateLink: "https://doorzenden.postnl.nl/van-naar#/van-naar",
     },
     {
       id: "rent-phase2-9",
@@ -1248,7 +1248,7 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Mail className="w-4 h-4" />,
       priority: 2,
-      affiliateLink: "https://www.postnl.nl/campagne/verhuisservice/",
+      affiliateLink: "https://doorzenden.postnl.nl/van-naar#/van-naar",
     },
     {
       id: "buy-phase4-9",

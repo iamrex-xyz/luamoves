@@ -428,14 +428,9 @@ export const TaskList = ({
       return;
     }
     
-    // Check if this is a forwarding/PostNL task
+    // Check if this is a forwarding/PostNL task - direct redirect to PostNL
     if (isForwardingTask(task)) {
-      if (needsForwardingQuestions(movingInfo)) {
-        setShowForwardingQuestions(true);
-        return;
-      }
-      // All forwarding questions answered, go to affiliate
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      window.open("https://doorzenden.postnl.nl/van-naar#/van-naar", "_blank");
       return;
     }
     
