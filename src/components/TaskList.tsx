@@ -606,13 +606,11 @@ export const TaskList = ({
   const handleRenovationQuestionsComplete = (data: {
     renovationBudget?: string;
     renovationStartDate?: Date;
-    housingPropertyType?: string;
   }) => {
     if (onUpdateMovingInfo) {
       onUpdateMovingInfo({
         renovationBudget: data.renovationBudget,
         renovationStartDate: data.renovationStartDate?.toISOString().split('T')[0],
-        housingPropertyType: data.housingPropertyType,
       } as Partial<MovingInfo>);
     }
   };
@@ -1130,7 +1128,6 @@ export const TaskList = ({
         existingData={{
           renovationBudget: (movingInfo as any).renovationBudget,
           renovationStartDate: (movingInfo as any).renovationStartDate ? new Date((movingInfo as any).renovationStartDate) : undefined,
-          housingPropertyType: (movingInfo as any).housingPropertyType,
         }}
       />
 
