@@ -225,6 +225,8 @@ export type Database = {
           children_ages: string | null
           created_at: string
           current_housing_situation: string | null
+          energy_connection_type: string | null
+          energy_current_supplier: string | null
           garden_size: string | null
           glasvezel: string | null
           has_garden: boolean | null
@@ -260,6 +262,8 @@ export type Database = {
           children_ages?: string | null
           created_at?: string
           current_housing_situation?: string | null
+          energy_connection_type?: string | null
+          energy_current_supplier?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_garden?: boolean | null
@@ -295,6 +299,8 @@ export type Database = {
           children_ages?: string | null
           created_at?: string
           current_housing_situation?: string | null
+          energy_connection_type?: string | null
+          energy_current_supplier?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_garden?: boolean | null
