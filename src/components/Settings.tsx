@@ -662,21 +662,21 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: Setting
           </div>
 
           <div className="p-4 space-y-4">
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Input
                 type="email"
                 placeholder="E-mailadres"
                 value={newCollaboratorEmail}
                 onChange={(e) => setNewCollaboratorEmail(e.target.value)}
-                className="flex-1 rounded-xl h-11"
+                className="flex-1 rounded-full h-11"
               />
               <Button 
                 onClick={handleInviteCollaborator} 
                 disabled={isLoading || !newCollaboratorEmail}
-                className="rounded-xl h-11 px-4"
+                size="icon"
+                className="rounded-full h-11 w-11 shrink-0 bg-orange-200 hover:bg-orange-300 text-orange-700"
               >
-                <Mail className="w-4 h-4 mr-2" />
-                Uitnodigen
+                <Mail className="w-4 h-4" />
               </Button>
             </div>
 
