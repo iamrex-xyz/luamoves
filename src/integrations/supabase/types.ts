@@ -255,6 +255,8 @@ export type Database = {
           municipality: string | null
           needs_contractor_help: boolean | null
           new_address: string | null
+          number_of_bedrooms: string | null
+          number_of_floors: string | null
           number_of_rooms: string | null
           old_address: string | null
           pet_types: string[] | null
@@ -307,6 +309,8 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          number_of_bedrooms?: string | null
+          number_of_floors?: string | null
           number_of_rooms?: string | null
           old_address?: string | null
           pet_types?: string[] | null
@@ -359,6 +363,8 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          number_of_bedrooms?: string | null
+          number_of_floors?: string | null
           number_of_rooms?: string | null
           old_address?: string | null
           pet_types?: string[] | null

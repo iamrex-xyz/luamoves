@@ -64,6 +64,9 @@ export type MovingInfo = {
   // Cleaning/painting velden
   serviceType?: string;
   preferredServiceDate?: string;
+  // Smoke detector velden
+  numberOfFloors?: string;
+  numberOfBedrooms?: string;
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -206,6 +209,9 @@ const Index = () => {
         // Cleaning/painting velden
         serviceType: (profile as any).service_type || undefined,
         preferredServiceDate: (profile as any).preferred_service_date || undefined,
+        // Smoke detector velden
+        numberOfFloors: (profile as any).number_of_floors || undefined,
+        numberOfBedrooms: (profile as any).number_of_bedrooms || undefined,
       });
       setCurrentView("dashboard");
     } else {
@@ -283,6 +289,9 @@ const Index = () => {
           // Cleaning/painting velden
           service_type: info.serviceType || null,
           preferred_service_date: info.preferredServiceDate || null,
+          // Smoke detector velden
+          number_of_floors: info.numberOfFloors || null,
+          number_of_bedrooms: info.numberOfBedrooms || null,
         } as any)
         .eq('user_id', userId);
 
@@ -469,6 +478,9 @@ const Index = () => {
             // Cleaning/painting velden
             service_type: (updatedInfo as any).serviceType || null,
             preferred_service_date: (updatedInfo as any).preferredServiceDate || null,
+            // Smoke detector velden
+            number_of_floors: (updatedInfo as any).numberOfFloors || null,
+            number_of_bedrooms: (updatedInfo as any).numberOfBedrooms || null,
           } as any)
           .eq('user_id', user.id);
       } catch (error) {
