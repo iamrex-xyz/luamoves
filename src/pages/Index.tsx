@@ -55,6 +55,10 @@ export type MovingInfo = {
   hasFragileItems?: string;
   // Insurance questions velden
   homeSizeM2?: string;
+  // Forwarding service velden
+  forwardingStartDate?: string;
+  forwardingDuration?: string;
+  householdNames?: string[];
 };
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
@@ -188,6 +192,10 @@ const Index = () => {
         hasFragileItems: (profile as any).has_fragile_items || undefined,
         // Insurance questions velden (homeSizeM2 nieuw, insuranceValue bestaat al)
         homeSizeM2: (profile as any).home_size_m2 || undefined,
+        // Forwarding service velden
+        forwardingStartDate: (profile as any).forwarding_start_date || undefined,
+        forwardingDuration: (profile as any).forwarding_duration || undefined,
+        householdNames: (profile as any).household_names || [],
       });
       setCurrentView("dashboard");
     } else {
@@ -256,6 +264,10 @@ const Index = () => {
           has_fragile_items: info.hasFragileItems || null,
           // Insurance questions velden
           home_size_m2: info.homeSizeM2 || null,
+          // Forwarding service velden
+          forwarding_start_date: info.forwardingStartDate || null,
+          forwarding_duration: info.forwardingDuration || null,
+          household_names: info.householdNames || [],
         } as any)
         .eq('user_id', userId);
 
@@ -420,6 +432,23 @@ const Index = () => {
             // Energy questions velden
             energy_current_supplier: updatedInfo.energyCurrentSupplier || null,
             energy_connection_type: updatedInfo.energyConnectionType || null,
+            // Internet questions velden
+            has_fiber: updatedInfo.hasFiber || null,
+            internet_speed_preference: updatedInfo.internetSpeedPreference || null,
+            internet_bundle: updatedInfo.internetBundle || null,
+            // Moving helper questions velden
+            floor_level: updatedInfo.floorLevel || null,
+            has_elevator: updatedInfo.hasElevator || null,
+            number_of_rooms: updatedInfo.numberOfRooms || null,
+            special_items: updatedInfo.specialItems || [],
+            // Boxes questions velden
+            has_fragile_items: updatedInfo.hasFragileItems || null,
+            // Insurance questions velden
+            home_size_m2: updatedInfo.homeSizeM2 || null,
+            // Forwarding service velden
+            forwarding_start_date: updatedInfo.forwardingStartDate || null,
+            forwarding_duration: updatedInfo.forwardingDuration || null,
+            household_names: updatedInfo.householdNames || [],
           } as any)
           .eq('user_id', user.id);
       } catch (error) {

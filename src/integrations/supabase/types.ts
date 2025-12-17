@@ -228,6 +228,8 @@ export type Database = {
           energy_connection_type: string | null
           energy_current_supplier: string | null
           floor_level: string | null
+          forwarding_duration: string | null
+          forwarding_start_date: string | null
           garden_size: string | null
           glasvezel: string | null
           has_elevator: string | null
@@ -239,6 +241,7 @@ export type Database = {
           has_parking: boolean | null
           has_smart_meter: string | null
           home_size_m2: string | null
+          household_names: string[] | null
           household_type: string | null
           housing_property_type: string | null
           id: string
@@ -274,6 +277,8 @@ export type Database = {
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
           floor_level?: string | null
+          forwarding_duration?: string | null
+          forwarding_start_date?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_elevator?: string | null
@@ -285,6 +290,7 @@ export type Database = {
           has_parking?: boolean | null
           has_smart_meter?: string | null
           home_size_m2?: string | null
+          household_names?: string[] | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
@@ -320,6 +326,8 @@ export type Database = {
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
           floor_level?: string | null
+          forwarding_duration?: string | null
+          forwarding_start_date?: string | null
           garden_size?: string | null
           glasvezel?: string | null
           has_elevator?: string | null
@@ -331,6 +339,7 @@ export type Database = {
           has_parking?: boolean | null
           has_smart_meter?: string | null
           home_size_m2?: string | null
+          household_names?: string[] | null
           household_type?: string | null
           housing_property_type?: string | null
           id?: string
