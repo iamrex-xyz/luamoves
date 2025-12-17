@@ -4,7 +4,7 @@ import {
   MobileModalContent,
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 
@@ -17,6 +17,12 @@ type InternetQuestionsDialogProps = {
 };
 
 type Step = "fiber" | "speed" | "bundle";
+
+const stepExplanations = {
+  fiber: "Glasvezel biedt de snelste verbinding. Dit bepaalt welke aanbieders beschikbaar zijn.",
+  speed: "Zo vinden we een abonnement dat past bij jouw gebruik en budget.",
+  bundle: "Bundels zijn vaak voordeliger dan losse producten.",
+};
 
 export const InternetQuestionsDialog = ({
   open,
@@ -134,6 +140,12 @@ export const InternetQuestionsDialog = ({
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Why this question */}
+          <div className="flex items-start gap-2 px-2 py-2 mb-4 bg-blue-50 rounded-lg border border-blue-100">
+            <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-blue-700">{stepExplanations[currentStep]}</p>
           </div>
 
           {/* Task context */}

@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TreePine, Leaf, Shovel } from "lucide-react";
+import { TreePine, Leaf, Shovel, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 
 interface GardenQuestionsDialogProps {
@@ -13,6 +13,12 @@ interface GardenQuestionsDialogProps {
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
 }
+
+const stepExplanations = {
+  1: "Dit bepaalt of we tuinonderhoud-taken en hoveniers voor je kunnen tonen.",
+  2: "De grootte van je tuin bepaalt het werk en de kosten.",
+  3: "Zo kunnen we de juiste hoveniers voor jou selecteren.",
+};
 
 export function GardenQuestionsDialog({
   open,
@@ -100,6 +106,10 @@ export function GardenQuestionsDialog({
           {step === 1 && (
             <div className="space-y-4">
               <Label>Heeft je nieuwe woning een tuin?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[1]}</p>
+              </div>
               <RadioGroup 
                 value={hasGarden === true ? "yes" : hasGarden === false ? "no" : ""} 
                 onValueChange={(v) => setHasGarden(v === "yes")}
@@ -127,6 +137,10 @@ export function GardenQuestionsDialog({
           {step === 2 && (
             <div className="space-y-4">
               <Label>Hoe groot is je tuin?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[2]}</p>
+              </div>
               <RadioGroup value={gardenSize} onValueChange={setGardenSize}>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
                   <RadioGroupItem value="small" id="gardenSmall" />
@@ -154,6 +168,10 @@ export function GardenQuestionsDialog({
           {step === 3 && (
             <div className="space-y-4">
               <Label>Wat wil je laten doen?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[3]}</p>
+              </div>
               <RadioGroup value={gardenServiceType} onValueChange={setGardenServiceType}>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
                   <RadioGroupItem value="maintenance" id="maintenance" />

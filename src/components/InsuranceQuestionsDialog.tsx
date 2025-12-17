@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Shield, Ruler, Wallet, Check } from "lucide-react";
+import { Shield, Ruler, Wallet, Check, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,11 @@ type InsuranceQuestionsDialogProps = {
 };
 
 type Step = 'size' | 'value';
+
+const stepExplanations: Record<Step, string> = {
+  size: "De grootte van je woning bepaalt vaak de basispremie van je verzekering.",
+  value: "Dit bepaalt het verzekerd bedrag. Zo ben je niet onder- of oververzekerd.",
+};
 
 const sizeOptions = [
   { value: '0-50', label: 'Tot 50 m²' },
@@ -146,7 +151,10 @@ export const InsuranceQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Hoeveel m² is je woning?</h3>
-              <p className="text-muted-foreground text-sm">Dit helpt bij het bepalen van de juiste verzekering.</p>
+            </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.size}</p>
             </div>
             <div className="space-y-2">
               {sizeOptions.map((option) => (
@@ -167,8 +175,12 @@ export const InsuranceQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Wat is de geschatte waarde van je inboedel?</h3>
-              <p className="text-muted-foreground text-sm">Denk aan meubels, elektronica, kleding, etc.</p>
             </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.value}</p>
+            </div>
+            <p className="text-muted-foreground text-sm">Denk aan meubels, elektronica, kleding, etc.</p>
             <div className="space-y-2">
               {valueOptions.map((option) => (
                 <OptionButton

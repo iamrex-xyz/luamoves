@@ -4,7 +4,7 @@ import {
   MobileModalContent,
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, ChevronDown } from "lucide-react";
+import { Check, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import {
@@ -45,6 +45,12 @@ const energySuppliers = [
 ];
 
 type Step = "supplier" | "smartMeter" | "connectionType";
+
+const stepExplanations = {
+  supplier: "Zo kunnen we zien of overstappen voordeliger is dan verlengen.",
+  smartMeter: "Met een slimme meter kun je makkelijker en sneller overstappen.",
+  connectionType: "Dit bepaalt welke energiecontracten we je kunnen aanbieden.",
+};
 
 export const EnergyQuestionsDialog = ({
   open,
@@ -162,6 +168,12 @@ export const EnergyQuestionsDialog = ({
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Why this question */}
+          <div className="flex items-start gap-2 px-2 py-2 mb-4 bg-blue-50 rounded-lg border border-blue-100">
+            <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-blue-700">{stepExplanations[currentStep]}</p>
           </div>
 
           {/* Task context */}

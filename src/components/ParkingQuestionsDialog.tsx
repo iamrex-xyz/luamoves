@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Home, Building2 } from "lucide-react";
+import { Home, Building2, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 
 interface ParkingQuestionsDialogProps {
@@ -14,6 +14,12 @@ interface ParkingQuestionsDialogProps {
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
 }
+
+const stepExplanations = {
+  1: "Bij een appartement of hogere verdieping is vaak een verhuislift nodig.",
+  2: "Hogere verdiepingen zonder lift vereisen een verhuislift van buitenaf.",
+  3: "Elke gemeente heeft andere regels voor parkeervergunningen en verhuisliften.",
+};
 
 export function ParkingQuestionsDialog({
   open,
@@ -90,6 +96,10 @@ export function ParkingQuestionsDialog({
           {step === 1 && (
             <div className="space-y-4">
               <Label>Wat voor type woning betrek je?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[1]}</p>
+              </div>
               <RadioGroup value={propertyType} onValueChange={(v) => setPropertyType(v as "house" | "apartment" | "studio")}>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
                   <RadioGroupItem value="house" id="house" />
@@ -120,6 +130,10 @@ export function ParkingQuestionsDialog({
           {step === 2 && (
             <div className="space-y-4">
               <Label>Op welke verdieping is de woning?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[2]}</p>
+              </div>
               <RadioGroup value={floorLevel} onValueChange={setFloorLevel}>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
                   <RadioGroupItem value="0" id="floor0" />
@@ -151,14 +165,15 @@ export function ParkingQuestionsDialog({
           {step === 3 && (
             <div className="space-y-4">
               <Label>In welke gemeente ga je wonen?</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[3]}</p>
+              </div>
               <Input
                 placeholder="Bijv. Amsterdam, Rotterdam, Utrecht..."
                 value={municipality}
                 onChange={(e) => setMunicipality(e.target.value)}
               />
-              <p className="text-sm text-muted-foreground">
-                Dit hebben we nodig om te bepalen of je een parkeervergunning of verhuislift moet aanvragen.
-              </p>
               <Button 
                 onClick={handleComplete} 
                 disabled={!municipality.trim()}

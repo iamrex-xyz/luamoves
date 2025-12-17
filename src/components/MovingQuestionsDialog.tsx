@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Building2, ArrowUp, DoorOpen, Package, Check, Piano, Refrigerator, PackageOpen } from "lucide-react";
+import { Building2, ArrowUp, DoorOpen, Package, Check, Piano, Refrigerator, PackageOpen, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,13 @@ type MovingQuestionsDialogProps = {
 };
 
 type Step = 'floor' | 'elevator' | 'rooms' | 'items';
+
+const stepExplanations: Record<Step, string> = {
+  floor: "Verhuizers rekenen extra voor hogere verdiepingen. Zo krijg je een nauwkeurige offerte.",
+  elevator: "Een lift maakt de verhuizing sneller en goedkoper.",
+  rooms: "Dit helpt bij het inschatten van de benodigde tijd en manuren.",
+  items: "Speciale items vereisen extra zorg en soms speciale apparatuur.",
+};
 
 const floorOptions = [
   { value: 'begane-grond', label: 'Begane grond' },
@@ -168,7 +175,10 @@ export const MovingQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Op welke verdieping woon je?</h3>
-              <p className="text-muted-foreground text-sm">Dit helpt bij het inschatten van de verhuiskosten.</p>
+            </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.floor}</p>
             </div>
             <div className="space-y-2">
               {floorOptions.map((option) => (
@@ -189,7 +199,10 @@ export const MovingQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Is er een lift aanwezig?</h3>
-              <p className="text-muted-foreground text-sm">Belangrijk voor het plannen van de verhuizing.</p>
+            </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.elevator}</p>
             </div>
             <div className="space-y-2">
               <OptionButton
@@ -219,7 +232,10 @@ export const MovingQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Hoeveel kamers verhuis je?</h3>
-              <p className="text-muted-foreground text-sm">Inclusief woonkamer en slaapkamers.</p>
+            </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.rooms}</p>
             </div>
             <div className="space-y-2">
               {roomOptions.map((option) => (
@@ -240,8 +256,12 @@ export const MovingQuestionsDialog = ({
           <div className="space-y-4">
             <div className="space-y-2">
               <h3 className="text-xl font-semibold text-foreground">Zijn er speciale items?</h3>
-              <p className="text-muted-foreground text-sm">Selecteer wat van toepassing is (optioneel).</p>
             </div>
+            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">{stepExplanations.items}</p>
+            </div>
+            <p className="text-muted-foreground text-sm">Selecteer wat van toepassing is (optioneel).</p>
             <div className="space-y-2">
               {specialItemOptions.map((option) => (
                 <OptionButton
