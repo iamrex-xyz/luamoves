@@ -107,15 +107,18 @@ export const TaskList = ({
     handleTaskToggle(task.id);
   };
 
-  // Helper function to check if task is energy comparison task
-  const isEnergyComparisonTask = (task: Task) => {
+  // Helper function to check if task is energy comparison/contract task
+  const isEnergyTask = (task: Task) => {
     const titleLower = task.title.toLowerCase();
     const idLower = task.id.toLowerCase();
     return (
       (titleLower.includes("energieleverancier") && titleLower.includes("vergelijk")) ||
       (titleLower.includes("energie") && titleLower.includes("vergelijk")) ||
+      (titleLower.includes("energiecontract") && titleLower.includes("kiezen")) ||
+      titleLower === "energiecontract kiezen" ||
       idLower.includes("energie-vergelijk") ||
-      idLower.includes("energy-compare")
+      idLower.includes("energy-compare") ||
+      idLower.includes("buy-phase2-12") // Energiecontract kiezen for buyers
     );
   };
 
@@ -128,8 +131,8 @@ export const TaskList = ({
   const handleRegelenClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     
-    // Check if this is the energy comparison task
-    if (isEnergyComparisonTask(task)) {
+    // Check if this is an energy task (both rent and buy)
+    if (isEnergyTask(task)) {
       if (needsEnergyQuestions(movingInfo)) {
         setShowEnergyQuestions(true);
         return;

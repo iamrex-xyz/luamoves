@@ -166,7 +166,7 @@ export const EnergyQuestionsDialog = ({
 
           {/* Task context */}
           <p className="text-xs text-muted-foreground mb-4 px-2">
-            Voor: <span className="font-medium text-foreground">Vergelijk energieleveranciers</span>
+            Voor: <span className="font-medium text-foreground">Energiecontract kiezen</span>
           </p>
 
           {/* Input based on step */}
