@@ -136,6 +136,20 @@ export default {
             opacity: "0",
           },
         },
+        "task-complete": {
+          "0%": {
+            transform: "translateX(0) scale(1)",
+            opacity: "1",
+          },
+          "50%": {
+            transform: "translateX(0) scale(1)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateX(100%) scale(0.95)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.25s ease-out",
@@ -143,6 +157,7 @@ export default {
         "fade-in": "fade-in 0.35s ease-out",
         "scale-in": "scale-in 0.35s ease-out",
         "confetti-fall": "confetti-fall 3s ease-out forwards",
+        "task-complete": "task-complete 0.6s ease-out forwards",
       },
     },
   },

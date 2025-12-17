@@ -120,7 +120,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
         <div 
           className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
             isCompleting 
-              ? "bg-primary/10 scale-95 opacity-0" 
+              ? "bg-primary animate-task-complete" 
               : isOverdue 
                 ? "bg-destructive/5 hover:bg-destructive/10" 
                 : "bg-secondary/50 hover:bg-secondary"
@@ -133,7 +133,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
               onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
             >
               {isCompleting ? (
-                <CheckCircle2 className="h-5 w-5 text-primary animate-scale-in" />
+                <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
               ) : task.status === "done" ? (
                 <CheckCircle2 className="h-5 w-5 text-primary" />
               ) : (
@@ -141,16 +141,24 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className={`font-medium text-sm mb-1 transition-colors ${task.status === "done" ? "line-through text-muted-foreground" : "text-foreground"}`}>
+              <h4 className={`font-medium text-sm mb-1 transition-all duration-200 ${
+                isCompleting 
+                  ? "line-through text-primary-foreground" 
+                  : task.status === "done" 
+                    ? "line-through text-muted-foreground" 
+                    : "text-foreground"
+              }`}>
                 {task.title}
               </h4>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className={`flex items-center gap-3 text-xs transition-colors duration-200 ${
+                isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
+              }`}>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {task.deadlineLabel}
                   {daysUntil === 0 && " (vandaag)"}
                   {daysUntil === 1 && " (morgen)"}
-                  {isOverdue && <span className="text-destructive ml-1">(verlopen)</span>}
+                  {isOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
                 </span>
                 {task.assignedToEmail && (
                   <span className="flex items-center gap-1">
