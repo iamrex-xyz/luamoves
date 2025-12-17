@@ -180,6 +180,20 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
                   {daysUntil === 1 && " (morgen)"}
                   {isOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
                 </span>
+                {task.affiliateLink && task.status !== "done" && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 -my-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+                    }}
+                  >
+                    Regelen
+                    <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
+                )}
                 {task.assignedToEmail && (
                   <span className="flex items-center gap-1">
                     <User className="w-3 h-3" />
@@ -188,20 +202,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
                 )}
               </div>
             </div>
-            {task.affiliateLink && task.status !== "done" && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="shrink-0 h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-                }}
-              >
-                Regelen
-                <ArrowRight className="w-3 h-3 ml-1" />
-              </Button>
-            )}
           </div>
         </div>
       </SwipeableTaskItem>
