@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Phone, Cake } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { z } from "zod";
 
 const phoneSchema = z.string()
@@ -20,6 +21,7 @@ const phoneSchema = z.string()
 export const PersonalInfoCard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [birthDate, setBirthDate] = useState("");
@@ -49,6 +51,8 @@ export const PersonalInfoCard = () => {
       }
     } catch (error) {
       console.error("Error loading profile:", error);
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -91,6 +95,33 @@ export const PersonalInfoCard = () => {
       setIsLoading(false);
     }
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+        <div className="p-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-10 h-10 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-36" />
+              <Skeleton className="h-3 w-28" />
+            </div>
+          </div>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+          <Skeleton className="h-11 w-full rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
