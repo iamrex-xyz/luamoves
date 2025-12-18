@@ -563,7 +563,6 @@ const Index = () => {
         <Dashboard 
           movingInfo={movingInfo} 
           onNavigate={setCurrentView}
-          onLogout={handleLogout}
           onTaskComplete={handleTaskComplete}
           onSignupClick={handleBadgeClick}
         />
@@ -572,7 +571,6 @@ const Index = () => {
         <TaskList 
           movingInfo={movingInfo}
           onNavigate={setCurrentView}
-          onLogout={handleLogout}
           onTaskComplete={handleTaskComplete}
           onUpdateMovingInfo={handleUpdateMovingInfo}
           isGuest={!user}
@@ -584,7 +582,6 @@ const Index = () => {
       {currentView === "extras" && movingInfo && (
         <Extras 
           onNavigate={setCurrentView}
-          onLogout={handleLogout}
         />
       )}
       {currentView === "settings" && movingInfo && (

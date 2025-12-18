@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { FileText, Upload, Trash2, Download, LogOut, FolderOpen, ArrowLeft, Users } from "lucide-react";
+import { FileText, Upload, Trash2, Download, FolderOpen, ArrowLeft, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,10 +17,9 @@ import { BottomNav } from "./BottomNav";
 
 type ExtrasProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
-  onLogout: () => void;
 };
 
-export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
+export const Extras = ({ onNavigate }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -151,14 +150,6 @@ export const Extras = ({ onNavigate, onLogout }: ExtrasProps) => {
         <div className="flex-1">
           <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onLogout}
-          className="h-10 w-10 rounded-full hover:bg-secondary"
-        >
-          <LogOut className="w-5 h-5 text-muted-foreground" />
-        </Button>
       </div>
 
       <div className="px-4">
