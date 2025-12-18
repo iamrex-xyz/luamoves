@@ -9,7 +9,7 @@ export const useUnreadMessages = (currentView: string) => {
 
   useEffect(() => {
     // Mark messages as read when viewing chat
-    if (currentView === "extras") {
+    if (currentView === "chat") {
       const now = new Date().toISOString();
       setLastReadTimestamp(now);
       localStorage.setItem("lastReadMessageTimestamp", now);
@@ -55,7 +55,7 @@ export const useUnreadMessages = (currentView: string) => {
           table: "collaborator_messages",
         },
         () => {
-          if (currentView !== "extras") {
+          if (currentView !== "chat") {
             setUnreadCount((prev) => prev + 1);
           }
         }

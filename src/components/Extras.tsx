@@ -17,16 +17,18 @@ import { BottomNav } from "./BottomNav";
 
 type ExtrasProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
+  isGuest?: boolean;
+  onSignupClick?: () => void;
 };
 
-export const Extras = ({ onNavigate }: ExtrasProps) => {
+export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch documents (own + from collaborators)
+  // Fetch documents (own + from collaborators) - only for authenticated users
   const { data: documents = [], isLoading } = useQuery({
     queryKey: ["moving-documents"],
     queryFn: async () => {
@@ -38,6 +40,7 @@ export const Extras = ({ onNavigate }: ExtrasProps) => {
       if (error) throw error;
       return data;
     },
+    enabled: !isGuest, // Don't fetch for guests
   });
 
   // Upload document mutation
@@ -134,6 +137,44 @@ export const Extras = ({ onNavigate }: ExtrasProps) => {
     factuur: "Facturen",
     overig: "Overig",
   };
+
+  // Guest UI
+  if (isGuest) {
+    return (
+      <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+        <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onNavigate("dashboard")}
+            className="shrink-0"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
+          </div>
+        </div>
+
+        <div className="px-4 py-12">
+          <Card className="p-8 text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <FolderOpen className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="font-medium mb-2">Maak een account aan</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Upload en bewaar belangrijke verhuisdocumenten veilig na het aanmaken van een account.
+            </p>
+            <Button onClick={onSignupClick} className="rounded-xl">
+              Account aanmaken
+            </Button>
+          </Card>
+        </div>
+
+        <BottomNav currentView="extras" onNavigate={onNavigate} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">

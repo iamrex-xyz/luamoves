@@ -12,7 +12,7 @@ const NotFound = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
       {/* Header */}
       <div className="p-6">
-        <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
       </div>
 
       {/* Main content */}

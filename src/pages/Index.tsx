@@ -625,6 +625,8 @@ const Index = () => {
       {currentView === "extras" && movingInfo && (
         <Extras 
           onNavigate={setCurrentView}
+          isGuest={!user}
+          onSignupClick={handleBadgeClick}
         />
       )}
       {currentView === "settings" && movingInfo && (
@@ -633,6 +635,8 @@ const Index = () => {
           onNavigate={setCurrentView}
           onLogout={handleLogout}
           onUpdate={setMovingInfo}
+          isGuest={!user}
+          onSignupClick={handleBadgeClick}
         />
       )}
       {currentView === "chat" && movingInfo && (
