@@ -142,9 +142,10 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
   if (isGuest) {
     return (
       <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
-        <div className="px-4 pt-6 pb-2">
-          <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
-        </div>
+      <div className="px-4 pt-6 pb-2">
+        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+        <p className="text-sm text-muted-foreground mt-0.5">Documenten</p>
+      </div>
 
         <div className="px-4 py-12">
           <Card className="p-8 text-center">
@@ -170,7 +171,8 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-4 pt-6 pb-2">
-        <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
+        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+        <p className="text-sm text-muted-foreground mt-0.5">Documenten</p>
       </div>
 
       <div className="px-4">
