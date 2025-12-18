@@ -7,6 +7,7 @@ import { CollaboratorChat } from "@/components/CollaboratorChat";
 import { LuaAIChat } from "@/components/LuaAIChat";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
+import { LuaLogo } from "@/components/LuaLogo";
 import { Users, Sparkles, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MovingInfo } from "@/pages/Index";
@@ -101,9 +102,11 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
-      <div className="px-4 pt-6 pb-2">
-        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
-        <p className="text-sm text-muted-foreground mt-0.5">Chat</p>
+      <div className="px-6 pt-6 pb-4">
+        <div>
+          <LuaLogo size="lg" />
+          <p className="text-sm text-muted-foreground mt-0.5">Chat</p>
+        </div>
       </div>
 
       {/* Tabs */}
