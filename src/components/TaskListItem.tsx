@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
+import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
 import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
 
 type TaskListItemProps = {
@@ -122,25 +123,18 @@ export const TaskListItem = ({
                 {task.deadlineLabel}
               </span>
               {task.status !== "done" && !isCompleting && (
-                <div className="flex items-center gap-1">
-                  <Button
-                    size="sm"
-                    className="shrink-0 h-6 px-3 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-full"
-                    onClick={(e) => onRegelenClick(e, task)}
-                  >
-                    Regelen
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="shrink-0 h-5 px-0 text-xs text-muted-foreground hover:text-primary hover:bg-transparent font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onTaskClick(task);
-                    }}
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
+                <div className="flex items-center gap-2">
+                  {hasAffiliateOptions(task) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                      onClick={(e) => onRegelenClick(e, task)}
+                    >
+                      Regelen
+                      <ChevronRight className="w-3 h-3 ml-0.5" />
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

@@ -194,6 +194,24 @@ export const needsRenovationQuestions = (info: MovingInfo): boolean => {
          !(info as any).housingPropertyType;
 };
 
+// Check if a task has affiliate options (i.e., should show "Regelen" button)
+export const hasAffiliateOptions = (task: Task): boolean => {
+  return (
+    isEnergyTask(task) ||
+    isInternetTask(task) ||
+    isMovingTask(task) ||
+    isBoxesTask(task) ||
+    isInsuranceTask(task) ||
+    isLiabilityTask(task) ||
+    isForwardingTask(task) ||
+    isParkingTask(task) ||
+    isCleaningTask(task) ||
+    isSmokeDetectorTask(task) ||
+    isGardenTask(task) ||
+    isRenovationTask(task)
+  );
+};
+
 // Task type to redirect URL mapping
 export const getTaskRedirectUrl = (taskType: string): string => {
   const redirectMap: Record<string, string> = {
