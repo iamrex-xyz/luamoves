@@ -133,8 +133,8 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
   const loadGuestTasks = () => {
     try {
-      // Check if we have saved guest task statuses (sessionStorage = cleared when browser closes)
-      const savedStatuses = sessionStorage.getItem(GUEST_TASKS_KEY);
+      // Check if we have saved guest task statuses (localStorage = persists across sessions)
+      const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
       const statusMap: Record<string, "todo" | "in_progress" | "done"> = savedStatuses 
         ? JSON.parse(savedStatuses) 
         : {};
@@ -186,14 +186,14 @@ export const useTasks = (movingInfo: MovingInfo) => {
       );
 
       if (isGuest) {
-        // Save to sessionStorage for guests (cleared when browser closes)
-        const savedStatuses = sessionStorage.getItem(GUEST_TASKS_KEY);
+        // Save to localStorage for guests (persists across sessions)
+        const savedStatuses = localStorage.getItem(GUEST_TASKS_KEY);
         const statusMap: Record<string, string> = savedStatuses 
           ? JSON.parse(savedStatuses) 
           : {};
         
         statusMap[taskId] = newStatus;
-        sessionStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
+        localStorage.setItem(GUEST_TASKS_KEY, JSON.stringify(statusMap));
         
         // Show toast with undo option when completing a task
         if (newStatus === "done" && showUndo) {
