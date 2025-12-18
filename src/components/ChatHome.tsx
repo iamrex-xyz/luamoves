@@ -7,7 +7,7 @@ import { CollaboratorChat } from "@/components/CollaboratorChat";
 import { LuaAIChat } from "@/components/LuaAIChat";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
-import { Users, Sparkles, UserPlus, ArrowLeft } from "lucide-react";
+import { Users, Sparkles, UserPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MovingInfo } from "@/pages/Index";
 import { trackEvent } from "@/lib/analytics";
@@ -101,15 +101,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onNavigate("dashboard")}
-          className="shrink-0"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+      <div className="px-4 pt-6 pb-2">
         <span className="text-2xl font-italiana text-foreground tracking-wide">Chat</span>
       </div>
 
@@ -185,7 +177,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={() => {
           setShowSignupPrompt(false);
-          window.location.reload();
+          checkPartnerStatus();
         }}
         capturedEmail=""
       />

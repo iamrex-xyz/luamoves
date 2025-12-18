@@ -41,25 +41,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     return sortTasksSmart(open);
   }, [tasks]);
 
-  // Get top 5 sorted tasks, ensuring at least 1 affiliate task is visible
-  const displayTasks = useMemo(() => {
-    const first5 = openTasks.slice(0, 5);
-    const hasAffiliateInFirst5 = first5.some(t => t.affiliateLink);
-    
-    if (hasAffiliateInFirst5 || first5.length < 5) {
-      return first5;
-    }
-    
-    // Find first affiliate task not in first 5
-    const firstAffiliateAfter5 = openTasks.slice(5).find(t => t.affiliateLink);
-    
-    if (firstAffiliateAfter5) {
-      // Replace the 5th task with the affiliate task
-      return [...first5.slice(0, 4), firstAffiliateAfter5];
-    }
-    
-    return first5;
-  }, [openTasks]);
+  // Get top 5 sorted tasks (smart sorting already prioritizes affiliate tasks)
+  const displayTasks = useMemo(() => openTasks.slice(0, 5), [openTasks]);
 
   // Detect when all tasks become completed
   useEffect(() => {
