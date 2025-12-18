@@ -176,12 +176,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         disabled={task.status === "done" || isCompleting}
       >
         <div 
-          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${getUrgencyStyles()}`}
+          className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${getUrgencyStyles()}`}
           onClick={() => !isCompleting && handleTaskClick(task)}
         >
-          <div className="flex items-start gap-4">
+          <div className="flex items-center gap-3">
             <div 
-              className="mt-0.5 shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
+              className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110"
               onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
             >
               {isCompleting ? (
@@ -199,8 +199,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <h4 className={`font-medium text-sm transition-all duration-200 ${
+              <div className="flex items-center justify-between gap-2">
+                <h4 className={`font-medium text-sm leading-tight truncate ${
                   isCompleting 
                     ? "line-through text-primary-foreground" 
                     : task.status === "done" 
@@ -209,39 +209,39 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                 }`}>
                   {task.title}
                 </h4>
-                {getUrgencyLabel()}
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <div className={`flex items-center gap-3 text-xs transition-colors duration-200 ${
-                  isCompleting 
-                    ? "text-primary-foreground/80" 
-                    : isOverdue 
-                      ? "text-destructive/70"
-                      : isDueToday
-                        ? "text-warning/70"
-                        : "text-muted-foreground"
-                }`}>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {task.deadlineLabel}
-                  </span>
-                  {task.assignedToEmail && (
-                    <span className="flex items-center gap-1">
-                      <User className="w-3 h-3" />
-                      {task.assignedToEmail}
-                    </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  {getUrgencyLabel()}
+                  {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                      onClick={(e) => handleRegelenClick(e, task)}
+                    >
+                      Regelen
+                      <ChevronRight className="w-3 h-3 ml-0.5" />
+                    </Button>
                   )}
                 </div>
-                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                    onClick={(e) => handleRegelenClick(e, task)}
-                  >
-                    Regelen
-                    <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
+              </div>
+              <div className={`flex items-center gap-2 text-[11px] mt-0.5 ${
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isOverdue 
+                    ? "text-destructive/70"
+                    : isDueToday
+                      ? "text-warning/70"
+                      : "text-muted-foreground"
+              }`}>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {task.deadlineLabel}
+                </span>
+                {task.assignedToEmail && (
+                  <span className="flex items-center gap-1">
+                    <User className="w-3 h-3" />
+                    {task.assignedToEmail}
+                  </span>
                 )}
               </div>
             </div>
