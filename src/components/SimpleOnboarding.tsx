@@ -24,6 +24,9 @@ const countryCodes = [
   { code: "+48", country: "PL", flag: "🇵🇱" },
   { code: "+90", country: "TR", flag: "🇹🇷" },
   { code: "+212", country: "MA", flag: "🇲🇦" },
+  { code: "+597", country: "SR", flag: "🇸🇷" },
+  { code: "+599", country: "CW", flag: "🇨🇼" },
+  { code: "+297", country: "AW", flag: "🇦🇼" },
 ];
 
 type SimpleOnboardingProps = {
