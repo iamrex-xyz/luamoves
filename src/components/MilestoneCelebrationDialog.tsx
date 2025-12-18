@@ -40,13 +40,20 @@ export const MilestoneCelebrationDialog = ({
   onSignup,
 }: MilestoneCelebrationDialogProps) => {
   const [showConfetti, setShowConfetti] = useState(false);
+  const [hasShownConfetti, setHasShownConfetti] = useState(false);
   const content = milestoneContent[milestoneType];
 
   useEffect(() => {
-    if (open) {
+    // Only trigger confetti once when dialog first opens
+    if (open && !hasShownConfetti) {
       setShowConfetti(true);
+      setHasShownConfetti(true);
     }
-  }, [open]);
+    // Reset when dialog closes so next milestone can trigger confetti
+    if (!open) {
+      setHasShownConfetti(false);
+    }
+  }, [open, hasShownConfetti]);
 
   const handleSkip = () => {
     onOpenChange(false);
