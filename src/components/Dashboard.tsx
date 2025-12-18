@@ -235,15 +235,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   )}
                 </div>
                 {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium -mr-1"
+                  <button
+                    className="flex items-center text-[11px] text-primary hover:text-primary/80 font-medium"
                     onClick={(e) => handleRegelenClick(e, task)}
                   >
                     Regelen
                     <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>
