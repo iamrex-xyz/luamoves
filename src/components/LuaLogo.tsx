@@ -21,7 +21,7 @@ export const LuaLogo = ({ size = "md", className, showText = true }: LuaLogoProp
           sizeClasses[size]
         )}
       >
-        {showText ? "LUA" : "L"}
+        logo
       </span>
     </div>
   );
