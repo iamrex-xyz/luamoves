@@ -5,11 +5,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
+
+const countryCodes = [
+  { code: "+31", country: "NL", flag: "🇳🇱" },
+  { code: "+32", country: "BE", flag: "🇧🇪" },
+  { code: "+49", country: "DE", flag: "🇩🇪" },
+  { code: "+33", country: "FR", flag: "🇫🇷" },
+  { code: "+44", country: "UK", flag: "🇬🇧" },
+  { code: "+1", country: "US", flag: "🇺🇸" },
+  { code: "+34", country: "ES", flag: "🇪🇸" },
+  { code: "+39", country: "IT", flag: "🇮🇹" },
+  { code: "+48", country: "PL", flag: "🇵🇱" },
+  { code: "+90", country: "TR", flag: "🇹🇷" },
+  { code: "+212", country: "MA", flag: "🇲🇦" },
+];
 
 type SimpleOnboardingProps = {
   onComplete: (info: MovingInfo) => void;
@@ -45,6 +60,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [petsCount, setPetsCount] = useState(0);
   const [hasJob, setHasJob] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+31");
 
   const animatedTasks = [
     "Verhuisbedrijf boeken",
@@ -140,7 +156,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           hasJob,
           children: childrenCount,
           pets: petsCount,
-          phone: phoneNumber || undefined,
+          phone: phoneNumber ? `${countryCode}${phoneNumber}` : undefined,
         });
       }, generatingSteps.length * 800 + 500);
 
@@ -149,7 +165,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         clearTimeout(timeout);
       };
     }
-  }, [step, postcode, houseNumber, streetName, cityName, movingDate, housingType, propertyType, hasGarden, hasParking, hasJob, childrenCount, petsCount, phoneNumber, onComplete]);
+  }, [step, postcode, houseNumber, streetName, cityName, movingDate, housingType, propertyType, hasGarden, hasParking, hasJob, childrenCount, petsCount, phoneNumber, countryCode, onComplete]);
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -550,29 +566,46 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">Telefoonnummer (optioneel)</Label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-muted-foreground" />
-                    <span className="text-muted-foreground">+31</span>
+                <div className="flex gap-2">
+                  <Select value={countryCode} onValueChange={setCountryCode}>
+                    <SelectTrigger className="w-[100px] h-14 rounded-xl border-2 border-muted focus:border-primary">
+                      <SelectValue>
+                        {countryCodes.find(c => c.code === countryCode)?.flag} {countryCode}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-50">
+                      {countryCodes.map((country) => (
+                        <SelectItem key={country.code} value={country.code}>
+                          <span className="flex items-center gap-2">
+                            <span>{country.flag}</span>
+                            <span>{country.code}</span>
+                            <span className="text-muted-foreground text-xs">({country.country})</span>
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="relative flex-1">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="6 12345678"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary pl-12"
+                      maxLength={15}
+                    />
                   </div>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="6 12345678"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary pl-24"
-                    maxLength={10}
-                  />
                 </div>
               </div>
-              {phoneNumber.length >= 9 && (
+              {phoneNumber.length >= 8 && (
                 <div className="flex items-center gap-3 p-4 bg-primary-light rounded-2xl animate-in fade-in duration-300">
                   <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
                     <Check className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">+31 {phoneNumber}</p>
+                    <p className="font-semibold text-foreground">{countryCode} {phoneNumber}</p>
                     <p className="text-sm text-muted-foreground">Je ontvangt handige tips via WhatsApp</p>
                   </div>
                 </div>
