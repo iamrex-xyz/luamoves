@@ -29,13 +29,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
   if (isGuest) {
     return (
       <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
-        <div className="px-6 pt-6 pb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <LuaLogo size="lg" />
-              <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
-            </div>
-          </div>
+        <div className="px-4 pt-4 pb-2">
+          <LuaLogo size="md" />
         </div>
 
         <div className="px-6 space-y-6">
@@ -65,12 +60,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4">
+      <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
-          <div>
-            <LuaLogo size="lg" />
-            <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
-          </div>
+          <LuaLogo size="md" />
           <Button
             variant="ghost"
             size="icon"

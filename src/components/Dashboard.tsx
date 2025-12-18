@@ -257,11 +257,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       {/* Header */}
-      <div className="px-6 pt-6 pb-4">
-        <div>
-          <LuaLogo size="lg" />
-          <p className="text-sm text-muted-foreground mt-0.5">Jouw verhuis assistent</p>
-        </div>
+      <div className="px-4 pt-4 pb-2">
+        <LuaLogo size="md" />
       </div>
 
       {/* Moving Date Card */}

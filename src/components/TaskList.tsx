@@ -13,6 +13,7 @@ import { useMilestones } from "@/hooks/useMilestones";
 import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
 import { isEnergyTask, isMovingTask } from "@/lib/taskTypeHelpers";
 import { sortTasksSmart } from "@/lib/taskSorting";
+import { LuaLogo } from "@/components/LuaLogo";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
@@ -264,7 +265,7 @@ export const TaskList = ({
       
       {/* Header with Logo */}
       <div className="px-4 pt-4 pb-2">
-        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+        <LuaLogo size="md" />
       </div>
       
       {/* Compact Header with Search */}
