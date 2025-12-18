@@ -57,7 +57,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     "Meter standen noteren",
   ];
 
-  const totalSteps = 7; // Welcome, date, housing type, property details, address, phone, generating
+  const totalSteps = 6; // Welcome, date, housing+property, address, phone (optional), generating
 
   // Animate tasks on welcome screen
   useEffect(() => {
@@ -110,7 +110,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   // Handle the generating animation
   useEffect(() => {
-    if (step === 7) {
+    if (step === 6) {
       const interval = setInterval(() => {
         setCurrentGeneratingStep((prev) => {
           if (prev < generatingSteps.length - 1) {
@@ -158,17 +158,16 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   const handleStartGenerating = () => {
-    setStep(7);
+    setStep(6);
   };
 
   const isStepValid = () => {
     switch (step) {
       case 1: return true;
       case 2: return !!movingDate;
-      case 3: return !!housingType;
-      case 4: return !!propertyType;
-      case 5: return postcode.length >= 4 && houseNumber.length > 0;
-      case 6: return phoneNumber.length >= 10;
+      case 3: return !!housingType; // Property type is now optional
+      case 4: return postcode.length >= 4 && houseNumber.length > 0;
+      case 5: return true; // Phone is optional
       default: return false;
     }
   };
@@ -370,7 +369,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     );
   }
 
-  // Step 3: Housing type (rent/buy)
+  // Step 3: Housing type + Property details (combined)
   if (step === 3) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
@@ -382,104 +381,56 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Ga je huren<br /><span className="text-primary">of kopen?</span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-md">Dit bepaalt welke taken relevant zijn voor jou.</p>
-            </div>
-            <div className="space-y-3">
-              <button onClick={() => setHousingType('rent')} className={cn(
-                "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
-                housingType === 'rent' ? "border-primary bg-primary-light shadow-lg" : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
-              )}>
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-colors", housingType === 'rent' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                  <Key className={cn("w-7 h-7", housingType === 'rent' ? "text-white" : "text-muted-foreground")} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className={cn("font-semibold text-lg", housingType === 'rent' ? "text-foreground" : "text-muted-foreground")}>Ik ga huren</p>
-                  <p className="text-sm text-muted-foreground">Huurwoning of appartement</p>
-                </div>
-                {housingType === 'rent' && <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center"><Check className="w-4 h-4 text-white" /></div>}
-              </button>
-              <button onClick={() => setHousingType('buy')} className={cn(
-                "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
-                housingType === 'buy' ? "border-primary bg-primary-light shadow-lg" : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
-              )}>
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-colors", housingType === 'buy' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                  <Home className={cn("w-7 h-7", housingType === 'buy' ? "text-white" : "text-muted-foreground")} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className={cn("font-semibold text-lg", housingType === 'buy' ? "text-foreground" : "text-muted-foreground")}>Ik ga kopen</p>
-                  <p className="text-sm text-muted-foreground">Koopwoning met eigen hypotheek</p>
-                </div>
-                {housingType === 'buy' && <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center"><Check className="w-4 h-4 text-white" /></div>}
-              </button>
-              <button onClick={() => setHousingType('unknown')} className={cn(
-                "w-full flex items-center gap-4 p-5 rounded-2xl border-2 transition-all duration-200",
-                housingType === 'unknown' ? "border-primary bg-primary-light shadow-lg" : "border-muted bg-white hover:border-primary/50 hover:shadow-md"
-              )}>
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-colors", housingType === 'unknown' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                  <HelpCircle className={cn("w-7 h-7", housingType === 'unknown' ? "text-white" : "text-muted-foreground")} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className={cn("font-semibold text-lg", housingType === 'unknown' ? "text-foreground" : "text-muted-foreground")}>Dat weet ik nog niet</p>
-                  <p className="text-sm text-muted-foreground">Nog geen definitieve keuze gemaakt</p>
-                </div>
-                {housingType === 'unknown' && <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center"><Check className="w-4 h-4 text-white" /></div>}
-              </button>
-            </div>
-            <div className="flex items-center justify-between pt-4">
-              <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                <span>Terug</span>
-              </button>
-              <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
-                <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Step 4: Property details & household (NEW STEP)
-  if (step === 4) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-6 flex justify-between items-center">
-          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
-          <div className="flex gap-1">
-            {[1, 2, 3, 4].map((num) => (
-              <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 3 ? "bg-primary" : "bg-muted"}`} />
-            ))}
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full overflow-y-auto">
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
+        <div className="flex-1 flex flex-col px-6 pb-12 max-w-2xl mx-auto w-full overflow-y-auto">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 py-4">
             <div className="space-y-3">
               <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Vertel ons meer over<br /><span className="text-primary">je situatie</span>
+                Vertel ons over<br /><span className="text-primary">je nieuwe thuis</span>
               </h1>
-              <p className="text-base text-muted-foreground max-w-md">Zo maken we je checklist 100% op maat.</p>
+              <p className="text-base text-muted-foreground max-w-md">Zo maken we je checklist op maat.</p>
             </div>
 
-            {/* Woningtype */}
+            {/* Huren of kopen */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Wat voor woning is het?</Label>
-              <div className="flex gap-3">
-                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType('apartment')} icon={Building2} label="Appartement" />
-                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType('house')} icon={Home} label="Huis" />
+              <Label className="text-sm font-medium text-muted-foreground">Ga je huren of kopen?</Label>
+              <div className="space-y-2">
+                <button onClick={() => setHousingType('rent')} className={cn(
+                  "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200",
+                  housingType === 'rent' ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
+                )}>
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", housingType === 'rent' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Key className={cn("w-6 h-6", housingType === 'rent' ? "text-white" : "text-muted-foreground")} />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className={cn("font-semibold", housingType === 'rent' ? "text-foreground" : "text-muted-foreground")}>Huren</p>
+                  </div>
+                  {housingType === 'rent' && <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
+                </button>
+                <button onClick={() => setHousingType('buy')} className={cn(
+                  "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200",
+                  housingType === 'buy' ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
+                )}>
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", housingType === 'buy' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Home className={cn("w-6 h-6", housingType === 'buy' ? "text-white" : "text-muted-foreground")} />
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className={cn("font-semibold", housingType === 'buy' ? "text-foreground" : "text-muted-foreground")}>Kopen</p>
+                  </div>
+                  {housingType === 'buy' && <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
+                </button>
               </div>
             </div>
 
-            {/* Voorzieningen */}
+            {/* Woningtype (optioneel) */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-muted-foreground">Wat voor woning? (optioneel)</Label>
+              <div className="flex gap-3">
+                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType(propertyType === 'apartment' ? null : 'apartment')} icon={Building2} label="Appartement" />
+                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType(propertyType === 'house' ? null : 'house')} icon={Home} label="Huis" />
+              </div>
+            </div>
+
+            {/* Voorzieningen (optioneel) */}
             <div className="space-y-3">
               <Label className="text-sm font-medium text-muted-foreground">Voorzieningen (optioneel)</Label>
               <div className="flex gap-3">
@@ -488,31 +439,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
 
-            {/* Huishouden */}
+            {/* Huishouden (optioneel) */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Je huishouden</Label>
+              <Label className="text-sm font-medium text-muted-foreground">Je huishouden (optioneel)</Label>
               <div className="space-y-2">
                 <CounterControl value={childrenCount} onChange={setChildrenCount} label="Kinderen" icon={Baby} />
                 <CounterControl value={petsCount} onChange={setPetsCount} label="Huisdieren" icon={Dog} />
               </div>
-            </div>
-
-            {/* Werksituatie */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Werksituatie</Label>
-              <button
-                onClick={() => setHasJob(!hasJob)}
-                className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all",
-                  hasJob ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
-                )}
-              >
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors", hasJob ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                  <Briefcase className={cn("w-5 h-5", hasJob ? "text-white" : "text-muted-foreground")} />
-                </div>
-                <span className={cn("font-medium flex-1 text-left", hasJob ? "text-foreground" : "text-muted-foreground")}>Ik heb een werkgever</span>
-                {hasJob && <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
-              </button>
             </div>
 
             <div className="flex items-center justify-between pt-4">
@@ -533,15 +466,15 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     );
   }
 
-  // Step 5: Address
-  if (step === 5) {
+  // Step 4: Address
+  if (step === 4) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         <div className="p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
-              <div key={num} className="w-8 h-1 rounded-full bg-primary" />
+              <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 3 ? "bg-primary" : "bg-muted"}`} />
             ))}
           </div>
         </div>
@@ -594,14 +527,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     );
   }
 
-  // Step 6: Phone number
-  if (step === 6) {
+  // Step 5: Phone number (optional)
+  if (step === 5) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         <div className="p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
           <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((num) => (
+            {[1, 2, 3, 4].map((num) => (
               <div key={num} className="w-8 h-1 rounded-full bg-primary" />
             ))}
           </div>
@@ -612,11 +545,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Hoe kunnen we<br /><span className="text-primary">je bereiken?</span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-md">We sturen je handige tips en reminders via WhatsApp.</p>
+              <p className="text-lg text-muted-foreground max-w-md">Optioneel: ontvang handige tips via WhatsApp.</p>
             </div>
             <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">Telefoonnummer</Label>
+                <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">Telefoonnummer (optioneel)</Label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
                     <Phone className="w-5 h-5 text-muted-foreground" />
@@ -650,12 +583,21 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 <span>Terug</span>
               </button>
-              <button onClick={handleStartGenerating} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Genereer checklist</span>
-                <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                </div>
-              </button>
+              <div className="flex items-center gap-3">
+                {!phoneNumber && (
+                  <button onClick={handleStartGenerating} className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+                    Overslaan
+                  </button>
+                )}
+                <button onClick={handleStartGenerating} className="flex items-center gap-3 group">
+                  <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                    {phoneNumber ? "Genereer checklist" : "Start"}
+                  </span>
+                  <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -663,7 +605,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     );
   }
 
-  // Step 7: Generating
+  // Step 6: Generating
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
       <div className="p-6 flex justify-between items-center">
