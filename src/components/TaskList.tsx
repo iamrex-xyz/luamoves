@@ -50,7 +50,7 @@ import {
 type TaskListProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
-  onTaskComplete?: (completedCount: number) => void;
+  onTaskComplete?: (completedCount: number, totalTasks: number) => void;
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
   isGuest?: boolean;
   showAccountBadge?: boolean;
@@ -149,7 +149,7 @@ export const TaskList = ({
 
     if (wasNotDone && onTaskComplete) {
       const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
-      onTaskComplete(newCompletedCount);
+      onTaskComplete(newCompletedCount, tasks.length);
     }
 
     // Check if we should show partner invite after completing energy or moving tasks

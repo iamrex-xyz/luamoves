@@ -22,7 +22,7 @@ import { useState, useEffect } from "react";
 type DashboardProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
-  onTaskComplete?: (completedCount: number) => void;
+  onTaskComplete?: (completedCount: number, totalTasks: number) => void;
   onSignupClick?: () => void;
 };
 
@@ -96,7 +96,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     // Trigger signup prompt if task was completed (not uncompleted)
     if (wasNotDone && onTaskComplete) {
       const newCompletedCount = tasks.filter(t => t.status === "done").length + 1;
-      onTaskComplete(newCompletedCount);
+      onTaskComplete(newCompletedCount, tasks.length);
     }
   };
 

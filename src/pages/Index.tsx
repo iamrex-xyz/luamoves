@@ -8,6 +8,7 @@ import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
 import { EmailCaptureDialog } from "@/components/EmailCaptureDialog";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
+import { MilestoneCelebrationDialog } from "@/components/MilestoneCelebrationDialog";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -82,6 +83,7 @@ const EMAIL_PROMPTED_KEY = "lua_email_prompted";
 const SIGNUP_PROMPTED_KEY = "lua_signup_prompted";
 const CAPTURED_EMAIL_KEY = "lua_captured_email";
 const GUEST_TASKS_KEY = "lua_guest_tasks";
+const MILESTONE_CELEBRATED_KEY = "lua_milestones_celebrated";
 
 const Index = () => {
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
@@ -97,6 +99,10 @@ const Index = () => {
   
   // Full signup dialog (after 2nd task) - hard blocking
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
+  
+  // Milestone celebration dialog (5 tasks, 50%)
+  const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
+  const [milestoneCelebrationType, setMilestoneCelebrationType] = useState<"five_tasks" | "halfway">("five_tasks");
   
   // Captured email for signup flow
   const [capturedEmail, setCapturedEmail] = useState<string>("");
@@ -343,7 +349,7 @@ const Index = () => {
     await loadUserProfile(authenticatedUser.id);
   };
 
-  const handleTaskComplete = (completedCount: number) => {
+  const handleTaskComplete = (completedCount: number, totalTasks?: number) => {
     // Only show prompts if not logged in
     if (!user) {
       // Reset account complete flag if user is not logged in
@@ -352,6 +358,33 @@ const Index = () => {
       if (isAccountComplete) {
         // If marked complete but not logged in, reset it
         sessionStorage.removeItem("lua_account_complete");
+      }
+      
+      // Get celebrated milestones
+      const celebratedMilestones: string[] = JSON.parse(
+        sessionStorage.getItem(MILESTONE_CELEBRATED_KEY) || "[]"
+      );
+      
+      // Check for milestone celebrations (soft nudges with confetti)
+      // 50% milestone
+      if (totalTasks && totalTasks > 0) {
+        const percentage = (completedCount / totalTasks) * 100;
+        if (percentage >= 50 && !celebratedMilestones.includes("halfway")) {
+          celebratedMilestones.push("halfway");
+          sessionStorage.setItem(MILESTONE_CELEBRATED_KEY, JSON.stringify(celebratedMilestones));
+          setMilestoneCelebrationType("halfway");
+          setShowMilestoneCelebration(true);
+          return;
+        }
+      }
+      
+      // 5 tasks milestone
+      if (completedCount >= 5 && !celebratedMilestones.includes("five_tasks")) {
+        celebratedMilestones.push("five_tasks");
+        sessionStorage.setItem(MILESTONE_CELEBRATED_KEY, JSON.stringify(celebratedMilestones));
+        setMilestoneCelebrationType("five_tasks");
+        setShowMilestoneCelebration(true);
+        return;
       }
       
       // After 2nd task - show signup dialog (hard blocking)
@@ -374,6 +407,16 @@ const Index = () => {
         setShowEmailCapture(true);
         return;
       }
+    }
+  };
+
+  const handleMilestoneSignup = () => {
+    setShowMilestoneCelebration(false);
+    // If we have an email, show signup prompt, otherwise show email capture
+    if (capturedEmail) {
+      setShowSignupPrompt(true);
+    } else {
+      setShowEmailCapture(true);
     }
   };
 
@@ -615,6 +658,14 @@ const Index = () => {
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={handleSignupComplete}
         capturedEmail={capturedEmail}
+      />
+
+      {/* Milestone celebration dialog - soft nudge at 5 tasks / 50% */}
+      <MilestoneCelebrationDialog
+        open={showMilestoneCelebration}
+        onOpenChange={setShowMilestoneCelebration}
+        milestoneType={milestoneCelebrationType}
+        onSignup={handleMilestoneSignup}
       />
     </div>
   );
