@@ -63,6 +63,9 @@ export const AdditionalInfo = ({ onComplete, user }: AdditionalInfoProps) => {
     { code: "+62", country: "Indonesië", flag: "🇮🇩", abbr: "ID", digits: 10 },
     { code: "+63", country: "Filipijnen", flag: "🇵🇭", abbr: "PH", digits: 10 },
     { code: "+82", country: "Zuid-Korea", flag: "🇰🇷", abbr: "KR", digits: 10 },
+    { code: "+597", country: "Suriname", flag: "🇸🇷", abbr: "SR", digits: 7 },
+    { code: "+599", country: "Curaçao", flag: "🇨🇼", abbr: "CW", digits: 7 },
+    { code: "+297", country: "Aruba", flag: "🇦🇼", abbr: "AW", digits: 7 },
   ];
 
   const handleLogout = async () => {
