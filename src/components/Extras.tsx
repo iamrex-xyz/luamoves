@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { FileText, Upload, Trash2, Download, FolderOpen, ArrowLeft, Users } from "lucide-react";
+import { FileText, Upload, Trash2, Download, FolderOpen, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -142,18 +142,8 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
   if (isGuest) {
     return (
       <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
-        <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onNavigate("dashboard")}
-            className="shrink-0"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex-1">
-            <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
-          </div>
+        <div className="px-4 pt-6 pb-2">
+          <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
         </div>
 
         <div className="px-4 py-12">
@@ -179,18 +169,8 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
-      <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onNavigate("dashboard")}
-          className="shrink-0"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
-        </div>
+      <div className="px-4 pt-6 pb-2">
+        <span className="text-2xl font-italiana text-foreground tracking-wide">Documenten</span>
       </div>
 
       <div className="px-4">
