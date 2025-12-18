@@ -199,8 +199,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2">
-                <h4 className={`font-medium text-sm leading-tight truncate ${
+              <div className="flex items-start justify-between gap-2">
+                <h4 className={`font-medium text-sm leading-snug ${
                   isCompleting 
                     ? "line-through text-primary-foreground" 
                     : task.status === "done" 
@@ -209,22 +209,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                 }`}>
                   {task.title}
                 </h4>
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="shrink-0">
                   {getUrgencyLabel()}
-                  {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                      onClick={(e) => handleRegelenClick(e, task)}
-                    >
-                      Regelen
-                      <ChevronRight className="w-3 h-3 ml-0.5" />
-                    </Button>
-                  )}
                 </div>
               </div>
-              <div className={`flex items-center gap-2 text-[11px] mt-0.5 ${
+              <div className={`flex items-center justify-between text-[11px] ${
                 isCompleting 
                   ? "text-primary-foreground/80" 
                   : isOverdue 
@@ -233,15 +222,28 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                       ? "text-warning/70"
                       : "text-muted-foreground"
               }`}>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {task.deadlineLabel}
-                </span>
-                {task.assignedToEmail && (
+                <div className="flex items-center gap-2">
                   <span className="flex items-center gap-1">
-                    <User className="w-3 h-3" />
-                    {task.assignedToEmail}
+                    <Clock className="w-3 h-3" />
+                    {task.deadlineLabel}
                   </span>
+                  {task.assignedToEmail && (
+                    <span className="flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      {task.assignedToEmail}
+                    </span>
+                  )}
+                </div>
+                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium -mr-1"
+                    onClick={(e) => handleRegelenClick(e, task)}
+                  >
+                    Regelen
+                    <ChevronRight className="w-3 h-3 ml-0.5" />
+                  </Button>
                 )}
               </div>
             </div>
