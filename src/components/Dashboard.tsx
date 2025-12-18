@@ -1,6 +1,4 @@
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
@@ -11,7 +9,6 @@ import { LuaLogo } from "@/components/LuaLogo";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
-import { useNavigate } from "react-router-dom";
 import {
   Clock,
   User,
@@ -36,7 +33,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
-  const navigate = useNavigate();
 
   // Filter alleen niet-afgeronde taken voor de homepage
   const openTasks = tasks.filter(t => t.status !== "done");
@@ -126,7 +122,27 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     deadline.setHours(0, 0, 0, 0);
     const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     const isOverdue = deadline < today && task.status !== "done";
+    const isDueToday = daysUntil === 0 && task.status !== "done";
+    const isDueSoon = daysUntil === 1 && task.status !== "done";
     const isCompleting = completingTasks.has(task.id);
+
+    // Determine urgency level for styling
+    const getUrgencyStyles = () => {
+      if (isCompleting) return "bg-primary animate-task-complete border-l-4 border-l-primary";
+      if (task.status === "done") return "bg-secondary/30 border-l-4 border-l-transparent";
+      if (isOverdue) return "bg-destructive/8 border-l-4 border-l-destructive hover:bg-destructive/12";
+      if (isDueToday) return "bg-warning/10 border-l-4 border-l-warning hover:bg-warning/15";
+      if (isDueSoon) return "bg-primary/5 border-l-4 border-l-primary/50 hover:bg-primary/10";
+      return "bg-secondary/50 border-l-4 border-l-transparent hover:bg-secondary";
+    };
+
+    const getUrgencyLabel = () => {
+      if (task.status === "done" || isCompleting) return null;
+      if (isOverdue) return <span className="text-[10px] font-medium text-destructive bg-destructive/10 px-1.5 py-0.5 rounded">Verlopen</span>;
+      if (isDueToday) return <span className="text-[10px] font-medium text-warning bg-warning/10 px-1.5 py-0.5 rounded">Vandaag</span>;
+      if (isDueSoon) return <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded">Morgen</span>;
+      return null;
+    };
 
     return (
       <SwipeableTaskItem
@@ -134,13 +150,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         disabled={task.status === "done" || isCompleting}
       >
         <div 
-          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${
-            isCompleting 
-              ? "bg-primary animate-task-complete" 
-              : isOverdue 
-                ? "bg-destructive/5 hover:bg-destructive/10" 
-                : "bg-secondary/50 hover:bg-secondary"
-          }`}
+          className={`group relative p-4 rounded-2xl transition-all duration-300 cursor-pointer ${getUrgencyStyles()}`}
           onClick={() => !isCompleting && handleTaskClick(task)}
         >
           <div className="flex items-start gap-4">
@@ -153,43 +163,41 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
               ) : task.status === "done" ? (
                 <CheckCircle2 className="h-5 w-5 text-primary" />
               ) : (
-                <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
+                <Circle className={`h-5 w-5 transition-colors ${
+                  isOverdue 
+                    ? "text-destructive/60 group-hover:text-destructive" 
+                    : isDueToday 
+                      ? "text-warning/60 group-hover:text-warning"
+                      : "text-muted-foreground/50 group-hover:text-primary/50"
+                }`} />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className={`font-medium text-sm mb-1 transition-all duration-200 ${
-                isCompleting 
-                  ? "line-through text-primary-foreground" 
-                  : task.status === "done" 
-                    ? "line-through text-muted-foreground" 
-                    : "text-foreground"
-              }`}>
-                {task.title}
-              </h4>
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h4 className={`font-medium text-sm transition-all duration-200 ${
+                  isCompleting 
+                    ? "line-through text-primary-foreground" 
+                    : task.status === "done" 
+                      ? "line-through text-muted-foreground" 
+                      : "text-foreground"
+                }`}>
+                  {task.title}
+                </h4>
+                {getUrgencyLabel()}
+              </div>
               <div className={`flex items-center gap-3 text-xs transition-colors duration-200 ${
-                isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isOverdue 
+                    ? "text-destructive/70"
+                    : isDueToday
+                      ? "text-warning/70"
+                      : "text-muted-foreground"
               }`}>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {task.deadlineLabel}
-                  {daysUntil === 0 && " (vandaag)"}
-                  {daysUntil === 1 && " (morgen)"}
-                  {isOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
                 </span>
-                {task.affiliateLink && task.status !== "done" && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10 -my-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
-                    }}
-                  >
-                    Regelen
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </Button>
-                )}
                 {task.assignedToEmail && (
                   <span className="flex items-center gap-1">
                     <User className="w-3 h-3" />
