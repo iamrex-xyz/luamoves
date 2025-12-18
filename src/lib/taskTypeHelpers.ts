@@ -6,12 +6,12 @@ export const isEnergyTask = (task: Task): boolean => {
   const titleLower = task.title.toLowerCase();
   const idLower = task.id.toLowerCase();
   return (
-    (titleLower.includes("energieleverancier") && titleLower.includes("vergelijk")) ||
+    titleLower.includes("energieleverancier") ||
     (titleLower.includes("energie") && titleLower.includes("vergelijk")) ||
     (titleLower.includes("energiecontract") && titleLower.includes("kiezen")) ||
-    titleLower === "energiecontract kiezen" ||
     idLower.includes("energie-vergelijk") ||
     idLower.includes("energy-compare") ||
+    idLower.includes("rent-phase1-5") ||
     idLower.includes("buy-phase2-12")
   );
 };
