@@ -10,6 +10,20 @@ import { LuaLogo } from "@/components/LuaLogo";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
+import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
+import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
+import { InternetQuestionsDialog } from "@/components/InternetQuestionsDialog";
+import { MovingQuestionsDialog } from "@/components/MovingQuestionsDialog";
+import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
+import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
+import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
+import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
+import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
+import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
+import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
+import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
+import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import {
   Clock,
   User,
@@ -17,6 +31,7 @@ import {
   Plus,
   Circle,
   ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
@@ -35,14 +50,38 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
 
+  // Question dialogs for affiliate tasks
+  const {
+    activeDialog,
+    handleRegelenClick,
+    handleDialogComplete,
+    handleDialogRedirect,
+    closeActiveDialog,
+  } = useQuestionDialogs(movingInfo);
+
   // Filter en sorteer taken voor de homepage
   const openTasks = useMemo(() => {
     const open = tasks.filter(t => t.status !== "done");
     return sortTasksSmart(open);
   }, [tasks]);
 
-  // Get top 5 sorted tasks (smart sorting already prioritizes affiliate tasks)
-  const displayTasks = useMemo(() => openTasks.slice(0, 5), [openTasks]);
+  // Get top 5 sorted tasks, ensuring at least 1 affiliate task is visible
+  const displayTasks = useMemo(() => {
+    const top5 = openTasks.slice(0, 5);
+    const hasAffiliate = top5.some(t => hasAffiliateOptions(t));
+    
+    if (hasAffiliate) {
+      return top5;
+    }
+    
+    // Find first affiliate task not in top 5 and swap it in
+    const firstAffiliateTask = openTasks.find((t, idx) => idx >= 5 && hasAffiliateOptions(t));
+    if (firstAffiliateTask && top5.length === 5) {
+      return [...top5.slice(0, 4), firstAffiliateTask];
+    }
+    
+    return top5;
+  }, [openTasks]);
 
   // Detect when all tasks become completed
   useEffect(() => {
@@ -172,24 +211,37 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                 </h4>
                 {getUrgencyLabel()}
               </div>
-              <div className={`flex items-center gap-3 text-xs transition-colors duration-200 ${
-                isCompleting 
-                  ? "text-primary-foreground/80" 
-                  : isOverdue 
-                    ? "text-destructive/70"
-                    : isDueToday
-                      ? "text-warning/70"
-                      : "text-muted-foreground"
-              }`}>
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {task.deadlineLabel}
-                </span>
-                {task.assignedToEmail && (
+              <div className="flex items-center justify-between gap-2">
+                <div className={`flex items-center gap-3 text-xs transition-colors duration-200 ${
+                  isCompleting 
+                    ? "text-primary-foreground/80" 
+                    : isOverdue 
+                      ? "text-destructive/70"
+                      : isDueToday
+                        ? "text-warning/70"
+                        : "text-muted-foreground"
+                }`}>
                   <span className="flex items-center gap-1">
-                    <User className="w-3 h-3" />
-                    {task.assignedToEmail}
+                    <Clock className="w-3 h-3" />
+                    {task.deadlineLabel}
                   </span>
+                  {task.assignedToEmail && (
+                    <span className="flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      {task.assignedToEmail}
+                    </span>
+                  )}
+                </div>
+                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="shrink-0 h-6 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                    onClick={(e) => handleRegelenClick(e, task)}
+                  >
+                    Regelen
+                    <ChevronRight className="w-3 h-3 ml-0.5" />
+                  </Button>
                 )}
               </div>
             </div>
@@ -336,6 +388,108 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
         onToggleStatus={handleTaskToggle}
+      />
+
+      {/* Question Dialogs */}
+      <EnergyQuestionsDialog
+        open={activeDialog === "energy"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("energy")}
+      />
+      <InternetQuestionsDialog
+        open={activeDialog === "internet"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("internet")}
+      />
+      <MovingQuestionsDialog
+        open={activeDialog === "moving"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("moving")}
+      />
+      <BoxesQuestionsDialog
+        open={activeDialog === "boxes"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("boxes")}
+      />
+      <InsuranceQuestionsDialog
+        open={activeDialog === "insurance"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("insurance")}
+      />
+      <LiabilityQuestionsDialog
+        open={activeDialog === "liability"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("liability")}
+      />
+      <PostNLPreparationDialog
+        open={activeDialog === "postNLPreparation"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={{
+          oldAddress: movingInfo.oldAddress,
+          newAddress: movingInfo.newAddress,
+          movingDate: movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined,
+        }}
+        onUpdateMovingInfo={(data) => {
+          handleDialogComplete({
+            ...data,
+            movingDate: data.movingDate?.toISOString(),
+          });
+        }}
+      />
+      <ParkingQuestionsDialog
+        open={activeDialog === "parking"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("parking")}
+      />
+      <CleaningQuestionsDialog
+        open={activeDialog === "cleaning"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("cleaning")}
+      />
+      <SmokeDetectorQuestionsDialog
+        open={activeDialog === "smokeDetector"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("smokeDetector")}
+      />
+      <GardenQuestionsDialog
+        open={activeDialog === "garden"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onRedirect={() => handleDialogRedirect("garden")}
+      />
+      <RenovationQuestionsDialog
+        open={activeDialog === "renovation"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        existingData={{
+          renovationBudget: movingInfo.renovationBudget,
+          renovationStartDate: movingInfo.renovationStartDate ? new Date(movingInfo.renovationStartDate) : undefined,
+        }}
+        onComplete={(data) => {
+          handleDialogComplete({
+            ...data,
+            renovationStartDate: data.renovationStartDate?.toISOString(),
+          });
+        }}
+        onRedirect={() => handleDialogRedirect("renovation")}
       />
 
       </PullToRefresh>
