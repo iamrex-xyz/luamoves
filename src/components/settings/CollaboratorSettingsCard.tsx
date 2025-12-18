@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Check, Trash2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ type Collaborator = {
 export const CollaboratorSettingsCard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [newCollaboratorEmail, setNewCollaboratorEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -44,6 +46,8 @@ export const CollaboratorSettingsCard = () => {
       setCollaborators(data || []);
     } catch (error) {
       console.error("Error loading collaborators:", error);
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -108,6 +112,28 @@ export const CollaboratorSettingsCard = () => {
       toast({ title: "Fout", description: "Kon huisgenoot niet verwijderen.", variant: "destructive" });
     }
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+        <div className="p-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-10 h-10 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-28" />
+            </div>
+          </div>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="flex gap-2">
+            <Skeleton className="flex-1 h-11 rounded-full" />
+            <Skeleton className="h-11 w-11 rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">

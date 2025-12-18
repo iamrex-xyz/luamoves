@@ -5,10 +5,12 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Users } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const HouseholdSettingsCard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [pets, setPets] = useState(0);
@@ -35,6 +37,8 @@ export const HouseholdSettingsCard = () => {
       }
     } catch (error) {
       console.error("Error loading profile:", error);
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -59,6 +63,39 @@ export const HouseholdSettingsCard = () => {
       setIsLoading(false);
     }
   };
+
+  if (isInitialLoading) {
+    return (
+      <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
+        <div className="p-4 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-10 h-10 rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-3 w-32" />
+            </div>
+          </div>
+        </div>
+        <div className="p-4 space-y-4">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-11 w-full rounded-xl" />
+            </div>
+          </div>
+          <Skeleton className="h-11 w-full rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
