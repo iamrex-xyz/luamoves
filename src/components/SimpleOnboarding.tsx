@@ -13,20 +13,20 @@ import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 
 const countryCodes = [
-  { code: "+31", country: "NL", flag: "🇳🇱" },
-  { code: "+32", country: "BE", flag: "🇧🇪" },
-  { code: "+49", country: "DE", flag: "🇩🇪" },
-  { code: "+33", country: "FR", flag: "🇫🇷" },
-  { code: "+44", country: "UK", flag: "🇬🇧" },
-  { code: "+1", country: "US", flag: "🇺🇸" },
-  { code: "+34", country: "ES", flag: "🇪🇸" },
-  { code: "+39", country: "IT", flag: "🇮🇹" },
-  { code: "+48", country: "PL", flag: "🇵🇱" },
-  { code: "+90", country: "TR", flag: "🇹🇷" },
-  { code: "+212", country: "MA", flag: "🇲🇦" },
-  { code: "+597", country: "SR", flag: "🇸🇷" },
-  { code: "+599", country: "CW", flag: "🇨🇼" },
-  { code: "+297", country: "AW", flag: "🇦🇼" },
+  { code: "+31", country: "NL" },
+  { code: "+32", country: "BE" },
+  { code: "+49", country: "DE" },
+  { code: "+33", country: "FR" },
+  { code: "+44", country: "UK" },
+  { code: "+1", country: "US" },
+  { code: "+34", country: "ES" },
+  { code: "+39", country: "IT" },
+  { code: "+48", country: "PL" },
+  { code: "+90", country: "TR" },
+  { code: "+212", country: "MA" },
+  { code: "+597", country: "SR" },
+  { code: "+599", country: "CW" },
+  { code: "+297", country: "AW" },
 ];
 
 type SimpleOnboardingProps = {
@@ -573,14 +573,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <Select value={countryCode} onValueChange={setCountryCode}>
                     <SelectTrigger className="w-[100px] h-14 rounded-xl border-2 border-muted focus:border-primary">
                       <SelectValue>
-                        {countryCodes.find(c => c.code === countryCode)?.flag} {countryCode}
+                        {countryCode}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white z-50">
                       {countryCodes.map((country) => (
                         <SelectItem key={country.code} value={country.code}>
                           <span className="flex items-center gap-2">
-                            <span>{country.flag}</span>
                             <span>{country.code}</span>
                             <span className="text-muted-foreground text-xs">({country.country})</span>
                           </span>
