@@ -236,7 +236,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                 </div>
                 {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
                   <button
-                    className="flex items-center text-[11px] text-primary hover:text-primary/80 font-medium"
+                    className="flex items-center text-[11px] text-primary hover:text-primary/80 hover:underline font-medium"
                     onClick={(e) => handleRegelenClick(e, task)}
                   >
                     Regelen
