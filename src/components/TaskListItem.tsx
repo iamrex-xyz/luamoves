@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
-import { Clock, Circle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
 
 type TaskListItemProps = {
   task: Task;
@@ -24,7 +25,47 @@ export const TaskListItem = ({
   today.setHours(0, 0, 0, 0);
   const deadline = new Date(task.deadline);
   deadline.setHours(0, 0, 0, 0);
+  const daysUntil = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   const isTaskOverdue = deadline < today && task.status !== "done";
+  const isDueToday = daysUntil === 0 && task.status !== "done";
+  const isDueSoon = daysUntil === 1 && task.status !== "done";
+
+  // Determine urgency level for styling
+  const getUrgencyStyles = () => {
+    if (isCompleting) return "bg-primary border-l-4 border-l-primary";
+    if (task.status === "done") return "bg-secondary/30 border-l-4 border-l-transparent";
+    if (isTaskOverdue) return "bg-destructive/8 border-l-4 border-l-destructive hover:bg-destructive/12";
+    if (isDueToday) return "bg-warning/10 border-l-4 border-l-warning hover:bg-warning/15";
+    if (isDueSoon) return "bg-primary/5 border-l-4 border-l-primary/50 hover:bg-primary/10";
+    return "bg-secondary/50 border-l-4 border-l-transparent hover:bg-secondary";
+  };
+
+  const getUrgencyBadge = () => {
+    if (task.status === "done" || isCompleting) return null;
+    if (isTaskOverdue) {
+      return (
+        <Badge variant="destructive" className="text-[10px] px-1.5 py-0 h-4 font-medium">
+          <AlertTriangle className="w-2.5 h-2.5 mr-0.5" />
+          Verlopen
+        </Badge>
+      );
+    }
+    if (isDueToday) {
+      return (
+        <Badge className="text-[10px] px-1.5 py-0 h-4 font-medium bg-warning text-warning-foreground">
+          Vandaag
+        </Badge>
+      );
+    }
+    if (isDueSoon) {
+      return (
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-medium text-primary">
+          Morgen
+        </Badge>
+      );
+    }
+    return null;
+  };
 
   return (
     <SwipeableTaskItem
@@ -32,13 +73,7 @@ export const TaskListItem = ({
       disabled={task.status === "done" || isCompleting}
     >
       <div
-        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
-          isCompleting 
-            ? "bg-primary animate-task-complete" 
-            : isTaskOverdue 
-              ? "bg-destructive/5 hover:bg-destructive/10" 
-              : "bg-secondary/50 hover:bg-secondary"
-        }`}
+        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
       >
         <div className="flex items-start gap-3">
@@ -51,36 +86,53 @@ export const TaskListItem = ({
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-5 w-5 text-primary" />
             ) : (
-              <Circle className="h-5 w-5 text-muted-foreground/50 group-hover:text-primary/50 transition-colors" />
+              <Circle className={`h-5 w-5 transition-colors ${
+                isTaskOverdue 
+                  ? "text-destructive/60 group-hover:text-destructive" 
+                  : isDueToday 
+                    ? "text-warning/60 group-hover:text-warning"
+                    : "text-muted-foreground/50 group-hover:text-primary/50"
+              }`} />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
-              isCompleting 
-                ? "line-through text-primary-foreground" 
-                : task.status === "done" 
-                  ? "line-through text-muted-foreground" 
-                  : "text-foreground"
-            }`}>
-              {task.title}
-            </h4>
-            <div className="flex items-center justify-between gap-2 mt-0.5">
+            <div className="flex items-start justify-between gap-2">
+              <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
+                isCompleting 
+                  ? "line-through text-primary-foreground" 
+                  : task.status === "done" 
+                    ? "line-through text-muted-foreground" 
+                    : "text-foreground"
+              }`}>
+                {task.title}
+              </h4>
+              {getUrgencyBadge()}
+            </div>
+            <div className="flex items-center justify-between gap-2 mt-1">
               <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                isCompleting ? "text-primary-foreground/80" : "text-muted-foreground"
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isTaskOverdue 
+                    ? "text-destructive/80"
+                    : isDueToday
+                      ? "text-warning/80"
+                      : "text-muted-foreground"
               }`}>
                 <Clock className="w-3 h-3" />
                 {task.deadlineLabel}
-                {isTaskOverdue && !isCompleting && <span className="text-destructive ml-1">(verlopen)</span>}
               </span>
-              {task.affiliateLink && task.status !== "done" && !isCompleting && (
+              {task.status !== "done" && !isCompleting && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="shrink-0 h-5 px-0 text-xs text-primary hover:text-primary hover:bg-transparent font-medium"
-                  onClick={(e) => onRegelenClick(e, task)}
+                  className="shrink-0 h-5 px-0 text-xs text-muted-foreground hover:text-primary hover:bg-transparent font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onTaskClick(task);
+                  }}
                 >
-                  Regelen
-                  <ArrowRight className="w-3 h-3 ml-1" />
+                  Bekijk
+                  <ChevronRight className="w-3 h-3 ml-0.5" />
                 </Button>
               )}
             </div>

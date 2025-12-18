@@ -49,6 +49,7 @@ All colors MUST be HSL.
     /* Refined accent colors with Dusk Blue */
     --success: 142 71% 45%;
     --warning: 35 91% 55%;
+    --warning-foreground: 25 97% 25%;
     --info: 228 35% 43%;
     
     /* Progress colors - warm gradient */
