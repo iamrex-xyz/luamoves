@@ -6,10 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, Mail, Check, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { z } from "zod";
 import { cn } from "@/lib/utils";
-
-const emailSchema = z.string().email({ message: "Voer een geldig e-mailadres in" });
+import { validateEmail as validateEmailUtil, cleanEmail } from "@/lib/validation";
 
 type Collaborator = {
   id: string;
@@ -52,13 +50,9 @@ export const CollaboratorSettingsCard = () => {
   };
 
   const validateEmail = (value: string) => {
-    const result = emailSchema.safeParse(value);
-    if (!result.success) {
-      setEmailError(result.error.errors[0]?.message || "Ongeldig e-mailadres");
-      return false;
-    }
-    setEmailError(null);
-    return true;
+    const result = validateEmailUtil(value);
+    setEmailError(result.error);
+    return result.isValid;
   };
 
   const handleInvite = async () => {
@@ -78,7 +72,7 @@ export const CollaboratorSettingsCard = () => {
         .from("moving_collaborators")
         .insert({
           owner_user_id: user.id,
-          collaborator_email: newCollaboratorEmail.trim().toLowerCase(),
+          collaborator_email: cleanEmail(newCollaboratorEmail),
           collaborator_user_id: null,
         });
 
