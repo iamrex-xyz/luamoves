@@ -12,13 +12,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Home as HomeIcon, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { z } from "zod";
-
-const postcodeSchema = z.string()
-  .transform(val => val.replace(/\s/g, '').toUpperCase())
-  .refine(val => val === '' || /^\d{4}[A-Z]{2}$/.test(val), {
-    message: "Voer een geldige postcode in (bijv. 1234 AB)"
-  });
+import { validateAddressPostcode, isSameAddress as checkSameAddress } from "@/lib/validation";
 
 type MovingSettingsCardProps = {
   movingInfo: MovingInfo;
@@ -81,32 +75,10 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     }
   };
 
-  const extractAddressParts = (address: string) => {
-    const postcodeMatch = address.match(/\b(\d{4}\s?[A-Za-z]{2})\b/);
-    const houseNumberMatch = address.match(/\b(\d+)\b/);
-    return {
-      postcode: postcodeMatch ? postcodeMatch[1].replace(/\s/g, '').toUpperCase() : '',
-      houseNumber: houseNumberMatch ? houseNumberMatch[1] : ''
-    };
-  };
-
   const validatePostcode = (address: string, setError: (error: string | null) => void) => {
-    if (!address) {
-      setError(null);
-      return true;
-    }
-    const { postcode } = extractAddressParts(address);
-    if (!postcode) {
-      setError("Adres moet een geldige postcode bevatten (bijv. 1234 AB)");
-      return false;
-    }
-    const result = postcodeSchema.safeParse(postcode);
-    if (!result.success) {
-      setError(result.error.errors[0]?.message || "Ongeldige postcode");
-      return false;
-    }
-    setError(null);
-    return true;
+    const result = validateAddressPostcode(address);
+    setError(result.error);
+    return result.isValid;
   };
 
   const handleOldAddressChange = (value: string) => {
@@ -119,14 +91,7 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     if (newAddressError) validatePostcode(value, setNewAddressError);
   };
 
-  const isSameAddress = () => {
-    const oldParts = extractAddressParts(oldAddress);
-    const newParts = extractAddressParts(newAddress);
-    if (oldParts.postcode && newParts.postcode && oldParts.houseNumber && newParts.houseNumber) {
-      return oldParts.postcode === newParts.postcode && oldParts.houseNumber === newParts.houseNumber;
-    }
-    return false;
-  };
+  const isSameAddress = () => checkSameAddress(oldAddress, newAddress);
 
   const isKeyHandoverAfterMoving = () => {
     if (!keyHandoverDateObj || !movingDateObj) return false;

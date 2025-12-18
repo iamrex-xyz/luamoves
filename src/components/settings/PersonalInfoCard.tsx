@@ -10,13 +10,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Phone, Cake } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { z } from "zod";
-
-const phoneSchema = z.string()
-  .transform(val => val.replace(/\s/g, ''))
-  .refine(val => val === '' || /^(\+31|0)[1-9][0-9]{8}$/.test(val), {
-    message: "Voer een geldig Nederlands telefoonnummer in (bijv. 0612345678)"
-  });
+import { validatePhone as validatePhoneUtil, cleanPhone } from "@/lib/validation";
 
 export const PersonalInfoCard = () => {
   const { toast } = useToast();
@@ -57,13 +51,9 @@ export const PersonalInfoCard = () => {
   };
 
   const validatePhone = (value: string) => {
-    const result = phoneSchema.safeParse(value);
-    if (!result.success) {
-      setPhoneError(result.error.errors[0]?.message || "Ongeldig telefoonnummer");
-      return false;
-    }
-    setPhoneError(null);
-    return true;
+    const result = validatePhoneUtil(value);
+    setPhoneError(result.error);
+    return result.isValid;
   };
 
   const handleSave = async () => {
@@ -78,11 +68,11 @@ export const PersonalInfoCard = () => {
       if (!user) return;
 
       const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
-      const cleanPhone = phone.replace(/\s/g, '');
+      const cleanedPhone = cleanPhone(phone);
 
       const { error } = await supabase
         .from("profiles")
-        .update({ phone: cleanPhone || null, birth_date: birthDateStr || null })
+        .update({ phone: cleanedPhone || null, birth_date: birthDateStr || null })
         .eq("user_id", user.id);
 
       if (error) throw error;
