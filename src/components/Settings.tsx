@@ -9,6 +9,7 @@ import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
 import { HouseholdSettingsCard } from "@/components/settings/HouseholdSettingsCard";
 import { PersonalInfoCard } from "@/components/settings/PersonalInfoCard";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
+import { LuaLogo } from "@/components/LuaLogo";
 import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon } from "lucide-react";
 
 type SettingsProps = {
@@ -31,7 +32,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
         <div className="px-6 pt-6 pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+              <LuaLogo size="lg" />
               <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
             </div>
           </div>
@@ -67,7 +68,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+            <LuaLogo size="lg" />
             <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
           </div>
           <Button
