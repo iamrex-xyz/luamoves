@@ -14,13 +14,10 @@ import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { useNavigate } from "react-router-dom";
 import {
   Clock,
-  LogOut,
   User,
   CheckCircle2,
   Plus,
-  ExternalLink,
   Circle,
-  Calendar,
   ArrowRight,
 } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -28,12 +25,11 @@ import { useState, useEffect } from "react";
 type DashboardProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
-  onLogout: () => void;
   onTaskComplete?: (completedCount: number) => void;
   onSignupClick?: () => void;
 };
 
-export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, onSignupClick }: DashboardProps) => {
+export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClick }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
@@ -215,19 +211,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onLogout, onTaskComplete, on
       
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <LuaLogo size="lg" />
-            <p className="text-sm text-muted-foreground mt-0.5">Jouw verhuis assistent</p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="h-10 w-10 rounded-full hover:bg-secondary"
-          >
-            <LogOut className="w-5 h-5 text-muted-foreground" />
-          </Button>
+        <div>
+          <LuaLogo size="lg" />
+          <p className="text-sm text-muted-foreground mt-0.5">Jouw verhuis assistent</p>
         </div>
       </div>
 

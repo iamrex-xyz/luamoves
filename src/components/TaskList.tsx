@@ -41,7 +41,6 @@ import { shouldShowTask } from "@/lib/smartQuestions";
 import {
   Filter,
   Loader2,
-  LogOut,
   Share2,
   User,
   Search,
@@ -51,7 +50,6 @@ import {
 type TaskListProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
-  onLogout: () => void;
   onTaskComplete?: (completedCount: number) => void;
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
   isGuest?: boolean;
@@ -63,7 +61,6 @@ type TaskListProps = {
 export const TaskList = ({ 
   movingInfo, 
   onNavigate, 
-  onLogout, 
   onTaskComplete, 
   onUpdateMovingInfo, 
   isGuest,
@@ -328,9 +325,6 @@ export const TaskList = ({
           {/* Action buttons */}
           <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10 rounded-xl">
             <Share2 className="w-4 h-4 text-muted-foreground" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onLogout} className="h-10 w-10 rounded-xl">
-            <LogOut className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
         
