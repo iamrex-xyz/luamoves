@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
+import { sortTasksSmart } from "@/lib/taskSorting";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
@@ -17,7 +18,7 @@ import {
   Circle,
   ArrowRight,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -34,11 +35,14 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
 
-  // Filter alleen niet-afgeronde taken voor de homepage
-  const openTasks = tasks.filter(t => t.status !== "done");
+  // Filter en sorteer taken voor de homepage
+  const openTasks = useMemo(() => {
+    const open = tasks.filter(t => t.status !== "done");
+    return sortTasksSmart(open);
+  }, [tasks]);
 
-  // Ensure at least 1 affiliate task is visible in the first 5 tasks
-  const displayTasks = (() => {
+  // Get top 5 sorted tasks, ensuring at least 1 affiliate task is visible
+  const displayTasks = useMemo(() => {
     const first5 = openTasks.slice(0, 5);
     const hasAffiliateInFirst5 = first5.some(t => t.affiliateLink);
     
@@ -55,7 +59,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     }
     
     return first5;
-  })();
+  }, [openTasks]);
 
   // Detect when all tasks become completed
   useEffect(() => {

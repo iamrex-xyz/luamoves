@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
 import { isEnergyTask, isMovingTask } from "@/lib/taskTypeHelpers";
+import { sortTasksSmart } from "@/lib/taskSorting";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { ShareMovingDialog } from "@/components/ShareMovingDialog";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
@@ -214,7 +215,7 @@ export const TaskList = ({
     });
   }, [tasks, filter, selectedCategories, searchQuery, movingInfo]);
 
-  // Group tasks by phase
+  // Group tasks by phase and sort by urgency
   const tasksByPhase = useMemo(() => {
     const phaseOrder = [
       "Fase 1 - Je nieuwe thuis is bevestigd",
@@ -233,12 +234,17 @@ export const TaskList = ({
       phases[task.phase].push(task);
     });
     
+    // Sort tasks within each phase by urgency/deadline
     const sortedPhases: { [key: string]: Task[] } = {};
     phaseOrder.forEach(phase => {
-      if (phases[phase]) sortedPhases[phase] = phases[phase];
+      if (phases[phase]) {
+        sortedPhases[phase] = sortTasksSmart(phases[phase]);
+      }
     });
     Object.keys(phases).forEach(phase => {
-      if (!sortedPhases[phase]) sortedPhases[phase] = phases[phase];
+      if (!sortedPhases[phase]) {
+        sortedPhases[phase] = sortTasksSmart(phases[phase]);
+      }
     });
     
     return sortedPhases;
