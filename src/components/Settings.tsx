@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { MovingInfo } from "@/pages/Index";
 import { BottomNav } from "@/components/BottomNav";
 import { ReminderSettingsListItem, ReminderSettingsSheet } from "@/components/ReminderSettings";
@@ -8,18 +9,57 @@ import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
 import { HouseholdSettingsCard } from "@/components/settings/HouseholdSettingsCard";
 import { PersonalInfoCard } from "@/components/settings/PersonalInfoCard";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
-import { LogOut, ChevronRight, Sparkles } from "lucide-react";
+import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   onLogout: () => void;
   onUpdate: (info: MovingInfo) => void;
+  isGuest?: boolean;
+  onSignupClick?: () => void;
 };
 
-export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate }: SettingsProps) => {
+export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick }: SettingsProps) => {
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
   const [extraInfoSheetOpen, setExtraInfoSheetOpen] = useState(false);
+
+  // Guest UI
+  if (isGuest) {
+    return (
+      <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+        <div className="px-6 pt-6 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+              <p className="text-sm text-muted-foreground mt-0.5">Instellingen</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 space-y-6">
+          {/* Moving Details Card - works for guests */}
+          <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
+
+          {/* Signup prompt */}
+          <Card className="p-6 text-center">
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <SettingsIcon className="h-7 w-7 text-primary" />
+            </div>
+            <h3 className="font-medium mb-2">Meer instellingen beschikbaar</h3>
+            <p className="text-sm text-muted-foreground mb-6">
+              Maak een account aan om huishouden, herinneringen en samenwerkingsopties te beheren.
+            </p>
+            <Button onClick={onSignupClick} className="rounded-xl">
+              Account aanmaken
+            </Button>
+          </Card>
+        </div>
+
+        <BottomNav currentView="settings" onNavigate={onNavigate} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">

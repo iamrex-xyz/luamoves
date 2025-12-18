@@ -25,7 +25,7 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
-            const showBadge = (item.id === "extras" || item.id === "chat") && unreadCount > 0;
+            const showBadge = item.id === "chat" && unreadCount > 0;
             
             return (
               <button
