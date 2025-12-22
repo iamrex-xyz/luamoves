@@ -40,14 +40,18 @@ type SignupPromptDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSignupComplete: () => void;
+  onDefer?: () => void;
   capturedEmail?: string;
+  isHardBlock?: boolean;
 };
 
 export const SignupPromptDialog = ({
   open,
   onOpenChange,
   onSignupComplete,
+  onDefer,
   capturedEmail = "",
+  isHardBlock = false,
 }: SignupPromptDialogProps) => {
   const { toast } = useToast();
   
@@ -299,16 +303,25 @@ export const SignupPromptDialog = ({
   };
 
   const handleLater = () => {
+    // Only allow "Later" for non-hard-block modals
+    if (isHardBlock) return;
+    
     trackEvent("signup_prompt_skipped");
-    onOpenChange(false);
+    if (onDefer) {
+      onDefer();
+    } else {
+      onOpenChange(false);
+    }
   };
 
   return (
-    <MobileModal open={open} onOpenChange={onOpenChange}>
+    <MobileModal open={open} onOpenChange={() => {}}>
       <MobileModalContent 
         className="max-h-[85vh]"
-        showCloseButton={true}
+        showCloseButton={!isHardBlock}
         onCloseClick={handleLater}
+        onPointerDownOutside={(e) => isHardBlock && e.preventDefault()}
+        onEscapeKeyDown={(e) => isHardBlock && e.preventDefault()}
       >
         {currentStep === 1 ? (
           <>

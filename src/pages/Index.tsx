@@ -8,7 +8,7 @@ import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
 import { EmailCaptureDialog } from "@/components/EmailCaptureDialog";
 import { SignupPromptDialog } from "@/components/SignupPromptDialog";
-import { MilestoneCelebrationDialog } from "@/components/MilestoneCelebrationDialog";
+// MilestoneCelebrationDialog removed - not used in strict flow
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -431,6 +431,7 @@ const Index = () => {
           open={signupFlow.showEmailCapture}
           onOpenChange={signupFlow.setShowEmailCapture}
           onEmailSubmit={signupFlow.handleEmailSubmit}
+          onDismiss={signupFlow.handleEmailDismiss}
           isHardBlock={signupFlow.isEmailHardBlock}
         />
 
@@ -439,16 +440,11 @@ const Index = () => {
           open={signupFlow.showSignupPrompt}
           onOpenChange={signupFlow.setShowSignupPrompt}
           onSignupComplete={signupFlow.handleSignupComplete}
+          onDefer={signupFlow.handleSignupDefer}
           capturedEmail={signupFlow.capturedEmail}
+          isHardBlock={signupFlow.isSignupHardBlock}
         />
 
-        {/* Milestone celebration dialog */}
-        <MilestoneCelebrationDialog
-          open={signupFlow.showMilestoneCelebration}
-          onOpenChange={signupFlow.setShowMilestoneCelebration}
-          milestoneType={signupFlow.milestoneCelebrationType}
-          onSignup={signupFlow.handleMilestoneSignup}
-        />
       </div>
     </ErrorBoundary>
   );
