@@ -60,6 +60,7 @@ const Index = () => {
         hasJob: profile.has_job !== false,
         children: profile.children || 0,
         pets: profile.pets || 0,
+        movingBudget: profile.moving_budget || undefined,
         hasGas: (profile as any).has_gas,
         hasSmartMeter: (profile as any).has_smart_meter,
         glasvezel: (profile as any).glasvezel,
@@ -131,6 +132,7 @@ const Index = () => {
           has_job: info.hasJob !== false,
           children: info.children || 0,
           pets: info.pets || 0,
+          moving_budget: info.movingBudget || null,
           has_gas: info.hasGas || null,
           has_smart_meter: info.hasSmartMeter || null,
           glasvezel: info.glasvezel || null,
@@ -268,6 +270,7 @@ const Index = () => {
             has_job: updatedInfo.hasJob !== false,
             children: updatedInfo.children || 0,
             pets: updatedInfo.pets || 0,
+            moving_budget: updatedInfo.movingBudget || null,
             has_gas: updatedInfo.hasGas || null,
             has_smart_meter: updatedInfo.hasSmartMeter || null,
             glasvezel: updatedInfo.glasvezel || null,
@@ -415,6 +418,7 @@ const Index = () => {
             onUpdate={setMovingInfo}
             isGuest={!user}
             onSignupClick={signupFlow.handleBadgeClick}
+            onTaskComplete={signupFlow.handleTaskComplete}
           />
         )}
         {currentView === "chat" && movingInfo && (
