@@ -33,7 +33,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
-const MAX_TASKS_ON_HOME = 5;
+const MAX_TASKS_ON_HOME = 3;
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -136,7 +136,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const dayNumber = moveDate.getDate();
   const monthName = moveDate.toLocaleDateString("nl-NL", { month: "short" });
 
-  const CompactTaskItem = ({ task, index }: { task: Task; index: number }) => {
+  const CompactTaskItem = ({ task }: { task: Task }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const deadline = new Date(task.deadline);
@@ -145,14 +145,18 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     const isOverdue = deadline < today && task.status !== "done";
     const isDueToday = daysUntil === 0 && task.status !== "done";
     const isCompleting = completingTasks.has(task.id);
-    const isAffiliate = hasAffiliateOptions(task);
 
     const getUrgencyStyles = () => {
-      if (isCompleting) return "bg-primary";
-      if (isOverdue) return "bg-destructive/8";
-      if (isDueToday) return "bg-warning/8";
-      if (isAffiliate) return "bg-primary/5";
-      return "bg-secondary/30 hover:bg-secondary/50";
+      if (isCompleting) return "bg-primary border-l-2 border-l-primary";
+      if (isOverdue) return "bg-destructive/8 border-l-2 border-l-destructive";
+      if (isDueToday) return "bg-warning/10 border-l-2 border-l-warning";
+      return "bg-secondary/40 border-l-2 border-l-transparent hover:bg-secondary/60";
+    };
+
+    const getUrgencyBadge = () => {
+      if (isOverdue) return <span className="text-[9px] font-medium text-destructive px-1.5 py-0.5 rounded bg-destructive/10">!</span>;
+      if (isDueToday) return <span className="text-[9px] font-medium text-warning px-1.5 py-0.5 rounded bg-warning/10">Nu</span>;
+      return null;
     };
 
     return (
@@ -161,60 +165,49 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         disabled={task.status === "done" || isCompleting}
       >
         <div 
-          className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all cursor-pointer animate-fade-in ${getUrgencyStyles()}`}
-          style={{ 
-            animationDelay: `${index * 50}ms`, 
-            animationFillMode: 'backwards',
-          }}
+          className={`group px-3 py-2 rounded-xl transition-all cursor-pointer ${getUrgencyStyles()}`}
           onClick={() => !isCompleting && handleTaskClick(task)}
         >
-          {/* Checkbox */}
-          <button 
-            className="shrink-0 w-5 h-5 flex items-center justify-center"
-            onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
-          >
-            {isCompleting ? (
-              <CheckCircle2 className="w-5 h-5 text-primary-foreground animate-scale-in" />
-            ) : (
-              <Circle className={`w-5 h-5 transition-colors ${
-                isOverdue ? "text-destructive" : isDueToday ? "text-warning" : "text-muted-foreground/40 hover:text-primary/60"
-              }`} />
-            )}
-          </button>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 flex items-center gap-2">
-            <span className={`text-sm font-medium truncate ${
-              isCompleting ? "text-primary-foreground" : "text-foreground"
-            }`}>
-              {task.title}
-            </span>
-            {isOverdue && !isCompleting && (
-              <span className="shrink-0 text-[9px] font-semibold text-destructive bg-destructive/10 px-1.5 py-0.5 rounded">!</span>
-            )}
-            {isDueToday && !isOverdue && !isCompleting && (
-              <span className="shrink-0 text-[9px] font-semibold text-warning bg-warning/10 px-1.5 py-0.5 rounded">Nu</span>
-            )}
-          </div>
-
-          {/* Right side: Regelen button or deadline */}
-          <div className="shrink-0 flex items-center">
-            {isAffiliate && !isCompleting ? (
-              <button
-                className="flex items-center gap-0.5 text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full hover:bg-primary/20 transition-colors"
-                onClick={(e) => handleRegelenClick(e, task)}
-              >
-                Regelen
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <span className={`text-[10px] flex items-center gap-1 ${
-                isCompleting ? "text-primary-foreground/80" : isOverdue ? "text-destructive/70" : isDueToday ? "text-warning/70" : "text-muted-foreground"
+          <div className="flex items-center gap-2.5">
+            <div 
+              className="shrink-0 cursor-pointer"
+              onClick={(e) => !isCompleting && handleCheckboxClick(e, task)}
+            >
+              {isCompleting ? (
+                <CheckCircle2 className="h-4 w-4 text-primary-foreground animate-scale-in" />
+              ) : (
+                <Circle className={`h-4 w-4 transition-colors ${
+                  isOverdue ? "text-destructive/60" : isDueToday ? "text-warning/60" : "text-muted-foreground/40"
+                }`} />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-medium truncate ${
+                  isCompleting ? "text-primary-foreground" : "text-foreground"
+                }`}>
+                  {task.title}
+                </span>
+                {getUrgencyBadge()}
+              </div>
+            </div>
+            <div className="shrink-0 flex items-center gap-1">
+              {hasAffiliateOptions(task) && !isCompleting && (
+                <button
+                  className="text-[10px] text-primary font-medium flex items-center hover:underline"
+                  onClick={(e) => handleRegelenClick(e, task)}
+                >
+                  Regelen
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              )}
+              <span className={`text-[10px] flex items-center gap-0.5 ${
+                isOverdue ? "text-destructive/70" : isDueToday ? "text-warning/70" : "text-muted-foreground"
               }`}>
-                <Clock className="w-3 h-3" />
+                <Clock className="w-2.5 h-2.5" />
                 {task.deadlineLabel}
               </span>
-            )}
+            </div>
           </div>
         </div>
       </SwipeableTaskItem>
@@ -264,12 +257,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   <p className="text-lg font-semibold text-foreground">{daysUntilMove} dagen</p>
                 </div>
 
-                {/* Progress Ring - Compact & Interactive */}
-                <button
-                  onClick={() => onNavigate("tasks")}
-                  className="relative w-12 h-12 shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                  aria-label="Bekijk alle taken"
-                >
+                {/* Progress Ring - Compact */}
+                <div className="relative w-12 h-12 shrink-0">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 48 48">
                     <circle
                       cx="24"
@@ -295,42 +284,39 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-xs font-bold text-foreground">{Math.round(progressPercentage)}%</span>
                   </div>
-                </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Tasks Section */}
+        {/* Tasks Section - Flex grow with fixed max */}
         <div className="flex-1 flex flex-col min-h-0">
-          <div className="shrink-0 flex items-center justify-between mb-2">
+          <div className="shrink-0 mb-2">
             <h2 className="text-sm font-semibold text-foreground">Dit pak je als eerste aan</h2>
-            <span className="text-xs text-muted-foreground">{completedTasks}/{totalTasks} klaar</span>
           </div>
 
           {isLoading ? (
-            <div className="flex-1 flex items-center justify-center bg-white rounded-2xl shadow-sm">
+            <div className="flex-1 flex items-center justify-center">
               <div className="animate-pulse text-muted-foreground text-sm">Laden...</div>
             </div>
           ) : openTasks.length > 0 ? (
-            <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-sm p-2.5 overflow-hidden">
-              <div className="flex-1 space-y-1 overflow-hidden">
-                {displayTasks.map((task, index) => (
-                  <CompactTaskItem key={task.id} task={task} index={index} />
+            <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-md shadow-primary/5 p-3 overflow-hidden">
+              <div className="flex-1 space-y-1.5 overflow-hidden">
+                {displayTasks.map((task) => (
+                  <CompactTaskItem key={task.id} task={task} />
                 ))}
               </div>
               
               {/* Always visible: View all tasks button */}
-              {openTasks.length > MAX_TASKS_ON_HOME && (
-                <Button
-                  variant="ghost"
-                  className="shrink-0 w-full h-9 mt-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl"
-                  onClick={() => onNavigate("tasks")}
-                >
-                  Bekijk alle {openTasks.length} taken
-                  <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-                </Button>
-              )}
+              <Button
+                variant="ghost"
+                className="shrink-0 w-full h-10 mt-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-xl"
+                onClick={() => onNavigate("tasks")}
+              >
+                Bekijk alle {openTasks.length} taken
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-2xl shadow-md shadow-primary/5 p-4">
