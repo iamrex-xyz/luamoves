@@ -6,7 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Mail, Sparkles, Phone } from "lucide-react";
+import { Loader2, Mail, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { trackEvent } from "@/lib/analytics";
 import { z } from "zod";
@@ -16,9 +16,8 @@ const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
 type EmailCaptureDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onEmailSubmit: (email: string, phone?: string) => void;
+  onEmailSubmit: (email: string) => void;
   isHardBlock?: boolean;
-  showPhoneField?: boolean;
 };
 
 export const EmailCaptureDialog = ({
@@ -26,11 +25,9 @@ export const EmailCaptureDialog = ({
   onOpenChange,
   onEmailSubmit,
   isHardBlock = false,
-  showPhoneField = false,
 }: EmailCaptureDialogProps) => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,7 +35,6 @@ export const EmailCaptureDialog = ({
     if (open) {
       trackEvent("email_modal_shown");
       setEmail("");
-      setPhone("");
       setEmailError("");
     }
   }, [open]);
@@ -61,11 +57,11 @@ export const EmailCaptureDialog = ({
     setIsLoading(true);
 
     try {
-      trackEvent("email_submitted", { hasPhone: !!phone.trim() });
-      onEmailSubmit(email, phone.trim() || undefined);
+      trackEvent("email_submitted");
+      onEmailSubmit(email);
       toast({
         title: "Top!",
-        description: isHardBlock ? "Nu nog even je account afronden." : "We bewaren je voortgang.",
+        description: "Ik bewaar je voortgang.",
       });
     } catch (error: any) {
       toast({
@@ -103,18 +99,15 @@ export const EmailCaptureDialog = ({
             </div>
             <div>
               <h2 className="text-2xl font-bold">
-                {isHardBlock ? "Je bent lekker op dreef!" : "Topstart!"}
+                Zal ik je voortgang bewaren?
               </h2>
               <p className="text-muted-foreground mt-2">
-{isHardBlock 
-                  ? "Vul je e-mail in zodat we je voortgang veilig kunnen bewaren."
-                  : "Laat je e-mail achter, dan bewaren we je voortgang."
-                }
+                Dan kun je later gewoon verder waar je gebleven was.
               </p>
             </div>
           </div>
 
-          {/* Form */}
+          {/* Form - only email */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="capture-email" className="flex items-center gap-2 text-base">
@@ -141,27 +134,6 @@ export const EmailCaptureDialog = ({
                 <p className="text-sm text-destructive">{emailError}</p>
               )}
             </div>
-
-            {showPhoneField && (
-              <div className="space-y-2">
-                <Label htmlFor="capture-phone" className="flex items-center gap-2 text-base">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  Telefoonnummer
-                  <span className="text-muted-foreground text-sm font-normal">(optioneel)</span>
-                </Label>
-                <Input
-                  id="capture-phone"
-                  type="tel"
-                  placeholder="06 12345678"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="h-14 rounded-xl text-base"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Handig als je partners contact met je willen opnemen.
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -178,7 +150,7 @@ export const EmailCaptureDialog = ({
                 Bezig...
               </>
             ) : (
-              "Opslaan"
+              "Bewaren"
             )}
           </Button>
 
@@ -188,12 +160,12 @@ export const EmailCaptureDialog = ({
               onClick={handleLater}
               className="w-full h-12 rounded-xl text-base text-muted-foreground"
             >
-              Later
+              Ik doe het later wel
             </Button>
           )}
 
           <p className="text-xs text-center text-muted-foreground">
-            We gebruiken je e-mail alleen voor je verhuizing. Geen spam.
+            Alleen voor je verhuizing. Geen spam, beloofd.
           </p>
         </div>
       </MobileModalContent>
