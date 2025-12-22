@@ -1,17 +1,13 @@
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Sparkles, Loader2 } from "lucide-react";
+import { Send, Sparkles, Loader2, Trash2 } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { trackEvent } from "@/lib/analytics";
 import { toast } from "sonner";
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+import { useChatHistory } from "@/hooks/useChatHistory";
 
 type LuaAIChatProps = {
   movingInfo: MovingInfo;
@@ -20,12 +16,7 @@ type LuaAIChatProps = {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/lua-chat`;
 
 export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: "Hoi! Ik ben Lua 👋\nWaar kan ik je nu mee helpen bij je verhuizing?",
-    },
-  ]);
+  const { messages, setMessages, addMessage, updateLastMessage, clearHistory } = useChatHistory();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -46,8 +37,8 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input.trim() };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage = { role: "user" as const, content: input.trim() };
+    addMessage(userMessage);
     setInput("");
     setIsLoading(true);
 
@@ -92,7 +83,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
       let textBuffer = "";
 
       // Add empty assistant message that we'll update
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      addMessage({ role: "assistant", content: "" });
 
       while (true) {
         const { done, value } = await reader.read();
@@ -117,14 +108,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
               assistantContent += content;
-              setMessages((prev) => {
-                const newMessages = [...prev];
-                const lastIndex = newMessages.length - 1;
-                if (newMessages[lastIndex]?.role === "assistant") {
-                  newMessages[lastIndex] = { ...newMessages[lastIndex], content: assistantContent };
-                }
-                return newMessages;
-              });
+              updateLastMessage(assistantContent);
             }
           } catch {
             // Incomplete JSON, put back and wait for more data
@@ -148,14 +132,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
               assistantContent += content;
-              setMessages((prev) => {
-                const newMessages = [...prev];
-                const lastIndex = newMessages.length - 1;
-                if (newMessages[lastIndex]?.role === "assistant") {
-                  newMessages[lastIndex] = { ...newMessages[lastIndex], content: assistantContent };
-                }
-                return newMessages;
-              });
+              updateLastMessage(assistantContent);
             }
           } catch {
             /* ignore partial leftovers */
@@ -184,14 +161,30 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
   return (
     <Card className="flex flex-col h-[calc(100vh-200px)] min-h-[400px]">
       <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm">Lua</h3>
+              <p className="text-xs text-muted-foreground">Je verhuisassistent</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-sm">Lua</h3>
-            <p className="text-xs text-muted-foreground">Je verhuisassistent</p>
-          </div>
+          {messages.length > 1 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                clearHistory();
+                toast.success("Chat geschiedenis gewist");
+              }}
+              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+              title="Wis chat geschiedenis"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
 
