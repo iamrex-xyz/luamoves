@@ -260,7 +260,12 @@ export const TaskList = ({
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <main 
+      id="main-content" 
+      tabIndex={-1}
+      className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
+      aria-label="Takenlijst"
+    >
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       {/* Header with Logo */}
@@ -558,6 +563,6 @@ export const TaskList = ({
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
-    </div>
+    </main>
   );
 };

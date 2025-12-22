@@ -269,7 +269,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <main 
+      id="main-content" 
+      tabIndex={-1}
+      className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
+      aria-label="Dashboard"
+    >
       <PullToRefresh onRefresh={refreshTasks} className="min-h-screen">
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
@@ -541,6 +546,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       </PullToRefresh>
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
-    </div>
+    </main>
   );
 };

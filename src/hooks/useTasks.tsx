@@ -1,10 +1,11 @@
-import { useState, useEffect, createElement } from "react";
+import { useState, useEffect, createElement, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Task, generateTasksForRenter, generateTasksForBuyer, HouseholdInfo } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/pages/Index";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { Package } from "lucide-react";
+import { useAnnounce } from "@/hooks/useAccessibility";
 
 const GUEST_TASKS_KEY = "lua_guest_tasks";
 
@@ -13,6 +14,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(false);
   const { toast } = useToast();
+  const { announce } = useAnnounce();
 
   useEffect(() => {
     loadTasks();
@@ -197,6 +199,9 @@ export const useTasks = (movingInfo: MovingInfo) => {
         
         // Show toast with undo option when completing a task
         if (newStatus === "done" && showUndo) {
+          // Screen reader announcement
+          announce(`Taak "${task?.title}" afgerond`);
+          
           toast({
             title: "Taak afgerond!",
             action: (
@@ -206,6 +211,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
             ),
           });
         } else {
+          announce(newStatus === "done" ? `Taak "${task?.title}" afgerond` : "Status bijgewerkt");
           toast({
             title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
           });
@@ -235,6 +241,9 @@ export const useTasks = (movingInfo: MovingInfo) => {
 
       // Show toast with undo option when completing a task
       if (newStatus === "done" && showUndo) {
+        // Screen reader announcement
+        announce(`Taak "${task?.title}" afgerond`);
+        
         toast({
           title: "Taak afgerond!",
           description: "Je voortgang is opgeslagen.",
@@ -245,6 +254,7 @@ export const useTasks = (movingInfo: MovingInfo) => {
           ),
         });
       } else {
+        announce(newStatus === "done" ? `Taak "${task?.title}" afgerond` : "Status bijgewerkt");
         toast({
           title: newStatus === "done" ? "Taak afgerond!" : "Status bijgewerkt",
           description: "Je voortgang is opgeslagen.",
