@@ -1,16 +1,36 @@
 import { useState, useEffect, useCallback } from "react";
 import { MovingInfo } from "@/types/moving";
 
+/**
+ * STRICT ACCOUNT FLOW STATE FLAGS
+ * All flags persist in localStorage
+ */
 const STORAGE_KEYS = {
+  // Core data
   MOVING_INFO: "lua_moving_info",
   GUEST_TASKS: "lua_guest_tasks",
-  EMAIL_PROMPTED: "lua_email_prompted",
-  SIGNUP_PROMPTED: "lua_signup_prompted",
+  
+  // Account state
+  HAS_ACCOUNT: "lua_has_account",
+  COMPLETED_TASK_COUNT: "lua_completed_task_count",
+  
+  // Email capture state (Step 1)
+  EMAIL_CAPTURED: "lua_email_captured",
+  EMAIL_PROMPT_SHOWN: "lua_email_prompt_shown",
+  EMAIL_PROMPT_DISMISSED: "lua_email_prompt_dismissed",
   CAPTURED_EMAIL: "lua_captured_email",
   CAPTURED_PHONE: "lua_captured_phone",
-  MILESTONES_CELEBRATED: "lua_milestones_celebrated",
-  ACCOUNT_COMPLETE: "lua_account_complete",
+  
+  // Account creation state (Step 2)
+  ACCOUNT_PROMPT_SHOWN: "lua_account_prompt_shown",
+  ACCOUNT_PROMPT_DEFERRED: "lua_account_prompt_deferred",
+  
+  // Guest limit state
+  GUEST_LIMIT_REACHED: "lua_guest_limit_reached",
 } as const;
+
+// Maximum tasks a guest can complete before forced account creation
+const MAX_GUEST_TASKS = 5;
 
 export const useGuestStorage = () => {
   const [movingInfo, setMovingInfoState] = useState<MovingInfo | null>(null);
@@ -39,6 +59,7 @@ export const useGuestStorage = () => {
     }
   }, []);
 
+  // === MOVING INFO ===
   const setMovingInfo = useCallback((info: MovingInfo | null) => {
     setMovingInfoState(info);
     if (info) {
@@ -57,12 +78,15 @@ export const useGuestStorage = () => {
     });
   }, []);
 
+  // === EMAIL & PHONE ===
   const setCapturedEmail = useCallback((email: string) => {
     setCapturedEmailState(email);
     if (email) {
       localStorage.setItem(STORAGE_KEYS.CAPTURED_EMAIL, email);
+      localStorage.setItem(STORAGE_KEYS.EMAIL_CAPTURED, "true");
     } else {
       localStorage.removeItem(STORAGE_KEYS.CAPTURED_EMAIL);
+      localStorage.removeItem(STORAGE_KEYS.EMAIL_CAPTURED);
     }
   }, []);
 
@@ -75,6 +99,11 @@ export const useGuestStorage = () => {
     }
   }, []);
 
+  const isEmailCaptured = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.EMAIL_CAPTURED) === "true";
+  }, []);
+
+  // === GUEST TASKS ===
   const getGuestTasks = useCallback((): Record<string, "todo" | "in_progress" | "done"> => {
     const saved = localStorage.getItem(STORAGE_KEYS.GUEST_TASKS);
     if (saved) {
@@ -94,54 +123,103 @@ export const useGuestStorage = () => {
   }, [getGuestTasks]);
 
   const getCompletedTaskCount = useCallback((): number => {
-    const tasks = getGuestTasks();
-    return Object.values(tasks).filter((status) => status === "done").length;
-  }, [getGuestTasks]);
-
-  const isEmailPrompted = useCallback((): boolean => {
-    return localStorage.getItem(STORAGE_KEYS.EMAIL_PROMPTED) === "true";
+    const saved = localStorage.getItem(STORAGE_KEYS.COMPLETED_TASK_COUNT);
+    return saved ? parseInt(saved, 10) : 0;
   }, []);
 
-  const setEmailPrompted = useCallback((value: boolean) => {
+  const setCompletedTaskCount = useCallback((count: number) => {
+    localStorage.setItem(STORAGE_KEYS.COMPLETED_TASK_COUNT, count.toString());
+  }, []);
+
+  const incrementCompletedTaskCount = useCallback((): number => {
+    const current = getCompletedTaskCount();
+    const newCount = current + 1;
+    setCompletedTaskCount(newCount);
+    return newCount;
+  }, [getCompletedTaskCount, setCompletedTaskCount]);
+
+  // === ACCOUNT STATE FLAGS ===
+  const hasAccount = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.HAS_ACCOUNT) === "true";
+  }, []);
+
+  const setHasAccount = useCallback((value: boolean) => {
     if (value) {
-      localStorage.setItem(STORAGE_KEYS.EMAIL_PROMPTED, "true");
+      localStorage.setItem(STORAGE_KEYS.HAS_ACCOUNT, "true");
     } else {
-      localStorage.removeItem(STORAGE_KEYS.EMAIL_PROMPTED);
+      localStorage.removeItem(STORAGE_KEYS.HAS_ACCOUNT);
     }
   }, []);
 
-  const getCelebratedMilestones = useCallback((): string[] => {
-    const saved = localStorage.getItem(STORAGE_KEYS.MILESTONES_CELEBRATED);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [];
+  // === EMAIL PROMPT FLAGS (Step 1) ===
+  const isEmailPromptShown = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.EMAIL_PROMPT_SHOWN) === "true";
   }, []);
 
-  const addCelebratedMilestone = useCallback((milestone: string) => {
-    const milestones = getCelebratedMilestones();
-    if (!milestones.includes(milestone)) {
-      milestones.push(milestone);
-      localStorage.setItem(STORAGE_KEYS.MILESTONES_CELEBRATED, JSON.stringify(milestones));
-    }
-  }, [getCelebratedMilestones]);
-
-  const isAccountComplete = useCallback((): boolean => {
-    return localStorage.getItem(STORAGE_KEYS.ACCOUNT_COMPLETE) === "true";
-  }, []);
-
-  const setAccountComplete = useCallback((value: boolean) => {
+  const setEmailPromptShown = useCallback((value: boolean) => {
     if (value) {
-      localStorage.setItem(STORAGE_KEYS.ACCOUNT_COMPLETE, "true");
+      localStorage.setItem(STORAGE_KEYS.EMAIL_PROMPT_SHOWN, "true");
     } else {
-      localStorage.removeItem(STORAGE_KEYS.ACCOUNT_COMPLETE);
+      localStorage.removeItem(STORAGE_KEYS.EMAIL_PROMPT_SHOWN);
     }
   }, []);
 
+  const isEmailPromptDismissed = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.EMAIL_PROMPT_DISMISSED) === "true";
+  }, []);
+
+  const setEmailPromptDismissed = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.EMAIL_PROMPT_DISMISSED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.EMAIL_PROMPT_DISMISSED);
+    }
+  }, []);
+
+  // === ACCOUNT PROMPT FLAGS (Step 2) ===
+  const isAccountPromptShown = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.ACCOUNT_PROMPT_SHOWN) === "true";
+  }, []);
+
+  const setAccountPromptShown = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.ACCOUNT_PROMPT_SHOWN, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACCOUNT_PROMPT_SHOWN);
+    }
+  }, []);
+
+  const isAccountPromptDeferred = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.ACCOUNT_PROMPT_DEFERRED) === "true";
+  }, []);
+
+  const setAccountPromptDeferred = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.ACCOUNT_PROMPT_DEFERRED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACCOUNT_PROMPT_DEFERRED);
+    }
+  }, []);
+
+  // === GUEST LIMIT FLAGS ===
+  const isGuestLimitReached = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.GUEST_LIMIT_REACHED) === "true";
+  }, []);
+
+  const setGuestLimitReached = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.GUEST_LIMIT_REACHED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.GUEST_LIMIT_REACHED);
+    }
+  }, []);
+
+  const canCompleteMoreTasks = useCallback((): boolean => {
+    if (hasAccount()) return true;
+    return getCompletedTaskCount() < MAX_GUEST_TASKS;
+  }, [hasAccount, getCompletedTaskCount]);
+
+  // === CLEANUP ===
   const clearAllData = useCallback(() => {
     Object.values(STORAGE_KEYS).forEach((key) => {
       localStorage.removeItem(key);
@@ -162,23 +240,36 @@ export const useGuestStorage = () => {
     setCapturedEmail,
     capturedPhone,
     setCapturedPhone,
+    isEmailCaptured,
     
     // Tasks
     getGuestTasks,
     setGuestTaskStatus,
     getCompletedTaskCount,
+    setCompletedTaskCount,
+    incrementCompletedTaskCount,
     
-    // Prompts
-    isEmailPrompted,
-    setEmailPrompted,
+    // Account state
+    hasAccount,
+    setHasAccount,
     
-    // Milestones
-    getCelebratedMilestones,
-    addCelebratedMilestone,
+    // Email prompt flags (Step 1)
+    isEmailPromptShown,
+    setEmailPromptShown,
+    isEmailPromptDismissed,
+    setEmailPromptDismissed,
     
-    // Account
-    isAccountComplete,
-    setAccountComplete,
+    // Account prompt flags (Step 2)
+    isAccountPromptShown,
+    setAccountPromptShown,
+    isAccountPromptDeferred,
+    setAccountPromptDeferred,
+    
+    // Guest limit
+    isGuestLimitReached,
+    setGuestLimitReached,
+    canCompleteMoreTasks,
+    MAX_GUEST_TASKS,
     
     // Cleanup
     clearAllData,
