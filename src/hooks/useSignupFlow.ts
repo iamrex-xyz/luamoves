@@ -39,10 +39,11 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return { type: "none" };
     }
 
-    const willBeCount = currentCompletedCount + 1;
+    // currentCompletedCount is the count AFTER the task was completed
+    const completedCount = currentCompletedCount;
 
     // HARD BLOCK: At task 6 (after 5 completed), force account creation
-    if (willBeCount > storage.MAX_GUEST_TASKS) {
+    if (completedCount > storage.MAX_GUEST_TASKS) {
       // If no email captured, need email first
       if (!storage.isEmailCaptured()) {
         return { type: "email_capture", isHardBlock: true };
@@ -52,7 +53,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     }
 
     // STEP 1: After first task - email capture (soft)
-    if (willBeCount === 1) {
+    if (completedCount === 1) {
       // Only show if: not captured, not already shown
       if (!storage.isEmailCaptured() && !storage.isEmailPromptShown()) {
         return { type: "email_capture", isHardBlock: false };
@@ -60,7 +61,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     }
 
     // STEP 2: After second task - account creation (soft)
-    if (willBeCount === 2) {
+    if (completedCount === 2) {
       // Only show if: email captured AND not already shown AND not deferred
       if (
         storage.isEmailCaptured() && 
