@@ -110,7 +110,11 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     }
 
     if (isSameAddress()) {
-      toast({ title: "Fout", description: "Het oude adres mag niet hetzelfde zijn als het nieuwe adres.", variant: "destructive" });
+      toast({ 
+        title: "Even checken", 
+        description: "Je oude en nieuwe adres zijn hetzelfde — waarschijnlijk per ongeluk verkeerd ingevuld?", 
+        variant: "destructive" 
+      });
       return;
     }
 
@@ -223,7 +227,11 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
             onChange={handleOldAddressChange}
           />
           {oldAddressError && <p className="text-xs text-destructive mt-1">{oldAddressError}</p>}
-          {!oldAddressError && isSameAddress() && <p className="text-xs text-destructive mt-1">Oud adres mag niet hetzelfde zijn als nieuw adres</p>}
+          {!oldAddressError && isSameAddress() && (
+            <p className="text-xs text-amber-600 mt-1">
+              Dit adres is hetzelfde als je nieuwe adres. Misschien per ongeluk verkeerd ingevuld?
+            </p>
+          )}
         </div>
 
         <div>
