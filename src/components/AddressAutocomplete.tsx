@@ -18,8 +18,10 @@ type AddressSuggestion = {
 type AddressAutocompleteProps = {
   label: string;
   value: string;
-  onChange: (address: string) => void;
+  onChange: (address: string, isComplete?: boolean) => void;
   placeholder?: string;
+  requireComplete?: boolean;
+  error?: string;
 };
 
 export const AddressAutocomplete = ({
@@ -27,6 +29,8 @@ export const AddressAutocomplete = ({
   value,
   onChange,
   placeholder = "Begin met typen...",
+  requireComplete = false,
+  error,
 }: AddressAutocompleteProps) => {
   const [query, setQuery] = useState(value);
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
@@ -34,6 +38,7 @@ export const AddressAutocomplete = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [justSelected, setJustSelected] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");
+  const [isCompleteAddress, setIsCompleteAddress] = useState(false);
   const [hasUserTyped, setHasUserTyped] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [locationRequested, setLocationRequested] = useState(false);
@@ -177,10 +182,13 @@ export const AddressAutocomplete = ({
 
   const handleSelect = (suggestion: AddressSuggestion) => {
     const fullAddress = suggestion.weergavenaam;
+    const hasPostcodeAndNumber = !!(suggestion.postcode && suggestion.huisnummer);
+    
     setJustSelected(true);
     setSelectedValue(fullAddress);
     setQuery(fullAddress);
-    onChange(fullAddress);
+    setIsCompleteAddress(hasPostcodeAndNumber);
+    onChange(fullAddress, hasPostcodeAndNumber);
     setShowSuggestions(false);
     setSuggestions([]);
     setHasUserTyped(false);
@@ -195,9 +203,12 @@ export const AddressAutocomplete = ({
           onChange={(e) => {
             setJustSelected(false);
             setSelectedValue("");
+            setIsCompleteAddress(false);
             setQuery(e.target.value);
             setHasUserTyped(true);
             setShowSuggestions(true);
+            // When typing manually, mark as incomplete
+            onChange(e.target.value, false);
           }}
           onFocus={() => {
             if (query.length >= 3 && query !== selectedValue && hasUserTyped) {
@@ -205,7 +216,7 @@ export const AddressAutocomplete = ({
             }
           }}
           placeholder={placeholder}
-          className="pr-10"
+          className={`pr-10 ${error ? 'border-destructive focus-visible:ring-destructive' : ''} ${requireComplete && query && !isCompleteAddress ? 'border-warning' : ''}`}
         />
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           {isLoading ? (
@@ -216,6 +227,15 @@ export const AddressAutocomplete = ({
         </div>
       </div>
 
+      {/* Error or hint message */}
+      {error && (
+        <p className="text-sm text-destructive mt-1">{error}</p>
+      )}
+      {requireComplete && query && !isCompleteAddress && !error && (
+        <p className="text-sm text-muted-foreground mt-1">
+          Selecteer een adres uit de lijst met postcode en huisnummer.
+        </p>
+      )}
       {showSuggestions && query !== selectedValue && suggestions.length > 0 && (
         <Card className="absolute z-50 w-full mt-2 max-h-60 overflow-y-auto bg-card border shadow-lg">
           {suggestions.map((suggestion) => (

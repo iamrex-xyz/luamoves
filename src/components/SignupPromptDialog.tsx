@@ -62,6 +62,8 @@ export const SignupPromptDialog = ({
   
   // Step 2: Essential profile fields only
   const [oldAddress, setOldAddress] = useState("");
+  const [isOldAddressComplete, setIsOldAddressComplete] = useState(false);
+  const [oldAddressError, setOldAddressError] = useState("");
   const [keyHandoverDate, setKeyHandoverDate] = useState<Date | undefined>(undefined);
   const [householdType, setHouseholdType] = useState<"alleen" | "samen" | "">(""); 
   const [phone, setPhone] = useState("");
@@ -127,10 +129,18 @@ export const SignupPromptDialog = ({
     setCurrentStep(2);
   };
 
-  // Check if step 2 is complete enough to proceed (oldAddress is required, rest is optional)
+  // Check if step 2 is complete enough to proceed (oldAddress with postcode+huisnummer is required)
   const canSubmit = useMemo(() => {
-    return oldAddress.trim().length > 0;
-  }, [oldAddress]);
+    return oldAddress.trim().length > 0 && isOldAddressComplete;
+  }, [oldAddress, isOldAddressComplete]);
+
+  const handleOldAddressChange = (address: string, isComplete?: boolean) => {
+    setOldAddress(address);
+    setIsOldAddressComplete(!!isComplete);
+    if (isComplete) {
+      setOldAddressError("");
+    }
+  };
 
   const handleSignup = async () => {
     if (!capturedEmail) {
@@ -153,10 +163,11 @@ export const SignupPromptDialog = ({
       return;
     }
 
-    if (!oldAddress.trim()) {
+    if (!oldAddress.trim() || !isOldAddressComplete) {
+      setOldAddressError("Selecteer een volledig adres met postcode en huisnummer");
       toast({
-        title: "Oud adres ontbreekt",
-        description: "Vul je huidige adres in zodat we weten waar je vandaan verhuist.",
+        title: "Volledig adres nodig",
+        description: "Selecteer een adres uit de lijst met postcode en huisnummer.",
         variant: "destructive",
       });
       return;
@@ -347,12 +358,14 @@ export const SignupPromptDialog = ({
               </div>
 
               <div className="space-y-5">
-                {/* Old Address - required */}
+                {/* Old Address - required with postcode + huisnummer */}
                 <AddressAutocomplete
                   label="Waar woon je nu?"
                   value={oldAddress}
-                  onChange={setOldAddress}
-                  placeholder="Je huidige adres"
+                  onChange={handleOldAddressChange}
+                  placeholder="Begin met typen (straat + huisnummer)"
+                  requireComplete={true}
+                  error={oldAddressError}
                 />
 
                 {/* Key Handover Date - optional */}
