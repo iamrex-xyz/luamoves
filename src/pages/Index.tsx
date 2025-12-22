@@ -445,6 +445,7 @@ const Index = () => {
           onOpenChange={signupFlow.setShowSignupPrompt}
           onSignupComplete={signupFlow.handleSignupComplete}
           onDefer={signupFlow.handleSignupDefer}
+          onPasswordSet={signupFlow.handlePasswordSet}
           capturedEmail={signupFlow.capturedEmail}
           isHardBlock={signupFlow.isSignupHardBlock}
         />

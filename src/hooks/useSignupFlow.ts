@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useGuestStorage } from "./useGuestStorage";
 
 /**
@@ -9,10 +9,11 @@ import { useGuestStorage } from "./useGuestStorage";
  * 2. After task 2: Account creation prompt (soft, deferrable - if email captured)
  * 3. After task 5: Hard block - must create account to continue
  * 
- * Guards:
- * - Email modal NEVER shows again after dismiss/submit
- * - Account modal NEVER shows again after defer (except hard block at task 6)
- * - Once account created, ALL modals disabled forever
+ * CRITICAL GUARD:
+ * Once account creation is STARTED (password set), the user MUST complete it.
+ * - Cannot proceed as guest anymore
+ * - Cannot complete more tasks
+ * - Refresh/page leave brings them back to account creation
  */
 
 type ModalAction = 
@@ -29,6 +30,17 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [isSignupHardBlock, setIsSignupHardBlock] = useState(false);
 
+  // CRITICAL: On mount, check if account creation was started but not completed
+  useEffect(() => {
+    if (isLoggedIn || storage.hasAccount()) return;
+    
+    // If account creation was started but not completed, force show the dialog
+    if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
+      setIsSignupHardBlock(true);
+      setShowSignupPrompt(true);
+    }
+  }, [isLoggedIn, storage]);
+
   /**
    * Determine what modal action to show based on current state
    * This is called BEFORE completing a task
@@ -37,6 +49,11 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     // If logged in or has account, no modals needed
     if (isLoggedIn || storage.hasAccount()) {
       return { type: "none" };
+    }
+
+    // CRITICAL: If account creation started but not completed, force account creation
+    if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
+      return { type: "account_creation", isHardBlock: true };
     }
 
     // currentCompletedCount is the count AFTER the task was completed
@@ -85,6 +102,11 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return true;
     }
     
+    // CRITICAL: Block if account creation started but not completed
+    if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
+      return false;
+    }
+    
     const currentCount = storage.getCompletedTaskCount();
     
     // Block at task 6
@@ -103,6 +125,13 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
   const handleTaskAttempt = useCallback((): boolean => {
     if (isLoggedIn || storage.hasAccount()) {
       return true;
+    }
+
+    // CRITICAL: If account creation started but not completed, block and show dialog
+    if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
+      setIsSignupHardBlock(true);
+      setShowSignupPrompt(true);
+      return false;
     }
 
     const currentCount = storage.getCompletedTaskCount();
@@ -185,6 +214,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     storage.setHasAccount(true);
     storage.setAccountPromptShown(true);
     storage.setGuestLimitReached(false);
+    storage.setAccountCreationCompleted(true); // Mark as fully completed
     setShowSignupPrompt(false);
     setIsSignupHardBlock(false);
     
@@ -193,10 +223,23 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
   }, [storage]);
 
   /**
+   * Called when user completes step 1 (password set)
+   * This marks account creation as STARTED - cannot be abandoned
+   */
+  const handlePasswordSet = useCallback(() => {
+    storage.setAccountCreationStarted(true);
+  }, [storage]);
+
+  /**
    * Account modal: User clicked "Later" / deferred
-   * CRITICAL: This should NEVER be called for hard blocks
+   * CRITICAL: This should NEVER be called for hard blocks or if account creation started
    */
   const handleSignupDefer = useCallback(() => {
+    // CRITICAL: Never allow defer if account creation has started
+    if (storage.isAccountCreationStarted()) {
+      return; // Cannot defer once started
+    }
+    
     // Only allow defer for non-hard-block modals
     if (!isSignupHardBlock) {
       storage.setAccountPromptShown(true);
@@ -243,6 +286,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     isSignupHardBlock,
     handleSignupComplete,
     handleSignupDefer,
+    handlePasswordSet,
     
     // Task handling
     canCompleteTask,

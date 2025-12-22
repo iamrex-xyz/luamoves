@@ -41,6 +41,7 @@ type SignupPromptDialogProps = {
   onOpenChange: (open: boolean) => void;
   onSignupComplete: () => void;
   onDefer?: () => void;
+  onPasswordSet?: () => void;
   capturedEmail?: string;
   isHardBlock?: boolean;
 };
@@ -50,6 +51,7 @@ export const SignupPromptDialog = ({
   onOpenChange,
   onSignupComplete,
   onDefer,
+  onPasswordSet,
   capturedEmail = "",
   isHardBlock = false,
 }: SignupPromptDialogProps) => {
@@ -169,6 +171,9 @@ export const SignupPromptDialog = ({
     
     setStoredPassword(password);
     trackEvent("password_set");
+    
+    // CRITICAL: Mark account creation as started - cannot be abandoned from here
+    onPasswordSet?.();
     
     toast({
       title: "Wachtwoord opgeslagen ✅",
@@ -320,6 +325,9 @@ export const SignupPromptDialog = ({
   };
 
   const handleLater = () => {
+    // CRITICAL: Never allow closing if password has been set (account creation started)
+    if (storedPassword || currentStep === 2) return;
+    
     // Only allow "Later" for non-hard-block modals
     if (isHardBlock) return;
     
@@ -331,14 +339,17 @@ export const SignupPromptDialog = ({
     }
   };
 
+  // Determine if dialog can be dismissed
+  const canDismiss = !isHardBlock && !storedPassword && currentStep === 1;
+
   return (
     <MobileModal open={open} onOpenChange={() => {}}>
       <MobileModalContent 
         className="max-h-[85vh]"
-        showCloseButton={!isHardBlock}
+        showCloseButton={canDismiss}
         onCloseClick={handleLater}
-        onPointerDownOutside={(e) => isHardBlock && e.preventDefault()}
-        onEscapeKeyDown={(e) => isHardBlock && e.preventDefault()}
+        onPointerDownOutside={(e) => !canDismiss && e.preventDefault()}
+        onEscapeKeyDown={(e) => !canDismiss && e.preventDefault()}
       >
         {currentStep === 1 ? (
           <>
