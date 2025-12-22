@@ -98,7 +98,14 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     return keyHandoverDateObj > movingDateObj;
   };
 
-  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving() || !!oldAddressError || !!newAddressError;
+  const isKeyHandoverInPast = () => {
+    if (!keyHandoverDateObj) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return keyHandoverDateObj < today;
+  };
+
+  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving() || isKeyHandoverInPast() || !!oldAddressError || !!newAddressError;
 
   const handleSave = async () => {
     const oldValid = validatePostcode(oldAddress, setOldAddressError);
@@ -297,13 +304,21 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
                     setKeyHandoverDateObj(date);
                     if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
                   }}
-                  disabled={(date) => movingDateObj ? date > movingDateObj : false}
+                  disabled={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    // Disable dates in the past and after moving date
+                    if (date < today) return true;
+                    if (movingDateObj && date > movingDateObj) return true;
+                    return false;
+                  }}
                   initialFocus
                   className="pointer-events-auto"
                 />
               </PopoverContent>
             </Popover>
-            {isKeyHandoverAfterMoving() && <p className="text-xs text-destructive mt-1">Kan niet na verhuisdatum</p>}
+            {isKeyHandoverInPast() && <p className="text-xs text-destructive mt-1">Kan niet in het verleden liggen</p>}
+            {!isKeyHandoverInPast() && isKeyHandoverAfterMoving() && <p className="text-xs text-destructive mt-1">Kan niet na verhuisdatum</p>}
           </div>
         </div>
 
