@@ -18,7 +18,9 @@ export type SmartQuestionType =
   | "hasPets"
   | "householdType"
   | "hasJob"
-  | "parkingPermitNeeded";
+  | "parkingPermitNeeded"
+  | "noticePeriod"
+  | "movingVolume";
 
 export type SmartQuestion = {
   type: SmartQuestionType;
@@ -211,6 +213,29 @@ export const smartQuestions: Record<SmartQuestionType, SmartQuestion> = {
       { value: "unknown", label: "Weet ik niet" },
     ],
     fieldKey: "hasParking",
+  },
+  noticePeriod: {
+    type: "noticePeriod",
+    luaMessage: "Wat is de opzegtermijn van je huidige huurwoning? 📄",
+    inputType: "radio",
+    options: [
+      { value: "1", label: "1 maand" },
+      { value: "2", label: "2 maanden" },
+      { value: "3", label: "3 maanden" },
+      { value: "unknown", label: "Weet ik niet" },
+    ],
+    fieldKey: "forwardingDuration",
+  },
+  movingVolume: {
+    type: "movingVolume",
+    luaMessage: "Hoeveel spullen verhuis je ongeveer? 📦",
+    inputType: "radio",
+    options: [
+      { value: "small", label: "Weinig (studio/kleine woning)" },
+      { value: "medium", label: "Gemiddeld (2-3 kamers)" },
+      { value: "large", label: "Veel (grote woning/gezin)" },
+    ],
+    fieldKey: "serviceType",
   },
 };
 
