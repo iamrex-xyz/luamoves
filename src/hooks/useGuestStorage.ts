@@ -24,6 +24,8 @@ const STORAGE_KEYS = {
   // Account creation state (Step 2)
   ACCOUNT_PROMPT_SHOWN: "lua_account_prompt_shown",
   ACCOUNT_PROMPT_DEFERRED: "lua_account_prompt_deferred",
+  ACCOUNT_CREATION_STARTED: "lua_account_creation_started",
+  ACCOUNT_CREATION_COMPLETED: "lua_account_creation_completed",
   
   // Guest limit state
   GUEST_LIMIT_REACHED: "lua_guest_limit_reached",
@@ -201,6 +203,31 @@ export const useGuestStorage = () => {
     }
   }, []);
 
+  // === ACCOUNT CREATION STATE (Critical for flow) ===
+  const isAccountCreationStarted = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.ACCOUNT_CREATION_STARTED) === "true";
+  }, []);
+
+  const setAccountCreationStarted = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.ACCOUNT_CREATION_STARTED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACCOUNT_CREATION_STARTED);
+    }
+  }, []);
+
+  const isAccountCreationCompleted = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.ACCOUNT_CREATION_COMPLETED) === "true";
+  }, []);
+
+  const setAccountCreationCompleted = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.ACCOUNT_CREATION_COMPLETED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.ACCOUNT_CREATION_COMPLETED);
+    }
+  }, []);
+
   // === GUEST LIMIT FLAGS ===
   const isGuestLimitReached = useCallback((): boolean => {
     return localStorage.getItem(STORAGE_KEYS.GUEST_LIMIT_REACHED) === "true";
@@ -216,8 +243,10 @@ export const useGuestStorage = () => {
 
   const canCompleteMoreTasks = useCallback((): boolean => {
     if (hasAccount()) return true;
+    // CRITICAL: Block task completion if account creation started but not completed
+    if (isAccountCreationStarted() && !isAccountCreationCompleted()) return false;
     return getCompletedTaskCount() < MAX_GUEST_TASKS;
-  }, [hasAccount, getCompletedTaskCount]);
+  }, [hasAccount, getCompletedTaskCount, isAccountCreationStarted, isAccountCreationCompleted]);
 
   // === CLEANUP ===
   const clearAllData = useCallback(() => {
@@ -264,6 +293,12 @@ export const useGuestStorage = () => {
     setAccountPromptShown,
     isAccountPromptDeferred,
     setAccountPromptDeferred,
+    
+    // Account creation flow state (Critical)
+    isAccountCreationStarted,
+    setAccountCreationStarted,
+    isAccountCreationCompleted,
+    setAccountCreationCompleted,
     
     // Guest limit
     isGuestLimitReached,
