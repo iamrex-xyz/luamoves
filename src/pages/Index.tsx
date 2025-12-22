@@ -32,8 +32,8 @@ const Index = () => {
   // Use guest storage hook
   const guestStorage = useGuestStorage();
 
-  // Use signup flow hook
-  const signupFlow = useSignupFlow(!user);
+  // Use signup flow hook - pass true if user IS logged in
+  const signupFlow = useSignupFlow(!!user);
 
   // Load user profile from database
   const loadUserProfile = useCallback(async (userId: string) => {
