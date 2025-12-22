@@ -136,7 +136,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const dayNumber = moveDate.getDate();
   const monthName = moveDate.toLocaleDateString("nl-NL", { month: "short" });
 
-  const CompactTaskItem = ({ task }: { task: Task }) => {
+  const CompactTaskItem = ({ task, index }: { task: Task; index: number }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const deadline = new Date(task.deadline);
@@ -165,7 +165,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         disabled={task.status === "done" || isCompleting}
       >
         <div 
-          className={`group px-3 py-2 rounded-xl transition-all cursor-pointer ${getUrgencyStyles()}`}
+          className={`group px-3 py-2 rounded-xl transition-all cursor-pointer animate-fade-in ${getUrgencyStyles()}`}
+          style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}
           onClick={() => !isCompleting && handleTaskClick(task)}
         >
           <div className="flex items-center gap-2.5">
@@ -307,8 +308,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           ) : openTasks.length > 0 ? (
             <div className="flex-1 flex flex-col bg-white rounded-2xl shadow-md shadow-primary/5 p-3 overflow-hidden">
               <div className="flex-1 space-y-1.5 overflow-hidden">
-                {displayTasks.map((task) => (
-                  <CompactTaskItem key={task.id} task={task} />
+                {displayTasks.map((task, index) => (
+                  <CompactTaskItem key={task.id} task={task} index={index} />
                 ))}
               </div>
               
