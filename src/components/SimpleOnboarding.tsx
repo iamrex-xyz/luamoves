@@ -417,7 +417,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <div className="text-left flex-1">
                     <p className={cn("font-semibold", housingType === 'rent' ? "text-foreground" : "text-muted-foreground")}>Huren</p>
                   </div>
-                  {housingType === 'rent' && <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
                 </button>
                 <button onClick={() => setHousingType('buy')} className={cn(
                   "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200",
@@ -429,7 +428,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   <div className="text-left flex-1">
                     <p className={cn("font-semibold", housingType === 'buy' ? "text-foreground" : "text-muted-foreground")}>Kopen</p>
                   </div>
-                  {housingType === 'buy' && <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center"><Check className="w-3 h-3 text-white" /></div>}
                 </button>
               </div>
             </div>
