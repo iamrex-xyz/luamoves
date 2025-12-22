@@ -184,9 +184,26 @@ export const SignupPromptDialog = ({
     return cleanPostcode.length >= 6 && oldHouseNumber.trim().length > 0;
   }, [oldPostcode, oldHouseNumber]);
 
+  // Check if old address matches new address from onboarding
+  const isSameAsNewAddress = useMemo(() => {
+    if (!onboardingData?.newAddress) return false;
+    const cleanOldPostcode = oldPostcode.replace(/\s/g, "").toUpperCase();
+    const cleanOldHouseNumber = oldHouseNumber.trim();
+    if (!cleanOldPostcode || !cleanOldHouseNumber) return false;
+    
+    // Extract postcode and house number from onboarding new address
+    const newAddressStr = onboardingData.newAddress;
+    const postcodeMatch = newAddressStr.match(/\b(\d{4}\s?[A-Za-z]{2})\b/);
+    const houseNumberMatch = newAddressStr.match(/\b(\d+)\b/);
+    const newPostcode = postcodeMatch ? postcodeMatch[1].replace(/\s/g, "").toUpperCase() : "";
+    const newHouseNumber = houseNumberMatch ? houseNumberMatch[1] : "";
+    
+    return cleanOldPostcode === newPostcode && cleanOldHouseNumber === newHouseNumber;
+  }, [oldPostcode, oldHouseNumber, onboardingData]);
+
   const canSubmit = useMemo(() => {
-    return isAddressComplete;
-  }, [isAddressComplete]);
+    return isAddressComplete && !isSameAsNewAddress;
+  }, [isAddressComplete, isSameAsNewAddress]);
 
   // Build full address string
   const getFullOldAddress = () => {
@@ -427,7 +444,7 @@ export const SignupPromptDialog = ({
                     Waar woon je nu?
                   </Label>
                   <div className="flex gap-3">
-                    <div className="flex-1">
+                    <div className="flex-[2]">
                       <Input
                         placeholder="Postcode"
                         value={oldPostcode}
@@ -436,7 +453,7 @@ export const SignupPromptDialog = ({
                         maxLength={7}
                       />
                     </div>
-                    <div className="w-24">
+                    <div className="flex-1 max-w-[100px]">
                       <Input
                         placeholder="Nr."
                         value={oldHouseNumber}
@@ -446,6 +463,13 @@ export const SignupPromptDialog = ({
                     </div>
                   </div>
                   
+                  {/* Same address warning */}
+                  {isSameAsNewAddress && (
+                    <p className="text-sm text-amber-600">
+                      Dit lijkt hetzelfde adres als je nieuwe woning. Vul hier je huidige adres in.
+                    </p>
+                  )}
+                  
                   {/* Show looked-up address */}
                   {isLoadingAddress && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -453,13 +477,13 @@ export const SignupPromptDialog = ({
                       Adres opzoeken...
                     </div>
                   )}
-                  {!isLoadingAddress && oldStreetName && oldCityName && (
+                  {!isLoadingAddress && oldStreetName && oldCityName && !isSameAsNewAddress && (
                     <div className="flex items-center gap-2 text-sm text-primary">
                       <Check className="w-4 h-4" />
                       {oldStreetName} {oldHouseNumber}, {oldCityName}
                     </div>
                   )}
-                  {!isLoadingAddress && isAddressComplete && !oldStreetName && (
+                  {!isLoadingAddress && isAddressComplete && !oldStreetName && !isSameAsNewAddress && (
                     <p className="text-sm text-muted-foreground">
                       Adres niet gevonden, maar je kunt doorgaan.
                     </p>
