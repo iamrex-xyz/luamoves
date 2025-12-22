@@ -304,6 +304,7 @@ const Index = () => {
     await supabase.auth.signOut();
     setUser(null);
     setMovingInfo(null);
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
     guestStorage.clearAllData();
     setCurrentView("onboarding");
     toast({
