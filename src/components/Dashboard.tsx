@@ -240,29 +240,31 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         {isLoading ? (
           <TaskListSkeleton count={5} />
         ) : openTasks.length > 0 ? (
-          <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
-            {displayTasks.map((task) => (
-              <TaskListItem
-                key={task.id}
-                task={task}
-                isCompleting={completingTasks.has(task.id)}
-                onTaskClick={handleTaskClick}
-                onCheckboxClick={handleCheckboxClick}
-                onRegelenClick={handleRegelenClick}
-                onDocumentClick={handleDocumentClick}
-                onSwipeComplete={handleTaskToggle}
-              />
-            ))}
-            {openTasks.length > 5 && (
-              <Button
-                variant="ghost"
-                className="w-full h-12 text-sm text-muted-foreground hover:text-foreground"
-                onClick={() => onNavigate("tasks")}
-              >
-                Bekijk alle {openTasks.length} taken
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            )}
+          <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 max-h-[calc(100vh-340px)] overflow-y-auto">
+            <div className="space-y-2 p-4">
+              {displayTasks.map((task) => (
+                <TaskListItem
+                  key={task.id}
+                  task={task}
+                  isCompleting={completingTasks.has(task.id)}
+                  onTaskClick={handleTaskClick}
+                  onCheckboxClick={handleCheckboxClick}
+                  onRegelenClick={handleRegelenClick}
+                  onDocumentClick={handleDocumentClick}
+                  onSwipeComplete={handleTaskToggle}
+                />
+              ))}
+              {openTasks.length > 5 && (
+                <Button
+                  variant="ghost"
+                  className="w-full h-12 text-sm text-muted-foreground hover:text-foreground sticky bottom-0 bg-white"
+                  onClick={() => onNavigate("tasks")}
+                >
+                  Bekijk alle {openTasks.length} taken
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="p-8 text-center rounded-3xl bg-white shadow-lg shadow-primary/10">
