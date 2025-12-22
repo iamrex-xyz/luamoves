@@ -432,6 +432,27 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     requiredQuestions: ["buildingYear"],
     checkField: (info) => isEmpty(info.buildingYear),
   },
+
+  // ===== HUURCONTRACT & OPZEGTERMIJN =====
+  // Check huurcontract: noticePeriod
+  {
+    taskIdPatterns: ["check-huurcontract", "huurcontract"],
+    titlePatterns: ["check je huidige huurcontract", "huurcontract checken", "opzegtermijn"],
+    requiredQuestions: ["noticePeriod"],
+    checkField: (info) => info.type === "rent" && isEmpty(info.forwardingDuration),
+  },
+
+  // ===== INVENTARISATIE =====
+  // Inventariseer spullen: movingVolume
+  {
+    taskIdPatterns: ["inventariseer", "inventaris"],
+    titlePatterns: ["inventariseer", "spullen", "inventaris"],
+    requiredQuestions: ["movingVolume"],
+    checkField: (info) => isEmpty(info.serviceType),
+  },
+
+  // ===== BUDGET =====
+  // Verhuisbudget: geen specifieke vragen (taak zelf is voldoende)
 ];
 
 // Bepaal welke vraag nodig is voor een taak
