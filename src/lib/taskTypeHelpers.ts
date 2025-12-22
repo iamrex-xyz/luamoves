@@ -55,6 +55,7 @@ export const isInsuranceTask = (task: Task): boolean => {
   const idLower = task.id.toLowerCase();
   return (
     titleLower.includes("inboedelverzekering") ||
+    (titleLower.includes("inboedel") && titleLower.includes("regelen")) ||
     (titleLower.includes("controleer") && titleLower.includes("verzekering")) ||
     idLower.includes("insurance") ||
     idLower.includes("inboedel")
@@ -90,8 +91,10 @@ export const isParkingTask = (task: Task): boolean => {
   return (
     titleLower.includes("parkeervergunning") ||
     titleLower.includes("verhuislift") ||
+    titleLower.includes("parkeersituatie") ||
     (titleLower.includes("parking") && titleLower.includes("permit")) ||
     idLower.includes("parking") ||
+    idLower.includes("parkeren") ||
     idLower.includes("verhuislift")
   );
 };
@@ -137,9 +140,71 @@ export const isRenovationTask = (task: Task): boolean => {
   return (
     titleLower.includes("aannemer") ||
     titleLower.includes("materialen inkopen") ||
+    titleLower.includes("materiaal inkopen") ||
     (titleLower.includes("vergelijk") && titleLower.includes("aannemer")) ||
     idLower.includes("contractor") ||
-    idLower.includes("materialen")
+    idLower.includes("materialen") ||
+    idLower.includes("materiaal")
+  );
+};
+
+// KOOP-specifieke helpers
+export const isHypothekTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("hypotheek") ||
+    titleLower.includes("hypotheekadviseur") ||
+    idLower.includes("hypotheek")
+  );
+};
+
+export const isBouwkundigeKeuringTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("bouwkundige keuring") ||
+    titleLower.includes("bouwkundig") ||
+    idLower.includes("bouwkundig")
+  );
+};
+
+export const isNotarisTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    (titleLower.includes("notaris") && titleLower.includes("kiezen")) ||
+    idLower.includes("notaris-kiezen") ||
+    (idLower.includes("notaris") && !titleLower.includes("levering") && !titleLower.includes("conceptakte"))
+  );
+};
+
+export const isTaxatieTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("taxatie") ||
+    idLower.includes("taxatie")
+  );
+};
+
+export const isOpstalTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("opstalverzekering") ||
+    titleLower.includes("opstal") ||
+    idLower.includes("opstal")
+  );
+};
+
+export const isSlotTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("slotcilinder") ||
+    titleLower.includes("slot") ||
+    idLower.includes("slotcilinder")
   );
 };
 
@@ -210,7 +275,13 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isCleaningTask(task) ||
     isSmokeDetectorTask(task) ||
     isGardenTask(task) ||
-    isRenovationTask(task)
+    isRenovationTask(task) ||
+    isHypothekTask(task) ||
+    isBouwkundigeKeuringTask(task) ||
+    isNotarisTask(task) ||
+    isTaxatieTask(task) ||
+    isOpstalTask(task) ||
+    isSlotTask(task)
   );
 };
 
