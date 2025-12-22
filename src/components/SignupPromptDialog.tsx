@@ -482,6 +482,12 @@ export const SignupPromptDialog = ({
                           setKeyHandoverCalendarOpen(false);
                         }}
                         disabled={(date) => {
+                          const today = new Date();
+                          const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, today.getDate());
+                          // Key handover date cannot be more than 3 months in the past
+                          if (date < threeMonthsAgo) {
+                            return true;
+                          }
                           // Key handover date cannot be after moving date
                           if (movingDate) {
                             return date > movingDate;
