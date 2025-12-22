@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
@@ -10,7 +9,6 @@ import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { LuaLogo } from "@/components/LuaLogo";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
-import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
 import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
@@ -21,7 +19,6 @@ import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
-
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
@@ -35,10 +32,8 @@ import {
   Circle,
   ArrowRight,
   ChevronRight,
-  Search,
-  X,
 } from "lucide-react";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -54,24 +49,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  // Hide search bar on scroll down
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 50 && showSearch) {
-        setShowSearch(false);
-        setSearchQuery("");
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY, showSearch]);
+  // Removed scroll-based search hiding - Home is now static
 
   // Question dialogs for affiliate tasks
   const {
@@ -85,19 +63,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   // Filter en sorteer taken voor de homepage
   const openTasks = useMemo(() => {
     const open = tasks.filter(t => t.status !== "done");
-    const sorted = sortTasksSmart(open);
-    
-    // Apply search filter if there's a query
-    if (searchQuery.trim()) {
-      return sorted.filter(t => 
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    return sorted;
-  }, [tasks, searchQuery]);
+    return sortTasksSmart(open);
+  }, [tasks]);
 
   // Get top 5 sorted tasks, ensuring at least 1 affiliate task is visible
   const displayTasks = useMemo(() => {
@@ -289,53 +256,14 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     <main 
       id="main-content" 
       tabIndex={-1}
-      className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
+      className="h-screen overflow-hidden pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
       aria-label="Dashboard"
     >
-      <PullToRefresh onRefresh={refreshTasks} className="min-h-screen">
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <LuaLogo size="md" />
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowSearch(!showSearch)}
-          className="h-10 w-10 rounded-xl"
-        >
-          <Search className="w-5 h-5 text-muted-foreground" />
-        </Button>
-      </div>
-
-      {/* Search Bar */}
-      <div 
-        className={`px-4 pb-3 transition-all duration-300 ease-out overflow-hidden ${
-          showSearch 
-            ? 'max-h-20 opacity-100 translate-y-0' 
-            : 'max-h-0 opacity-0 -translate-y-2'
-        }`}
-      >
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Zoek taken..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-10 h-11 rounded-xl border-0 bg-white shadow-sm"
-            autoFocus={showSearch}
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSearchQuery("")}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
       </div>
 
       {/* Moving Date Card */}
@@ -569,8 +497,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           closeActiveDialog();
         }}
       />
-
-      </PullToRefresh>
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
     </main>
