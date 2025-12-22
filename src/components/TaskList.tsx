@@ -283,130 +283,135 @@ export const TaskList = ({
     <main 
       id="main-content" 
       tabIndex={-1}
-      className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
+      className="h-screen flex flex-col bg-gradient-to-br from-primary-light via-primary-light/80 to-white focus:outline-none"
       aria-label="Takenlijst"
     >
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
-      {/* Header with Logo */}
-      <div className="px-4 pt-4 pb-2">
-        <LuaLogo size="md" />
+      {/* Fixed Header */}
+      <div className="shrink-0">
+        {/* Header with Logo */}
+        <div className="px-4 pt-4 pb-2">
+          <LuaLogo size="md" />
+        </div>
+        
+        {/* Compact Header with Search */}
+        <div className="px-3 sm:px-4 pb-3 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 border-b border-border/50">
+          <div className="flex items-center gap-3">
+            {/* Filter button */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl">
+                  <Filter className="h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-72 bg-background z-50 rounded-2xl" align="start">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {categories.map((cat) => (
+                        <div 
+                          key={cat} 
+                          className={`flex items-center space-x-2 p-2 rounded-xl cursor-pointer transition-colors ${
+                            selectedCategories.includes(cat) ? "bg-primary/10" : "hover:bg-muted"
+                          }`}
+                          onClick={() => toggleCategory(cat)}
+                        >
+                          <Label htmlFor={cat} className="text-sm cursor-pointer flex-1">{cat}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            
+            {/* Search bar */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Zoek taken..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-10 rounded-xl border-0 bg-secondary/50"
+              />
+            </div>
+
+            {/* Action buttons */}
+            <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10 rounded-xl">
+              <Share2 className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          </div>
+          
+          {/* Account reminder badge */}
+          {showAccountBadge && (
+            <button
+              onClick={onAccountBadgeClick}
+              className="mt-3 w-full flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors"
+            >
+              <User className="w-4 h-4 text-primary" />
+              <span className="text-sm text-primary font-medium">Sla je voortgang op met een gratis account</span>
+              <ArrowRight className="w-4 h-4 text-primary ml-auto" />
+            </button>
+          )}
+          
+          {/* Mini progress indicator */}
+          <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
+            <span>{tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid</span>
+            <span>{daysUntilMove > 0 ? `${daysUntilMove} dagen tot verhuizing` : getCountdownText()}</span>
+          </div>
+        </div>
       </div>
-      
-      {/* Compact Header with Search */}
-      <div className="px-3 sm:px-4 pb-3 sticky top-0 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg z-10 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          {/* Filter button */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0 rounded-xl">
-                <Filter className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72 bg-background z-50 rounded-2xl" align="start">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {categories.map((cat) => (
-                      <div 
-                        key={cat} 
-                        className={`flex items-center space-x-2 p-2 rounded-xl cursor-pointer transition-colors ${
-                          selectedCategories.includes(cat) ? "bg-primary/10" : "hover:bg-muted"
-                        }`}
-                        onClick={() => toggleCategory(cat)}
-                      >
-                        <Label htmlFor={cat} className="text-sm cursor-pointer flex-1">{cat}</Label>
-                      </div>
+
+      {/* Scrollable Tasks Area */}
+      <div className="flex-1 overflow-y-auto pb-20">
+        <PullToRefresh onRefresh={refreshTasks} className="px-3 sm:px-4 py-3">
+          {isLoading ? (
+            <TaskListSkeleton count={8} />
+          ) : Object.entries(tasksByPhase).length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground rounded-3xl bg-white shadow-lg shadow-primary/10">
+              Geen taken gevonden. Probeer een andere zoekopdracht!
+            </div>
+          ) : (
+            <div className="space-y-4 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
+              {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
+                <div key={phase}>
+                  <div className="flex items-center gap-2 mb-2 py-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    <span className="text-sm font-medium text-foreground">{phase}</span>
+                    <span className="text-xs text-muted-foreground">({phaseTasks.length})</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {phaseTasks.map((task) => (
+                      <TaskListItem
+                        key={task.id}
+                        task={task}
+                        isCompleting={completingTasks.has(task.id)}
+                        onTaskClick={handleTaskClick}
+                        onCheckboxClick={handleCheckboxClick}
+                        onRegelenClick={handleRegelenClick}
+                        onDocumentClick={(e, task) => {
+                          e.stopPropagation();
+                          setDocumentTask(task);
+                        }}
+                        onSwipeComplete={handleTaskToggle}
+                      />
                     ))}
                   </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          
-          {/* Search bar */}
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Zoek taken..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 rounded-xl border-0 bg-secondary/50"
-            />
-          </div>
-
-          {/* Action buttons */}
-          <Button variant="ghost" size="icon" onClick={() => setShowShareDialog(true)} className="h-10 w-10 rounded-xl">
-            <Share2 className="w-4 h-4 text-muted-foreground" />
-          </Button>
-        </div>
-        
-        {/* Account reminder badge */}
-        {showAccountBadge && (
-          <button
-            onClick={onAccountBadgeClick}
-            className="mt-3 w-full flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors"
-          >
-            <User className="w-4 h-4 text-primary" />
-            <span className="text-sm text-primary font-medium">Sla je voortgang op met een gratis account</span>
-            <ArrowRight className="w-4 h-4 text-primary ml-auto" />
-          </button>
-        )}
-        
-        {/* Mini progress indicator */}
-        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-          <span>{tasks.filter(t => t.status === "done").length} van {tasks.length} voltooid</span>
-          <span>{daysUntilMove > 0 ? `${daysUntilMove} dagen tot verhuizing` : getCountdownText()}</span>
-        </div>
+              ))}
+              
+              {/* Completed tasks - collapsible section */}
+              <CompletedTasksSection
+                tasks={completedTasks}
+                onUndoTask={handleTaskToggle}
+              />
+            </div>
+          )}
+        </PullToRefresh>
       </div>
-
-      {/* Tasks with Pull to Refresh */}
-      <PullToRefresh onRefresh={refreshTasks} className="px-3 sm:px-4 py-3">
-        {isLoading ? (
-          <TaskListSkeleton count={8} />
-        ) : Object.entries(tasksByPhase).length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground rounded-3xl bg-white shadow-lg shadow-primary/10">
-            Geen taken gevonden. Probeer een andere zoekopdracht!
-          </div>
-        ) : (
-          <div className="space-y-4 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
-            {Object.entries(tasksByPhase).map(([phase, phaseTasks]) => (
-              <div key={phase}>
-                <div className="flex items-center gap-2 mb-2 py-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                  <span className="text-sm font-medium text-foreground">{phase}</span>
-                  <span className="text-xs text-muted-foreground">({phaseTasks.length})</span>
-                </div>
-
-                <div className="space-y-2">
-                  {phaseTasks.map((task) => (
-                    <TaskListItem
-                      key={task.id}
-                      task={task}
-                      isCompleting={completingTasks.has(task.id)}
-                      onTaskClick={handleTaskClick}
-                      onCheckboxClick={handleCheckboxClick}
-                      onRegelenClick={handleRegelenClick}
-                      onDocumentClick={(e, task) => {
-                        e.stopPropagation();
-                        setDocumentTask(task);
-                      }}
-                      onSwipeComplete={handleTaskToggle}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-            
-            {/* Completed tasks - collapsible section */}
-            <CompletedTasksSection
-              tasks={completedTasks}
-              onUndoTask={handleTaskToggle}
-            />
-          </div>
-        )}
-      </PullToRefresh>
 
       {/* Dialogs */}
       <AddTaskDialog 
