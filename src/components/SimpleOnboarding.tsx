@@ -191,9 +191,9 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   };
 
   const CounterControl = ({ value, onChange, label, icon: Icon }: { value: number; onChange: (v: number) => void; label: string; icon: any }) => (
-    <div className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-muted">
+    <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
           <Icon className="w-5 h-5 text-muted-foreground" />
         </div>
         <span className="font-medium text-foreground">{label}</span>
@@ -201,15 +201,15 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       <div className="flex items-center gap-3">
         <button
           onClick={() => onChange(Math.max(0, value - 1))}
-          className="w-8 h-8 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+          className="w-9 h-9 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors disabled:opacity-40"
           disabled={value === 0}
         >
           <Minus className="w-4 h-4 text-muted-foreground" />
         </button>
-        <span className="w-8 text-center font-semibold text-lg">{value}</span>
+        <span className="w-6 text-center font-semibold text-lg tabular-nums">{value}</span>
         <button
           onClick={() => onChange(value + 1)}
-          className="w-8 h-8 rounded-full bg-primary flex items-center justify-center hover:bg-primary/90 transition-colors"
+          className="w-9 h-9 rounded-full bg-primary flex items-center justify-center hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-4 h-4 text-white" />
         </button>
@@ -221,8 +221,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all flex-1",
-        active ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
+        "flex items-center gap-3 p-4 rounded-2xl border transition-all flex-1",
+        active ? "border-primary bg-primary-light" : "border-border bg-card hover:border-primary/50"
       )}
     >
       <div className={cn(
@@ -231,7 +231,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       )}>
         <Icon className={cn("w-5 h-5", active ? "text-white" : "text-muted-foreground")} />
       </div>
-      <span className={cn("font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+      <span className={cn("text-sm font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
     </button>
   );
 
@@ -405,37 +405,33 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
             {/* Huren of kopen */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Ga je huren of kopen?</Label>
-              <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Ga je huren of kopen?</Label>
+              <div className="grid grid-cols-2 gap-3">
                 <button onClick={() => setHousingType('rent')} className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200",
-                  housingType === 'rent' ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
+                  "flex items-center gap-3 p-4 rounded-2xl border transition-all",
+                  housingType === 'rent' ? "border-primary bg-primary-light" : "border-border bg-card hover:border-primary/50"
                 )}>
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", housingType === 'rent' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                    <Key className={cn("w-6 h-6", housingType === 'rent' ? "text-white" : "text-muted-foreground")} />
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0", housingType === 'rent' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Key className={cn("w-5 h-5", housingType === 'rent' ? "text-white" : "text-muted-foreground")} />
                   </div>
-                  <div className="text-left flex-1">
-                    <p className={cn("font-semibold", housingType === 'rent' ? "text-foreground" : "text-muted-foreground")}>Huren</p>
-                  </div>
+                  <span className={cn("text-sm font-medium", housingType === 'rent' ? "text-foreground" : "text-muted-foreground")}>Huren</span>
                 </button>
                 <button onClick={() => setHousingType('buy')} className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-200",
-                  housingType === 'buy' ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
+                  "flex items-center gap-3 p-4 rounded-2xl border transition-all",
+                  housingType === 'buy' ? "border-primary bg-primary-light" : "border-border bg-card hover:border-primary/50"
                 )}>
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center transition-colors", housingType === 'buy' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                    <Home className={cn("w-6 h-6", housingType === 'buy' ? "text-white" : "text-muted-foreground")} />
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0", housingType === 'buy' ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Home className={cn("w-5 h-5", housingType === 'buy' ? "text-white" : "text-muted-foreground")} />
                   </div>
-                  <div className="text-left flex-1">
-                    <p className={cn("font-semibold", housingType === 'buy' ? "text-foreground" : "text-muted-foreground")}>Kopen</p>
-                  </div>
+                  <span className={cn("text-sm font-medium", housingType === 'buy' ? "text-foreground" : "text-muted-foreground")}>Kopen</span>
                 </button>
               </div>
             </div>
 
             {/* Woningtype (optioneel) */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Wat voor woning? (optioneel)</Label>
-              <div className="flex gap-3">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Wat voor woning? (optioneel)</Label>
+              <div className="grid grid-cols-2 gap-3">
                 <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType(propertyType === 'apartment' ? null : 'apartment')} icon={Building2} label="Appartement" />
                 <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType(propertyType === 'house' ? null : 'house')} icon={Home} label="Huis" />
               </div>
@@ -443,16 +439,16 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
             {/* Voorzieningen (optioneel) */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Voorzieningen (optioneel)</Label>
-              <div className="flex gap-3">
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Voorzieningen (optioneel)</Label>
+              <div className="grid grid-cols-2 gap-3">
                 <ToggleOption active={hasGarden} onClick={() => setHasGarden(!hasGarden)} icon={Trees} label="Tuin" />
-                <ToggleOption active={hasParking} onClick={() => setHasParking(!hasParking)} icon={Car} label="Parkeerplek" />
+                <ToggleOption active={hasParking} onClick={() => setHasParking(!hasParking)} icon={Car} label="Parkeren" />
               </div>
             </div>
 
             {/* Huishouden (optioneel) */}
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-muted-foreground">Je huishouden (optioneel)</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Je huishouden (optioneel)</Label>
               <div className="space-y-2">
                 <CounterControl value={childrenCount} onChange={setChildrenCount} label="Kinderen" icon={Baby} />
                 <CounterControl value={petsCount} onChange={setPetsCount} label="Huisdieren" icon={Dog} />
