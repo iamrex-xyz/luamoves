@@ -58,24 +58,22 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
     enabled: !isGuest,
   });
 
-  // Generate preview URLs for images
+  // Generate preview URLs for all documents
   useEffect(() => {
     const loadPreviews = async () => {
       const urls: Record<string, string> = {};
       
       for (const doc of documents) {
-        if (doc.file_type.startsWith('image/')) {
-          try {
-            const { data } = await supabase.storage
-              .from('moving_documents')
-              .createSignedUrl(doc.file_path, 3600); // 1 hour
-            
-            if (data?.signedUrl) {
-              urls[doc.id] = data.signedUrl;
-            }
-          } catch (error) {
-            console.error('Error loading preview:', error);
+        try {
+          const { data } = await supabase.storage
+            .from('moving_documents')
+            .createSignedUrl(doc.file_path, 3600); // 1 hour
+          
+          if (data?.signedUrl) {
+            urls[doc.id] = data.signedUrl;
           }
+        } catch (error) {
+          console.error('Error loading preview:', error);
         }
       }
       
@@ -376,22 +374,36 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
                 <div className="grid grid-cols-2 gap-3">
                   {docs.map((doc) => {
                     const Icon = getDocumentIcon(doc.file_type);
-                    const hasPreview = isImage(doc.file_type) && previewUrls[doc.id];
+                    const hasImagePreview = isImage(doc.file_type) && previewUrls[doc.id];
+                    const hasPdfPreview = isPdf(doc.file_type) && previewUrls[doc.id];
                     
                     return (
                       <Card 
                         key={doc.id} 
                         className="group overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                        onClick={() => openDocument(doc)}
+                        onClick={() => {
+                          // Use cached preview URL if available
+                          if (previewUrls[doc.id]) {
+                            setViewingUrl(previewUrls[doc.id]);
+                            setViewingDoc(doc);
+                          } else {
+                            openDocument(doc);
+                          }
+                        }}
                       >
                         {/* Preview area */}
                         <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center relative overflow-hidden">
-                          {hasPreview ? (
+                          {hasImagePreview ? (
                             <img 
                               src={previewUrls[doc.id]} 
                               alt={doc.description || doc.file_name}
                               className="w-full h-full object-cover"
                             />
+                          ) : hasPdfPreview ? (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20">
+                              <FileText className="h-10 w-10 text-red-500" />
+                              <span className="text-xs font-medium text-red-600 dark:text-red-400 mt-2 uppercase">PDF</span>
+                            </div>
                           ) : (
                             <div className="flex flex-col items-center gap-2">
                               <Icon className="h-8 w-8 text-muted-foreground" />
