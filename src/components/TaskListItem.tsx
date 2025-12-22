@@ -89,6 +89,7 @@ export const TaskListItem = ({
         }}
       >
         <div className="flex items-start gap-2">
+          {/* Checkbox - fixed width */}
           <button 
             type="button"
             aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
@@ -110,21 +111,24 @@ export const TaskListItem = ({
               }`} aria-hidden="true" />
             )}
           </button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
-                isCompleting 
-                  ? "line-through text-primary-foreground" 
-                  : task.status === "done" 
-                    ? "line-through text-muted-foreground" 
-                    : "text-foreground"
-              }`}>
-                {task.title}
-              </h4>
-              {getUrgencyBadge()}
-            </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+          
+          {/* Content area - two column grid */}
+          <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
+            {/* Left column: title + timing (fixed position) */}
+            <div className="min-w-0">
+              <div className="flex items-start gap-2">
+                <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
+                  isCompleting 
+                    ? "line-through text-primary-foreground" 
+                    : task.status === "done" 
+                      ? "line-through text-muted-foreground" 
+                      : "text-foreground"
+                }`}>
+                  {task.title}
+                </h4>
+                {getUrgencyBadge()}
+              </div>
+              <span className={`flex items-center gap-1 text-xs mt-0.5 transition-colors duration-200 ${
                 isCompleting 
                   ? "text-primary-foreground/80" 
                   : isTaskOverdue 
@@ -133,33 +137,35 @@ export const TaskListItem = ({
                       ? "text-warning/80"
                       : "text-muted-foreground"
               }`}>
-                <Clock className="w-3 h-3" />
+                <Clock className="w-3 h-3 shrink-0" />
                 {task.deadlineLabel}
               </span>
-              <div className="flex items-center gap-1 ml-auto shrink-0">
-                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
-                    onClick={(e) => onDocumentClick(e, task)}
-                  >
-                    <FileText className="w-3 h-3 mr-0.5" />
-                    Docs
-                  </Button>
-                )}
-                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                    onClick={(e) => onRegelenClick(e, task)}
-                  >
-                    Regelen
-                    <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
-                )}
-              </div>
+            </div>
+            
+            {/* Right column: actions (optional, does not affect left column) */}
+            <div className="flex items-center gap-1 self-center">
+              {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
+                  onClick={(e) => onDocumentClick(e, task)}
+                >
+                  <FileText className="w-3 h-3 mr-0.5" />
+                  Docs
+                </Button>
+              )}
+              {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                  onClick={(e) => onRegelenClick(e, task)}
+                >
+                  Regelen
+                  <ChevronRight className="w-3 h-3 ml-0.5" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
