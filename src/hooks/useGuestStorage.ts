@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   EMAIL_PROMPTED: "lua_email_prompted",
   SIGNUP_PROMPTED: "lua_signup_prompted",
   CAPTURED_EMAIL: "lua_captured_email",
+  CAPTURED_PHONE: "lua_captured_phone",
   MILESTONES_CELEBRATED: "lua_milestones_celebrated",
   ACCOUNT_COMPLETE: "lua_account_complete",
 } as const;
@@ -14,6 +15,7 @@ const STORAGE_KEYS = {
 export const useGuestStorage = () => {
   const [movingInfo, setMovingInfoState] = useState<MovingInfo | null>(null);
   const [capturedEmail, setCapturedEmailState] = useState<string>("");
+  const [capturedPhone, setCapturedPhoneState] = useState<string>("");
 
   // Load data on mount
   useEffect(() => {
@@ -29,6 +31,11 @@ export const useGuestStorage = () => {
     const savedEmail = localStorage.getItem(STORAGE_KEYS.CAPTURED_EMAIL);
     if (savedEmail) {
       setCapturedEmailState(savedEmail);
+    }
+
+    const savedPhone = localStorage.getItem(STORAGE_KEYS.CAPTURED_PHONE);
+    if (savedPhone) {
+      setCapturedPhoneState(savedPhone);
     }
   }, []);
 
@@ -56,6 +63,15 @@ export const useGuestStorage = () => {
       localStorage.setItem(STORAGE_KEYS.CAPTURED_EMAIL, email);
     } else {
       localStorage.removeItem(STORAGE_KEYS.CAPTURED_EMAIL);
+    }
+  }, []);
+
+  const setCapturedPhone = useCallback((phone: string) => {
+    setCapturedPhoneState(phone);
+    if (phone) {
+      localStorage.setItem(STORAGE_KEYS.CAPTURED_PHONE, phone);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.CAPTURED_PHONE);
     }
   }, []);
 
@@ -132,6 +148,7 @@ export const useGuestStorage = () => {
     });
     setMovingInfoState(null);
     setCapturedEmailState("");
+    setCapturedPhoneState("");
   }, []);
 
   return {
@@ -140,9 +157,11 @@ export const useGuestStorage = () => {
     setMovingInfo,
     updateMovingInfo,
     
-    // Email
+    // Email & Phone
     capturedEmail,
     setCapturedEmail,
+    capturedPhone,
+    setCapturedPhone,
     
     // Tasks
     getGuestTasks,
