@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
 import { Task } from "@/lib/taskGenerator";
@@ -32,6 +33,8 @@ import {
   Circle,
   ArrowRight,
   ChevronRight,
+  Search,
+  X,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
@@ -49,6 +52,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
   // Question dialogs for affiliate tasks
   const {
@@ -62,8 +67,19 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   // Filter en sorteer taken voor de homepage
   const openTasks = useMemo(() => {
     const open = tasks.filter(t => t.status !== "done");
-    return sortTasksSmart(open);
-  }, [tasks]);
+    const sorted = sortTasksSmart(open);
+    
+    // Apply search filter if there's a query
+    if (searchQuery.trim()) {
+      return sorted.filter(t => 
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return sorted;
+  }, [tasks, searchQuery]);
 
   // Get top 5 sorted tasks, ensuring at least 1 affiliate task is visible
   const displayTasks = useMemo(() => {
@@ -257,9 +273,43 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
       
       {/* Header */}
-      <div className="px-4 pt-4 pb-2">
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <LuaLogo size="md" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowSearch(!showSearch)}
+          className="h-10 w-10 rounded-xl"
+        >
+          <Search className="w-5 h-5 text-muted-foreground" />
+        </Button>
       </div>
+
+      {/* Search Bar */}
+      {showSearch && (
+        <div className="px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Zoek taken..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 h-11 rounded-xl border-0 bg-white shadow-sm"
+              autoFocus
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Moving Date Card */}
       <div className="px-6 mb-6">

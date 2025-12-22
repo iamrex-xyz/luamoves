@@ -407,12 +407,17 @@ export const SignupPromptDialog = ({
     trackEvent("account_field_completed", { field: fieldName });
   };
 
+  const handleLater = () => {
+    trackEvent("signup_prompt_skipped");
+    onOpenChange(false);
+  };
+
   return (
-    <MobileModal open={open} onOpenChange={() => {}}>
+    <MobileModal open={open} onOpenChange={onOpenChange}>
       <MobileModalContent 
         className="max-h-[85vh]"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
+        showCloseButton={true}
+        onCloseClick={handleLater}
       >
         {currentStep === 1 ? (
           <>

@@ -35,7 +35,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
 
     const celebratedMilestones = getCelebratedMilestones();
 
-    // Check for 50% milestone
+    // Check for 50% milestone - soft prompt with celebration
     if (totalTasks && totalTasks > 0) {
       const percentage = (completedCount / totalTasks) * 100;
       if (percentage >= 50 && !celebratedMilestones.includes("halfway")) {
@@ -46,7 +46,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       }
     }
 
-    // Check for 5 tasks milestone
+    // Check for 5 tasks milestone - soft prompt with celebration
     if (completedCount >= 5 && !celebratedMilestones.includes("five_tasks")) {
       addCelebratedMilestone("five_tasks");
       setMilestoneCelebrationType("five_tasks");
@@ -54,22 +54,24 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return;
     }
 
-    // After 2nd task - show signup dialog (hard blocking)
-    if (completedCount >= 2) {
-      if (capturedEmail) {
-        setShowSignupPrompt(true);
-      } else {
-        setIsEmailHardBlock(true);
-        setShowEmailCapture(true);
-      }
+    // After 3rd task - show account badge reminder (soft, non-blocking)
+    if (completedCount >= 3 && !capturedEmail) {
+      setShowAccountBadge(true);
       return;
     }
 
-    // After 1st task - show email capture dialog (soft)
-    if (completedCount >= 1 && !isEmailPrompted()) {
+    // After 5th task - show soft email capture (dismissible)
+    if (completedCount >= 5 && !isEmailPrompted() && !capturedEmail) {
       setEmailPrompted(true);
       setIsEmailHardBlock(false);
       setShowEmailCapture(true);
+      return;
+    }
+
+    // After 8th task - show signup prompt if email captured (still dismissible)
+    if (completedCount >= 8 && capturedEmail && !celebratedMilestones.includes("signup_prompt_8")) {
+      addCelebratedMilestone("signup_prompt_8");
+      setShowSignupPrompt(true);
       return;
     }
   }, [isLoggedIn, capturedEmail, isEmailPrompted, setEmailPrompted, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
