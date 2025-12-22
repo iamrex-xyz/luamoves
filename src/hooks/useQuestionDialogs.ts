@@ -15,6 +15,12 @@ import {
   isSmokeDetectorTask,
   isGardenTask,
   isRenovationTask,
+  isHypothekTask,
+  isBouwkundigeKeuringTask,
+  isNotarisTask,
+  isTaxatieTask,
+  isOpstalTask,
+  isSlotTask,
   needsEnergyQuestions,
   needsInternetQuestions,
   needsMovingQuestions,
@@ -175,6 +181,13 @@ export const useQuestionDialogs = (
         setActiveDialog("renovation");
         return;
       }
+      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      return;
+    }
+    
+    // KOOP-specifieke taken - direct naar deals (geen extra vragen nodig)
+    if (isHypothekTask(task) || isBouwkundigeKeuringTask(task) || isNotarisTask(task) || 
+        isTaxatieTask(task) || isOpstalTask(task) || isSlotTask(task)) {
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }
