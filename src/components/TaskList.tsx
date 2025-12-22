@@ -35,6 +35,7 @@ import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestion
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
+import { BudgetDialog } from "@/components/BudgetDialog";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -561,6 +562,18 @@ export const TaskList = ({
         open={activeDialog === "partnerInvite"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInviteSent={() => setActiveDialog(null)}
+      />
+
+      <BudgetDialog
+        open={activeDialog === "budget"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        currentBudget={(movingInfo as any).movingBudget}
+        onComplete={(budget) => {
+          if (onUpdateMovingInfo) {
+            onUpdateMovingInfo({ movingBudget: budget } as any);
+          }
+          setActiveDialog(null);
+        }}
       />
 
       <DocumentUploadSheet

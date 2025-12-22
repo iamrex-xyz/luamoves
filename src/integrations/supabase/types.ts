@@ -251,6 +251,7 @@ export type Database = {
           internet_speed_preference: string | null
           is_vve: boolean | null
           key_handover_date: string | null
+          moving_budget: number | null
           moving_date: string | null
           moving_type: string | null
           municipality: string | null
@@ -308,6 +309,7 @@ export type Database = {
           internet_speed_preference?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
+          moving_budget?: number | null
           moving_date?: string | null
           moving_type?: string | null
           municipality?: string | null
@@ -365,6 +367,7 @@ export type Database = {
           internet_speed_preference?: string | null
           is_vve?: boolean | null
           key_handover_date?: string | null
+          moving_budget?: number | null
           moving_date?: string | null
           moving_type?: string | null
           municipality?: string | null
