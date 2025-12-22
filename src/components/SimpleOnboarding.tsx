@@ -327,7 +327,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   if (step === 2) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-6 flex justify-between items-center">
+        <div className="p-4 sm:p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
@@ -335,7 +335,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
@@ -391,7 +391,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   if (step === 3) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-6 flex justify-between items-center">
+        <div className="p-4 sm:p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
@@ -399,7 +399,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col px-6 pb-12 max-w-2xl mx-auto w-full overflow-y-auto">
+        <div className="flex-1 flex flex-col px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full overflow-y-auto">
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 py-4">
             <div className="space-y-3">
               <h1 className="text-3xl md:text-5xl font-bold text-foreground leading-[1.1] tracking-tight">
@@ -488,7 +488,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   if (step === 4) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-6 flex justify-between items-center">
+        <div className="p-4 sm:p-6 flex justify-between items-center">
           <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
@@ -496,7 +496,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
@@ -548,10 +548,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   // Step 5: Generating
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-      <div className="p-6 flex justify-between items-center">
+      <div className="p-4 sm:p-6 flex justify-between items-center">
         <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
       </div>
-      <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">

@@ -24,7 +24,7 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
       role="navigation"
       aria-label="Hoofdnavigatie"
     >
-      <div className="max-w-4xl mx-auto px-2 py-2">
+      <div className="max-w-4xl mx-auto px-1 sm:px-2 py-2">
         <div className="flex items-center justify-around" role="tablist">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -39,14 +39,14 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
                 aria-label={`${item.label}${showBadge ? `, ${unreadCount} ongelezen berichten` : ''}`}
                 onClick={() => onNavigate(item.id)}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-xl transition-all min-w-[50px] relative active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                  "flex flex-col items-center justify-center gap-0.5 px-1.5 sm:px-2 py-1.5 rounded-xl transition-all min-w-[44px] sm:min-w-[50px] relative active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                   isActive
                     ? "text-primary bg-primary/10"
                     : "text-muted-foreground hover:text-foreground active:bg-muted/50"
                 )}
               >
                 <Icon className={cn("w-5 h-5", isActive && "stroke-[2.5]")} aria-hidden="true" />
-                <span className="text-[9px] font-medium">{item.label}</span>
+                <span className="text-[8px] sm:text-[9px] font-medium truncate max-w-[48px] sm:max-w-none">{item.label}</span>
                 {showBadge && (
                   <span 
                     className="absolute -top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5"

@@ -33,7 +33,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
           <LuaLogo size="md" />
         </div>
 
-        <div className="px-6 space-y-6">
+        <div className="px-4 sm:px-6 space-y-6">
           {/* Moving Details Card - works for guests */}
           <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
 
@@ -74,7 +74,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
         </div>
       </div>
 
-      <div className="px-6 space-y-6">
+      <div className="px-4 sm:px-6 space-y-6">
         {/* Moving Details Card */}
         <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
 

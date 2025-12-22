@@ -147,7 +147,7 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
           <LuaLogo size="md" />
         </div>
 
-        <div className="px-4 py-12">
+        <div className="px-4 py-8">
           <Card className="p-8 text-center">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <FolderOpen className="h-8 w-8 text-primary" />
