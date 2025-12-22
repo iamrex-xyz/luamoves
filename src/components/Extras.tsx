@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -365,24 +365,22 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
             </p>
           </Card>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {Object.entries(documentsByCategory).map(([category, docs]) => (
               <div key={category}>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2 px-1">
                   {categoryLabels[category] || category} ({docs.length})
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
                   {docs.map((doc) => {
                     const Icon = getDocumentIcon(doc.file_type);
-                    const hasImagePreview = isImage(doc.file_type) && previewUrls[doc.id];
-                    const hasPdfPreview = isPdf(doc.file_type) && previewUrls[doc.id];
+                    const fileType = doc.file_name.split('.').pop()?.toUpperCase() || 'FILE';
                     
                     return (
                       <Card 
                         key={doc.id} 
-                        className="group overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                        className="p-3 hover:bg-secondary/50 transition-colors cursor-pointer"
                         onClick={() => {
-                          // Use cached preview URL if available
                           if (previewUrls[doc.id]) {
                             setViewingUrl(previewUrls[doc.id]);
                             setViewingDoc(doc);
@@ -391,42 +389,27 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
                           }
                         }}
                       >
-                        {/* Preview area */}
-                        <div className="aspect-[4/3] bg-muted/30 flex items-center justify-center relative overflow-hidden">
-                          {hasImagePreview ? (
-                            <img 
-                              src={previewUrls[doc.id]} 
-                              alt={doc.description || doc.file_name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : hasPdfPreview ? (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/20 dark:to-red-900/20">
-                              <FileText className="h-10 w-10 text-red-500" />
-                              <span className="text-xs font-medium text-red-600 dark:text-red-400 mt-2 uppercase">PDF</span>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center gap-2">
-                              <Icon className="h-8 w-8 text-muted-foreground" />
-                              <span className="text-xs text-muted-foreground uppercase">
-                                {doc.file_name.split('.').pop()}
-                              </span>
-                            </div>
-                          )}
-                          
-                          {/* Hover overlay */}
-                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <Eye className="h-6 w-6 text-white" />
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+                            <Icon className="h-5 w-5 text-muted-foreground" />
                           </div>
-                        </div>
-                        
-                        {/* Info area */}
-                        <div className="p-3">
-                          <p className="font-medium text-sm truncate">
-                            {doc.description || doc.file_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {doc.upload_date && format(new Date(doc.upload_date), "d MMM", { locale: nl })}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {doc.description || doc.file_name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs text-muted-foreground">{fileType}</span>
+                              {doc.upload_date && (
+                                <>
+                                  <span className="text-muted-foreground/40">•</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(doc.upload_date), "d MMM", { locale: nl })}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <Eye className="h-4 w-4 text-muted-foreground/50" />
                         </div>
                       </Card>
                     );
@@ -438,95 +421,97 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
         )}
       </div>
 
-      {/* Document Viewer Sheet */}
-      <Sheet open={!!viewingDoc} onOpenChange={(open) => {
-        if (!open) {
-          setViewingDoc(null);
-          setViewingUrl(null);
-        }
-      }}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-2xl p-0">
-          {viewingDoc && viewingUrl && (
-            <div className="h-full flex flex-col">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
-                <div className="flex-1 min-w-0 pr-4">
-                  <h3 className="font-medium truncate">
-                    {viewingDoc.description || viewingDoc.file_name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    {viewingDoc.upload_date && format(new Date(viewingDoc.upload_date), "d MMMM yyyy", { locale: nl })}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl"
-                    onClick={() => downloadDocument(viewingDoc.file_path, viewingDoc.file_name)}
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl text-destructive"
-                    onClick={() => {
-                      deleteDocument.mutate({ id: viewingDoc.id, file_path: viewingDoc.file_path });
-                      setViewingDoc(null);
-                      setViewingUrl(null);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl"
-                    onClick={() => {
-                      setViewingDoc(null);
-                      setViewingUrl(null);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+      {/* Document Viewer Modal */}
+      {viewingDoc && viewingUrl && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => {
+            setViewingDoc(null);
+            setViewingUrl(null);
+          }}
+        >
+          <div 
+            className="relative bg-background rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex-1 min-w-0 pr-4">
+                <h3 className="font-medium truncate">
+                  {viewingDoc.description || viewingDoc.file_name}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Even checken?
+                </p>
               </div>
-              
-              {/* Content */}
-              <div className="flex-1 overflow-auto bg-muted/20">
-                {isImage(viewingDoc.file_type) ? (
-                  <img 
-                    src={viewingUrl} 
-                    alt={viewingDoc.description || viewingDoc.file_name}
-                    className="w-full h-auto"
-                  />
-                ) : isPdf(viewingDoc.file_type) ? (
-                  <iframe 
-                    src={viewingUrl}
-                    className="w-full h-full"
-                    title={viewingDoc.file_name}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-full gap-4 p-8">
-                    <File className="h-16 w-16 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground text-center">
-                      Dit bestandstype kan niet worden weergegeven. Download het bestand om te bekijken.
-                    </p>
-                    <Button 
-                      onClick={() => downloadDocument(viewingDoc.file_path, viewingDoc.file_name)}
-                      className="rounded-xl"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </Button>
-                  </div>
-                )}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-xl h-8 w-8"
+                  onClick={() => downloadDocument(viewingDoc.file_path, viewingDoc.file_name)}
+                >
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-xl h-8 w-8 text-destructive hover:text-destructive"
+                  onClick={() => {
+                    deleteDocument.mutate({ id: viewingDoc.id, file_path: viewingDoc.file_path });
+                    setViewingDoc(null);
+                    setViewingUrl(null);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-xl h-8 w-8"
+                  onClick={() => {
+                    setViewingDoc(null);
+                    setViewingUrl(null);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-          )}
-        </SheetContent>
-      </Sheet>
+            
+            {/* Content */}
+            <div className="overflow-auto max-h-[calc(90vh-80px)] bg-muted/10">
+              {isImage(viewingDoc.file_type) ? (
+                <img 
+                  src={viewingUrl} 
+                  alt={viewingDoc.description || viewingDoc.file_name}
+                  className="w-full h-auto"
+                />
+              ) : isPdf(viewingDoc.file_type) ? (
+                <iframe 
+                  src={viewingUrl}
+                  className="w-full min-h-[70vh]"
+                  title={viewingDoc.file_name}
+                />
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 gap-4 px-8">
+                  <File className="h-16 w-16 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground text-center">
+                    Dit bestandstype kan niet worden weergegeven.
+                  </p>
+                  <Button 
+                    onClick={() => downloadDocument(viewingDoc.file_path, viewingDoc.file_name)}
+                    className="rounded-xl"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav currentView="extras" onNavigate={onNavigate} />
     </div>
