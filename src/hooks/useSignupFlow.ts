@@ -38,15 +38,18 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     const celebratedMilestones = getCelebratedMilestones();
 
     // After 1st task - show email + phone capture (soft, dismissible)
-    if (completedCount === 1 && !capturedEmail && !celebratedMilestones.includes("task_1_email")) {
-      addCelebratedMilestone("task_1_email");
+    // Always show if no email captured yet, regardless of previous milestone
+    if (completedCount >= 1 && !capturedEmail && !showEmailCapture) {
+      if (!celebratedMilestones.includes("task_1_email")) {
+        addCelebratedMilestone("task_1_email");
+      }
       setIsEmailHardBlock(false);
       setShowEmailCapture(true);
       return;
     }
 
     // After 2nd task - show signup prompt for remaining questions (if email captured)
-    if (completedCount === 2 && capturedEmail && !celebratedMilestones.includes("task_2_signup")) {
+    if (completedCount >= 2 && capturedEmail && !celebratedMilestones.includes("task_2_signup")) {
       addCelebratedMilestone("task_2_signup");
       setShowSignupPrompt(true);
       return;
@@ -76,7 +79,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       setShowAccountBadge(true);
       return;
     }
-  }, [isLoggedIn, capturedEmail, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
+  }, [isLoggedIn, capturedEmail, showEmailCapture, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
 
   const handleEmailSubmit = useCallback((email: string, phone?: string) => {
     setCapturedEmail(email);
