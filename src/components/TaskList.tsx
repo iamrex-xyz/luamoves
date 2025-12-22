@@ -39,6 +39,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { DocumentUploadSheet } from "@/components/DocumentUploadSheet";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { useNavigate } from "react-router-dom";
 import { shouldShowTask } from "@/lib/smartQuestions";
@@ -84,6 +85,7 @@ export const TaskList = ({
   );
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
+  const [documentTask, setDocumentTask] = useState<Task | null>(null);
 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const { toast } = useToast();
@@ -390,11 +392,7 @@ export const TaskList = ({
                       onRegelenClick={handleRegelenClick}
                       onDocumentClick={(e, task) => {
                         e.stopPropagation();
-                        // Navigate to documents tab - for now show toast
-                        toast({
-                          title: "Documenten",
-                          description: `Upload documenten voor: ${task.title}`,
-                        });
+                        setDocumentTask(task);
                       }}
                       onSwipeComplete={handleTaskToggle}
                     />
@@ -570,6 +568,12 @@ export const TaskList = ({
         open={activeDialog === "partnerInvite"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInviteSent={() => setActiveDialog(null)}
+      />
+
+      <DocumentUploadSheet
+        open={!!documentTask}
+        onOpenChange={(open) => !open && setDocumentTask(null)}
+        task={documentTask}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
