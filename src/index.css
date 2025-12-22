@@ -20,7 +20,6 @@ All colors MUST be HSL.
 
     /* Primary - Pumpkin Spice #FC7A1E */
     --primary: 25 97% 55%;
-    --primary-rgb: 252, 122, 30;
     --primary-foreground: 0 0% 100%;
     /* Apricot Cream #F9C784 */
     --primary-light: 35 91% 93%;
