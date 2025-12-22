@@ -420,8 +420,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           <TaskListSkeleton count={5} />
         ) : openTasks.length > 0 ? (
           <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
-            {displayTasks.map((task) => (
-              <TaskItem key={task.id} task={task} />
+            {displayTasks.map((task, index) => (
+              <div key={task.id} className={index === 0 ? "animate-[pulse_3s_ease-in-out_2]" : ""}>
+                <TaskItem task={task} />
+              </div>
             ))}
             {openTasks.length > 5 && (
               <Button
