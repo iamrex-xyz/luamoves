@@ -440,7 +440,7 @@ export const SignupPromptDialog = ({
                   <Sparkles className="w-7 h-7 text-primary-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">Nog een paar dingen</h2>
+                  <h2 className="text-2xl font-bold">Nog even afmaken</h2>
                   <p className="text-muted-foreground mt-1">
                     Dan kan ik alles voor je blijven bijhouden.
                   </p>
