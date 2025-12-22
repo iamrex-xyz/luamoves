@@ -168,7 +168,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
             </div>
             <div>
               <h3 className="font-semibold text-sm">Lua</h3>
-              <p className="text-xs text-muted-foreground">Je verhuisassistent</p>
+              <p className="text-xs text-muted-foreground">Altijd klaar om je te helpen</p>
             </div>
           </div>
           {messages.length > 1 && (
@@ -222,7 +222,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Stel hier je verhuisvraag…"
+            placeholder="Stel je vraag aan Lua..."
             className="flex-1"
             disabled={isLoading}
           />

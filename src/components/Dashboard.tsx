@@ -378,7 +378,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Jouw taken</h2>
-            <p className="text-xs text-muted-foreground">Recente taken om te voltooien</p>
+            <p className="text-xs text-muted-foreground">Dit pak je als eerste aan</p>
           </div>
           <Button 
             variant="ghost" 
@@ -414,9 +414,9 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="font-semibold text-lg mb-2 text-foreground">Alle taken voltooid!</h3>
+            <h3 className="font-semibold text-lg mb-2 text-foreground">Lekker bezig! Alles is afgevinkt 🎉</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Voeg een nieuwe taak toe om verder te gaan.
+              Heb je nog iets te doen? Voeg het hieronder toe.
             </p>
             <Button onClick={() => setShowAddTask(true)} className="rounded-full bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4 mr-2" />

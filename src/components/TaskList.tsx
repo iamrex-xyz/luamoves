@@ -347,7 +347,7 @@ export const TaskList = ({
             className="mt-3 w-full flex items-center gap-2 px-3 py-2 bg-primary/10 hover:bg-primary/20 rounded-xl transition-colors"
           >
             <User className="w-4 h-4 text-primary" />
-            <span className="text-sm text-primary font-medium">Bewaar je voortgang met een account</span>
+            <span className="text-sm text-primary font-medium">Sla je voortgang op met een gratis account</span>
             <ArrowRight className="w-4 h-4 text-primary ml-auto" />
           </button>
         )}
@@ -365,7 +365,7 @@ export const TaskList = ({
           <TaskListSkeleton count={8} />
         ) : Object.entries(tasksByPhase).length === 0 ? (
           <div className="p-8 text-center text-muted-foreground rounded-3xl bg-white shadow-lg shadow-primary/10">
-            Geen taken gevonden.
+            Geen taken gevonden. Probeer een andere zoekopdracht!
           </div>
         ) : (
           <div className="space-y-4 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">

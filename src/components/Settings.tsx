@@ -42,9 +42,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <SettingsIcon className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="font-medium mb-2">Meer instellingen beschikbaar</h3>
+            <h3 className="font-medium mb-2">Nog meer opties ontgrendelen?</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Maak een account aan om huishouden, herinneringen en samenwerkingsopties te beheren.
+              Maak gratis een account aan en beheer je huishouden, herinneringen en samenwerkingsopties.
             </p>
             <Button onClick={onSignupClick} className="rounded-xl">
               Account aanmaken
@@ -93,7 +93,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 text-left">
-            <p className="font-medium text-foreground">Extra info over je verhuizing</p>
+            <p className="font-medium text-foreground">Personaliseer je verhuizing</p>
             <p className="text-xs text-muted-foreground">Energie, woning, internet & meer</p>
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground" />

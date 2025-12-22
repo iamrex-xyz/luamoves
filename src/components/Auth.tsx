@@ -202,7 +202,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                 <span className="text-primary">terug!</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
-                Log in om verder te gaan met je verhuisplanning.
+                Fijn dat je er weer bent. Log in en ga verder waar je was gebleven.
               </p>
             </div>
 
@@ -218,7 +218,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-foreground">Inloggen</p>
-                    <p className="text-sm text-muted-foreground">Met je bestaande account</p>
+                    <p className="text-sm text-muted-foreground">Ga verder met je planning</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -234,7 +234,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-foreground">Account aanmaken</p>
-                    <p className="text-sm text-muted-foreground">Start met je verhuisplanning</p>
+                    <p className="text-sm text-muted-foreground">Gratis en in 30 seconden klaar</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -292,7 +292,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                 <span className="text-primary">vergeten?</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
-                Vul je email in om een reset link te ontvangen.
+                Geen probleem! Vul je email in en we sturen je een reset link.
               </p>
             </div>
 
@@ -353,7 +353,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                 <span className="text-primary">terug!</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-md">
-                Log in om verder te gaan met je verhuisplanning.
+                Fijn dat je er weer bent. Log in en ga verder waar je was gebleven.
               </p>
             </div>
 
