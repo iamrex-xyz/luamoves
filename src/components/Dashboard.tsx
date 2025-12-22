@@ -37,7 +37,7 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 type DashboardProps = {
   movingInfo: MovingInfo;
@@ -55,6 +55,22 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Hide search bar on scroll down
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 50 && showSearch) {
+        setShowSearch(false);
+        setSearchQuery("");
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY, showSearch]);
 
   // Question dialogs for affiliate tasks
   const {
