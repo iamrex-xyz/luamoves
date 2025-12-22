@@ -8,9 +8,11 @@ export const isEnergyTask = (task: Task): boolean => {
   return (
     titleLower.includes("energieleverancier") ||
     (titleLower.includes("energie") && titleLower.includes("vergelijk")) ||
+    (titleLower.includes("energie") && titleLower.includes("regelen")) ||
     (titleLower.includes("energiecontract") && titleLower.includes("kiezen")) ||
     idLower.includes("energie-vergelijk") ||
     idLower.includes("energy-compare") ||
+    idLower.includes("fase2-energie") ||
     idLower.includes("rent-phase1-5") ||
     idLower.includes("buy-phase2-12")
   );
