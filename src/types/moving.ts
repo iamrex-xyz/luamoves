@@ -61,6 +61,8 @@ export type MovingInfo = {
   housingPropertyType?: string;
   // Contact veld
   phone?: string;
+  // Budget veld
+  movingBudget?: number;
 };
 
 export type AppView = "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings" | "chat";

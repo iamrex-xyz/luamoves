@@ -9,9 +9,10 @@ import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
 import { HouseholdSettingsCard } from "@/components/settings/HouseholdSettingsCard";
 import { PersonalInfoCard } from "@/components/settings/PersonalInfoCard";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
+import { BudgetProgressBar } from "@/components/BudgetProgressBar";
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon, RotateCcw } from "lucide-react";
+import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
@@ -109,6 +110,13 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
       </div>
 
       <div className="px-4 sm:px-6 space-y-6">
+        {/* Budget Progress Bar - always on top */}
+        <BudgetProgressBar
+          totalBudget={movingInfo.movingBudget || null}
+          spentAmount={0} // TODO: Calculate from completed affiliate tasks
+          onBudgetUpdate={(budget) => onUpdate({ ...movingInfo, movingBudget: budget || undefined })}
+        />
+
         {/* Moving Details Card */}
         <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
 
