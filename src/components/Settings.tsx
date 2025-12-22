@@ -10,7 +10,8 @@ import { HouseholdSettingsCard } from "@/components/settings/HouseholdSettingsCa
 import { PersonalInfoCard } from "@/components/settings/PersonalInfoCard";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
 import { LuaLogo } from "@/components/LuaLogo";
-import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon, RotateCcw } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
@@ -24,13 +25,44 @@ type SettingsProps = {
 export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick }: SettingsProps) => {
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
   const [extraInfoSheetOpen, setExtraInfoSheetOpen] = useState(false);
+  const [resetClickCount, setResetClickCount] = useState(0);
+  const { toast } = useToast();
+
+  // Hidden reset function - triple tap on logo to activate
+  const handleLogoClick = () => {
+    const newCount = resetClickCount + 1;
+    setResetClickCount(newCount);
+    
+    if (newCount >= 3) {
+      // Clear all localStorage
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      toast({
+        title: "Reset voltooid",
+        description: "Alle lokale data is gewist. Ververs de pagina om opnieuw te beginnen.",
+      });
+      
+      setResetClickCount(0);
+      
+      // Auto refresh after short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } else {
+      // Reset count after 2 seconds of no clicks
+      setTimeout(() => setResetClickCount(0), 2000);
+    }
+  };
 
   // Guest UI
   if (isGuest) {
     return (
       <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
         <div className="px-4 pt-4 pb-2">
-          <LuaLogo size="md" />
+          <div onClick={handleLogoClick} className="cursor-pointer">
+            <LuaLogo size="md" />
+          </div>
         </div>
 
         <div className="px-4 sm:px-6 space-y-6">
@@ -62,7 +94,9 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
       {/* Header */}
       <div className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
-          <LuaLogo size="md" />
+          <div onClick={handleLogoClick} className="cursor-pointer">
+            <LuaLogo size="md" />
+          </div>
           <Button
             variant="ghost"
             size="icon"
