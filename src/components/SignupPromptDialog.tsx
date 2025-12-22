@@ -74,7 +74,7 @@ export const SignupPromptDialog = ({
   const [keyHandoverCalendarOpen, setKeyHandoverCalendarOpen] = useState(false);
   
   // Get onboarding data from sessionStorage
-  const getOnboardingData = () => {
+  const onboardingData = useMemo(() => {
     try {
       const storedData = sessionStorage.getItem("lua_moving_info");
       if (storedData) {
@@ -84,7 +84,15 @@ export const SignupPromptDialog = ({
       console.error("Error parsing onboarding data:", e);
     }
     return null;
-  };
+  }, [open]);
+
+  // Get moving date from onboarding to limit key handover date
+  const movingDate = useMemo(() => {
+    if (onboardingData?.movingDate) {
+      return new Date(onboardingData.movingDate);
+    }
+    return null;
+  }, [onboardingData]);
 
   // Address lookup effect - same as onboarding
   useEffect(() => {
@@ -473,8 +481,16 @@ export const SignupPromptDialog = ({
                           setKeyHandoverDate(date);
                           setKeyHandoverCalendarOpen(false);
                         }}
+                        disabled={(date) => {
+                          // Key handover date cannot be after moving date
+                          if (movingDate) {
+                            return date > movingDate;
+                          }
+                          return false;
+                        }}
                         locale={nl}
                         initialFocus
+                        className={cn("p-3 pointer-events-auto")}
                       />
                     </PopoverContent>
                   </Popover>
