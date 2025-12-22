@@ -494,17 +494,36 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
                   title={viewingDoc.file_name}
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center py-16 gap-4 px-8">
-                  <File className="h-16 w-16 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground text-center">
-                    Dit bestandstype kan niet worden weergegeven.
+                <div className="flex flex-col items-center justify-center py-16 gap-6 px-8">
+                  <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center">
+                    <File className="h-10 w-10 text-muted-foreground" />
+                  </div>
+                  <div className="text-center space-y-1">
+                    <p className="font-medium">
+                      {viewingDoc.description || viewingDoc.file_name}
+                    </p>
+                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                      <span>{viewingDoc.file_name.split('.').pop()?.toUpperCase()}</span>
+                      {viewingDoc.upload_date && (
+                        <>
+                          <span className="text-muted-foreground/40">•</span>
+                          <span>
+                            {format(new Date(viewingDoc.upload_date), "d MMMM yyyy", { locale: nl })}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center max-w-xs">
+                    Dit kan ik hier niet openen, maar ik weet wel welk document dit is.
                   </p>
                   <Button 
+                    variant="outline"
                     onClick={() => downloadDocument(viewingDoc.file_path, viewingDoc.file_name)}
                     className="rounded-xl"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Download
+                    Downloaden
                   </Button>
                 </div>
               )}
