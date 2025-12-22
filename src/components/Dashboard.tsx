@@ -318,7 +318,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       )}
 
       {/* Moving Date Card */}
-      <div className="px-6 mb-6">
+      <div className="px-4 sm:px-6 mb-6">
         <div className="relative overflow-hidden rounded-3xl bg-white shadow-2xl shadow-primary/15">
           <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="relative p-6">
@@ -374,7 +374,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       </div>
 
       {/* Tasks Section */}
-      <div className="px-6">
+      <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Jouw taken</h2>

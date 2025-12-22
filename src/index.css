@@ -185,8 +185,21 @@ All colors MUST be HSL.
     @apply transition-all;
     transition-duration: 0.15s;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    min-height: 44px;
-    min-width: 44px;
+  }
+  
+  /* Ensure adequate touch targets on small screens */
+  @media (max-width: 360px) {
+    button {
+      min-height: 40px;
+      min-width: 40px;
+    }
+  }
+  
+  @media (min-width: 361px) {
+    button {
+      min-height: 44px;
+      min-width: 44px;
+    }
   }
   
   /* Improve touch targets on mobile */

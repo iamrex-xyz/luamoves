@@ -159,7 +159,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
   };
 
   return (
-    <Card className="flex flex-col h-[calc(100vh-200px)] min-h-[400px]">
+    <Card className="flex flex-col h-[calc(100vh-220px)] sm:h-[calc(100vh-200px)] min-h-[350px]">
       <div className="p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

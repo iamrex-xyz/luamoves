@@ -274,7 +274,7 @@ export const TaskList = ({
       </div>
       
       {/* Compact Header with Search */}
-      <div className="px-4 pb-3 sticky top-0 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg z-10 border-b border-border/50">
+      <div className="px-3 sm:px-4 pb-3 sticky top-0 bg-gradient-to-br from-primary-light/95 via-primary-light/80 to-white/95 backdrop-blur-lg z-10 border-b border-border/50">
         <div className="flex items-center gap-3">
           {/* Filter button */}
           <Popover>
@@ -360,7 +360,7 @@ export const TaskList = ({
       </div>
 
       {/* Tasks with Pull to Refresh */}
-      <PullToRefresh onRefresh={refreshTasks} className="px-4 py-3">
+      <PullToRefresh onRefresh={refreshTasks} className="px-3 sm:px-4 py-3">
         {isLoading ? (
           <TaskListSkeleton count={8} />
         ) : Object.entries(tasksByPhase).length === 0 ? (
