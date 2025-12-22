@@ -362,7 +362,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
               </div>
 
               {/* Progress Ring */}
-              <div className="relative w-16 h-16">
+              <button 
+                onClick={() => onNavigate("tasks")}
+                className="relative w-16 h-16 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full"
+                aria-label={`${Math.round(progressPercentage)}% voltooid - Bekijk alle taken`}
+              >
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
                   <circle
                     cx="32"
@@ -388,7 +392,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-sm font-bold text-foreground">{Math.round(progressPercentage)}%</span>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </div>
