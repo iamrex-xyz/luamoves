@@ -8,6 +8,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { TaskDetailDialog } from "@/components/TaskDetailDialog";
 import { AddTaskDialog } from "@/components/AddTaskDialog";
 import { LuaLogo } from "@/components/LuaLogo";
+import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
@@ -386,9 +387,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         </div>
 
         {isLoading ? (
-          <div className="p-8 rounded-3xl bg-white shadow-lg shadow-primary/10">
-            <p className="text-center text-muted-foreground">Taken laden...</p>
-          </div>
+          <TaskListSkeleton count={5} />
         ) : openTasks.length > 0 ? (
           <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
             {displayTasks.map((task) => (

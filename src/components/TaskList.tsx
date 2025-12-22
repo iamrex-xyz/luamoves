@@ -38,11 +38,11 @@ import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { useNavigate } from "react-router-dom";
 import { shouldShowTask } from "@/lib/smartQuestions";
 import {
   Filter,
-  Loader2,
   Share2,
   User,
   Search,
@@ -357,9 +357,7 @@ export const TaskList = ({
       {/* Tasks with Pull to Refresh */}
       <PullToRefresh onRefresh={refreshTasks} className="px-4 py-3">
         {isLoading ? (
-          <div className="p-8 text-center rounded-3xl bg-white shadow-lg shadow-primary/10">
-            <Loader2 className="w-6 h-6 mx-auto animate-spin text-primary" />
-          </div>
+          <TaskListSkeleton count={8} />
         ) : Object.entries(tasksByPhase).length === 0 ? (
           <div className="p-8 text-center text-muted-foreground rounded-3xl bg-white shadow-lg shadow-primary/10">
             Geen taken gevonden.
