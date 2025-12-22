@@ -79,7 +79,7 @@ export const TaskListItem = ({
         role="button"
         tabIndex={0}
         aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
-        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
+        className={`group relative px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 min-h-[60px] ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -88,11 +88,11 @@ export const TaskListItem = ({
           }
         }}
       >
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-2">
           <button 
             type="button"
             aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
-            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 pt-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
+            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
             disabled={isCompleting}
           >
@@ -110,21 +110,21 @@ export const TaskListItem = ({
               }`} aria-hidden="true" />
             )}
           </button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
-                isCompleting 
-                  ? "line-through text-primary-foreground" 
-                  : task.status === "done" 
-                    ? "line-through text-muted-foreground" 
-                    : "text-foreground"
-              }`}>
-                {task.title}
-              </h4>
-              {getUrgencyBadge()}
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+          <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className={`font-medium text-sm leading-tight truncate transition-all duration-200 ${
+                  isCompleting 
+                    ? "line-through text-primary-foreground" 
+                    : task.status === "done" 
+                      ? "line-through text-muted-foreground" 
+                      : "text-foreground"
+                }`}>
+                  {task.title}
+                </h4>
+                {getUrgencyBadge()}
+              </div>
+              <span className={`flex items-center gap-1 text-xs mt-0.5 transition-colors duration-200 ${
                 isCompleting 
                   ? "text-primary-foreground/80" 
                   : isTaskOverdue 
@@ -136,30 +136,30 @@ export const TaskListItem = ({
                 <Clock className="w-3 h-3" />
                 {task.deadlineLabel}
               </span>
-              <div className="flex items-center gap-1 ml-auto">
-                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="shrink-0 h-5 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
-                    onClick={(e) => onDocumentClick(e, task)}
-                  >
-                    <FileText className="w-3 h-3 mr-0.5" />
-                    Documenten
-                  </Button>
-                )}
-                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                    onClick={(e) => onRegelenClick(e, task)}
-                  >
-                    Regelen
-                    <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
-                )}
-              </div>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
+                  onClick={(e) => onDocumentClick(e, task)}
+                >
+                  <FileText className="w-3 h-3 mr-0.5" />
+                  Documenten
+                </Button>
+              )}
+              {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                  onClick={(e) => onRegelenClick(e, task)}
+                >
+                  Regelen
+                  <ChevronRight className="w-3 h-3 ml-0.5" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
