@@ -257,8 +257,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   <p className="text-lg font-semibold text-foreground">{daysUntilMove} dagen</p>
                 </div>
 
-                {/* Progress Ring - Compact */}
-                <div className="relative w-12 h-12 shrink-0">
+                {/* Progress Ring - Compact & Interactive */}
+                <button
+                  onClick={() => onNavigate("tasks")}
+                  className="relative w-12 h-12 shrink-0 cursor-pointer transition-transform hover:scale-105 active:scale-95"
+                  aria-label="Bekijk alle taken"
+                >
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 48 48">
                     <circle
                       cx="24"
@@ -284,7 +288,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   <div className="absolute inset-0 flex items-center justify-center">
                     <span className="text-xs font-bold text-foreground">{Math.round(progressPercentage)}%</span>
                   </div>
-                </div>
+                </button>
               </div>
             </div>
           </div>
