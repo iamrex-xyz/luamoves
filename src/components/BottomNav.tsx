@@ -14,8 +14,8 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
     { id: "chat", label: "Chat", icon: MessageCircle },
-    { id: "extras", label: "Documenten", icon: FileText },
-    { id: "settings", label: "Instellingen", icon: Settings },
+    { id: "extras", label: "Docs", icon: FileText },
+    { id: "settings", label: "Account", icon: Settings },
   ] as const;
 
   return (
@@ -46,7 +46,7 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
                 )}
               >
                 <Icon className={cn("w-5 h-5", isActive && "stroke-[2.5]")} aria-hidden="true" />
-                <span className="text-[8px] sm:text-[9px] font-medium truncate max-w-[48px] sm:max-w-none">{item.label}</span>
+                <span className="text-[9px] sm:text-[10px] font-medium whitespace-nowrap">{item.label}</span>
                 {showBadge && (
                   <span 
                     className="absolute -top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5"
