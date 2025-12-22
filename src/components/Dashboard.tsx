@@ -421,7 +421,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         ) : openTasks.length > 0 ? (
           <div className="space-y-2 p-4 rounded-3xl bg-white shadow-lg shadow-primary/10">
             {displayTasks.map((task, index) => (
-              <div key={task.id} className={index === 0 ? "animate-[pulse_3s_ease-in-out_2]" : ""}>
+              <div key={task.id} className={index === 0 ? "rounded-xl shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] ring-1 ring-primary/20" : ""}>
                 <TaskItem task={task} />
               </div>
             ))}
