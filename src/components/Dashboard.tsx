@@ -308,30 +308,34 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       </div>
 
       {/* Search Bar */}
-      {showSearch && (
-        <div className="px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Zoek taken..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 h-11 rounded-xl border-0 bg-white shadow-sm"
-              autoFocus
-            />
-            {searchQuery && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
+      <div 
+        className={`px-4 pb-3 transition-all duration-300 ease-out overflow-hidden ${
+          showSearch 
+            ? 'max-h-20 opacity-100 translate-y-0' 
+            : 'max-h-0 opacity-0 -translate-y-2'
+        }`}
+      >
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Zoek taken..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-10 h-11 rounded-xl border-0 bg-white shadow-sm"
+            autoFocus={showSearch}
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Moving Date Card */}
       <div className="px-4 sm:px-6 mb-6">
