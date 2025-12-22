@@ -29,7 +29,7 @@ import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog"
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
 import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
-import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
+
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
@@ -514,13 +514,6 @@ export const TaskList = ({
         } : undefined}
       />
 
-      <ParkingQuestionsDialog
-        open={activeDialog === "parking"}
-        onOpenChange={(open) => !open && setActiveDialog(null)}
-        movingInfo={movingInfo}
-        onComplete={handleDialogComplete}
-        onRedirect={() => handleDialogRedirect("parking")}
-      />
 
       <CleaningQuestionsDialog
         open={activeDialog === "cleaning"}

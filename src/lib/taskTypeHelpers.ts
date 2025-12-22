@@ -90,11 +90,17 @@ export const isParkingTask = (task: Task): boolean => {
   const idLower = task.id.toLowerCase();
   return (
     titleLower.includes("parkeervergunning") ||
-    titleLower.includes("verhuislift") ||
     titleLower.includes("parkeersituatie") ||
     (titleLower.includes("parking") && titleLower.includes("permit")) ||
-    idLower.includes("parking") ||
-    idLower.includes("parkeren") ||
+    idLower.includes("parkeervergunning")
+  );
+};
+
+export const isVerhuisliftTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("verhuislift") ||
     idLower.includes("verhuislift")
   );
 };
@@ -238,8 +244,8 @@ export const needsForwardingQuestions = (info: MovingInfo): boolean => {
   return !info.forwardingStartDate || !info.forwardingDuration || !info.householdNames || info.householdNames.length === 0;
 };
 
-export const needsParkingQuestions = (info: MovingInfo): boolean => {
-  return !info.propertyType || !info.floorLevel || !(info as any).municipality;
+export const needsVerhuisliftQuestions = (info: MovingInfo): boolean => {
+  return !info.propertyType || !info.buildingAccess;
 };
 
 export const needsCleaningQuestions = (info: MovingInfo): boolean => {
@@ -271,7 +277,7 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isInsuranceTask(task) ||
     isLiabilityTask(task) ||
     isForwardingTask(task) ||
-    isParkingTask(task) ||
+    isVerhuisliftTask(task) ||
     isCleaningTask(task) ||
     isSmokeDetectorTask(task) ||
     isGardenTask(task) ||
@@ -295,7 +301,7 @@ export const getTaskRedirectUrl = (taskType: string): string => {
     insurance: "Controleer inboedelverzekering",
     liability: "Controleer aansprakelijkheidsverzekering",
     forwarding: "Vraag PostNL doorstuurservice aan",
-    parking: "Regel parkeervergunning of verhuislift",
+    verhuislift: "Verhuislift regelen",
     cleaning: "Plan schoonmaak of schilderwerk",
     smokeDetector: "Controleer rookmelders",
     garden: "Plan tuinonderhoud",

@@ -10,7 +10,7 @@ import {
   isInsuranceTask,
   isLiabilityTask,
   isForwardingTask,
-  isParkingTask,
+  isVerhuisliftTask,
   isCleaningTask,
   isSmokeDetectorTask,
   isGardenTask,
@@ -28,7 +28,6 @@ import {
   needsInsuranceQuestions,
   needsLiabilityQuestions,
   needsForwardingQuestions,
-  needsParkingQuestions,
   needsCleaningQuestions,
   needsSmokeDetectorQuestions,
   needsGardenQuestions,
@@ -47,7 +46,6 @@ export type QuestionDialogType =
   | "liability"
   | "forwarding"
   | "postNLPreparation"
-  | "parking"
   | "cleaning"
   | "smokeDetector"
   | "garden"
@@ -140,11 +138,8 @@ export const useQuestionDialogs = (
       return;
     }
     
-    if (isParkingTask(task)) {
-      if (needsParkingQuestions(movingInfo)) {
-        setActiveDialog("parking");
-        return;
-      }
+    if (isVerhuisliftTask(task)) {
+      // Verhuislift gaat direct naar deals (vragen worden via smart questions gesteld)
       navigate(`/deals?task=${encodeURIComponent(task.title)}`);
       return;
     }

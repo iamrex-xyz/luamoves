@@ -21,7 +21,7 @@ import { BoxesQuestionsDialog } from "@/components/BoxesQuestionsDialog";
 import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog";
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
-import { ParkingQuestionsDialog } from "@/components/ParkingQuestionsDialog";
+
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
@@ -518,13 +518,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
             movingDate: data.movingDate?.toISOString(),
           });
         }}
-      />
-      <ParkingQuestionsDialog
-        open={activeDialog === "parking"}
-        onOpenChange={(open) => !open && closeActiveDialog()}
-        movingInfo={movingInfo}
-        onComplete={handleDialogComplete}
-        onRedirect={() => handleDialogRedirect("parking")}
       />
       <CleaningQuestionsDialog
         open={activeDialog === "cleaning"}

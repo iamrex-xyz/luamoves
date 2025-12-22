@@ -330,16 +330,16 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     requiredQuestions: ["buildingAccess"],
     checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.buildingAccess),
   },
-  // Parkeren: propertyType + buildingAccess (voor verhuislift advies)
+  // Verhuislift: propertyType + buildingAccess
   {
-    taskIdPatterns: ["parkeer", "parkeren"],
-    titlePatterns: ["parkeer", "parkeersituatie", "vergunning"],
+    taskIdPatterns: ["verhuislift"],
+    titlePatterns: ["verhuislift"],
     requiredQuestions: ["propertyType"],
     checkField: (info) => isEmpty(info.propertyType),
   },
   {
-    taskIdPatterns: ["parkeer", "parkeren"],
-    titlePatterns: ["parkeer", "parkeersituatie", "vergunning"],
+    taskIdPatterns: ["verhuislift"],
+    titlePatterns: ["verhuislift"],
     requiredQuestions: ["buildingAccess"],
     checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.buildingAccess),
   },
