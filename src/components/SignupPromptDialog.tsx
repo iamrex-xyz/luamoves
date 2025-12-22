@@ -45,6 +45,7 @@ type SignupPromptDialogProps = {
   onOpenChange: (open: boolean) => void;
   onSignupComplete: () => void;
   capturedEmail?: string;
+  capturedPhone?: string;
 };
 
 export const SignupPromptDialog = ({
@@ -52,6 +53,7 @@ export const SignupPromptDialog = ({
   onOpenChange,
   onSignupComplete,
   capturedEmail = "",
+  capturedPhone = "",
 }: SignupPromptDialogProps) => {
   const { toast } = useToast();
   
@@ -65,8 +67,8 @@ export const SignupPromptDialog = ({
   const [passwordSet, setPasswordSet] = useState(false);
   const [storedPassword, setStoredPassword] = useState("");
   
-  // Step 2: Profile fields
-  const [phone, setPhone] = useState("");
+  // Step 2: Profile fields - pre-fill phone from captured value
+  const [phone, setPhone] = useState(capturedPhone);
   const [oldAddress, setOldAddress] = useState("");
   const [keyHandoverDate, setKeyHandoverDate] = useState<Date | undefined>(undefined);
   const [renovationType, setRenovationType] = useState<"none" | "small" | "large">("none");
@@ -101,6 +103,13 @@ export const SignupPromptDialog = ({
       setOldAddress(onboardingData.oldAddress);
     }
   }, []);
+
+  // Pre-fill phone from captured value when it changes
+  useEffect(() => {
+    if (capturedPhone && !phone) {
+      setPhone(capturedPhone);
+    }
+  }, [capturedPhone]);
 
   // Check if old address matches new address from onboarding
   const isSameAsNewAddress = useMemo(() => {

@@ -7,6 +7,8 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
   const {
     capturedEmail,
     setCapturedEmail,
+    capturedPhone,
+    setCapturedPhone,
     isEmailPrompted,
     setEmailPrompted,
     getCelebratedMilestones,
@@ -35,6 +37,21 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
 
     const celebratedMilestones = getCelebratedMilestones();
 
+    // After 1st task - show email + phone capture (soft, dismissible)
+    if (completedCount === 1 && !capturedEmail && !celebratedMilestones.includes("task_1_email")) {
+      addCelebratedMilestone("task_1_email");
+      setIsEmailHardBlock(false);
+      setShowEmailCapture(true);
+      return;
+    }
+
+    // After 2nd task - show signup prompt for remaining questions (if email captured)
+    if (completedCount === 2 && capturedEmail && !celebratedMilestones.includes("task_2_signup")) {
+      addCelebratedMilestone("task_2_signup");
+      setShowSignupPrompt(true);
+      return;
+    }
+
     // Check for 50% milestone - soft prompt with celebration
     if (totalTasks && totalTasks > 0) {
       const percentage = (completedCount / totalTasks) * 100;
@@ -54,30 +71,18 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return;
     }
 
-    // After 3rd task - show account badge reminder (soft, non-blocking)
+    // After 3rd task - show account badge reminder if no email yet (soft, non-blocking)
     if (completedCount >= 3 && !capturedEmail) {
       setShowAccountBadge(true);
       return;
     }
+  }, [isLoggedIn, capturedEmail, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
 
-    // After 5th task - show soft email capture (dismissible)
-    if (completedCount >= 5 && !isEmailPrompted() && !capturedEmail) {
-      setEmailPrompted(true);
-      setIsEmailHardBlock(false);
-      setShowEmailCapture(true);
-      return;
-    }
-
-    // After 8th task - show signup prompt if email captured (still dismissible)
-    if (completedCount >= 8 && capturedEmail && !celebratedMilestones.includes("signup_prompt_8")) {
-      addCelebratedMilestone("signup_prompt_8");
-      setShowSignupPrompt(true);
-      return;
-    }
-  }, [isLoggedIn, capturedEmail, isEmailPrompted, setEmailPrompted, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
-
-  const handleEmailSubmit = useCallback((email: string) => {
+  const handleEmailSubmit = useCallback((email: string, phone?: string) => {
     setCapturedEmail(email);
+    if (phone) {
+      setCapturedPhone(phone);
+    }
     setShowEmailCapture(false);
 
     // If hard block, immediately show signup
@@ -87,7 +92,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
         setShowSignupPrompt(true);
       }, 100);
     }
-  }, [setCapturedEmail, isEmailHardBlock]);
+  }, [setCapturedEmail, setCapturedPhone, isEmailHardBlock]);
 
   const handleSignupComplete = useCallback(() => {
     setShowSignupPrompt(false);
@@ -139,7 +144,8 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     // Task complete handler
     handleTaskComplete,
     
-    // Email
+    // Email & Phone
     capturedEmail,
+    capturedPhone,
   };
 };
