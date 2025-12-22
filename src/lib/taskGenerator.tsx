@@ -254,6 +254,18 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       icon: <Shield className="w-4 h-4" />,
       priority: 2,
       affiliateLink: "https://www.independer.nl/inboedelverzekering/intro.aspx",
+    },
+    {
+      id: "rent-fase3-aansprakelijkheid",
+      title: "Aansprakelijkheidsverzekering checken",
+      category: "Financieel",
+      description: "Controleer of je aansprakelijkheidsverzekering nog actueel is, of sluit er een af.",
+      ...fase3NormalDeadline,
+      phase: "Papier & zekerheid",
+      status: "todo",
+      icon: <Shield className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.independer.nl/aansprakelijkheidsverzekering/intro.aspx",
     }
   );
 
@@ -323,7 +335,17 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - sociale melding
+    },
+    {
+      id: "rent-fase4-afvalinzameling",
+      title: "Afvalinzameling nieuw adres checken",
+      category: "Administratie",
+      description: "Check wanneer welk afval wordt opgehaald en vraag eventueel een afvalpas aan.",
+      ...fase4LaterDeadline,
+      phase: "De praktische puzzel",
+      status: "todo",
+      icon: <Trash2 className="w-4 h-4" />,
+      priority: 3,
     }
   );
 
@@ -456,6 +478,28 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       icon: <Key className="w-4 h-4" />,
       priority: 1,
       hasDocumentLink: true,
+    },
+    {
+      id: "rent-fase6-belangrijke-spullen",
+      title: "Belangrijke spullen apart houden",
+      category: "Verhuizing",
+      description: "Houd sleutels, paspoorten, opladers en medicijnen bij de hand — niet in de verhuisdozen!",
+      ...moveDayDeadline,
+      phase: "Verhuisdag",
+      status: "todo",
+      icon: <Package className="w-4 h-4" />,
+      priority: 1,
+    },
+    {
+      id: "rent-fase6-verhuizing-uitvoeren",
+      title: "Verhuizing uitvoeren",
+      category: "Verhuizing",
+      description: "De grote dag is daar! Neem de tijd, houd overzicht en vergeet niet te genieten. 🎉",
+      ...moveDayDeadline,
+      phase: "Verhuisdag",
+      status: "todo",
+      icon: <Truck className="w-4 h-4" />,
+      priority: 2,
     }
   );
 
@@ -471,6 +515,11 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
     deadlineLabel: getDeadlineLabel(addDays(movingDate, 7), movingDate)
   };
   
+  const postMove2Weeks = {
+    deadline: addDays(movingDate, 14),
+    deadlineLabel: getDeadlineLabel(addDays(movingDate, 14), movingDate)
+  };
+
   tasks.push(
     {
       id: "rent-fase7-check-voorzieningen",
@@ -484,6 +533,18 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       priority: 1,
     },
     {
+      id: "rent-fase7-dozen-uitpakken",
+      title: "Dozen uitpakken & organiseren",
+      category: "Huishouden",
+      description: "Pak je spullen uit en geef alles een plek. Begin met de belangrijkste kamers.",
+      ...postMove1Day,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Package className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.ikea.com/nl/nl/cat/opbergers-702/",
+    },
+    {
       id: "rent-fase7-instanties",
       title: "Verhuizing doorgeven bij overige instanties",
       category: "Administratie",
@@ -493,7 +554,39 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - wettelijke meldingen
+    },
+    {
+      id: "rent-fase7-buren-ontmoeten",
+      title: "Kennismaken met je buren",
+      category: "Sociaal",
+      description: "Stel jezelf voor bij de buren. Een goede start in de buurt is altijd fijn!",
+      ...postMove1Week,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Users className="w-4 h-4" />,
+      priority: 3,
+    },
+    {
+      id: "rent-fase7-feedback-verhuizers",
+      title: "Feedback geven op verhuisbedrijf",
+      category: "Verhuizing",
+      description: "Geregeld via Lua? Laat een review achter voor het verhuisbedrijf.",
+      ...postMove1Week,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <ClipboardCheck className="w-4 h-4" />,
+      priority: 3,
+    },
+    {
+      id: "rent-fase7-gemeentelijke-belastingen",
+      title: "Gemeentelijke belastingen checken",
+      category: "Financieel",
+      description: "Check welke gemeentelijke belastingen je kunt verwachten op je nieuwe adres.",
+      ...postMove2Weeks,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Euro className="w-4 h-4" />,
+      priority: 3,
     }
   );
 
