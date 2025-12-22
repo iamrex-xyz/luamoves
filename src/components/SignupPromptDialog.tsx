@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
@@ -20,7 +19,8 @@ import {
   Check,
   ArrowRight,
   Shield,
-  Sparkles
+  Sparkles,
+  MapPin
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -60,10 +60,12 @@ export const SignupPromptDialog = ({
   const [passwordError, setPasswordError] = useState("");
   const [storedPassword, setStoredPassword] = useState("");
   
-  // Step 2: Essential profile fields only
-  const [oldAddress, setOldAddress] = useState("");
-  const [isOldAddressComplete, setIsOldAddressComplete] = useState(false);
-  const [oldAddressError, setOldAddressError] = useState("");
+  // Step 2: Essential profile fields - postcode + huisnummer like onboarding
+  const [oldPostcode, setOldPostcode] = useState("");
+  const [oldHouseNumber, setOldHouseNumber] = useState("");
+  const [oldStreetName, setOldStreetName] = useState("");
+  const [oldCityName, setOldCityName] = useState("");
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [keyHandoverDate, setKeyHandoverDate] = useState<Date | undefined>(undefined);
   const [householdType, setHouseholdType] = useState<"alleen" | "samen" | "">(""); 
   const [phone, setPhone] = useState("");
@@ -83,6 +85,41 @@ export const SignupPromptDialog = ({
     }
     return null;
   };
+
+  // Address lookup effect - same as onboarding
+  useEffect(() => {
+    const lookupAddress = async () => {
+      const cleanPostcode = oldPostcode.replace(/\s/g, "");
+      if (cleanPostcode.length >= 6 && oldHouseNumber.length > 0) {
+        setIsLoadingAddress(true);
+        try {
+          const searchQuery = `${cleanPostcode} ${oldHouseNumber}`;
+          const apiUrl = `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(searchQuery)}&fq=type:(adres)&rows=1`;
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          if (data.response?.docs?.[0]) {
+            const result = data.response.docs[0];
+            setOldStreetName(result.straatnaam || "");
+            setOldCityName(result.woonplaatsnaam || "");
+          } else {
+            setOldStreetName("");
+            setOldCityName("");
+          }
+        } catch (error) {
+          console.error("Fout bij ophalen adres:", error);
+          setOldStreetName("");
+          setOldCityName("");
+        } finally {
+          setIsLoadingAddress(false);
+        }
+      } else {
+        setOldStreetName("");
+        setOldCityName("");
+      }
+    };
+    const timeoutId = setTimeout(lookupAddress, 500);
+    return () => clearTimeout(timeoutId);
+  }, [oldPostcode, oldHouseNumber]);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -129,17 +166,22 @@ export const SignupPromptDialog = ({
     setCurrentStep(2);
   };
 
-  // Check if step 2 is complete enough to proceed (oldAddress with postcode+huisnummer is required)
-  const canSubmit = useMemo(() => {
-    return oldAddress.trim().length > 0 && isOldAddressComplete;
-  }, [oldAddress, isOldAddressComplete]);
+  // Check if step 2 is complete - need postcode (6 chars) + huisnummer
+  const isAddressComplete = useMemo(() => {
+    const cleanPostcode = oldPostcode.replace(/\s/g, "");
+    return cleanPostcode.length >= 6 && oldHouseNumber.trim().length > 0;
+  }, [oldPostcode, oldHouseNumber]);
 
-  const handleOldAddressChange = (address: string, isComplete?: boolean) => {
-    setOldAddress(address);
-    setIsOldAddressComplete(!!isComplete);
-    if (isComplete) {
-      setOldAddressError("");
+  const canSubmit = useMemo(() => {
+    return isAddressComplete;
+  }, [isAddressComplete]);
+
+  // Build full address string
+  const getFullOldAddress = () => {
+    if (oldStreetName && oldCityName) {
+      return `${oldStreetName} ${oldHouseNumber}, ${oldPostcode} ${oldCityName}`;
     }
+    return `${oldPostcode} ${oldHouseNumber}`.trim();
   };
 
   const handleSignup = async () => {
@@ -163,11 +205,10 @@ export const SignupPromptDialog = ({
       return;
     }
 
-    if (!oldAddress.trim() || !isOldAddressComplete) {
-      setOldAddressError("Selecteer een volledig adres met postcode en huisnummer");
+    if (!isAddressComplete) {
       toast({
         title: "Volledig adres nodig",
-        description: "Selecteer een adres uit de lijst met postcode en huisnummer.",
+        description: "Vul je postcode en huisnummer in.",
         variant: "destructive",
       });
       return;
@@ -193,7 +234,7 @@ export const SignupPromptDialog = ({
           const storedData = sessionStorage.getItem("lua_moving_info");
           if (storedData) {
             const movingInfo = JSON.parse(storedData);
-            movingInfo.oldAddress = oldAddress.trim();
+            movingInfo.oldAddress = getFullOldAddress();
             if (keyHandoverDate) {
               movingInfo.keyHandoverDate = format(keyHandoverDate, "yyyy-MM-dd");
             }
@@ -207,7 +248,7 @@ export const SignupPromptDialog = ({
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
-            old_address: oldAddress.trim(),
+            old_address: getFullOldAddress(),
             key_handover_date: keyHandoverDate ? format(keyHandoverDate, "yyyy-MM-dd") : null,
             household_type: householdType || null,
             phone: phone.trim() || null,
@@ -358,15 +399,51 @@ export const SignupPromptDialog = ({
               </div>
 
               <div className="space-y-5">
-                {/* Old Address - required with postcode + huisnummer */}
-                <AddressAutocomplete
-                  label="Waar woon je nu?"
-                  value={oldAddress}
-                  onChange={handleOldAddressChange}
-                  placeholder="Begin met typen (straat + huisnummer)"
-                  requireComplete={true}
-                  error={oldAddressError}
-                />
+                {/* Old Address - postcode + huisnummer like onboarding */}
+                <div className="space-y-3">
+                  <Label className="flex items-center gap-2 text-base">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    Waar woon je nu?
+                  </Label>
+                  <div className="flex gap-3">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Postcode"
+                        value={oldPostcode}
+                        onChange={(e) => setOldPostcode(e.target.value.toUpperCase())}
+                        className="h-14 rounded-xl text-base"
+                        maxLength={7}
+                      />
+                    </div>
+                    <div className="w-24">
+                      <Input
+                        placeholder="Nr."
+                        value={oldHouseNumber}
+                        onChange={(e) => setOldHouseNumber(e.target.value)}
+                        className="h-14 rounded-xl text-base"
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Show looked-up address */}
+                  {isLoadingAddress && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Adres opzoeken...
+                    </div>
+                  )}
+                  {!isLoadingAddress && oldStreetName && oldCityName && (
+                    <div className="flex items-center gap-2 text-sm text-primary">
+                      <Check className="w-4 h-4" />
+                      {oldStreetName} {oldHouseNumber}, {oldCityName}
+                    </div>
+                  )}
+                  {!isLoadingAddress && isAddressComplete && !oldStreetName && (
+                    <p className="text-sm text-muted-foreground">
+                      Adres niet gevonden, maar je kunt doorgaan.
+                    </p>
+                  )}
+                </div>
 
                 {/* Key Handover Date - optional */}
                 <div className="space-y-2">
