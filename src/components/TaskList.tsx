@@ -1,10 +1,8 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
@@ -42,6 +40,7 @@ import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
 import { DocumentUploadSheet } from "@/components/DocumentUploadSheet";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
+import { CompletedTasksSection } from "@/components/CompletedTasksSection";
 import { useNavigate } from "react-router-dom";
 import { shouldShowTask } from "@/lib/smartQuestions";
 import {
@@ -73,7 +72,7 @@ export const TaskList = ({
   onAccountBadgeClick,
   onSignupClick
 }: TaskListProps) => {
-  const [filter, setFilter] = useState<"open" | "done">("open");
+  // Filter state removed - now using collapsible completed tasks section
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAddTask, setShowAddTask] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
@@ -205,21 +204,37 @@ export const TaskList = ({
     );
   };
 
-  // Filter tasks
-  const filteredTasks = useMemo(() => {
+  // Filter tasks - now only shows open tasks in main list
+  const openTasks = useMemo(() => {
     return tasks.filter((task) => {
       if (!shouldShowTask(task.id, task.title, movingInfo)) return false;
+      if (task.status === "done") return false; // Exclude done tasks from main list
       
-      const statusMatch = filter === "done" ? task.status === "done" : task.status !== "done";
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
       const searchMatch = searchQuery === "" || 
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.category.toLowerCase().includes(searchQuery.toLowerCase());
       
-      return statusMatch && categoryMatch && searchMatch;
+      return categoryMatch && searchMatch;
     });
-  }, [tasks, filter, selectedCategories, searchQuery, movingInfo]);
+  }, [tasks, selectedCategories, searchQuery, movingInfo]);
+
+  // Completed tasks for the collapsible section
+  const completedTasks = useMemo(() => {
+    return tasks.filter((task) => {
+      if (!shouldShowTask(task.id, task.title, movingInfo)) return false;
+      if (task.status !== "done") return false;
+      
+      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(task.category);
+      const searchMatch = searchQuery === "" || 
+        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        task.category.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return categoryMatch && searchMatch;
+    });
+  }, [tasks, selectedCategories, searchQuery, movingInfo]);
 
   // Group tasks by phase and sort by urgency
   const tasksByPhase = useMemo(() => {
@@ -235,7 +250,7 @@ export const TaskList = ({
     ];
     
     const phases: { [key: string]: Task[] } = {};
-    filteredTasks.forEach((task) => {
+    openTasks.forEach((task) => {
       if (!phases[task.phase]) phases[task.phase] = [];
       phases[task.phase].push(task);
     });
@@ -254,7 +269,7 @@ export const TaskList = ({
     });
     
     return sortedPhases;
-  }, [filteredTasks]);
+  }, [openTasks]);
 
   const getCountdownText = () => {
     if (!movingInfo.movingDate) return null;
@@ -291,24 +306,6 @@ export const TaskList = ({
             <PopoverContent className="w-72 bg-background z-50 rounded-2xl" align="start">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-sm mb-3">Status</h3>
-                  <RadioGroup value={filter} onValueChange={(val: "open" | "done") => setFilter(val)}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="open" id="open" />
-                      <Label htmlFor="open" className="text-sm cursor-pointer">
-                        Open ({tasks.filter((t) => t.status !== "done").length})
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="done" id="done" />
-                      <Label htmlFor="done" className="text-sm cursor-pointer">
-                        Voltooid ({tasks.filter((t) => t.status === "done").length})
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-                
-                <div className="border-t pt-4">
                   <h3 className="font-semibold text-sm mb-3">Categorieën</h3>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {categories.map((cat) => (
@@ -401,6 +398,12 @@ export const TaskList = ({
                 </div>
               </div>
             ))}
+            
+            {/* Completed tasks - collapsible section */}
+            <CompletedTasksSection
+              tasks={completedTasks}
+              onUndoTask={handleTaskToggle}
+            />
           </div>
         )}
       </PullToRefresh>
