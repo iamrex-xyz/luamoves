@@ -408,7 +408,6 @@ const Index = () => {
           onOpenChange={signupFlow.setShowEmailCapture}
           onEmailSubmit={signupFlow.handleEmailSubmit}
           isHardBlock={signupFlow.isEmailHardBlock}
-          showPhoneField={true}
         />
 
         {/* Signup prompt dialog */}
@@ -417,7 +416,6 @@ const Index = () => {
           onOpenChange={signupFlow.setShowSignupPrompt}
           onSignupComplete={signupFlow.handleSignupComplete}
           capturedEmail={signupFlow.capturedEmail}
-          capturedPhone={signupFlow.capturedPhone}
         />
 
         {/* Milestone celebration dialog */}

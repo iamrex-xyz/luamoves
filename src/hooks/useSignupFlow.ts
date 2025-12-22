@@ -81,11 +81,8 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     }
   }, [isLoggedIn, capturedEmail, showEmailCapture, getCelebratedMilestones, addCelebratedMilestone, isAccountComplete, setAccountComplete]);
 
-  const handleEmailSubmit = useCallback((email: string, phone?: string) => {
+  const handleEmailSubmit = useCallback((email: string) => {
     setCapturedEmail(email);
-    if (phone) {
-      setCapturedPhone(phone);
-    }
     setShowEmailCapture(false);
 
     // If hard block, immediately show signup
@@ -95,7 +92,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
         setShowSignupPrompt(true);
       }, 100);
     }
-  }, [setCapturedEmail, setCapturedPhone, isEmailHardBlock]);
+  }, [setCapturedEmail, isEmailHardBlock]);
 
   const handleSignupComplete = useCallback(() => {
     setShowSignupPrompt(false);
@@ -147,8 +144,7 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     // Task complete handler
     handleTaskComplete,
     
-    // Email & Phone
+    // Email
     capturedEmail,
-    capturedPhone,
   };
 };
