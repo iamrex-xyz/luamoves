@@ -784,6 +784,17 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Package className="w-4 h-4" />,
       priority: 2,
+    },
+    {
+      id: "buy-fase1-verhuisbudget",
+      title: "Stel je verhuisbudget in",
+      category: "Financieel",
+      description: "Bepaal hoeveel je wilt uitgeven aan je verhuizing. Dit helpt bij slimme keuzes voor verhuisbedrijven en materiaal.",
+      ...fase1LaterDeadline,
+      phase: "Even landen",
+      status: "todo",
+      icon: <Euro className="w-4 h-4" />,
+      priority: 2,
     }
   );
 
@@ -929,6 +940,18 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       affiliateLink: "https://www.independer.nl/inboedelverzekering/intro.aspx",
     },
     {
+      id: "buy-fase3-aansprakelijkheid",
+      title: "Aansprakelijkheidsverzekering checken",
+      category: "Financieel",
+      description: "Controleer of je aansprakelijkheidsverzekering nog actueel is, of sluit er een af.",
+      ...fase3NormalDeadline,
+      phase: "Papier & zekerheid",
+      status: "todo",
+      icon: <Shield className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.independer.nl/aansprakelijkheidsverzekering/intro.aspx",
+    },
+    {
       id: "buy-fase3-conceptaktes",
       title: "Conceptaktes van notaris doornemen",
       category: "Administratie",
@@ -1026,7 +1049,17 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - sociale melding
+    },
+    {
+      id: "buy-fase4-afvalinzameling",
+      title: "Afvalinzameling nieuw adres checken",
+      category: "Administratie",
+      description: "Check wanneer welk afval wordt opgehaald en vraag eventueel een afvalpas aan.",
+      ...fase4LaterDeadline,
+      phase: "De praktische puzzel",
+      status: "todo",
+      icon: <Trash2 className="w-4 h-4" />,
+      priority: 3,
     }
   );
 
@@ -1186,6 +1219,28 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       icon: <Zap className="w-4 h-4" />,
       priority: 1,
       hasDocumentLink: true,
+    },
+    {
+      id: "buy-fase6-belangrijke-spullen",
+      title: "Belangrijke spullen apart houden",
+      category: "Verhuizing",
+      description: "Houd sleutels, paspoorten, opladers en medicijnen bij de hand — niet in de verhuisdozen!",
+      ...moveDayDeadline,
+      phase: "Verhuisdag",
+      status: "todo",
+      icon: <Package className="w-4 h-4" />,
+      priority: 1,
+    },
+    {
+      id: "buy-fase6-verhuizing-uitvoeren",
+      title: "Verhuizing uitvoeren",
+      category: "Verhuizing",
+      description: "De grote dag is daar! Neem de tijd, houd overzicht en vergeet niet te genieten. 🎉",
+      ...moveDayDeadline,
+      phase: "Verhuisdag",
+      status: "todo",
+      icon: <Truck className="w-4 h-4" />,
+      priority: 2,
     }
   );
 
@@ -1223,6 +1278,18 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       priority: 1,
     },
     {
+      id: "buy-fase7-dozen-uitpakken",
+      title: "Dozen uitpakken & organiseren",
+      category: "Huishouden",
+      description: "Pak je spullen uit en geef alles een plek. Begin met de belangrijkste kamers.",
+      ...postMove1Day,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Package className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.ikea.com/nl/nl/cat/opbergers-702/",
+    },
+    {
       id: "buy-fase7-instanties",
       title: "Verhuizing doorgeven bij overige instanties",
       category: "Administratie",
@@ -1232,7 +1299,28 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <FileText className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - wettelijke meldingen
+    },
+    {
+      id: "buy-fase7-buren-ontmoeten",
+      title: "Kennismaken met je buren",
+      category: "Sociaal",
+      description: "Stel jezelf voor bij de buren. Een goede start in de buurt is altijd fijn!",
+      ...postMove1Week,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Users className="w-4 h-4" />,
+      priority: 3,
+    },
+    {
+      id: "buy-fase7-feedback-verhuizers",
+      title: "Feedback geven op verhuisbedrijf",
+      category: "Verhuizing",
+      description: "Geregeld via Lua? Laat een review achter voor het verhuisbedrijf.",
+      ...postMove1Week,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <ClipboardCheck className="w-4 h-4" />,
+      priority: 3,
     },
     {
       id: "buy-fase7-maandlasten",
@@ -1244,7 +1332,17 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - persoonlijke administratie
+    },
+    {
+      id: "buy-fase7-gemeentelijke-belastingen",
+      title: "Gemeentelijke belastingen checken",
+      category: "Financieel",
+      description: "Check welke gemeentelijke belastingen je kunt verwachten op je nieuwe adres.",
+      ...postMove2Weeks,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Euro className="w-4 h-4" />,
+      priority: 3,
     },
     {
       id: "buy-fase7-hypotheekrenteaftrek",
@@ -1256,7 +1354,6 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
       priority: 2,
-      // Geen affiliate - wettelijke melding
     }
   );
 
