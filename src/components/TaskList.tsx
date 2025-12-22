@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -85,6 +86,7 @@ export const TaskList = ({
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   // Use the question dialogs hook
@@ -386,6 +388,14 @@ export const TaskList = ({
                       onTaskClick={handleTaskClick}
                       onCheckboxClick={handleCheckboxClick}
                       onRegelenClick={handleRegelenClick}
+                      onDocumentClick={(e, task) => {
+                        e.stopPropagation();
+                        // Navigate to documents tab - for now show toast
+                        toast({
+                          title: "Documenten",
+                          description: `Upload documenten voor: ${task.title}`,
+                        });
+                      }}
                       onSwipeComplete={handleTaskToggle}
                     />
                   ))}

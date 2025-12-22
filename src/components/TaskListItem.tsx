@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
-import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle } from "lucide-react";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText } from "lucide-react";
 
 type TaskListItemProps = {
   task: Task;
@@ -11,6 +11,7 @@ type TaskListItemProps = {
   onTaskClick: (task: Task) => void;
   onCheckboxClick: (e: React.MouseEvent, task: Task) => void;
   onRegelenClick: (e: React.MouseEvent, task: Task) => void;
+  onDocumentClick: (e: React.MouseEvent, task: Task) => void;
   onSwipeComplete: (taskId: string) => void;
 };
 
@@ -20,6 +21,7 @@ export const TaskListItem = ({
   onTaskClick,
   onCheckboxClick,
   onRegelenClick,
+  onDocumentClick,
   onSwipeComplete,
 }: TaskListItemProps) => {
   const today = new Date();
@@ -134,17 +136,30 @@ export const TaskListItem = ({
                 <Clock className="w-3 h-3" />
                 {task.deadlineLabel}
               </span>
-              {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium ml-auto"
-                  onClick={(e) => onRegelenClick(e, task)}
-                >
-                  Regelen
-                  <ChevronRight className="w-3 h-3 ml-0.5" />
-                </Button>
-              )}
+              <div className="flex items-center gap-1 ml-auto">
+                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="shrink-0 h-5 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
+                    onClick={(e) => onDocumentClick(e, task)}
+                  >
+                    <FileText className="w-3 h-3 mr-0.5" />
+                    Documenten
+                  </Button>
+                )}
+                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
+                    onClick={(e) => onRegelenClick(e, task)}
+                  >
+                    Regelen
+                    <ChevronRight className="w-3 h-3 ml-0.5" />
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
