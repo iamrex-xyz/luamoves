@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
+import { isSameAddress } from "@/lib/validation";
 
 export type PromptType = "oldAddress" | "movingType" | "keyHandoverDate";
 
@@ -25,6 +26,7 @@ type ContextualPromptDialogProps = {
   promptType: PromptType;
   onComplete: (data: Partial<MovingInfo>) => void;
   taskTitle?: string;
+  movingInfo?: MovingInfo;
 };
 
 const promptConfig: Record<PromptType, { title: string; description: string }> = {
@@ -48,12 +50,18 @@ export const ContextualPromptDialog = ({
   promptType,
   onComplete,
   taskTitle,
+  movingInfo,
 }: ContextualPromptDialogProps) => {
   const [oldAddress, setOldAddress] = useState("");
   const [movingType, setMovingType] = useState<"rent" | "buy" | "">("");
   const [keyDate, setKeyDate] = useState<Date | undefined>(undefined);
 
   const config = promptConfig[promptType];
+
+  // Check if old address matches new address
+  const isAddressSame = promptType === "oldAddress" && movingInfo?.newAddress 
+    ? isSameAddress(oldAddress, movingInfo.newAddress)
+    : false;
 
   const handleSubmit = () => {
     switch (promptType) {
@@ -79,7 +87,7 @@ export const ContextualPromptDialog = ({
   const isValid = () => {
     switch (promptType) {
       case "oldAddress":
-        return oldAddress.trim().length > 0;
+        return oldAddress.trim().length > 0 && !isAddressSame;
       case "movingType":
         return movingType !== "";
       case "keyHandoverDate":
@@ -112,6 +120,11 @@ export const ContextualPromptDialog = ({
                 onChange={(e) => setOldAddress(e.target.value)}
                 autoFocus
               />
+              {isAddressSame && (
+                <p className="text-xs text-amber-600">
+                  Dit adres is hetzelfde als je nieuwe adres. Misschien per ongeluk verkeerd ingevuld?
+                </p>
+              )}
             </div>
           )}
 
