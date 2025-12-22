@@ -74,18 +74,30 @@ export const TaskListItem = ({
       disabled={task.status === "done" || isCompleting}
     >
       <div
-        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer ${getUrgencyStyles()}`}
+        role="button"
+        tabIndex={0}
+        aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
+        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            !isCompleting && onTaskClick(task);
+          }
+        }}
       >
         <div className="flex items-start gap-3">
-          <div 
-            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 pt-0.5"
+          <button 
+            type="button"
+            aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
+            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 pt-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
+            disabled={isCompleting}
           >
             {isCompleting ? (
-              <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" />
+              <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" aria-hidden="true" />
             ) : task.status === "done" ? (
-              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <CheckCircle2 className="h-5 w-5 text-primary" aria-hidden="true" />
             ) : (
               <Circle className={`h-5 w-5 transition-colors ${
                 isTaskOverdue 
@@ -93,9 +105,9 @@ export const TaskListItem = ({
                   : isDueToday 
                     ? "text-warning/60 group-hover:text-warning"
                     : "text-muted-foreground/50 group-hover:text-primary/50"
-              }`} />
+              }`} aria-hidden="true" />
             )}
-          </div>
+          </button>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
