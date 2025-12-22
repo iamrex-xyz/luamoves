@@ -221,22 +221,17 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 p-3 rounded-2xl border-2 transition-all flex-1 min-w-0",
+        "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all flex-1",
         active ? "border-primary bg-primary-light" : "border-muted bg-white hover:border-primary/50"
       )}
     >
       <div className={cn(
-        "w-9 h-9 rounded-xl flex items-center justify-center transition-colors shrink-0",
+        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0",
         active ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
       )}>
-        <Icon className={cn("w-4 h-4", active ? "text-white" : "text-muted-foreground")} />
+        <Icon className={cn("w-5 h-5", active ? "text-white" : "text-muted-foreground")} />
       </div>
-      <span className={cn("text-sm font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
-      {active && (
-        <div className="ml-auto w-5 h-5 bg-primary rounded-full flex items-center justify-center shrink-0">
-          <Check className="w-2.5 h-2.5 text-white" />
-        </div>
-      )}
+      <span className={cn("font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
     </button>
   );
 
