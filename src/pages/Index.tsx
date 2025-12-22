@@ -205,8 +205,15 @@ const Index = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
-        
-        if (session?.user && event === 'SIGNED_IN') {
+
+        // If the session is cleared (logout), immediately return to onboarding.
+        if (event === "SIGNED_OUT" || !session?.user) {
+          setMovingInfo(null);
+          setCurrentView("onboarding");
+          return;
+        }
+
+        if (session?.user && event === "SIGNED_IN") {
           setTimeout(() => {
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
@@ -301,16 +308,33 @@ const Index = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setMovingInfo(null);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-    guestStorage.clearAllData();
-    setCurrentView("onboarding");
-    toast({
-      title: "Uitgelogd",
-      description: "Je bent succesvol uitgelogd.",
-    });
+    let hadError = false;
+
+    try {
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) throw error;
+    } catch (error: any) {
+      hadError = true;
+      // We still clear local state so the user can continue as guest.
+      toast({
+        title: "Uitloggen lukte niet helemaal",
+        description: error?.message || "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setUser(null);
+      setMovingInfo(null);
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      guestStorage.clearAllData();
+      setCurrentView("onboarding");
+
+      if (!hadError) {
+        toast({
+          title: "Uitgelogd",
+          description: "Je bent succesvol uitgelogd.",
+        });
+      }
+    }
   };
 
   // Loading state
