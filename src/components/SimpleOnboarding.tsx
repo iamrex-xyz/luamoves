@@ -35,10 +35,10 @@ type SimpleOnboardingProps = {
 };
 
 const generatingSteps = [
-  "Je verhuisdatum analyseren...",
-  "Belangrijke deadlines berekenen...",
-  "Persoonlijke taken samenstellen...",
-  "Je checklist gereedmaken...",
+  "Je verhuisdatum bekijken...",
+  "Slimme deadlines instellen...",
+  "Taken op maat samenstellen...",
+  "Bijna klaar!",
 ];
 
 export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps) => {
@@ -255,10 +255,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
               <div className="space-y-3">
                 <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-                  Jouw verhuizing,<br /><span className="text-primary">georganiseerd.</span>
+                  Jouw verhuizing,<br /><span className="text-primary">geregeld.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-md leading-relaxed">
-                  Lua is jouw persoonlijke verhuis assistent. Slim, snel en gratis!
+                  Lua is je slimme verhuisassistent. Wij ontzorgen, jij focust op je nieuwe thuis!
                 </p>
               </div>
               <div className="relative h-52 md:h-56">
@@ -341,7 +341,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Wanneer is de<br /><span className="text-primary">grote dag?</span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-md">We gebruiken je verhuisdatum om slimme deadlines te berekenen.</p>
+              <p className="text-lg text-muted-foreground max-w-md">Met je verhuisdatum maken we een persoonlijk stappenplan voor je.</p>
             </div>
             <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
               <Popover>
@@ -502,7 +502,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Waar ga je<br /><span className="text-primary">naartoe?</span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-md">Je nieuwe adres helpt ons om relevante taken toe te voegen.</p>
+              <p className="text-lg text-muted-foreground max-w-md">Met je adres maken we taken op maat voor jouw gemeente.</p>
             </div>
             <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -555,9 +555,9 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-              Even<br /><span className="text-primary">geduld...</span>
+              Momentje,<br /><span className="text-primary">we regelen het!</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md">We maken je persoonlijke verhuischecklist.</p>
+            <p className="text-lg text-muted-foreground max-w-md">Je persoonlijke checklist wordt voor je klaargezet.</p>
           </div>
           <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
             <div className="space-y-3">

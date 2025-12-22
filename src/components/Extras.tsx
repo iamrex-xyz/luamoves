@@ -152,9 +152,9 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <FolderOpen className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="font-medium mb-2">Maak een account aan</h3>
+            <h3 className="font-medium mb-2">Bewaar je documenten veilig</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              Upload en bewaar belangrijke verhuisdocumenten veilig na het aanmaken van een account.
+              Maak gratis een account aan en upload contracten, meterstanden en andere belangrijke bestanden.
             </p>
             <Button onClick={onSignupClick} className="rounded-xl">
               Account aanmaken
@@ -175,11 +175,10 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
       </div>
 
       <div className="px-4">
-        {/* Info Banner */}
         <div className="p-4 mb-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-start gap-3">
           <Users className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-muted-foreground">
-            Documenten zijn zichtbaar voor iedereen in je verhuisomgeving, inclusief uitgenodigde huisgenoten.
+            Documenten deel je automatisch met je verhuispartners. Handig!
           </p>
         </div>
 
@@ -280,7 +279,7 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
             </div>
             <h3 className="font-medium mb-1">Nog geen documenten</h3>
             <p className="text-sm text-muted-foreground">
-              Upload contracten, meterstanden of andere belangrijke documenten.
+              Hier bewaar je straks je contracten, meterstanden en andere belangrijke bestanden.
             </p>
           </Card>
         ) : (
