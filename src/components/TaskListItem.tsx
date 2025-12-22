@@ -121,7 +121,7 @@ export const TaskListItem = ({
               </h4>
               {getUrgencyBadge()}
             </div>
-            <div className="flex items-center justify-between gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1">
               <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
                 isCompleting 
                   ? "text-primary-foreground/80" 
@@ -134,20 +134,16 @@ export const TaskListItem = ({
                 <Clock className="w-3 h-3" />
                 {task.deadlineLabel}
               </span>
-              {task.status !== "done" && !isCompleting && (
-                <div className="flex items-center gap-2">
-                  {hasAffiliateOptions(task) && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                      onClick={(e) => onRegelenClick(e, task)}
-                    >
-                      Regelen
-                      <ChevronRight className="w-3 h-3 ml-0.5" />
-                    </Button>
-                  )}
-                </div>
+              {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="shrink-0 h-5 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium ml-auto"
+                  onClick={(e) => onRegelenClick(e, task)}
+                >
+                  Regelen
+                  <ChevronRight className="w-3 h-3 ml-0.5" />
+                </Button>
               )}
             </div>
           </div>
