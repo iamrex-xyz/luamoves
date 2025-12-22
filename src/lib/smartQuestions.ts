@@ -330,12 +330,18 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
     requiredQuestions: ["buildingAccess"],
     checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.buildingAccess),
   },
-  // Parkeervergunning: parkingPermitNeeded
+  // Parkeren: propertyType + buildingAccess (voor verhuislift advies)
   {
-    taskIdPatterns: ["parkeer", "vergunning"],
-    titlePatterns: ["parkeer", "vergunning"],
-    requiredQuestions: ["parkingPermitNeeded"],
-    checkField: (info) => isEmpty(info.hasParking),
+    taskIdPatterns: ["parkeer", "parkeren"],
+    titlePatterns: ["parkeer", "parkeersituatie", "vergunning"],
+    requiredQuestions: ["propertyType"],
+    checkField: (info) => isEmpty(info.propertyType),
+  },
+  {
+    taskIdPatterns: ["parkeer", "parkeren"],
+    titlePatterns: ["parkeer", "parkeersituatie", "vergunning"],
+    requiredQuestions: ["buildingAccess"],
+    checkField: (info) => !isEmpty(info.propertyType) && isEmpty(info.buildingAccess),
   },
 
   // ===== VERZEKERINGEN =====
@@ -412,12 +418,12 @@ export const taskQuestionTriggers: TaskQuestionTrigger[] = [
   },
 
   // ===== SCHOONMAAK & ONDERHOUD =====
-  // Schoonmaak nieuwe woning: buildingYear (nieuwbouw vs bewoond)
+  // Schoonmaak: propertyType (voor inschatting grootte)
   {
     taskIdPatterns: ["schoonmaak", "schoonmaken"],
     titlePatterns: ["schoonmaak", "schoonmaken", "reinigen"],
-    requiredQuestions: ["buildingYear"],
-    checkField: (info) => isEmpty(info.buildingYear),
+    requiredQuestions: ["propertyType"],
+    checkField: (info) => isEmpty(info.propertyType),
   },
   // Rookmelders checken: buildingYear
   {
