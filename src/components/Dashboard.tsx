@@ -165,10 +165,16 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         disabled={task.status === "done" || isCompleting}
       >
         <div 
-          className={`group px-3 py-2 rounded-xl transition-all cursor-pointer animate-fade-in ${getUrgencyStyles()}`}
-          style={{ animationDelay: `${index * 75}ms`, animationFillMode: 'backwards' }}
+          className={`group px-3 py-2 rounded-xl transition-all cursor-pointer animate-fade-in ${getUrgencyStyles()} ${index === 0 ? 'ring-1 ring-primary/20 shadow-sm shadow-primary/10' : ''}`}
+          style={{ 
+            animationDelay: `${index * 75}ms`, 
+            animationFillMode: 'backwards',
+          }}
           onClick={() => !isCompleting && handleTaskClick(task)}
         >
+          {index === 0 && !isCompleting && (
+            <div className="absolute inset-0 rounded-xl bg-primary/5 animate-pulse pointer-events-none" />
+          )}
           <div className="flex items-center gap-2.5">
             <div 
               className="shrink-0 cursor-pointer"
