@@ -21,6 +21,7 @@ import {
   isTaxatieTask,
   isOpstalTask,
   isSlotTask,
+  isBudgetTask,
   needsEnergyQuestions,
   needsInternetQuestions,
   needsMovingQuestions,
@@ -51,6 +52,7 @@ export type QuestionDialogType =
   | "garden"
   | "renovation"
   | "partnerInvite"
+  | "budget"
   | null;
 
 export type SmartQuestionState = {
@@ -77,6 +79,12 @@ export const useQuestionDialogs = (
   // Handle "Regelen" button click - determines which questions to show
   const handleRegelenClick = useCallback((e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
+    
+    // Budget task - opens budget dialog (no external navigation)
+    if (isBudgetTask(task)) {
+      setActiveDialog("budget");
+      return;
+    }
     
     // Check each task type and show appropriate questions
     if (isEnergyTask(task)) {

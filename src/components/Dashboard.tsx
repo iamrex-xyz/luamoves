@@ -26,6 +26,7 @@ import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
+import { BudgetDialog } from "@/components/BudgetDialog";
 import {
   Clock,
   User,
@@ -554,6 +555,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           });
         }}
         onRedirect={() => handleDialogRedirect("renovation")}
+      />
+      <BudgetDialog
+        open={activeDialog === "budget"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        currentBudget={(movingInfo as any).movingBudget}
+        onComplete={(budget) => {
+          handleDialogComplete({ movingBudget: budget } as any);
+          closeActiveDialog();
+        }}
       />
 
       </PullToRefresh>

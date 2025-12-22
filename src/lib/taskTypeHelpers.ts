@@ -214,6 +214,17 @@ export const isSlotTask = (task: Task): boolean => {
   );
 };
 
+export const isBudgetTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    titleLower.includes("verhuisbudget") ||
+    titleLower.includes("budget instellen") ||
+    idLower.includes("verhuisbudget") ||
+    idLower.includes("budget")
+  );
+};
+
 // Needs questions helpers
 export const needsEnergyQuestions = (info: MovingInfo): boolean => {
   return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
@@ -287,7 +298,8 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isNotarisTask(task) ||
     isTaxatieTask(task) ||
     isOpstalTask(task) ||
-    isSlotTask(task)
+    isSlotTask(task) ||
+    isBudgetTask(task)
   );
 };
 
