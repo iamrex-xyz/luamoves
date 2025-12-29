@@ -4,16 +4,14 @@ import { Card } from "@/components/ui/card";
 import { MovingInfo } from "@/pages/Index";
 import { BottomNav } from "@/components/BottomNav";
 import { ReminderSettingsListItem, ReminderSettingsSheet } from "@/components/ReminderSettings";
-import { ExtraInfoSheet } from "@/components/ExtraInfoSheet";
 import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
-import { HouseholdSettingsCard } from "@/components/settings/HouseholdSettingsCard";
-import { PersonalInfoCard } from "@/components/settings/PersonalInfoCard";
+import { ProfileOverview } from "@/components/settings/ProfileOverview";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
 import { BudgetProgressBar } from "@/components/BudgetProgressBar";
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
 import { useBudget } from "@/hooks/useBudget";
-import { LogOut, ChevronRight, Sparkles, Settings as SettingsIcon } from "lucide-react";
+import { LogOut, Settings as SettingsIcon } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
@@ -27,7 +25,6 @@ type SettingsProps = {
 
 export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick, onTaskComplete }: SettingsProps) => {
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
-  const [extraInfoSheetOpen, setExtraInfoSheetOpen] = useState(false);
   const [resetClickCount, setResetClickCount] = useState(0);
   const { toast } = useToast();
 
@@ -127,29 +124,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
           onBudgetUpdate={budget.setBudget}
         />
 
-        {/* Moving Details Card */}
-        <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
-
-        {/* Household Card */}
-        <HouseholdSettingsCard />
-
-        {/* Personal Info Card */}
-        <PersonalInfoCard />
-
-        {/* Extra Info Button */}
-        <button
-          onClick={() => setExtraInfoSheetOpen(true)}
-          className="w-full flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 hover:border-primary/40 transition-all"
-        >
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-medium text-foreground">Personaliseer je verhuizing</p>
-            <p className="text-xs text-muted-foreground">Energie, woning, internet & meer</p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-        </button>
+        {/* Profile Overview - All profile data in collapsible sections */}
+        <ProfileOverview movingInfo={movingInfo} onUpdate={onUpdate} />
 
         {/* Collaborators Card */}
         <CollaboratorSettingsCard />
@@ -162,12 +138,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
         </div>
 
         <ReminderSettingsSheet open={reminderSheetOpen} onOpenChange={setReminderSheetOpen} />
-        <ExtraInfoSheet 
-          open={extraInfoSheetOpen} 
-          onOpenChange={setExtraInfoSheetOpen}
-          movingInfo={movingInfo}
-          onUpdate={onUpdate}
-        />
       </div>
 
       <BottomNav currentView="settings" onNavigate={onNavigate} />
