@@ -101,24 +101,40 @@ export const useAuth = () => {
     try {
       const info = JSON.parse(savedInfo) as MovingInfo;
       
+      // Also get captured phone from signup flow if not in moving info
+      const capturedPhone = localStorage.getItem("lua_captured_phone");
+      
       await supabase
         .from('profiles')
         .update({
-          old_address: info.oldAddress,
-          new_address: info.newAddress,
+          // Core moving info
+          old_address: info.oldAddress || null,
+          new_address: info.newAddress || null,
           moving_date: info.movingDate || null,
           key_handover_date: info.keyHandoverDate || null,
-          moving_type: info.type,
-          renovation_type: info.renovationType || "none",
-          needs_contractor_help: info.needsContractorHelp || false,
-          housing_property_type: info.propertyType || null,
+          moving_type: info.type || null,
+          
+          // Property info
+          housing_property_type: info.propertyType || info.housingPropertyType || null,
           has_garden: info.hasGarden || false,
           has_parking: info.hasParking || false,
           is_vve: info.isVve || false,
           current_housing_situation: info.currentSituation || null,
+          
+          // Renovation info
+          renovation_type: info.renovationType || "none",
+          needs_contractor_help: info.needsContractorHelp || false,
+          renovation_budget: info.renovationBudget || null,
+          renovation_start_date: info.renovationStartDate || null,
+          
+          // Household info
           has_job: info.hasJob !== false,
           children: info.children || 0,
           pets: info.pets || 0,
+          children_ages: info.childrenAges || null,
+          household_names: info.householdNames || [],
+          
+          // Smart questions
           has_gas: info.hasGas || null,
           has_smart_meter: info.hasSmartMeter || null,
           glasvezel: info.glasvezel || null,
@@ -127,38 +143,60 @@ export const useAuth = () => {
           insurance_value: info.insuranceValue || null,
           building_year: info.buildingYear || null,
           garden_size: info.gardenSize || null,
-          children_ages: info.childrenAges || null,
+          
+          // Energy questions
           energy_current_supplier: info.energyCurrentSupplier || null,
           energy_connection_type: info.energyConnectionType || null,
+          
+          // Internet questions
           has_fiber: info.hasFiber || null,
           internet_speed_preference: info.internetSpeedPreference || null,
           internet_bundle: info.internetBundle || null,
+          
+          // Moving helper questions
           floor_level: info.floorLevel || null,
           has_elevator: info.hasElevator || null,
           number_of_rooms: info.numberOfRooms || null,
           special_items: info.specialItems || [],
           has_fragile_items: info.hasFragileItems || null,
           home_size_m2: info.homeSizeM2 || null,
+          
+          // Forwarding service
           forwarding_start_date: info.forwardingStartDate || null,
           forwarding_duration: info.forwardingDuration || null,
-          household_names: info.householdNames || [],
+          
+          // Location/services
           municipality: info.municipality || null,
           service_type: info.serviceType || null,
           preferred_service_date: info.preferredServiceDate || null,
+          
+          // Property details
           number_of_floors: info.numberOfFloors || null,
           number_of_bedrooms: info.numberOfBedrooms || null,
           garden_service_type: info.gardenServiceType || null,
-          renovation_budget: (info as any).renovationBudget || null,
-          renovation_start_date: (info as any).renovationStartDate || null,
-          phone: info.phone || null,
+          
+          // Contact & budget
+          phone: info.phone || capturedPhone || null,
+          moving_budget: info.movingBudget || null,
         } as any)
         .eq('user_id', userId);
 
-      // Clear localStorage after sync
+      // Clear all localStorage data after successful sync
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       localStorage.removeItem("lua_email_prompted");
       localStorage.removeItem("lua_signup_prompted");
       localStorage.removeItem("lua_captured_email");
+      localStorage.removeItem("lua_captured_phone");
+      localStorage.removeItem("lua_guest_tasks");
+      localStorage.removeItem("lua_completed_task_count");
+      localStorage.removeItem("lua_email_captured");
+      localStorage.removeItem("lua_email_prompt_shown");
+      localStorage.removeItem("lua_email_prompt_dismissed");
+      localStorage.removeItem("lua_account_prompt_shown");
+      localStorage.removeItem("lua_account_prompt_deferred");
+      localStorage.removeItem("lua_account_creation_started");
+      localStorage.removeItem("lua_account_creation_completed");
+      localStorage.removeItem("lua_guest_limit_reached");
     } catch (error) {
       console.error('Error syncing data:', error);
     }
