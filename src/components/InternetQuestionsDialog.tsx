@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
-
+import { useProfileSync } from "@/hooks/useProfileSync";
 type InternetQuestionsDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -31,11 +31,11 @@ export const InternetQuestionsDialog = ({
   onComplete,
   onRedirect,
 }: InternetQuestionsDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [currentStep, setCurrentStep] = useState<Step>("fiber");
   const [hasFiber, setHasFiber] = useState<string>("");
   const [speedPreference, setSpeedPreference] = useState<string>("");
   const [bundle, setBundle] = useState<string>("");
-
   // Determine which steps are needed based on existing data
   const needsFiber = !movingInfo.hasFiber;
   const needsSpeed = !movingInfo.internetSpeedPreference;
@@ -74,16 +74,19 @@ export const InternetQuestionsDialog = ({
     return null;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const next = getNextStep(currentStep);
     if (next) {
       setCurrentStep(next);
     } else {
       // All questions answered, save and redirect
-      const data: Record<string, any> = {};
-      if (needsFiber) data.hasFiber = hasFiber;
-      if (needsSpeed) data.internetSpeedPreference = speedPreference;
-      if (needsBundle) data.internetBundle = bundle;
+      const data: Partial<MovingInfo> = {};
+      if (needsFiber) data.hasFiber = hasFiber as "yes" | "no" | "unknown";
+      if (needsSpeed) data.internetSpeedPreference = speedPreference as "basic" | "medium" | "high";
+      if (needsBundle) data.internetBundle = bundle as "internet_only" | "internet_tv" | "internet_tv_mobile";
+      
+      // Save to Supabase profile
+      await saveToProfile(data);
       
       onComplete(data);
       onOpenChange(false);

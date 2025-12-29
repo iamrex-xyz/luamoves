@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertTriangle } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface SmokeDetectorQuestionsDialogProps {
   open: boolean;
@@ -21,11 +22,11 @@ export function SmokeDetectorQuestionsDialog({
   onComplete,
   onRedirect
 }: SmokeDetectorQuestionsDialogProps) {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [numberOfBedrooms, setNumberOfBedrooms] = useState("");
   const [showAdvice, setShowAdvice] = useState(false);
-
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
@@ -65,15 +66,19 @@ export function SmokeDetectorQuestionsDialog({
     return floors + bedrooms;
   };
 
-  const handleComplete = () => {
-    onComplete({
+  const handleComplete = async () => {
+    const data: Partial<MovingInfo> = {
       numberOfFloors,
       numberOfBedrooms
-    } as Partial<MovingInfo>);
+    };
+    
+    // Save to Supabase profile
+    await saveToProfile(data);
+    
+    onComplete(data);
     onOpenChange(false);
     onRedirect();
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">

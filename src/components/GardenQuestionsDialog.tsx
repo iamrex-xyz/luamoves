@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { TreePine, Leaf, Shovel, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface GardenQuestionsDialogProps {
   open: boolean;
@@ -27,11 +28,11 @@ export function GardenQuestionsDialog({
   onComplete,
   onRedirect
 }: GardenQuestionsDialogProps) {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [hasGarden, setHasGarden] = useState<boolean | null>(null);
   const [gardenSize, setGardenSize] = useState("");
   const [gardenServiceType, setGardenServiceType] = useState("");
-
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
@@ -55,18 +56,20 @@ export function GardenQuestionsDialog({
     }
   }, [open, movingInfo]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1) {
       if (hasGarden === false) {
         // No garden, complete immediately
-        onComplete({ hasGarden: false });
+        const data = { hasGarden: false };
+        await saveToProfile(data);
+        onComplete(data);
         onOpenChange(false);
         return;
       }
       if (hasGarden === true) {
         if (movingInfo.gardenSize) {
           if ((movingInfo as any).gardenServiceType) {
-            handleComplete();
+            await handleComplete();
           } else {
             setStep(3);
           }
@@ -76,25 +79,29 @@ export function GardenQuestionsDialog({
       }
     } else if (step === 2 && gardenSize) {
       if ((movingInfo as any).gardenServiceType) {
-        handleComplete();
+        await handleComplete();
       } else {
         setStep(3);
       }
     } else if (step === 3 && gardenServiceType) {
-      handleComplete();
+      await handleComplete();
     }
   };
 
-  const handleComplete = () => {
-    onComplete({
+  const handleComplete = async () => {
+    const data: Partial<MovingInfo> = {
       hasGarden: true,
       gardenSize: gardenSize as "small" | "medium" | "large",
       gardenServiceType
-    } as Partial<MovingInfo>);
+    };
+    
+    // Save to Supabase profile
+    await saveToProfile(data);
+    
+    onComplete(data);
     onOpenChange(false);
     onRedirect();
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">

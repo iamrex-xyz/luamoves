@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sparkles, Paintbrush, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface CleaningQuestionsDialogProps {
   open: boolean;
@@ -28,11 +29,11 @@ export function CleaningQuestionsDialog({
   onComplete,
   onRedirect
 }: CleaningQuestionsDialogProps) {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [serviceType, setServiceType] = useState("");
   const [homeSizeM2, setHomeSizeM2] = useState("");
   const [preferredServiceDate, setPreferredServiceDate] = useState("");
-
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
@@ -75,16 +76,20 @@ export function CleaningQuestionsDialog({
     }
   };
 
-  const handleComplete = () => {
-    onComplete({
+  const handleComplete = async () => {
+    const data: Partial<MovingInfo> = {
       serviceType,
       homeSizeM2,
       preferredServiceDate
-    } as Partial<MovingInfo>);
+    };
+    
+    // Save to Supabase profile
+    await saveToProfile(data);
+    
+    onComplete(data);
     onOpenChange(false);
     onRedirect();
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">

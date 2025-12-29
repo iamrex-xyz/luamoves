@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Shield, Baby, PawPrint, ArrowRight, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 type LiabilityQuestionsDialogProps = {
   open: boolean;
@@ -32,12 +33,12 @@ export const LiabilityQuestionsDialog = ({
   onComplete,
   onRedirect,
 }: LiabilityQuestionsDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [numberOfChildren, setNumberOfChildren] = useState<number>(movingInfo.children || 0);
   const [hasPets, setHasPets] = useState<"yes" | "no" | "">(
     movingInfo.pets !== undefined && movingInfo.pets > 0 ? "yes" : ""
   );
-
   // Determine which questions to ask
   const needsChildrenQuestion = movingInfo.children === undefined || movingInfo.children === null;
   const needsPetsQuestion = movingInfo.pets === undefined || movingInfo.pets === null;
@@ -45,7 +46,7 @@ export const LiabilityQuestionsDialog = ({
   const totalSteps = (needsChildrenQuestion ? 1 : 0) + (needsPetsQuestion ? 1 : 0);
   const startStep = needsChildrenQuestion ? 1 : 2;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && needsPetsQuestion) {
       setStep(2);
     } else {
@@ -57,12 +58,15 @@ export const LiabilityQuestionsDialog = ({
       if (needsPetsQuestion) {
         updates.pets = hasPets === "yes" ? 1 : 0;
       }
+      
+      // Save to Supabase profile
+      await saveToProfile(updates);
+      
       onComplete(updates);
       onOpenChange(false);
       onRedirect();
     }
   };
-
   const getCurrentStep = () => {
     if (step === 1 && needsChildrenQuestion) return 1;
     if (step === 2 || (!needsChildrenQuestion && needsPetsQuestion)) return totalSteps;

@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 type EnergyQuestionsDialogProps = {
   open: boolean;
@@ -59,11 +60,11 @@ export const EnergyQuestionsDialog = ({
   onComplete,
   onRedirect,
 }: EnergyQuestionsDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [currentStep, setCurrentStep] = useState<Step>("supplier");
   const [supplier, setSupplier] = useState<string>("");
   const [smartMeter, setSmartMeter] = useState<string>("");
   const [connectionType, setConnectionType] = useState<string>("");
-
   // Determine which steps are needed based on existing data
   const needsSupplier = !movingInfo.energyCurrentSupplier;
   const needsSmartMeter = !movingInfo.hasSmartMeter;
@@ -102,23 +103,25 @@ export const EnergyQuestionsDialog = ({
     return null;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const next = getNextStep(currentStep);
     if (next) {
       setCurrentStep(next);
     } else {
       // All questions answered, save and redirect
-      const data: Record<string, any> = {};
+      const data: Partial<MovingInfo> = {};
       if (needsSupplier) data.energyCurrentSupplier = supplier;
-      if (needsSmartMeter) data.hasSmartMeter = smartMeter;
-      if (needsConnectionType) data.energyConnectionType = connectionType;
+      if (needsSmartMeter) data.hasSmartMeter = smartMeter as "yes" | "no" | "unknown";
+      if (needsConnectionType) data.energyConnectionType = connectionType as "gas_stroom" | "alleen_stroom";
+      
+      // Save to Supabase profile
+      await saveToProfile(data);
       
       onComplete(data);
       onOpenChange(false);
       onRedirect();
     }
   };
-
   const isCurrentStepValid = () => {
     switch (currentStep) {
       case "supplier":

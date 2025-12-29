@@ -9,7 +9,7 @@ import { CalendarIcon, Info } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-
+import { useProfileSync } from "@/hooks/useProfileSync";
 interface RenovationQuestionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,10 +43,10 @@ export function RenovationQuestionsDialog({
   onRedirect,
   existingData,
 }: RenovationQuestionsDialogProps) {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [budget, setBudget] = useState(existingData.renovationBudget || "");
   const [startDate, setStartDate] = useState<Date | undefined>(existingData.renovationStartDate);
-
   const needsBudget = !existingData.renovationBudget;
   const needsStartDate = !existingData.renovationStartDate;
 
@@ -56,22 +56,29 @@ export function RenovationQuestionsDialog({
     return 1;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 1 && needsStartDate) {
       setStep(2);
     } else {
-      handleComplete();
+      await handleComplete();
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
+    const data = {
+      renovationBudget: budget || existingData.renovationBudget,
+      renovationStartDate: startDate ? format(startDate, "yyyy-MM-dd") : existingData.renovationStartDate?.toString(),
+    };
+    
+    // Save to Supabase profile
+    await saveToProfile(data);
+    
     onComplete({
       renovationBudget: budget || existingData.renovationBudget,
       renovationStartDate: startDate || existingData.renovationStartDate,
     });
     onRedirect();
   };
-
   const canProceed = () => {
     if (step === 1) return !!budget;
     if (step === 2) return !!startDate;

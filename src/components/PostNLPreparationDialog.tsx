@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface MovingInfo {
   oldAddress?: string;
@@ -258,10 +259,10 @@ export const PostNLPreparationDialog = ({
   movingInfo,
   onUpdateMovingInfo,
 }: PostNLPreparationDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [allCopied, setAllCopied] = useState(false);
   const [editingField, setEditingField] = useState<"oldAddress" | "newAddress" | null>(null);
   const [editValue, setEditValue] = useState("");
-
   const formattedDate = movingInfo.movingDate
     ? format(movingInfo.movingDate, "d MMMM yyyy", { locale: nl })
     : undefined;
@@ -271,9 +272,13 @@ export const PostNLPreparationDialog = ({
     setEditValue(movingInfo[field] || "");
   };
 
-  const handleSave = (field: "oldAddress" | "newAddress", value: string) => {
+  const handleSave = async (field: "oldAddress" | "newAddress", value: string) => {
     if (onUpdateMovingInfo && value.trim()) {
       onUpdateMovingInfo({ [field]: value.trim() });
+      
+      // Save to Supabase profile
+      await saveToProfile({ [field]: value.trim() });
+      
       toast({
         title: "Opgeslagen!",
         description: `Je ${field === "oldAddress" ? "oude adres" : "nieuwe adres"} is opgeslagen`,
@@ -282,18 +287,19 @@ export const PostNLPreparationDialog = ({
     setEditingField(null);
     setEditValue("");
   };
-
   const handleCancel = () => {
     setEditingField(null);
     setEditValue("");
   };
 
-  const handleDateUpdate = (date: Date) => {
+  const handleDateUpdate = async (date: Date) => {
     if (onUpdateMovingInfo) {
       onUpdateMovingInfo({ movingDate: date });
+      
+      // Save to Supabase profile
+      await saveToProfile({ movingDate: format(date, "yyyy-MM-dd") });
     }
   };
-
   const handleCopyAll = async () => {
     const parts = [];
     if (movingInfo.oldAddress) parts.push(`Oud adres: ${movingInfo.oldAddress}`);
