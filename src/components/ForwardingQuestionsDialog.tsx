@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
-
+import { useProfileSync } from "@/hooks/useProfileSync";
 interface ForwardingQuestionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -30,12 +30,12 @@ export function ForwardingQuestionsDialog({
   onRedirect,
   existingData
 }: ForwardingQuestionsDialogProps) {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [forwardingStartDate, setForwardingStartDate] = useState("");
   const [forwardingDuration, setForwardingDuration] = useState("");
   const [householdNames, setHouseholdNames] = useState<string[]>([]);
   const [newName, setNewName] = useState("");
-
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
@@ -78,16 +78,20 @@ export function ForwardingQuestionsDialog({
     }
   };
 
-  const handleComplete = () => {
-    onComplete({
+  const handleComplete = async () => {
+    const data = {
       forwardingStartDate,
       forwardingDuration,
       householdNames
-    });
+    };
+    
+    // Save to Supabase profile
+    await saveToProfile(data);
+    
+    onComplete(data);
     onOpenChange(false);
     onRedirect();
   };
-
   const addName = () => {
     if (newName.trim() && !householdNames.includes(newName.trim())) {
       setHouseholdNames([...householdNames, newName.trim()]);
