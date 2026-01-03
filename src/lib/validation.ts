@@ -3,8 +3,8 @@ import { z } from "zod";
 // Dutch phone number validation
 export const phoneSchema = z.string()
   .transform(val => val.replace(/[\s\-]/g, ''))
-  .refine(val => val === '' || /^(\+31|0)[1-9][0-9]{8}$/.test(val), {
-    message: "Voer een geldig Nederlands telefoonnummer in (bijv. 06 12345678 of +31 6 12345678)"
+  .refine(val => val === '' || /^(\+[1-9][0-9]{0,3}[0-9]{6,14}|0[1-9][0-9]{8})$/.test(val), {
+    message: "Voer een geldig telefoonnummer in"
   });
 
 // Email validation

@@ -121,7 +121,7 @@ export const PhoneCaptureDialog = ({
               <Input
                 id="capture-phone"
                 type="tel"
-                placeholder="06 12345678 of +31 6 12345678"
+                placeholder="06 12345678"
                 value={phone}
                 onChange={(e) => {
                   setPhone(e.target.value);
