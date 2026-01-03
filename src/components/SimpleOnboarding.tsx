@@ -12,6 +12,54 @@ import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 
+const testimonials = [
+  { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
+  { name: "Mark", location: "Rotterdam", text: "Eindelijk overzicht tijdens mijn verhuizing. Aanrader!" },
+  { name: "Sophie", location: "Utrecht", text: "Dankzij Lua vergat ik niks. Gratis en makkelijk." },
+  { name: "Tom", location: "Den Haag", text: "De checklist was precies wat ik nodig had." },
+];
+
+const TestimonialCarousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const testimonial = testimonials[currentIndex];
+
+  return (
+    <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+      <div className="max-w-2xl mx-auto text-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
+          Wat anderen zeggen
+        </h2>
+        <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[140px] flex flex-col justify-center">
+          <p className="text-lg text-foreground mb-4 italic">"{testimonial.text}"</p>
+          <p className="text-sm text-muted-foreground">
+            — {testimonial.name}, {testimonial.location}
+          </p>
+        </div>
+        <div className="flex justify-center gap-2 mt-4">
+          {testimonials.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentIndex(idx)}
+              className={cn(
+                "w-2 h-2 rounded-full transition-all",
+                idx === currentIndex ? "bg-primary w-4" : "bg-muted"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const countryCodes = [
   { code: "+31", country: "NL" },
   { code: "+32", country: "BE" },
@@ -312,10 +360,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           <div className="flex justify-center mt-8">
             <Button 
               onClick={handleNext}
-              className="h-14 px-8 text-lg rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-lg"
+              size="sm"
+              className="h-11 px-6 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
             >
               Maak mijn verhuisplan
-              <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Button>
@@ -398,24 +447,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             </div>
           </section>
 
-          {/* Section 4: Geruststelling & vertrouwen */}
-          <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
-            <div className="max-w-2xl mx-auto">
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { icon: "✓", text: "Gratis te gebruiken" },
-                  { icon: "🔒", text: "Geen spam, beloofd" },
-                  { icon: "🛡️", text: "Jij houdt controle" },
-                  { icon: "📋", text: "Alles op één plek" },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="text-sm font-medium text-foreground">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
+          {/* Section 4: Testimonials */}
+          <TestimonialCarousel />
 
           {/* Section 5: Tweede CTA */}
           <section className="px-5 py-16 bg-white">
