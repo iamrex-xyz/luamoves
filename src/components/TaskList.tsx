@@ -87,7 +87,6 @@ export const TaskList = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const [documentTask, setDocumentTask] = useState<Task | null>(null);
-  const [showInviteHousehold, setShowInviteHousehold] = useState(false);
 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const { toast } = useToast();
@@ -132,11 +131,6 @@ export const TaskList = ({
   }, [openTasksCount, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
-    // Open InviteHouseholdDialog voor de mede-verhuizers taak
-    if (task.id === "invite-household-members") {
-      setShowInviteHousehold(true);
-      return;
-    }
     setSelectedTask(task);
   };
 
@@ -613,8 +607,8 @@ export const TaskList = ({
       />
 
       <InviteHouseholdDialog
-        open={showInviteHousehold}
-        onOpenChange={setShowInviteHousehold}
+        open={activeDialog === "inviteHousehold"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
         onInvitesSent={refreshTasks}
       />
 

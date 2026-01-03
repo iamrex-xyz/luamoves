@@ -45,7 +45,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showInviteHousehold, setShowInviteHousehold] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   // Removed scroll-based search hiding - Home is now static
 
@@ -91,11 +90,6 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   }, [openTasks.length, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
-    // Open InviteHouseholdDialog voor de mede-verhuizers taak
-    if (task.id === "invite-household-members") {
-      setShowInviteHousehold(true);
-      return;
-    }
     setSelectedTask(task);
   };
 
@@ -306,12 +300,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       />
 
       <InviteHouseholdDialog
-        open={showInviteHousehold}
-        onOpenChange={setShowInviteHousehold}
+        open={activeDialog === "inviteHousehold"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
         onInvitesSent={refreshTasks}
       />
-
-      {/* Question Dialogs */}
       <EnergyQuestionsDialog
         open={activeDialog === "energy"}
         onOpenChange={(open) => !open && closeActiveDialog()}

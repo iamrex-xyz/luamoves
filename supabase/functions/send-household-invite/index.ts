@@ -118,7 +118,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (memberError) {
       console.error("[send-household-invite] Error creating member:", memberError);
-      throw new Error("Kon huisgenoot niet toevoegen");
+      throw new Error("Kon mede-verhuizer niet toevoegen");
     }
 
     console.log(`[send-household-invite] Created/updated member: ${member.id}`);
@@ -129,9 +129,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send WhatsApp message via Twilio
     const whatsappNumber = formatPhoneForWhatsApp(phone);
-    const message = `🏠 Je bent uitgenodigd voor een verhuizing!
+    const message = `🏠 Je bent uitgenodigd als mede-verhuizer!
 
-${name ? `Hoi ${name}! ` : ""}Je huisgenoot gebruikt Lua, de slimme verhuisassistent. Samen verhuizen wordt zo veel makkelijker!
+${name ? `Hoi ${name}! ` : ""}Iemand gebruikt Lua, de slimme verhuisassistent, en nodigt je uit om samen te verhuizen!
 
 Met Lua kun je:
 ✅ Taken verdelen
