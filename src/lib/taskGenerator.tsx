@@ -32,6 +32,8 @@ export type Task = {
   priority: number;
   assignedTo?: string | null;
   assignedToEmail?: string | null;
+  assignedBy?: string | null;
+  assignedAt?: string | null;
   notes?: string | null;
   affiliateLink?: string;
   hasDocumentLink?: boolean; // Voor taken die naar documenten-tab moeten linken

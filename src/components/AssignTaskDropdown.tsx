@@ -72,6 +72,7 @@ export const AssignTaskDropdown = ({
       if (!user) return;
 
       // Use upsert to handle both new and existing task records
+      // Include assigned_by and assigned_at to track who made the assignment
       const { error } = await supabase
         .from("tasks")
         .upsert({
@@ -79,6 +80,8 @@ export const AssignTaskDropdown = ({
           task_id: taskId,
           assigned_to: userId,
           assigned_to_email: email,
+          assigned_by: user.id,
+          assigned_at: new Date().toISOString(),
         }, {
           onConflict: "user_id,task_id",
         });
@@ -90,7 +93,7 @@ export const AssignTaskDropdown = ({
         description: email 
           ? `Taak toegewezen aan ${email}` 
           : userId 
-          ? "Toegewezen aan collaborator"
+          ? "Toegewezen aan medeverhuizer"
           : "Toewijzing verwijderd",
       });
 
@@ -121,6 +124,8 @@ export const AssignTaskDropdown = ({
           task_id: taskId,
           assigned_to: member.member_user_id,
           assigned_to_email: displayName,
+          assigned_by: user.id,
+          assigned_at: new Date().toISOString(),
         }, {
           onConflict: "user_id,task_id",
         });

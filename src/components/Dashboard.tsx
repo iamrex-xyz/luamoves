@@ -94,7 +94,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const handleTaskClick = (task: Task) => {
     // Mark assignment as seen when opening the task
     if (task.assignedToEmail) {
-      markAssignmentSeen(task.id, task.assignedToEmail);
+      markAssignmentSeen(task.id, task.assignedAt);
     }
     setSelectedTask(task);
   };
@@ -254,7 +254,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   key={task.id}
                   task={task}
                   isCompleting={completingTasks.has(task.id)}
-                  isNewAssignment={isNewAssignment(task.id, task.assignedToEmail)}
+                  isNewAssignment={isNewAssignment({
+                    taskId: task.id,
+                    assignedTo: task.assignedTo,
+                    assignedToEmail: task.assignedToEmail,
+                    assignedBy: task.assignedBy,
+                    assignedAt: task.assignedAt,
+                  })}
                   onTaskClick={handleTaskClick}
                   onCheckboxClick={handleCheckboxClick}
                   onRegelenClick={handleRegelenClick}
