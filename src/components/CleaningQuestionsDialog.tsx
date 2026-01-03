@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Sparkles, Paintbrush, Info } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Home, Building2, Castle, Info, CheckCircle2 } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
@@ -17,9 +18,10 @@ interface CleaningQuestionsDialogProps {
 }
 
 const stepExplanations = {
-  1: "Dit bepaalt welke vakmensen we voor je zoeken.",
-  2: "Grotere ruimtes kosten meer tijd. Zo krijg je een realistische prijsindicatie.",
-  3: "Zo kunnen we beschikbare vakmensen voor je vinden.",
+  1: "Dit helpt ons de juiste schoonmaakpartners te selecteren.",
+  2: "Zo kunnen we een realistische inschatting maken van de benodigde tijd.",
+  3: "Wanneer wil je de schoonmaak laten uitvoeren?",
+  4: "Heb je specifieke wensen of aandachtspunten?",
 };
 
 export function CleaningQuestionsDialog({
@@ -31,103 +33,116 @@ export function CleaningQuestionsDialog({
 }: CleaningQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
-  const [serviceType, setServiceType] = useState("");
+  const [housingType, setHousingType] = useState("");
   const [homeSizeM2, setHomeSizeM2] = useState("");
   const [preferredServiceDate, setPreferredServiceDate] = useState("");
+  const [specificWishes, setSpecificWishes] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
-      setServiceType((movingInfo as any).serviceType || "");
+      setHousingType(movingInfo.housingPropertyType || "");
       setHomeSizeM2(movingInfo.homeSizeM2 || "");
       setPreferredServiceDate((movingInfo as any).preferredServiceDate || "");
-      
-      // Calculate which step to start from based on existing data
-      if (!(movingInfo as any).serviceType) {
-        setStep(1);
-      } else if (!movingInfo.homeSizeM2) {
-        setStep(2);
-      } else if (!(movingInfo as any).preferredServiceDate) {
-        setStep(3);
-      } else {
-        setStep(1);
-      }
+      setSpecificWishes("");
+      setShowConfirmation(false);
+      setStep(1);
     }
   }, [open, movingInfo]);
 
   const handleNext = () => {
-    if (step === 1 && serviceType) {
-      if (movingInfo.homeSizeM2) {
-        if ((movingInfo as any).preferredServiceDate) {
-          handleComplete();
-        } else {
-          setStep(3);
-        }
-      } else {
-        setStep(2);
-      }
+    if (step === 1 && housingType) {
+      setStep(2);
     } else if (step === 2 && homeSizeM2) {
-      if ((movingInfo as any).preferredServiceDate) {
-        handleComplete();
-      } else {
-        setStep(3);
-      }
+      setStep(3);
     } else if (step === 3 && preferredServiceDate) {
-      handleComplete();
+      setStep(4);
     }
   };
 
   const handleComplete = async () => {
     const data: Partial<MovingInfo> = {
-      serviceType,
+      housingPropertyType: housingType,
       homeSizeM2,
-      preferredServiceDate
+      preferredServiceDate,
     };
     
     // Save to Supabase profile
     await saveToProfile(data);
     
     onComplete(data);
-    onOpenChange(false);
-    onRedirect();
+    setShowConfirmation(true);
   };
+
+  const handleClose = () => {
+    onOpenChange(false);
+    setShowConfirmation(false);
+  };
+
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              We nemen contact op met schoonmaakpartners.
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              Je ontvangt binnenkort bericht met beschikbare opties.
+            </p>
+            <Button onClick={handleClose} className="w-full mt-4">
+              Sluiten
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Schoonmaak of Schilderwerk</DialogTitle>
+          <DialogTitle>Schoonmaak regelen</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {step === 1 && (
             <div className="space-y-4">
-              <Label>Wat voor klus wil je laten uitvoeren?</Label>
+              <Label>Wat voor type woning heb je?</Label>
               <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
                 <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-blue-700">{stepExplanations[1]}</p>
               </div>
-              <RadioGroup value={serviceType} onValueChange={setServiceType}>
+              <RadioGroup value={housingType} onValueChange={setHousingType}>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                  <RadioGroupItem value="cleaning" id="cleaning" />
-                  <Sparkles className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="cleaning" className="flex-1 cursor-pointer">Schoonmaak</Label>
+                  <RadioGroupItem value="apartment" id="apartment" />
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="apartment" className="flex-1 cursor-pointer">Appartement</Label>
                 </div>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                  <RadioGroupItem value="painting" id="painting" />
-                  <Paintbrush className="h-4 w-4 text-muted-foreground" />
-                  <Label htmlFor="painting" className="flex-1 cursor-pointer">Schilderwerk</Label>
+                  <RadioGroupItem value="house" id="house" />
+                  <Home className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="house" className="flex-1 cursor-pointer">Tussenwoning / hoekwoning</Label>
                 </div>
                 <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                  <RadioGroupItem value="both" id="both" />
-                  <div className="flex gap-1">
-                    <Sparkles className="h-4 w-4 text-muted-foreground" />
-                    <Paintbrush className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Label htmlFor="both" className="flex-1 cursor-pointer">Beide</Label>
+                  <RadioGroupItem value="detached" id="detached" />
+                  <Home className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="detached" className="flex-1 cursor-pointer">Vrijstaande woning</Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
+                  <RadioGroupItem value="villa" id="villa" />
+                  <Castle className="h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="villa" className="flex-1 cursor-pointer">Villa</Label>
                 </div>
               </RadioGroup>
               <Button 
                 onClick={handleNext} 
-                disabled={!serviceType}
+                disabled={!housingType}
                 className="w-full"
               >
                 Volgende
@@ -184,11 +199,33 @@ export function CleaningQuestionsDialog({
                 min={new Date().toISOString().split('T')[0]}
               />
               <Button 
-                onClick={handleComplete} 
+                onClick={handleNext} 
                 disabled={!preferredServiceDate}
                 className="w-full"
               >
-                Bekijk aanbieders
+                Volgende
+              </Button>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-4">
+              <Label>Specifieke wensen (optioneel)</Label>
+              <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
+                <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700">{stepExplanations[4]}</p>
+              </div>
+              <Textarea
+                placeholder="Bijv. extra aandacht voor de keuken, ramen buitenkant, etc."
+                value={specificWishes}
+                onChange={(e) => setSpecificWishes(e.target.value)}
+                rows={3}
+              />
+              <Button 
+                onClick={handleComplete}
+                className="w-full"
+              >
+                Versturen
               </Button>
             </div>
           )}
