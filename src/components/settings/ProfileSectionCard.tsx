@@ -53,7 +53,7 @@ export const ProfileSectionCard = ({
               <p className="text-xs text-muted-foreground">{subtitle}</p>
             </div>
             <div className="flex items-center gap-2">
-              {hasProgress && !isComplete && (
+              {!isComplete && (
                 <span className="text-xs text-muted-foreground">
                   {completedFields}/{totalFields}
                 </span>

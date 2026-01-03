@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MovingInfo } from "@/pages/Index";
@@ -8,10 +8,8 @@ import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
 import { ProfileOverview } from "@/components/settings/ProfileOverview";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
 import { HouseholdMembersSettingsCard } from "@/components/settings/HouseholdMembersSettingsCard";
-import { BudgetProgressBar } from "@/components/BudgetProgressBar";
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
-import { useBudget } from "@/hooks/useBudget";
 import { useGuestStorage } from "@/hooks/useGuestStorage";
 import { LogOut, Settings as SettingsIcon, Phone as PhoneIcon } from "lucide-react";
 
@@ -22,22 +20,13 @@ type SettingsProps = {
   onUpdate: (info: MovingInfo) => void;
   isGuest?: boolean;
   onSignupClick?: () => void;
-  onTaskComplete?: (taskId: string) => void;
 };
 
-export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick, onTaskComplete }: SettingsProps) => {
+export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick }: SettingsProps) => {
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
   const [resetClickCount, setResetClickCount] = useState(0);
   const { toast } = useToast();
   const guestStorage = useGuestStorage();
-
-  // Use budget hook for deterministic budget management
-  const budget = useBudget(
-    movingInfo.movingBudget,
-    isGuest ?? false,
-    (amount) => onUpdate({ ...movingInfo, movingBudget: amount ?? undefined }),
-    onTaskComplete
-  );
 
   // Hidden reset function - triple tap on logo to activate
   const handleLogoClick = () => {
@@ -125,13 +114,6 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
       </div>
 
       <div className="px-4 sm:px-6 space-y-6">
-        {/* Budget Progress Bar - always on top, driven by useBudget hook */}
-        <BudgetProgressBar
-          totalBudget={budget.budgetAmount}
-          spentAmount={budget.spentAmount}
-          onBudgetUpdate={budget.setBudget}
-        />
-
         {/* Profile Overview - All profile data in collapsible sections */}
         <ProfileOverview movingInfo={movingInfo} onUpdate={onUpdate} />
 

@@ -483,7 +483,6 @@ const Index = () => {
             onUpdate={setMovingInfo}
             isGuest={!user}
             onSignupClick={signupFlow.handleBadgeClick}
-            onTaskComplete={signupFlow.handleTaskComplete}
           />
         )}
         {currentView === "chat" && movingInfo && (
