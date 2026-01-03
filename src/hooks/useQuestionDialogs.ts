@@ -123,11 +123,8 @@ export const useQuestionDialogs = (
     }
     
     if (isInsuranceTask(task)) {
-      if (needsInsuranceQuestions(movingInfo)) {
-        setActiveDialog("insurance");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Verzekeringen-taak opent altijd het intakeformulier, geen redirect naar deals
+      setActiveDialog("insurance");
       return;
     }
     
