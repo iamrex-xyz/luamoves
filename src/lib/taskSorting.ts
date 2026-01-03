@@ -81,7 +81,11 @@ const calculateTaskScore = (task: Task): number => {
  * Sort tasks by smart criteria
  */
 export const sortTasksSmart = (tasks: Task[]): Task[] => {
-  return [...tasks].sort((a, b) => {
+  // Mede-verhuizers taak altijd bovenaan
+  const inviteTask = tasks.find(t => t.id === "invite-household-members");
+  const otherTasks = tasks.filter(t => t.id !== "invite-household-members");
+  
+  const sortedOtherTasks = [...otherTasks].sort((a, b) => {
     const scoreA = calculateTaskScore(a);
     const scoreB = calculateTaskScore(b);
     
@@ -92,6 +96,13 @@ export const sortTasksSmart = (tasks: Task[]): Task[] => {
     // Secondary sort by title for consistent ordering
     return a.title.localeCompare(b.title);
   });
+  
+  // Als invite task bestaat en niet done, zet bovenaan
+  if (inviteTask && inviteTask.status !== "done") {
+    return [inviteTask, ...sortedOtherTasks];
+  }
+  
+  return sortedOtherTasks;
 };
 
 /**
