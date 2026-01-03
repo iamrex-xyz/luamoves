@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
+import { LuaLogo } from "@/components/LuaLogo";
 
 const testimonials = [
   { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
@@ -467,7 +468,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         <div className="p-4 sm:p-6 flex justify-between items-center">
-          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <LuaLogo size="sm" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 1 ? "bg-primary" : "bg-muted"}`} />
@@ -531,7 +532,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         <div className="p-4 sm:p-6 flex justify-between items-center">
-          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <LuaLogo size="sm" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 2 ? "bg-primary" : "bg-muted"}`} />
@@ -622,7 +623,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         <div className="p-4 sm:p-6 flex justify-between items-center">
-          <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+          <LuaLogo size="sm" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 3 ? "bg-primary" : "bg-muted"}`} />
