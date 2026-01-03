@@ -108,11 +108,8 @@ export const useQuestionDialogs = (
     }
     
     if (isMovingTask(task)) {
-      if (needsMovingQuestions(movingInfo)) {
-        setActiveDialog("moving");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Verhuisbedrijf-taak opent altijd het intakeformulier, geen redirect naar deals
+      setActiveDialog("moving");
       return;
     }
     
