@@ -22,6 +22,7 @@ import {
   isOpstalTask,
   isSlotTask,
   isBudgetTask,
+  isInviteHouseholdTask,
   needsEnergyQuestions,
   needsInternetQuestions,
   needsMovingQuestions,
@@ -53,6 +54,7 @@ export type QuestionDialogType =
   | "renovation"
   | "partnerInvite"
   | "budget"
+  | "inviteHousehold"
   | null;
 
 export type SmartQuestionState = {
@@ -79,6 +81,12 @@ export const useQuestionDialogs = (
   // Handle "Regelen" button click - determines which questions to show
   const handleRegelenClick = useCallback((e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
+    
+    // Invite household task - opens invite dialog
+    if (isInviteHouseholdTask(task)) {
+      setActiveDialog("inviteHousehold");
+      return;
+    }
     
     // Budget task - opens budget dialog (no external navigation)
     if (isBudgetTask(task)) {

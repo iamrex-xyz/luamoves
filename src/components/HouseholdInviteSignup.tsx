@@ -128,7 +128,7 @@ export const HouseholdInviteSignup = ({
         
         toast({
           title: "Welkom bij Lua! 🎉",
-          description: "Je account is aangemaakt en je bent toegevoegd aan het huishouden.",
+          description: "Je account is aangemaakt en je bent toegevoegd als mede-verhuizer.",
         });
         
         onComplete();
@@ -161,7 +161,7 @@ export const HouseholdInviteSignup = ({
             <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-3">
               <Users className="w-6 h-6 text-primary-foreground" />
             </div>
-            <h2 className="text-xl font-bold">Je bent uitgenodigd!</h2>
+            <h2 className="text-xl font-bold">Je bent uitgenodigd als mede-verhuizer!</h2>
             <p className="text-sm text-muted-foreground mt-1">
               {name ? `Hoi ${name}! ` : ""}Maak een account aan om samen te verhuizen.
             </p>
@@ -265,7 +265,7 @@ export const HouseholdInviteSignup = ({
             </Button>
 
             <p className="text-xs text-center text-muted-foreground pt-1">
-              Je wordt automatisch toegevoegd aan het huishouden na registratie.
+              Je wordt automatisch toegevoegd als mede-verhuizer na registratie.
             </p>
           </div>
         </div>

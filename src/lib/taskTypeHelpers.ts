@@ -225,6 +225,10 @@ export const isBudgetTask = (task: Task): boolean => {
   );
 };
 
+export const isInviteHouseholdTask = (task: Task): boolean => {
+  return task.id === "invite-household-members";
+};
+
 // Needs questions helpers
 export const needsEnergyQuestions = (info: MovingInfo): boolean => {
   return !info.energyCurrentSupplier || !info.hasSmartMeter || !info.energyConnectionType;
@@ -299,7 +303,8 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isTaxatieTask(task) ||
     isOpstalTask(task) ||
     isSlotTask(task) ||
-    isBudgetTask(task)
+    isBudgetTask(task) ||
+    isInviteHouseholdTask(task)
   );
 };
 
