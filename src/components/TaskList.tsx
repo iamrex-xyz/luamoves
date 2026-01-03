@@ -133,6 +133,27 @@ export const TaskList = ({
     setSelectedTask(task);
   };
 
+  // Keep the opened task details in sync after refreshes (e.g. assignment)
+  useEffect(() => {
+    if (!selectedTask) return;
+
+    const updated = tasks.find((t) => t.id === selectedTask.id);
+    if (!updated) return;
+
+    const deadlineChanged =
+      updated.deadline instanceof Date && selectedTask.deadline instanceof Date
+        ? updated.deadline.getTime() !== selectedTask.deadline.getTime()
+        : updated.deadline !== selectedTask.deadline;
+
+    if (
+      updated.status !== selectedTask.status ||
+      updated.assignedTo !== selectedTask.assignedTo ||
+      updated.assignedToEmail !== selectedTask.assignedToEmail ||
+      deadlineChanged
+    ) {
+      setSelectedTask(updated);
+    }
+  }, [tasks, selectedTask]);
   const handleCheckboxClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
     handleTaskToggle(task.id);

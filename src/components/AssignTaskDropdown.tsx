@@ -193,13 +193,14 @@ export const AssignTaskDropdown = ({
   const currentAssignee = getCurrentAssignee();
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
           size="sm" 
           className="h-8 gap-2"
           disabled={isLoading}
+          data-vaul-no-drag
         >
           {isLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -215,11 +216,11 @@ export const AssignTaskDropdown = ({
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" className="w-64 z-[80]">
         <DropdownMenuLabel>Wijs taak toe aan</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={handleAssignToSelf}>
+        <DropdownMenuItem onSelect={handleAssignToSelf}>
           <UserCircle className="w-4 h-4 mr-2" />
           Mezelf
           {currentAssignee === "Ik" && <Check className="w-4 h-4 ml-auto" />}
@@ -236,7 +237,7 @@ export const AssignTaskDropdown = ({
             {householdMembers.map((member) => (
               <DropdownMenuItem
                 key={member}
-                onClick={() => assignToHouseholdMember(member)}
+                onSelect={() => assignToHouseholdMember(member)}
               >
                 <UserCircle className="w-4 h-4 mr-2" />
                 <span className="truncate">{member}</span>
@@ -258,7 +259,7 @@ export const AssignTaskDropdown = ({
             {collaborators.map((collab) => (
               <DropdownMenuItem
                 key={collab.id}
-                onClick={() =>
+                onSelect={() =>
                   assignTask(collab.collaborator_user_id, collab.collaborator_email)
                 }
               >
@@ -310,7 +311,7 @@ export const AssignTaskDropdown = ({
             </div>
           </div>
         ) : (
-          <DropdownMenuItem onClick={() => setShowEmailInput(true)}>
+          <DropdownMenuItem onSelect={() => setShowEmailInput(true)}>
             <Mail className="w-4 h-4 mr-2" />
             Ander e-mailadres...
           </DropdownMenuItem>
@@ -320,7 +321,7 @@ export const AssignTaskDropdown = ({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => assignTask(null, null)}
+              onSelect={() => assignTask(null, null)}
               className="text-destructive"
             >
               Toewijzing verwijderen
