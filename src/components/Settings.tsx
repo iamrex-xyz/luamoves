@@ -7,6 +7,7 @@ import { ReminderSettingsListItem, ReminderSettingsSheet } from "@/components/Re
 import { MovingSettingsCard } from "@/components/settings/MovingSettingsCard";
 import { ProfileOverview } from "@/components/settings/ProfileOverview";
 import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSettingsCard";
+import { HouseholdMembersSettingsCard } from "@/components/settings/HouseholdMembersSettingsCard";
 import { BudgetProgressBar } from "@/components/BudgetProgressBar";
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
@@ -134,7 +135,10 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
         {/* Profile Overview - All profile data in collapsible sections */}
         <ProfileOverview movingInfo={movingInfo} onUpdate={onUpdate} />
 
-        {/* Collaborators Card */}
+        {/* Household Members Card - medeverhuizers from WhatsApp invites */}
+        <HouseholdMembersSettingsCard />
+
+        {/* Collaborators Card - email invites */}
         <CollaboratorSettingsCard />
 
         {/* Other Settings */}

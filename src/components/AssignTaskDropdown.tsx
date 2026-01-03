@@ -11,20 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useHouseholdMembers, HouseholdMember } from "@/hooks/useHouseholdMembers";
 import { UserCircle, Mail, Check, Loader2, Users } from "lucide-react";
 
 type Collaborator = {
   id: string;
   collaborator_email: string;
   collaborator_user_id: string | null;
-};
-
-type HouseholdMember = {
-  id: string;
-  name: string | null;
-  phone: string;
-  status: string;
-  member_user_id: string | null;
 };
 
 type AssignTaskDropdownProps = {
@@ -43,16 +36,16 @@ export const AssignTaskDropdown = ({
   onAssignmentChange,
 }: AssignTaskDropdownProps) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [householdMembers, setHouseholdMembers] = useState<HouseholdMember[]>([]);
-  const [legacyHouseholdNames, setLegacyHouseholdNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [customEmail, setCustomEmail] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
   const { toast } = useToast();
+  
+  // Use centralized hook for household members (single source of truth)
+  const { activeMembers: householdMembers } = useHouseholdMembers();
 
   useEffect(() => {
     loadCollaborators();
-    loadHouseholdMembers();
   }, []);
 
   const loadCollaborators = async () => {
@@ -69,38 +62,6 @@ export const AssignTaskDropdown = ({
       setCollaborators(data || []);
     } catch (error) {
       console.error("Error loading collaborators:", error);
-    }
-  };
-
-  const loadHouseholdMembers = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // Load from new household_members table (active members only)
-      const { data: members, error: membersError } = await supabase
-        .from("household_members")
-        .select("*")
-        .eq("owner_user_id", user.id)
-        .eq("status", "active");
-
-      if (!membersError && members) {
-        setHouseholdMembers(members);
-      }
-
-      // Also load legacy household_names from profiles as fallback
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("household_names")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!profileError && profile) {
-        const names = (profile.household_names || []).filter((name: string) => name && name.trim() !== "");
-        setLegacyHouseholdNames(names);
-      }
-    } catch (error) {
-      console.error("Error loading household members:", error);
     }
   };
 
@@ -184,42 +145,6 @@ export const AssignTaskDropdown = ({
       toast({
         title: "Taak toegewezen",
         description: `Taak toegewezen aan ${displayName}`,
-      });
-
-      onAssignmentChange();
-    } catch (error) {
-      console.error("Error assigning task to household member:", error);
-      toast({
-        title: "Fout bij toewijzen",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const assignToLegacyMember = async (memberName: string) => {
-    setIsLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from("tasks")
-        .upsert({
-          user_id: user.id,
-          task_id: taskId,
-          assigned_to: null,
-          assigned_to_email: memberName,
-        }, {
-          onConflict: "user_id,task_id",
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Taak toegewezen",
-        description: `Taak toegewezen aan ${memberName}`,
       });
 
       onAssignmentChange();
@@ -324,29 +249,6 @@ export const AssignTaskDropdown = ({
                 </DropdownMenuItem>
               );
             })}
-          </>
-        )}
-
-        {/* Legacy Household Names (from profile) */}
-        {legacyHouseholdNames.length > 0 && householdMembers.length === 0 && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="text-xs text-muted-foreground flex items-center gap-1.5">
-              <Users className="w-3.5 h-3.5" />
-              Huishouden
-            </DropdownMenuLabel>
-            {legacyHouseholdNames.map((name) => (
-              <DropdownMenuItem
-                key={name}
-                onSelect={() => assignToLegacyMember(name)}
-              >
-                <UserCircle className="w-4 h-4 mr-2" />
-                <span className="truncate">{name}</span>
-                {currentAssignee === name && (
-                  <Check className="w-4 h-4 ml-auto" />
-                )}
-              </DropdownMenuItem>
-            ))}
           </>
         )}
 
