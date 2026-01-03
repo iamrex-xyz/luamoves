@@ -2,48 +2,43 @@ import { useState, useCallback, useEffect } from "react";
 import { useGuestStorage } from "./useGuestStorage";
 
 /**
- * STRICT GATED ACCOUNT CREATION FLOW
+ * PHASED ACCOUNT CREATION FLOW
  * 
  * Flow:
- * 1. After task 1: Email capture (soft, dismissible)
- * 2. After task 2: Account creation prompt (soft, deferrable - if email captured)
+ * 1. After task 1: Phone capture (soft, dismissible) - pre-account profile
+ * 2. After task 2: Full account creation with email + password (soft, deferrable if phone captured)
  * 3. After task 5: Hard block - must create account to continue
  * 
- * CRITICAL GUARD:
- * Once account creation is STARTED (password set), the user MUST complete it.
- * - Cannot proceed as guest anymore
- * - Cannot complete more tasks
- * - Refresh/page leave brings them back to account creation
+ * The user profile is the single source of truth for all personal data.
  */
 
 type ModalAction = 
   | { type: "none" }
-  | { type: "email_capture"; isHardBlock: boolean }
+  | { type: "phone_capture"; isHardBlock: boolean }
   | { type: "account_creation"; isHardBlock: boolean };
 
 export const useSignupFlow = (isLoggedIn: boolean) => {
   const storage = useGuestStorage();
 
   // Dialog states
-  const [showEmailCapture, setShowEmailCapture] = useState(false);
-  const [isEmailHardBlock, setIsEmailHardBlock] = useState(false);
-  const [showSignupPrompt, setShowSignupPrompt] = useState(false);
-  const [isSignupHardBlock, setIsSignupHardBlock] = useState(false);
+  const [showPhoneCapture, setShowPhoneCapture] = useState(false);
+  const [isPhoneHardBlock, setIsPhoneHardBlock] = useState(false);
+  const [showAccountCreation, setShowAccountCreation] = useState(false);
+  const [isAccountHardBlock, setIsAccountHardBlock] = useState(false);
 
-  // CRITICAL: On mount, check if account creation was started but not completed
+  // Check on mount if account creation was started but not completed
   useEffect(() => {
     if (isLoggedIn || storage.hasAccount()) return;
     
     // If account creation was started but not completed, force show the dialog
     if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
-      setIsSignupHardBlock(true);
-      setShowSignupPrompt(true);
+      setIsAccountHardBlock(true);
+      setShowAccountCreation(true);
     }
   }, [isLoggedIn, storage]);
 
   /**
    * Determine what modal action to show based on current state
-   * This is called BEFORE completing a task
    */
   const determineModalAction = useCallback((currentCompletedCount: number): ModalAction => {
     // If logged in or has account, no modals needed
@@ -51,37 +46,34 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return { type: "none" };
     }
 
-    // CRITICAL: If account creation started but not completed, force account creation
+    // If account creation started but not completed, force account creation
     if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
       return { type: "account_creation", isHardBlock: true };
     }
 
-    // currentCompletedCount is the count AFTER the task was completed
     const completedCount = currentCompletedCount;
 
-    // HARD BLOCK: At task 6 (after 5 completed), force account creation
+    // HARD BLOCK: After 5 tasks, force account creation
     if (completedCount > storage.MAX_GUEST_TASKS) {
-      // If no email captured, need email first
-      if (!storage.isEmailCaptured()) {
-        return { type: "email_capture", isHardBlock: true };
+      // If no phone captured yet, need phone first
+      if (!storage.isPhoneCaptured()) {
+        return { type: "phone_capture", isHardBlock: true };
       }
       // Otherwise force account creation
       return { type: "account_creation", isHardBlock: true };
     }
 
-    // STEP 1: After first task - email capture (soft)
+    // STEP 1: After first task - phone capture (soft)
     if (completedCount === 1) {
-      // Only show if: not captured, not already shown
-      if (!storage.isEmailCaptured() && !storage.isEmailPromptShown()) {
-        return { type: "email_capture", isHardBlock: false };
+      if (!storage.isPhoneCaptured() && !storage.isPhonePromptShown()) {
+        return { type: "phone_capture", isHardBlock: false };
       }
     }
 
     // STEP 2: After second task - account creation (soft)
     if (completedCount === 2) {
-      // Only show if: email captured AND not already shown AND not deferred
       if (
-        storage.isEmailCaptured() && 
+        storage.isPhoneCaptured() && 
         !storage.isAccountPromptShown() && 
         !storage.isAccountPromptDeferred()
       ) {
@@ -94,15 +86,13 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
 
   /**
    * Check if user can complete a task
-   * Returns true if task can be completed immediately
-   * Returns false if a modal needs to be shown first
    */
   const canCompleteTask = useCallback((): boolean => {
     if (isLoggedIn || storage.hasAccount()) {
       return true;
     }
     
-    // CRITICAL: Block if account creation started but not completed
+    // Block if account creation started but not completed
     if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
       return false;
     }
@@ -120,17 +110,16 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
   /**
    * Called when user attempts to complete a task
    * Returns true if task completion should proceed
-   * Returns false if a modal was shown (task completion should wait)
    */
   const handleTaskAttempt = useCallback((): boolean => {
     if (isLoggedIn || storage.hasAccount()) {
       return true;
     }
 
-    // CRITICAL: If account creation started but not completed, block and show dialog
+    // If account creation started but not completed, block and show dialog
     if (storage.isAccountCreationStarted() && !storage.isAccountCreationCompleted()) {
-      setIsSignupHardBlock(true);
-      setShowSignupPrompt(true);
+      setIsAccountHardBlock(true);
+      setShowAccountCreation(true);
       return false;
     }
 
@@ -138,14 +127,14 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     const action = determineModalAction(currentCount);
 
     switch (action.type) {
-      case "email_capture":
-        setIsEmailHardBlock(action.isHardBlock);
-        setShowEmailCapture(true);
+      case "phone_capture":
+        setIsPhoneHardBlock(action.isHardBlock);
+        setShowPhoneCapture(true);
         return false;
         
       case "account_creation":
-        setIsSignupHardBlock(action.isHardBlock);
-        setShowSignupPrompt(true);
+        setIsAccountHardBlock(action.isHardBlock);
+        setShowAccountCreation(true);
         return false;
         
       default:
@@ -155,7 +144,6 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
 
   /**
    * Called AFTER a task is successfully completed
-   * Handles post-completion modal logic
    */
   const handleTaskComplete = useCallback((): void => {
     if (isLoggedIn || storage.hasAccount()) {
@@ -168,85 +156,71 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     // Check if we need to show a modal after this completion
     const action = determineModalAction(newCount);
     
-    if (action.type === "email_capture") {
-      setIsEmailHardBlock(action.isHardBlock);
-      setShowEmailCapture(true);
+    if (action.type === "phone_capture") {
+      setIsPhoneHardBlock(action.isHardBlock);
+      setShowPhoneCapture(true);
     } else if (action.type === "account_creation") {
-      setIsSignupHardBlock(action.isHardBlock);
-      setShowSignupPrompt(true);
+      setIsAccountHardBlock(action.isHardBlock);
+      setShowAccountCreation(true);
     }
   }, [isLoggedIn, storage, determineModalAction]);
 
   /**
-   * Email modal: User submitted email
+   * Phone modal: User submitted phone
    */
-  const handleEmailSubmit = useCallback((email: string, phone?: string) => {
-    storage.setCapturedEmail(email);
-    if (phone) {
-      storage.setCapturedPhone(phone);
-    }
-    storage.setEmailPromptShown(true);
-    setShowEmailCapture(false);
+  const handlePhoneSubmit = useCallback((phone: string) => {
+    storage.setCapturedPhone(phone);
+    storage.setPhonePromptShown(true);
+    storage.setPhoneCaptured(true);
+    setShowPhoneCapture(false);
 
     // If this was a hard block, immediately show account creation
-    if (isEmailHardBlock) {
-      setIsEmailHardBlock(false);
+    if (isPhoneHardBlock) {
+      setIsPhoneHardBlock(false);
       setTimeout(() => {
-        setIsSignupHardBlock(true);
-        setShowSignupPrompt(true);
+        setIsAccountHardBlock(true);
+        setShowAccountCreation(true);
       }, 100);
     }
-  }, [storage, isEmailHardBlock]);
+  }, [storage, isPhoneHardBlock]);
 
   /**
-   * Email modal: User clicked "Later" / dismissed
+   * Phone modal: User clicked "Later" / dismissed
    */
-  const handleEmailDismiss = useCallback(() => {
-    storage.setEmailPromptShown(true);
-    storage.setEmailPromptDismissed(true);
-    setShowEmailCapture(false);
+  const handlePhoneDismiss = useCallback(() => {
+    storage.setPhonePromptShown(true);
+    storage.setPhonePromptDismissed(true);
+    setShowPhoneCapture(false);
   }, [storage]);
 
   /**
    * Account modal: User created account
    */
-  const handleSignupComplete = useCallback(() => {
+  const handleAccountCreated = useCallback(() => {
     storage.setHasAccount(true);
     storage.setAccountPromptShown(true);
     storage.setGuestLimitReached(false);
-    storage.setAccountCreationCompleted(true); // Mark as fully completed
-    setShowSignupPrompt(false);
-    setIsSignupHardBlock(false);
-    
-    // Clear captured email since account is now created
-    storage.setCapturedEmail("");
-  }, [storage]);
-
-  /**
-   * Called when user completes step 1 (password set)
-   * This marks account creation as STARTED - cannot be abandoned
-   */
-  const handlePasswordSet = useCallback(() => {
-    storage.setAccountCreationStarted(true);
+    storage.setAccountCreationCompleted(true);
+    setShowAccountCreation(false);
+    setIsAccountHardBlock(false);
   }, [storage]);
 
   /**
    * Account modal: User clicked "Later" / deferred
-   * CRITICAL: This should NEVER be called for hard blocks or if account creation started
    */
-  const handleSignupDefer = useCallback(() => {
-    // CRITICAL: Never allow defer if account creation has started
+  const handleAccountDefer = useCallback(() => {
+    // Never allow defer if account creation has started
     if (storage.isAccountCreationStarted()) {
-      return; // Cannot defer once started
+      return;
     }
     
     // Only allow defer for non-hard-block modals
-    if (!isSignupHardBlock) {
+    if (!isAccountHardBlock) {
       storage.setAccountPromptShown(true);
       storage.setAccountPromptDeferred(true);
-      setShowSignupPrompt(false);
+      setShowAccountCreation(false);
     }
-  }, [storage, isSignupHardBlock]);
+  }, [storage, isAccountHardBlock]);
 
   /**
    * Manual trigger for signup flow (e.g., from badge click)
@@ -256,12 +230,12 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
       return;
     }
     
-    if (storage.isEmailCaptured()) {
-      setIsSignupHardBlock(false);
-      setShowSignupPrompt(true);
+    if (storage.isPhoneCaptured()) {
+      setIsAccountHardBlock(false);
+      setShowAccountCreation(true);
     } else {
-      setIsEmailHardBlock(false);
-      setShowEmailCapture(true);
+      setIsPhoneHardBlock(false);
+      setShowPhoneCapture(true);
     }
   }, [isLoggedIn, storage]);
 
@@ -273,20 +247,19 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     storage.getCompletedTaskCount() >= 3;
 
   return {
-    // Email capture dialog
-    showEmailCapture,
-    setShowEmailCapture,
-    isEmailHardBlock,
-    handleEmailSubmit,
-    handleEmailDismiss,
+    // Phone capture dialog
+    showPhoneCapture,
+    setShowPhoneCapture,
+    isPhoneHardBlock,
+    handlePhoneSubmit,
+    handlePhoneDismiss,
     
-    // Signup prompt
-    showSignupPrompt,
-    setShowSignupPrompt,
-    isSignupHardBlock,
-    handleSignupComplete,
-    handleSignupDefer,
-    handlePasswordSet,
+    // Account creation dialog
+    showAccountCreation,
+    setShowAccountCreation,
+    isAccountHardBlock,
+    handleAccountCreated,
+    handleAccountDefer,
     
     // Task handling
     canCompleteTask,
@@ -297,8 +270,8 @@ export const useSignupFlow = (isLoggedIn: boolean) => {
     showAccountBadge,
     handleBadgeClick,
     
-    // Email
-    capturedEmail: storage.capturedEmail,
+    // Captured data
+    capturedPhone: storage.capturedPhone,
     
     // Storage access for components
     storage,

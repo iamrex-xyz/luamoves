@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { MovingInfo } from "@/pages/Index";
@@ -11,7 +11,8 @@ import { BudgetProgressBar } from "@/components/BudgetProgressBar";
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
 import { useBudget } from "@/hooks/useBudget";
-import { LogOut, Settings as SettingsIcon } from "lucide-react";
+import { useGuestStorage } from "@/hooks/useGuestStorage";
+import { LogOut, Settings as SettingsIcon, Phone as PhoneIcon } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
@@ -27,6 +28,7 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
   const [resetClickCount, setResetClickCount] = useState(0);
   const { toast } = useToast();
+  const guestStorage = useGuestStorage();
 
   // Use budget hook for deterministic budget management
   const budget = useBudget(
@@ -74,6 +76,21 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
         </div>
 
         <div className="px-4 sm:px-6 space-y-6">
+          {/* Phone number card - if captured */}
+          {guestStorage.capturedPhone && (
+            <Card className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <PhoneIcon className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Telefoonnummer</p>
+                  <p className="font-medium">{guestStorage.capturedPhone}</p>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Moving Details Card - works for guests */}
           <MovingSettingsCard movingInfo={movingInfo} onUpdate={onUpdate} />
 
