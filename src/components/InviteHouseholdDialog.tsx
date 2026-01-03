@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MobileModal,
   MobileModalContent,
@@ -14,17 +14,19 @@ import {
   Loader2, 
   CheckCircle2,
   Send,
-  UserPlus,
+  LogIn,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import { User } from "@supabase/supabase-js";
 
 type InviteHouseholdDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onInvitesSent?: () => void;
+  onRequestLogin?: () => void;
 };
 
 type InviteEntry = {
@@ -67,13 +69,27 @@ export const InviteHouseholdDialog = ({
   open,
   onOpenChange,
   onInvitesSent,
+  onRequestLogin,
 }: InviteHouseholdDialogProps) => {
   const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [entries, setEntries] = useState<InviteEntry[]>([
     { id: crypto.randomUUID(), phone: "", name: "", status: "pending" }
   ]);
   const [isSending, setIsSending] = useState(false);
   const [allSent, setAllSent] = useState(false);
+
+  // Check authentication status when dialog opens
+  useEffect(() => {
+    if (open) {
+      setCheckingAuth(true);
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+        setCheckingAuth(false);
+      });
+    }
+  }, [open]);
 
   const addEntry = () => {
     setEntries(prev => [
@@ -215,6 +231,72 @@ export const InviteHouseholdDialog = ({
 
   const canSend = entries.some(e => e.phone.trim() !== "" && e.status !== "sent");
   const sentCount = entries.filter(e => e.status === "sent").length;
+
+  // Show login prompt if not authenticated
+  if (!checkingAuth && !user) {
+    return (
+      <MobileModal open={open} onOpenChange={handleClose}>
+        <MobileModalContent className="max-h-[85vh]">
+          <div className="px-5 py-6">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-3">
+                <Users className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <h2 className="text-xl font-bold">Account vereist</h2>
+              <p className="text-sm text-muted-foreground mt-2">
+                Om mede-verhuizers uit te nodigen heb je een account nodig. Zo weten we bij welke verhuizing de uitnodiging hoort.
+              </p>
+            </div>
+
+            {/* Benefits */}
+            <div className="bg-muted/30 rounded-xl p-4 mb-6">
+              <p className="text-sm font-medium mb-2">Met een account kun je:</p>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>✓ Mede-verhuizers uitnodigen</li>
+                <li>✓ Taken verdelen en samenwerken</li>
+                <li>✓ Je voortgang opslaan</li>
+              </ul>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2">
+              <Button
+                onClick={() => {
+                  handleClose();
+                  onRequestLogin?.();
+                }}
+                className="w-full h-11 rounded-xl"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Account aanmaken of inloggen
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full h-9 text-muted-foreground"
+              >
+                Later
+              </Button>
+            </div>
+          </div>
+        </MobileModalContent>
+      </MobileModal>
+    );
+  }
+
+  // Show loading while checking auth
+  if (checkingAuth) {
+    return (
+      <MobileModal open={open} onOpenChange={handleClose}>
+        <MobileModalContent className="max-h-[85vh]">
+          <div className="px-5 py-8 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        </MobileModalContent>
+      </MobileModal>
+    );
+  }
 
   return (
     <MobileModal open={open} onOpenChange={handleClose}>
