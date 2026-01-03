@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, Mail, Check, Trash2 } from "lucide-react";
+import { UserPlus, Mail, Check, Trash2, Phone } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { validateEmail as validateEmailUtil, cleanEmail } from "@/lib/validation";
@@ -17,11 +17,21 @@ type Collaborator = {
   invited_at: string;
 };
 
+type HouseholdMember = {
+  id: string;
+  name: string | null;
+  phone: string;
+  member_user_id: string | null;
+  accepted_at: string | null;
+  status: string;
+};
+
 export const CollaboratorSettingsCard = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [householdMembers, setHouseholdMembers] = useState<HouseholdMember[]>([]);
   const [newCollaboratorEmail, setNewCollaboratorEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
 
@@ -34,14 +44,25 @@ export const CollaboratorSettingsCard = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Load email-based collaborators
+      const { data: emailData, error: emailError } = await supabase
         .from("moving_collaborators")
         .select("*")
         .eq("owner_user_id", user.id)
         .order("invited_at", { ascending: false });
 
-      if (error) throw error;
-      setCollaborators(data || []);
+      if (emailError) throw emailError;
+      setCollaborators(emailData || []);
+
+      // Load phone-based household members
+      const { data: householdData, error: householdError } = await supabase
+        .from("household_members")
+        .select("*")
+        .eq("owner_user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (householdError) throw householdError;
+      setHouseholdMembers(householdData || []);
     } catch (error) {
       console.error("Error loading collaborators:", error);
     } finally {
@@ -96,6 +117,23 @@ export const CollaboratorSettingsCard = () => {
         .from("moving_collaborators")
         .delete()
         .eq("id", collaboratorId);
+
+      if (error) throw error;
+
+      toast({ title: "Verwijderd", description: "Medeverhuizer is verwijderd." });
+      loadCollaborators();
+    } catch (error) {
+      console.error("Error removing:", error);
+      toast({ title: "Fout", description: "Kon medeverhuizer niet verwijderen.", variant: "destructive" });
+    }
+  };
+
+  const handleRemoveHouseholdMember = async (memberId: string) => {
+    try {
+      const { error } = await supabase
+        .from("household_members")
+        .delete()
+        .eq("id", memberId);
 
       if (error) throw error;
 
@@ -169,6 +207,48 @@ export const CollaboratorSettingsCard = () => {
           {emailError && <p className="text-xs text-destructive mt-1">{emailError}</p>}
         </div>
 
+        {/* Phone-based household members */}
+        {householdMembers.length > 0 && (
+          <div className="space-y-2">
+            {householdMembers.map((member) => (
+              <div key={member.id} className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{member.name || member.phone}</p>
+                    {member.name && (
+                      <p className="text-xs text-muted-foreground">{member.phone}</p>
+                    )}
+                    <div className="flex items-center gap-1">
+                      {member.accepted_at ? (
+                        <Badge variant="secondary" className="text-xs bg-success/10 text-success">
+                          <Check className="w-3 h-3 mr-1" />
+                          Geaccepteerd
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-xs bg-warning/10 text-warning">
+                          Uitgenodigd
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => handleRemoveHouseholdMember(member.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Email-based collaborators */}
         {collaborators.length > 0 && (
           <div className="space-y-2">
             {collaborators.map((collab) => (

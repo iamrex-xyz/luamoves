@@ -57,14 +57,22 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
       
       setLivesAlone(profile?.household_type === "single");
 
-      // Check if user has any collaborators
-      const { data: collaborators } = await supabase
+      // Check if user has any collaborators (email-based)
+      const { data: emailCollaborators } = await supabase
         .from("moving_collaborators")
         .select("*")
-        .or(`owner_user_id.eq.${user.id},collaborator_user_id.eq.${user.id}`)
-        .not("accepted_at", "is", null);
+        .or(`owner_user_id.eq.${user.id},collaborator_user_id.eq.${user.id}`);
 
-      setHasCollaborators((collaborators?.length || 0) > 0);
+      // Check if user has any household members (phone-based)
+      const { data: householdMembers } = await supabase
+        .from("household_members")
+        .select("*")
+        .or(`owner_user_id.eq.${user.id},member_user_id.eq.${user.id}`);
+
+      const hasEmailCollaborators = (emailCollaborators?.length || 0) > 0;
+      const hasHouseholdMembers = (householdMembers?.length || 0) > 0;
+      
+      setHasCollaborators(hasEmailCollaborators || hasHouseholdMembers);
     } catch (error) {
       console.error("Error checking collaborator status:", error);
     } finally {
