@@ -164,17 +164,6 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Package className="w-4 h-4" />,
       priority: 2,
-    },
-    {
-      id: "rent-fase1-verhuisbudget",
-      title: "Stel je verhuisbudget in",
-      category: "Financieel",
-      description: "Bepaal hoeveel je wilt uitgeven aan je verhuizing. Dit helpt bij slimme keuzes voor verhuisbedrijven en materiaal.",
-      ...fase1LaterDeadline,
-      phase: "Even landen",
-      status: "todo",
-      icon: <Euro className="w-4 h-4" />,
-      priority: 2,
     }
   );
 
@@ -783,17 +772,6 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
       phase: "Even landen",
       status: "todo",
       icon: <Package className="w-4 h-4" />,
-      priority: 2,
-    },
-    {
-      id: "buy-fase1-verhuisbudget",
-      title: "Stel je verhuisbudget in",
-      category: "Financieel",
-      description: "Bepaal hoeveel je wilt uitgeven aan je verhuizing. Dit helpt bij slimme keuzes voor verhuisbedrijven en materiaal.",
-      ...fase1LaterDeadline,
-      phase: "Even landen",
-      status: "todo",
-      icon: <Euro className="w-4 h-4" />,
       priority: 2,
     }
   );
