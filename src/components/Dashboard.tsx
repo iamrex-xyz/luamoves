@@ -55,7 +55,8 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     handleDialogComplete,
     handleDialogRedirect,
     closeActiveDialog,
-  } = useQuestionDialogs(movingInfo);
+    handleCompleteCurrentTask,
+  } = useQuestionDialogs(movingInfo, undefined, undefined, toggleTaskStatus);
 
   // Filter en sorteer taken voor de homepage
   const openTasks = useMemo(() => {
@@ -304,6 +305,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         onOpenChange={(open) => !open && closeActiveDialog()}
         onInvitesSent={refreshTasks}
         onRequestLogin={onSignupClick}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <EnergyQuestionsDialog
         open={activeDialog === "energy"}
@@ -311,6 +313,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("energy")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <InternetQuestionsDialog
         open={activeDialog === "internet"}
@@ -318,6 +321,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("internet")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <MovingQuestionsDialog
         open={activeDialog === "moving"}
@@ -325,6 +329,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("moving")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <BoxesQuestionsDialog
         open={activeDialog === "boxes"}
@@ -339,6 +344,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("insurance")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <LiabilityQuestionsDialog
         open={activeDialog === "liability"}
@@ -368,6 +374,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("cleaning")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
       <SmokeDetectorQuestionsDialog
         open={activeDialog === "smokeDetector"}

@@ -36,6 +36,7 @@ type MovingQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (updatedInfo: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 };
 
 type Step = 'dates' | 'addresses' | 'details' | 'confirmation';
@@ -70,6 +71,7 @@ export const MovingQuestionsDialog = ({
   movingInfo,
   onComplete,
   onRedirect,
+  onCompleteTask,
 }: MovingQuestionsDialogProps) => {
   const [step, setStep] = useState<Step>('dates');
   const [movingDate, setMovingDate] = useState<Date | undefined>(
@@ -195,12 +197,25 @@ export const MovingQuestionsDialog = ({
             <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
               Je ontvangt binnenkort vergelijkbare offertes in je inbox.
             </p>
-            <Button 
-              onClick={handleClose}
-              className="w-full max-w-[200px] h-12 rounded-xl"
-            >
-              Sluiten
-            </Button>
+            <div className="w-full max-w-[280px] space-y-2">
+              <Button 
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full h-12 rounded-xl"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full h-10 text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
           </div>
         ) : (
           <>
