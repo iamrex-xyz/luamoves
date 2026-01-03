@@ -149,11 +149,8 @@ export const useQuestionDialogs = (
     }
     
     if (isCleaningTask(task)) {
-      if (needsCleaningQuestions(movingInfo)) {
-        setActiveDialog("cleaning");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Schoonmaak-taak opent altijd het intakeformulier, geen redirect naar deals
+      setActiveDialog("cleaning");
       return;
     }
     
