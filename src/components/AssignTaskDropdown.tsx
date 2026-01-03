@@ -127,27 +127,29 @@ export const AssignTaskDropdown = ({
 
       if (error) throw error;
 
-      // Send WhatsApp notification
-      if (member.phone && taskTitle) {
-        try {
-          await supabase.functions.invoke("notify-task-assignment", {
-            body: { 
-              taskTitle, 
-              assignedToPhone: member.phone 
-            }
-          });
-        } catch (notifyError) {
-          console.error("Error sending WhatsApp notification:", notifyError);
-          // Don't fail the assignment if notification fails
-        }
-      }
+      // First update the UI immediately
+      onAssignmentChange();
 
       toast({
         title: "Taak toegewezen",
-        description: `Taak toegewezen aan ${displayName}`,
+        description: `${displayName} krijgt een WhatsApp-bericht`,
       });
 
-      onAssignmentChange();
+      // Send WhatsApp notification in background
+      if (member.phone && taskTitle) {
+        supabase.functions.invoke("notify-task-assignment", {
+          body: { 
+            taskTitle, 
+            assignedToPhone: member.phone 
+          }
+        }).then(({ error }) => {
+          if (error) {
+            console.error("Error sending WhatsApp notification:", error);
+          }
+        }).catch((notifyError) => {
+          console.error("Error sending WhatsApp notification:", notifyError);
+        });
+      }
     } catch (error) {
       console.error("Error assigning task to household member:", error);
       toast({
