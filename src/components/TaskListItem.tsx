@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
-import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
+import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
 import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText } from "lucide-react";
 
 type TaskListItemProps = {
@@ -162,7 +162,7 @@ export const TaskListItem = ({
                   className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
                   onClick={(e) => onRegelenClick(e, task)}
                 >
-                  Regelen
+                  {getTaskButtonLabel(task) || "Regelen"}
                   <ChevronRight className="w-3 h-3 ml-0.5" />
                 </Button>
               )}

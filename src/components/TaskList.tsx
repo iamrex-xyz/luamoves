@@ -35,6 +35,7 @@ import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialo
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InviteHouseholdDialog } from "@/components/InviteHouseholdDialog";
 import { BudgetDialog } from "@/components/BudgetDialog";
+import { MovingFeedbackDialog } from "@/components/MovingFeedbackDialog";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
@@ -610,6 +611,19 @@ export const TaskList = ({
         open={activeDialog === "inviteHousehold"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInvitesSent={refreshTasks}
+      />
+
+      <MovingFeedbackDialog
+        open={activeDialog === "movingFeedback"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingDate={movingInfo.movingDate}
+        onSubmitSuccess={async () => {
+          // Find and complete the feedback task
+          const feedbackTask = tasks.find(t => t.id.includes("moving-feedback"));
+          if (feedbackTask && feedbackTask.status !== "done") {
+            await toggleTaskStatus(feedbackTask.id);
+          }
+        }}
       />
 
       <DocumentUploadSheet

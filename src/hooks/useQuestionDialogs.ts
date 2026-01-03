@@ -6,6 +6,7 @@ import {
   isEnergyTask,
   isInternetTask,
   isMovingTask,
+  isMovingFeedbackTask,
   isBoxesTask,
   isInsuranceTask,
   isLiabilityTask,
@@ -43,6 +44,7 @@ export type QuestionDialogType =
   | "energy"
   | "internet"
   | "moving"
+  | "movingFeedback"
   | "boxes"
   | "insurance"
   | "liability"
@@ -104,6 +106,12 @@ export const useQuestionDialogs = (
     if (isInternetTask(task)) {
       // Internet-taak opent altijd het intakeformulier, geen redirect naar deals
       setActiveDialog("internet");
+      return;
+    }
+    
+    if (isMovingFeedbackTask(task)) {
+      // Feedback taak opent de feedback dialog
+      setActiveDialog("movingFeedback");
       return;
     }
     
