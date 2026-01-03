@@ -99,11 +99,11 @@ export const CollaboratorSettingsCard = () => {
 
       if (error) throw error;
 
-      toast({ title: "Verwijderd", description: "Huisgenoot is verwijderd." });
+      toast({ title: "Verwijderd", description: "Medeverhuizer is verwijderd." });
       loadCollaborators();
     } catch (error) {
       console.error("Error removing:", error);
-      toast({ title: "Fout", description: "Kon huisgenoot niet verwijderen.", variant: "destructive" });
+      toast({ title: "Fout", description: "Kon medeverhuizer niet verwijderen.", variant: "destructive" });
     }
   };
 
@@ -137,8 +137,8 @@ export const CollaboratorSettingsCard = () => {
             <UserPlus className="w-5 h-5 text-success" />
           </div>
           <div>
-            <h2 className="font-semibold text-foreground">Huisgenoten</h2>
-            <p className="text-xs text-muted-foreground">Nodig anderen uit</p>
+            <h2 className="font-semibold text-foreground">Medeverhuizers</h2>
+            <p className="text-xs text-muted-foreground">Nodig anderen uit om mee te helpen</p>
           </div>
         </div>
       </div>
