@@ -89,7 +89,7 @@ export const TaskList = ({
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const [documentTask, setDocumentTask] = useState<Task | null>(null);
 
-  const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+  const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -450,6 +450,7 @@ export const TaskList = ({
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
+        onTaskAssignment={updateTaskAssignment}
         onToggleStatus={handleTaskToggle}
       />
       <TaskDealDialog task={dealTask} open={!!dealTask} onOpenChange={(open) => !open && setDealTask(null)} />

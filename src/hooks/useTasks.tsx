@@ -282,12 +282,22 @@ export const useTasks = (movingInfo: MovingInfo) => {
     updateTaskStatus(taskId, newStatus);
   };
 
+  // Optimistic update for task assignment (used by AssignTaskDropdown)
+  const updateTaskAssignment = useCallback((taskId: string, assignedToEmail: string | null) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, assignedToEmail } : task
+      )
+    );
+  }, []);
+
   return {
     tasks,
     isLoading,
     isGuest,
     updateTaskStatus,
     toggleTaskStatus,
+    updateTaskAssignment,
     refreshTasks: loadTasks,
   };
 };

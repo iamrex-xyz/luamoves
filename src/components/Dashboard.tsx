@@ -40,7 +40,7 @@ type DashboardProps = {
 };
 
 export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClick }: DashboardProps) => {
-  const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
+  const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
@@ -297,6 +297,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         open={!!selectedTask}
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
+        onTaskAssignment={updateTaskAssignment}
         onToggleStatus={handleTaskToggle}
       />
 

@@ -25,7 +25,7 @@ type AssignTaskDropdownProps = {
   taskTitle?: string;
   currentAssignedTo?: string | null;
   currentAssignedEmail?: string | null;
-  onAssignmentChange: () => void;
+  onAssignmentChange: (assignedEmail: string | null) => void;
 };
 
 export const AssignTaskDropdown = ({
@@ -94,7 +94,7 @@ export const AssignTaskDropdown = ({
           : "Toewijzing verwijderd",
       });
 
-      onAssignmentChange();
+      onAssignmentChange(email);
     } catch (error) {
       console.error("Error assigning task:", error);
       toast({
@@ -128,7 +128,7 @@ export const AssignTaskDropdown = ({
       if (error) throw error;
 
       // First update the UI immediately
-      onAssignmentChange();
+      onAssignmentChange(displayName);
 
       toast({
         title: "Taak toegewezen",

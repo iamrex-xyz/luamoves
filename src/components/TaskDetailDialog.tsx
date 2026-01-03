@@ -32,6 +32,7 @@ type TaskDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onTaskUpdate: () => void;
+  onTaskAssignment?: (taskId: string, assignedEmail: string | null) => void;
   onToggleStatus?: (taskId: string) => void;
 };
 
@@ -40,17 +41,21 @@ export const TaskDetailDialog = ({
   open,
   onOpenChange,
   onTaskUpdate,
+  onTaskAssignment,
   onToggleStatus,
 }: TaskDetailDialogProps) => {
   const [notes, setNotes] = useState("");
+  const [localAssignedEmail, setLocalAssignedEmail] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
+  // Reset local state when task changes
   useEffect(() => {
     if (task) {
+      setLocalAssignedEmail(task.assignedToEmail || null);
       loadTaskNotes();
     }
-  }, [task?.id]);
+  }, [task?.id, task?.assignedToEmail]);
 
   const loadTaskNotes = async () => {
     if (!task) return;
@@ -225,7 +230,7 @@ export const TaskDetailDialog = ({
                   <div>
                     <Label className="text-sm font-medium">Toegewezen aan</Label>
                     <p className="text-sm text-muted-foreground">
-                      {task.assignedToEmail || "Niet toegewezen"}
+                      {localAssignedEmail || "Niet toegewezen"}
                     </p>
                   </div>
                 </div>
@@ -233,8 +238,17 @@ export const TaskDetailDialog = ({
                   taskId={task.id}
                   taskTitle={task.title}
                   currentAssignedTo={task.assignedTo}
-                  currentAssignedEmail={task.assignedToEmail}
-                  onAssignmentChange={onTaskUpdate}
+                  currentAssignedEmail={localAssignedEmail}
+                  onAssignmentChange={(assignedEmail) => {
+                    // Immediately update local state
+                    setLocalAssignedEmail(assignedEmail);
+                    // Then update parent state
+                    if (onTaskAssignment) {
+                      onTaskAssignment(task.id, assignedEmail);
+                    } else {
+                      onTaskUpdate();
+                    }
+                  }}
                 />
               </div>
 
