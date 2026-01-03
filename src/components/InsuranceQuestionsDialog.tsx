@@ -24,6 +24,7 @@ type InsuranceQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (updatedInfo: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 };
 
 type Step = 'woningType' | 'size' | 'value' | 'confirmation';
@@ -58,6 +59,7 @@ export const InsuranceQuestionsDialog = ({
   movingInfo,
   onComplete,
   onRedirect,
+  onCompleteTask,
 }: InsuranceQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState<Step>('woningType');
@@ -136,12 +138,25 @@ export const InsuranceQuestionsDialog = ({
             <p className="text-muted-foreground mb-8 max-w-[280px]">
               Dank je! We zoeken de beste verzekering voor jouw situatie.
             </p>
-            <Button 
-              onClick={handleClose}
-              className="w-full max-w-[200px] h-12 rounded-xl"
-            >
-              Sluiten
-            </Button>
+            <div className="w-full max-w-[280px] space-y-2">
+              <Button 
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full h-12 rounded-xl"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full h-10 text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
           </div>
         ) : (
           <>

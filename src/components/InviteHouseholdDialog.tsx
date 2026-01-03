@@ -27,6 +27,7 @@ type InviteHouseholdDialogProps = {
   onOpenChange: (open: boolean) => void;
   onInvitesSent?: () => void;
   onRequestLogin?: () => void;
+  onCompleteTask?: () => void;
 };
 
 type InviteEntry = {
@@ -70,6 +71,7 @@ export const InviteHouseholdDialog = ({
   onOpenChange,
   onInvitesSent,
   onRequestLogin,
+  onCompleteTask,
 }: InviteHouseholdDialogProps) => {
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
@@ -404,13 +406,25 @@ export const InviteHouseholdDialog = ({
           {/* Actions */}
           <div className="mt-4 space-y-2">
             {allSent ? (
-              <Button
-                onClick={handleClose}
-                className="w-full h-11 rounded-xl"
-              >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                Klaar
-              </Button>
+              <>
+                <Button
+                  onClick={() => {
+                    onCompleteTask?.();
+                    handleClose();
+                  }}
+                  className="w-full h-11 rounded-xl"
+                >
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  Taak afronden
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={handleClose}
+                  className="w-full h-9 text-muted-foreground"
+                >
+                  Sluiten
+                </Button>
+              </>
             ) : (
               <>
                 <Button

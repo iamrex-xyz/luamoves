@@ -15,6 +15,7 @@ interface CleaningQuestionsDialogProps {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 }
 
 const stepExplanations = {
@@ -29,7 +30,8 @@ export function CleaningQuestionsDialog({
   onOpenChange,
   movingInfo,
   onComplete,
-  onRedirect
+  onRedirect,
+  onCompleteTask,
 }: CleaningQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
@@ -94,9 +96,24 @@ export function CleaningQuestionsDialog({
             <p className="text-muted-foreground text-center text-sm">
               Je ontvangt binnenkort bericht met beschikbare opties.
             </p>
-            <Button onClick={handleClose} className="w-full mt-4">
-              Sluiten
-            </Button>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>

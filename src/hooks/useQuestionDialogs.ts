@@ -73,16 +73,19 @@ export type ContextualPromptState = {
 export const useQuestionDialogs = (
   movingInfo: MovingInfo,
   onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void,
-  isGuest?: boolean
+  isGuest?: boolean,
+  onToggleTaskStatus?: (taskId: string) => void
 ) => {
   const navigate = useNavigate();
   const [activeDialog, setActiveDialog] = useState<QuestionDialogType>(null);
+  const [currentDialogTask, setCurrentDialogTask] = useState<Task | null>(null);
   const [smartQuestion, setSmartQuestion] = useState<SmartQuestionState>(null);
   const [contextualPrompt, setContextualPrompt] = useState<ContextualPromptState>(null);
 
   // Handle "Regelen" button click - determines which questions to show
   const handleRegelenClick = useCallback((e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
+    setCurrentDialogTask(task);
     
     // Invite household task - opens invite dialog
     if (isInviteHouseholdTask(task)) {
@@ -258,16 +261,25 @@ export const useQuestionDialogs = (
 
   const closeActiveDialog = useCallback(() => {
     setActiveDialog(null);
+    setCurrentDialogTask(null);
   }, []);
 
   const showPartnerInvite = useCallback(() => {
     setActiveDialog("partnerInvite");
   }, []);
 
+  // Complete the current task
+  const handleCompleteCurrentTask = useCallback(() => {
+    if (currentDialogTask && onToggleTaskStatus) {
+      onToggleTaskStatus(currentDialogTask.id);
+    }
+  }, [currentDialogTask, onToggleTaskStatus]);
+
   return {
     // Dialog states
     activeDialog,
     setActiveDialog,
+    currentDialogTask,
     smartQuestion,
     setSmartQuestion,
     contextualPrompt,
@@ -281,5 +293,6 @@ export const useQuestionDialogs = (
     handleContextualPromptComplete,
     closeActiveDialog,
     showPartnerInvite,
+    handleCompleteCurrentTask,
   };
 };

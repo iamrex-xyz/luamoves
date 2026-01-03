@@ -106,7 +106,8 @@ export const TaskList = ({
     handleDialogRedirect,
     handleSmartQuestionComplete,
     handleContextualPromptComplete,
-  } = useQuestionDialogs(movingInfo, onUpdateMovingInfo, isGuest);
+    handleCompleteCurrentTask,
+  } = useQuestionDialogs(movingInfo, onUpdateMovingInfo, isGuest, toggleTaskStatus);
 
   // Milestone celebrations
   const completedTasksCount = tasks.filter(t => t.status === "done").length;
@@ -475,6 +476,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("energy")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <InternetQuestionsDialog
@@ -483,6 +485,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("internet")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <MovingQuestionsDialog
@@ -491,6 +494,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("moving")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <BoxesQuestionsDialog
@@ -507,6 +511,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("insurance")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <LiabilityQuestionsDialog
@@ -553,6 +558,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("cleaning")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <SmokeDetectorQuestionsDialog
@@ -612,6 +618,7 @@ export const TaskList = ({
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInvitesSent={refreshTasks}
         onRequestLogin={onSignupClick}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <MovingFeedbackDialog

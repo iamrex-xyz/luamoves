@@ -24,6 +24,7 @@ type EnergyQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo> & Record<string, any>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 };
 
 // Bekende energieleveranciers in Nederland
@@ -63,6 +64,7 @@ export const EnergyQuestionsDialog = ({
   movingInfo,
   onComplete,
   onRedirect,
+  onCompleteTask,
 }: EnergyQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
   const [currentStep, setCurrentStep] = useState<Step>("address");
@@ -155,12 +157,25 @@ export const EnergyQuestionsDialog = ({
             <p className="text-muted-foreground mb-8 max-w-[280px]">
               We gaan nu de beste energiedeals voor je zoeken. Je hoort snel van ons.
             </p>
-            <Button 
-              onClick={handleClose}
-              className="w-full max-w-[200px] h-12 rounded-xl"
-            >
-              Sluiten
-            </Button>
+            <div className="w-full max-w-[280px] space-y-2">
+              <Button 
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full h-12 rounded-xl"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full h-10 text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
           </div>
         ) : (
           <>
