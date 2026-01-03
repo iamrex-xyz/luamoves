@@ -116,10 +116,10 @@ export function MovingFeedbackDialog({
           {/* Rating */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">
-              Geef een cijfer (1-10) <span className="text-destructive">*</span>
+              Geef een cijfer (1-5) <span className="text-destructive">*</span>
             </Label>
-            <div className="flex gap-1 justify-center flex-wrap">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+            <div className="flex gap-2 justify-center">
+              {[1, 2, 3, 4, 5].map((num) => (
                 <button
                   key={num}
                   type="button"
@@ -127,11 +127,11 @@ export function MovingFeedbackDialog({
                   onMouseEnter={() => setHoveredRating(num)}
                   onMouseLeave={() => setHoveredRating(null)}
                   className={cn(
-                    "w-9 h-9 rounded-lg border-2 text-sm font-medium transition-all",
+                    "w-12 h-12 rounded-xl border-2 text-lg font-semibold transition-all",
                     displayRating && num <= displayRating
-                      ? num <= 4
+                      ? num <= 2
                         ? "border-red-500 bg-red-50 text-red-700"
-                        : num <= 6
+                        : num === 3
                         ? "border-yellow-500 bg-yellow-50 text-yellow-700"
                         : "border-green-500 bg-green-50 text-green-700"
                       : "border-border bg-background text-muted-foreground hover:border-primary/50"
@@ -143,7 +143,7 @@ export function MovingFeedbackDialog({
             </div>
             {rating && (
               <p className="text-center text-sm text-muted-foreground">
-                {rating <= 4 ? "Niet tevreden" : rating <= 6 ? "Matig tevreden" : rating <= 8 ? "Tevreden" : "Zeer tevreden"}
+                {rating <= 2 ? "Niet tevreden" : rating === 3 ? "Neutraal" : rating === 4 ? "Tevreden" : "Zeer tevreden"}
               </p>
             )}
           </div>
