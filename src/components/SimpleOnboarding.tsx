@@ -243,7 +243,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   // Step 1: Welcome screen
   if (step === 1) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white overflow-y-auto">
+        {/* Hero Section - Above the fold */}
         <div className="min-h-screen flex flex-col cursor-pointer" onClick={handleNext}>
           <div className="px-5 pt-5 pb-3 flex justify-between items-center">
             <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
@@ -318,6 +319,116 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Below the fold content - Click doesn't trigger navigation */}
+        <div onClick={(e) => e.stopPropagation()}>
+          {/* Section 1: Waarom Lua helpt */}
+          <section className="px-5 py-16 bg-white">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                Waarom Lua helpt tijdens je verhuizing
+              </h2>
+              <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto">
+                Verhuizen is chaotisch: tientallen taken, onvoorspelbare deadlines, en veel om te onthouden. 
+                Lua geeft je rust en overzicht, zodat jij minder hoeft na te denken.
+              </p>
+            </div>
+          </section>
+
+          {/* Section 2: Zo werkt Lua */}
+          <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-10 text-center">
+                Zo werkt Lua
+              </h2>
+              <div className="grid gap-6">
+                {[
+                  { step: "1", title: "Start met je verhuischecklist", desc: "Vul je verhuisdatum en adres in" },
+                  { step: "2", title: "Vul alleen in wat nodig is", desc: "We vragen alleen wat relevant is voor jou" },
+                  { step: "3", title: "Lua regelt of komt bij je terug", desc: "Wij doen het werk, jij houdt overzicht" },
+                ].map((item) => (
+                  <div key={item.step} className="flex items-start gap-4 bg-white rounded-2xl p-5 shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0">
+                      <span className="text-white font-bold">{item.step}</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section 3: Wat Lua voor je regelt */}
+          <section className="px-5 py-16 bg-white">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">
+                Wat Lua voor je regelt
+              </h2>
+              <div className="flex flex-wrap justify-center gap-3">
+                {[
+                  "Energie",
+                  "Internet",
+                  "Verhuisbedrijf",
+                  "Verzekeringen",
+                  "Post doorsturen",
+                  "Schoonmaak",
+                  "Adreswijzigingen",
+                  "Sleutels",
+                ].map((item) => (
+                  <span
+                    key={item}
+                    className="px-4 py-2 bg-primary-light text-primary rounded-full text-sm font-medium"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section 4: Geruststelling & vertrouwen */}
+          <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+            <div className="max-w-2xl mx-auto">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: "✓", text: "Gratis te gebruiken" },
+                  { icon: "🔒", text: "Geen spam, beloofd" },
+                  { icon: "🛡️", text: "Jij houdt controle" },
+                  { icon: "📋", text: "Alles op één plek" },
+                ].map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3 bg-white rounded-xl p-4 shadow-sm">
+                    <span className="text-xl">{item.icon}</span>
+                    <span className="text-sm font-medium text-foreground">{item.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section 5: Tweede CTA */}
+          <section className="px-5 py-16 bg-white">
+            <div className="max-w-2xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                Klaar om te beginnen?
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Start wanneer jij wilt. Geen verplichtingen.
+              </p>
+              <Button 
+                onClick={handleNext}
+                className="h-14 px-8 text-lg rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-lg"
+              >
+                Start mijn verhuischecklist
+                <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Button>
+            </div>
+          </section>
         </div>
       </div>
     );
