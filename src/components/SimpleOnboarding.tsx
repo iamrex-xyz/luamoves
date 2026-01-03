@@ -345,7 +345,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
           </div>
-          <div className="flex justify-center mt-8 -mb-5">
+          <div className="flex justify-center mt-8" style={{ marginTop: '-30px' }}>
             <Button 
               onClick={handleNext}
               size="sm"
