@@ -92,13 +92,8 @@ export const InsuranceQuestionsDialog = ({
         insuranceValue,
       };
       
-      const profileData: Record<string, any> = {
-        housing_property_type: woningType,
-        home_size_m2: homeSizeM2,
-        insurance_value: insuranceValue,
-      };
-      
-      await saveToProfile(profileData);
+      // Save using MovingInfo field names (hook converts to DB columns)
+      await saveToProfile(data);
       onComplete(data);
       
       setIsSaving(false);

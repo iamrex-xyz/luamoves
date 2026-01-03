@@ -65,15 +65,8 @@ export const InternetQuestionsDialog = ({
         worksFromHome: worksFromHome,
       };
       
-      // Map to profile column names
-      const profileData: Record<string, any> = {
-        new_address: address,
-        internet_speed_preference: speedPreference,
-        internet_bundle: bundle,
-        works_from_home: worksFromHome,
-      };
-      
-      await saveToProfile(profileData);
+      // Save using MovingInfo field names (hook converts to DB columns)
+      await saveToProfile(data);
       onComplete(data);
       
       setIsSaving(false);
