@@ -124,15 +124,15 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
   const tasks: Task[] = [];
 
   // =====================================================
-  // TAAK 0 — Huisgenoten uitnodigen (altijd eerste taak)
+  // TAAK 0 — Mede-verhuizers uitnodigen (altijd eerste taak)
   // =====================================================
   const inviteDeadline = createDeadline(-28, 'urgent');
   
   tasks.push({
-    id: "rent-fase0-invite-household",
-    title: "Huisgenoten & familie uitnodigen",
+    id: "invite-household-members",
+    title: "Mede-verhuizers uitnodigen",
     category: "Samenwerken",
-    description: "Nodig je huisgenoten of familieleden uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+    description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
     ...inviteDeadline,
     phase: "Fase 1 - Je nieuwe thuis is bevestigd",
     status: "todo",
@@ -724,15 +724,15 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
   const tasks: Task[] = [];
 
   // =====================================================
-  // TAAK 0 — Huisgenoten uitnodigen (altijd eerste taak)
+  // TAAK 0 — Mede-verhuizers uitnodigen (altijd eerste taak)
   // =====================================================
   const inviteDeadline = createDeadline(-28, 'urgent');
   
   tasks.push({
-    id: "buy-fase0-invite-household",
-    title: "Huisgenoten & familie uitnodigen",
+    id: "invite-household-members",
+    title: "Mede-verhuizers uitnodigen",
     category: "Samenwerken",
-    description: "Nodig je huisgenoten of familieleden uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+    description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
     ...inviteDeadline,
     phase: "Fase 1 - Je nieuwe thuis is bevestigd",
     status: "todo",

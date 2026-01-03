@@ -10,6 +10,7 @@ import { LuaLogo } from "@/components/LuaLogo";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { TaskListItem } from "@/components/TaskListItem";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { InviteHouseholdDialog } from "@/components/InviteHouseholdDialog";
 import { hasAffiliateOptions } from "@/lib/taskTypeHelpers";
 import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
 import { EnergyQuestionsDialog } from "@/components/EnergyQuestionsDialog";
@@ -44,6 +45,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showInviteHousehold, setShowInviteHousehold] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   // Removed scroll-based search hiding - Home is now static
 
@@ -89,6 +91,11 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   }, [openTasks.length, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
+    // Open InviteHouseholdDialog voor de mede-verhuizers taak
+    if (task.id === "invite-household-members") {
+      setShowInviteHousehold(true);
+      return;
+    }
     setSelectedTask(task);
   };
 
@@ -296,6 +303,12 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         onOpenChange={(open) => !open && setSelectedTask(null)}
         onTaskUpdate={refreshTasks}
         onToggleStatus={handleTaskToggle}
+      />
+
+      <InviteHouseholdDialog
+        open={showInviteHousehold}
+        onOpenChange={setShowInviteHousehold}
+        onInvitesSent={refreshTasks}
       />
 
       {/* Question Dialogs */}

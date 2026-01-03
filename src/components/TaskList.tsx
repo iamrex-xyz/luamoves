@@ -132,6 +132,11 @@ export const TaskList = ({
   }, [openTasksCount, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
+    // Open InviteHouseholdDialog voor de mede-verhuizers taak
+    if (task.id === "invite-household-members") {
+      setShowInviteHousehold(true);
+      return;
+    }
     setSelectedTask(task);
   };
 
