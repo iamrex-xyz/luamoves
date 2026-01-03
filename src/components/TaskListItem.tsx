@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
-import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText } from "lucide-react";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
 
 type TaskListItemProps = {
   task: Task;
@@ -128,18 +128,26 @@ export const TaskListItem = ({
                 </h4>
                 {getUrgencyBadge()}
               </div>
-              <span className={`flex items-center gap-1 text-xs mt-0.5 transition-colors duration-200 ${
-                isCompleting 
-                  ? "text-primary-foreground/80" 
-                  : isTaskOverdue 
-                    ? "text-destructive/80"
-                    : isDueToday
-                      ? "text-warning/80"
-                      : "text-muted-foreground"
-              }`}>
-                <Clock className="w-3 h-3 shrink-0" />
-                {task.deadlineLabel}
-              </span>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+                  isCompleting 
+                    ? "text-primary-foreground/80" 
+                    : isTaskOverdue 
+                      ? "text-destructive/80"
+                      : isDueToday
+                        ? "text-warning/80"
+                        : "text-muted-foreground"
+                }`}>
+                  <Clock className="w-3 h-3 shrink-0" />
+                  {task.deadlineLabel}
+                </span>
+                {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+                  <span className="flex items-center gap-1 text-xs text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded-full">
+                    <UserCircle className="w-3 h-3 shrink-0" />
+                    {task.assignedToEmail}
+                  </span>
+                )}
+              </div>
             </div>
             
             {/* Right column: actions (optional, does not affect left column) */}
