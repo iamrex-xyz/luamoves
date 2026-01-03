@@ -269,6 +269,8 @@ export type Database = {
           current_housing_situation: string | null
           energy_connection_type: string | null
           energy_current_supplier: string | null
+          energy_estimated_electricity: number | null
+          energy_estimated_gas: number | null
           floor_level: string | null
           forwarding_duration: string | null
           forwarding_start_date: string | null
@@ -327,6 +329,8 @@ export type Database = {
           current_housing_situation?: string | null
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
+          energy_estimated_electricity?: number | null
+          energy_estimated_gas?: number | null
           floor_level?: string | null
           forwarding_duration?: string | null
           forwarding_start_date?: string | null
@@ -385,6 +389,8 @@ export type Database = {
           current_housing_situation?: string | null
           energy_connection_type?: string | null
           energy_current_supplier?: string | null
+          energy_estimated_electricity?: number | null
+          energy_estimated_gas?: number | null
           floor_level?: string | null
           forwarding_duration?: string | null
           forwarding_start_date?: string | null

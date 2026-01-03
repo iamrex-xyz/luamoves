@@ -96,11 +96,8 @@ export const useQuestionDialogs = (
     
     // Check each task type and show appropriate questions
     if (isEnergyTask(task)) {
-      if (needsEnergyQuestions(movingInfo)) {
-        setActiveDialog("energy");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Energie-taak opent altijd het intakeformulier, geen redirect naar deals
+      setActiveDialog("energy");
       return;
     }
     
