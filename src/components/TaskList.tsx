@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { MovingInfo } from "@/pages/Index";
 import { Task } from "@/lib/taskGenerator";
 import { useTasks } from "@/hooks/useTasks";
+import { useAssignmentNotifications } from "@/hooks/useAssignmentNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import { useMilestones } from "@/hooks/useMilestones";
 import { useQuestionDialogs } from "@/hooks/useQuestionDialogs";
@@ -90,6 +91,7 @@ export const TaskList = ({
   const [documentTask, setDocumentTask] = useState<Task | null>(null);
 
   const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
+  const { isNewAssignment, markAssignmentSeen } = useAssignmentNotifications();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -133,6 +135,10 @@ export const TaskList = ({
   }, [openTasksCount, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
+    // Mark assignment as seen when opening the task
+    if (task.assignedToEmail) {
+      markAssignmentSeen(task.id, task.assignedToEmail);
+    }
     setSelectedTask(task);
   };
 
@@ -413,6 +419,7 @@ export const TaskList = ({
                         key={task.id}
                         task={task}
                         isCompleting={completingTasks.has(task.id)}
+                        isNewAssignment={isNewAssignment(task.id, task.assignedToEmail)}
                         onTaskClick={handleTaskClick}
                         onCheckboxClick={handleCheckboxClick}
                         onRegelenClick={handleRegelenClick}

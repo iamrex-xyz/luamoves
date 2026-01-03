@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { MovingInfo } from "@/pages/Index";
 import { useTasks } from "@/hooks/useTasks";
+import { useAssignmentNotifications } from "@/hooks/useAssignmentNotifications";
 import { Task } from "@/lib/taskGenerator";
 import { sortTasksSmart } from "@/lib/taskSorting";
 import { BottomNav } from "@/components/BottomNav";
@@ -41,12 +42,12 @@ type DashboardProps = {
 
 export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClick }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
+  const { isNewAssignment, markAssignmentSeen } = useAssignmentNotifications();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showAddTask, setShowAddTask] = useState(false);
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
-  // Removed scroll-based search hiding - Home is now static
 
   // Question dialogs for affiliate tasks
   const {
@@ -91,6 +92,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   }, [openTasks.length, tasks.length, prevOpenTasksCount]);
 
   const handleTaskClick = (task: Task) => {
+    // Mark assignment as seen when opening the task
+    if (task.assignedToEmail) {
+      markAssignmentSeen(task.id, task.assignedToEmail);
+    }
     setSelectedTask(task);
   };
 
@@ -249,6 +254,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
                   key={task.id}
                   task={task}
                   isCompleting={completingTasks.has(task.id)}
+                  isNewAssignment={isNewAssignment(task.id, task.assignedToEmail)}
                   onTaskClick={handleTaskClick}
                   onCheckboxClick={handleCheckboxClick}
                   onRegelenClick={handleRegelenClick}
