@@ -93,6 +93,17 @@ export const InviteHouseholdDialog = ({
       return;
     }
 
+    // Check for missing names
+    const missingNames = validEntries.filter(e => !e.name.trim());
+    if (missingNames.length > 0) {
+      setEntries(prev => prev.map(e => 
+        missingNames.find(mn => mn.id === e.id) 
+          ? { ...e, status: "error" as const, error: "Naam is verplicht" }
+          : e
+      ));
+      return;
+    }
+
     const invalidEntries = validEntries.filter(e => !validatePhone(e.phone));
     if (invalidEntries.length > 0) {
       setEntries(prev => prev.map(e => 
@@ -222,14 +233,17 @@ export const InviteHouseholdDialog = ({
                         </div>
                       </div>
                       <div className="flex-1">
-                        <Label className="text-xs text-muted-foreground">Naam (optioneel)</Label>
+                        <Label className="text-xs text-muted-foreground">Naam <span className="text-destructive">*</span></Label>
                         <Input
                           type="text"
                           placeholder="Voornaam"
                           value={entry.name}
                           onChange={(e) => updateEntry(entry.id, "name", e.target.value)}
                           disabled={entry.status === "sent" || entry.status === "sending"}
-                          className="h-10"
+                          className={cn(
+                            "h-10",
+                            entry.error === "Naam is verplicht" && "border-destructive"
+                          )}
                         />
                       </div>
                     </div>
