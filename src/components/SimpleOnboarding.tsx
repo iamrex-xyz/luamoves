@@ -343,7 +343,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center mt-10">
                 <Button 
                   onClick={handleNext}
                   size="sm"
