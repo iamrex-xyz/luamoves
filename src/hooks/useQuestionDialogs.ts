@@ -102,11 +102,8 @@ export const useQuestionDialogs = (
     }
     
     if (isInternetTask(task)) {
-      if (needsInternetQuestions(movingInfo)) {
-        setActiveDialog("internet");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Internet-taak opent altijd het intakeformulier, geen redirect naar deals
+      setActiveDialog("internet");
       return;
     }
     

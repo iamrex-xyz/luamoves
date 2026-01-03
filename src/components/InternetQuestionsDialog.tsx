@@ -4,10 +4,13 @@ import {
   MobileModalContent,
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Sparkles, CheckCircle2, Wifi, Home, Monitor, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
+
 type InternetQuestionsDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -16,13 +19,7 @@ type InternetQuestionsDialogProps = {
   onRedirect: () => void;
 };
 
-type Step = "fiber" | "speed" | "bundle";
-
-const stepExplanations = {
-  fiber: "Glasvezel biedt de snelste verbinding. Dit bepaalt welke aanbieders beschikbaar zijn.",
-  speed: "Zo vinden we een abonnement dat past bij jouw gebruik en budget.",
-  bundle: "Bundels zijn vaak voordeliger dan losse producten.",
-};
+type Step = "address" | "speed" | "bundle" | "confirmation";
 
 export const InternetQuestionsDialog = ({
   open,
@@ -32,253 +29,297 @@ export const InternetQuestionsDialog = ({
   onRedirect,
 }: InternetQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [currentStep, setCurrentStep] = useState<Step>("fiber");
-  const [hasFiber, setHasFiber] = useState<string>("");
+  const [currentStep, setCurrentStep] = useState<Step>("address");
+  const [address, setAddress] = useState<string>("");
   const [speedPreference, setSpeedPreference] = useState<string>("");
   const [bundle, setBundle] = useState<string>("");
-  // Determine which steps are needed based on existing data
-  const needsFiber = !movingInfo.hasFiber;
-  const needsSpeed = !movingInfo.internetSpeedPreference;
-  const needsBundle = !movingInfo.internetBundle;
+  const [worksFromHome, setWorksFromHome] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
 
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
-      setHasFiber(movingInfo.hasFiber || "");
+      setAddress(movingInfo.newAddress || "");
       setSpeedPreference(movingInfo.internetSpeedPreference || "");
       setBundle(movingInfo.internetBundle || "");
-      
-      // Start at first needed step
-      if (needsFiber) {
-        setCurrentStep("fiber");
-      } else if (needsSpeed) {
-        setCurrentStep("speed");
-      } else if (needsBundle) {
-        setCurrentStep("bundle");
-      }
+      setWorksFromHome((movingInfo as any).worksFromHome || "");
+      setCurrentStep("address");
     }
-  }, [open, movingInfo, needsFiber, needsSpeed, needsBundle]);
-
-  // If no questions needed, redirect immediately
-  useEffect(() => {
-    if (open && !needsFiber && !needsSpeed && !needsBundle) {
-      onOpenChange(false);
-      onRedirect();
-    }
-  }, [open, needsFiber, needsSpeed, needsBundle, onOpenChange, onRedirect]);
-
-  const getNextStep = (current: Step): Step | null => {
-    if (current === "fiber" && needsSpeed) return "speed";
-    if (current === "fiber" && needsBundle) return "bundle";
-    if (current === "speed" && needsBundle) return "bundle";
-    return null;
-  };
+  }, [open, movingInfo]);
 
   const handleNext = async () => {
-    const next = getNextStep(currentStep);
-    if (next) {
-      setCurrentStep(next);
-    } else {
-      // All questions answered, save and redirect
-      const data: Partial<MovingInfo> = {};
-      if (needsFiber) data.hasFiber = hasFiber as "yes" | "no" | "unknown";
-      if (needsSpeed) data.internetSpeedPreference = speedPreference as "basic" | "medium" | "high";
-      if (needsBundle) data.internetBundle = bundle as "internet_only" | "internet_tv" | "internet_tv_mobile";
+    if (currentStep === "address") {
+      setCurrentStep("speed");
+    } else if (currentStep === "speed") {
+      setCurrentStep("bundle");
+    } else if (currentStep === "bundle") {
+      // Save all data and show confirmation
+      setIsSaving(true);
       
-      // Save to Supabase profile
-      await saveToProfile(data);
+      const data: Record<string, any> = {
+        newAddress: address,
+        internetSpeedPreference: speedPreference,
+        internetBundle: bundle,
+        worksFromHome: worksFromHome,
+      };
       
+      // Map to profile column names
+      const profileData: Record<string, any> = {
+        new_address: address,
+        internet_speed_preference: speedPreference,
+        internet_bundle: bundle,
+        works_from_home: worksFromHome,
+      };
+      
+      await saveToProfile(profileData);
       onComplete(data);
-      onOpenChange(false);
-      onRedirect();
+      
+      setIsSaving(false);
+      setCurrentStep("confirmation");
     }
   };
 
   const isCurrentStepValid = () => {
     switch (currentStep) {
-      case "fiber":
-        return hasFiber !== "";
+      case "address":
+        return address.trim().length >= 5;
       case "speed":
-        return speedPreference !== "";
+        return speedPreference !== "" && worksFromHome !== "";
       case "bundle":
         return bundle !== "";
+      case "confirmation":
+        return true;
     }
   };
 
-  const handleLater = () => {
+  const handleClose = () => {
     onOpenChange(false);
   };
 
-  // Don't render if no questions needed
-  if (!needsFiber && !needsSpeed && !needsBundle) {
-    return null;
-  }
-
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
-      <MobileModalContent className="max-h-[80vh]">
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {/* Lua avatar + message */}
-          <div className="flex gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
+      <MobileModalContent className="max-h-[85vh]">
+        {currentStep === "confirmation" ? (
+          // Confirmation screen
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-muted-foreground mb-1">Lua</p>
-              <div className="bg-muted/50 rounded-2xl rounded-tl-md px-4 py-3">
-                {currentStep === "fiber" && (
-                  <p className="text-foreground">
-                    Is er glasvezel beschikbaar op je nieuwe adres? 📡
-                  </p>
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              Gegevens ontvangen!
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-[280px]">
+              We zijn op zoek naar de beste internetdeal voor jouw situatie.
+            </p>
+            <Button 
+              onClick={handleClose}
+              className="w-full max-w-[200px] h-12 rounded-xl"
+            >
+              Sluiten
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {/* Progress indicator */}
+              <div className="flex gap-1 mb-6">
+                {["address", "speed", "bundle"].map((step, idx) => (
+                  <div 
+                    key={step}
+                    className={cn(
+                      "h-1 flex-1 rounded-full transition-colors",
+                      idx <= ["address", "speed", "bundle"].indexOf(currentStep)
+                        ? "bg-primary"
+                        : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Lua avatar + message */}
+              <div className="flex gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Lua</p>
+                  <div className="bg-muted/50 rounded-2xl rounded-tl-md px-4 py-3">
+                    {currentStep === "address" && (
+                      <p className="text-foreground">
+                        Op welk adres wil je internet aansluiten? 🏠
+                      </p>
+                    )}
+                    {currentStep === "speed" && (
+                      <p className="text-foreground">
+                        Welke internetsnelheid past bij jou? 🚀
+                      </p>
+                    )}
+                    {currentStep === "bundle" && (
+                      <p className="text-foreground">
+                        Wat wil je allemaal afsluiten? 📺
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Input based on step */}
+              <div className="space-y-4">
+                {currentStep === "address" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm flex items-center gap-2">
+                      <Home className="w-4 h-4 text-muted-foreground" />
+                      Adres nieuwe woning
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder="Straatnaam 123, Plaats"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="h-14 rounded-xl text-base"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Vul je volledige adres in inclusief huisnummer en plaats
+                    </p>
+                  </div>
                 )}
+
                 {currentStep === "speed" && (
-                  <p className="text-foreground">
-                    Welke internetsnelheid past bij je? 🚀
-                  </p>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2 mb-3">
+                        <Wifi className="w-4 h-4 text-muted-foreground" />
+                        Gewenste snelheid
+                      </Label>
+                      {[
+                        { value: "basic", label: "Basis (tot 100 Mbps)", description: "Mail & browsen" },
+                        { value: "medium", label: "Gemiddeld (100-500 Mbps)", description: "Streamen & videobellen" },
+                        { value: "high", label: "Snel (500+ Mbps)", description: "Thuiswerken, gamen, 4K streamen" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setSpeedPreference(option.value)}
+                          className={cn(
+                            "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
+                            speedPreference === option.value
+                              ? "border-primary bg-primary-light"
+                              : "border-muted hover:border-primary/50 bg-white"
+                          )}
+                        >
+                          <div className="text-left">
+                            <span className={cn(
+                              "font-medium block",
+                              speedPreference === option.value ? "text-foreground" : "text-muted-foreground"
+                            )}>
+                              {option.label}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{option.description}</span>
+                          </div>
+                          {speedPreference === option.value && (
+                            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <div className="space-y-2 pt-2">
+                      <Label className="text-sm flex items-center gap-2 mb-3">
+                        <Monitor className="w-4 h-4 text-muted-foreground" />
+                        Werk je thuis?
+                      </Label>
+                      {[
+                        { value: "yes", label: "Ja, regelmatig" },
+                        { value: "sometimes", label: "Soms" },
+                        { value: "no", label: "Nee" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => setWorksFromHome(option.value)}
+                          className={cn(
+                            "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
+                            worksFromHome === option.value
+                              ? "border-primary bg-primary-light"
+                              : "border-muted hover:border-primary/50 bg-white"
+                          )}
+                        >
+                          <span className={cn(
+                            "font-medium",
+                            worksFromHome === option.value ? "text-foreground" : "text-muted-foreground"
+                          )}>
+                            {option.label}
+                          </span>
+                          {worksFromHome === option.value && (
+                            <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
+
                 {currentStep === "bundle" && (
-                  <p className="text-foreground">
-                    Wat wil je allemaal afsluiten? 📺
-                  </p>
+                  <div className="space-y-2">
+                    <Label className="text-sm flex items-center gap-2 mb-3">
+                      <Smartphone className="w-4 h-4 text-muted-foreground" />
+                      Wat wil je afsluiten?
+                    </Label>
+                    {[
+                      { value: "internet_only", label: "Alleen internet", icon: "📡" },
+                      { value: "internet_tv", label: "Internet + tv", icon: "📺" },
+                      { value: "internet_tv_mobile", label: "Internet + tv + mobiel", icon: "📱" },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setBundle(option.value)}
+                        className={cn(
+                          "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
+                          bundle === option.value
+                            ? "border-primary bg-primary-light"
+                            : "border-muted hover:border-primary/50 bg-white"
+                        )}
+                      >
+                        <span className={cn(
+                          "font-medium flex items-center gap-2",
+                          bundle === option.value ? "text-foreground" : "text-muted-foreground"
+                        )}>
+                          <span>{option.icon}</span>
+                          {option.label}
+                        </span>
+                        {bundle === option.value && (
+                          <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Why this question */}
-          <div className="flex items-start gap-2 px-2 py-2 mb-4 bg-blue-50 rounded-lg border border-blue-100">
-            <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-blue-700">{stepExplanations[currentStep]}</p>
-          </div>
-
-          {/* Task context */}
-          <p className="text-xs text-muted-foreground mb-4 px-2">
-            Voor: <span className="font-medium text-foreground">Internet regelen</span>
-          </p>
-
-          {/* Input based on step */}
-          <div className="space-y-3">
-            {currentStep === "fiber" && (
-              <div className="space-y-2">
-                {[
-                  { value: "yes", label: "Ja, glasvezel beschikbaar" },
-                  { value: "no", label: "Nee, geen glasvezel" },
-                  { value: "unknown", label: "Weet ik niet" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setHasFiber(option.value)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
-                      hasFiber === option.value
-                        ? "border-primary bg-primary-light"
-                        : "border-muted hover:border-primary/50 bg-white"
-                    )}
-                  >
-                    <span className={cn(
-                      "font-medium",
-                      hasFiber === option.value ? "text-foreground" : "text-muted-foreground"
-                    )}>
-                      {option.label}
-                    </span>
-                    {hasFiber === option.value && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {currentStep === "speed" && (
-              <div className="space-y-2">
-                {[
-                  { value: "basic", label: "Basis", description: "Mail & browsen" },
-                  { value: "medium", label: "Gemiddeld", description: "Streamen" },
-                  { value: "high", label: "Veel", description: "Thuiswerken/gamen" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setSpeedPreference(option.value)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
-                      speedPreference === option.value
-                        ? "border-primary bg-primary-light"
-                        : "border-muted hover:border-primary/50 bg-white"
-                    )}
-                  >
-                    <div className="text-left">
-                      <span className={cn(
-                        "font-medium block",
-                        speedPreference === option.value ? "text-foreground" : "text-muted-foreground"
-                      )}>
-                        {option.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{option.description}</span>
-                    </div>
-                    {speedPreference === option.value && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {currentStep === "bundle" && (
-              <div className="space-y-2">
-                {[
-                  { value: "internet_only", label: "Alleen internet" },
-                  { value: "internet_tv", label: "Internet + tv" },
-                  { value: "internet_tv_mobile", label: "Internet + tv + mobiel" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setBundle(option.value)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
-                      bundle === option.value
-                        ? "border-primary bg-primary-light"
-                        : "border-muted hover:border-primary/50 bg-white"
-                    )}
-                  >
-                    <span className={cn(
-                      "font-medium",
-                      bundle === option.value ? "text-foreground" : "text-muted-foreground"
-                    )}>
-                      {option.label}
-                    </span>
-                    {bundle === option.value && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="p-6 pt-4 border-t bg-background flex gap-3">
-          <Button 
-            variant="outline" 
-            onClick={handleLater} 
-            className="flex-1 h-12 rounded-xl"
-          >
-            Later
-          </Button>
-          <Button 
-            onClick={handleNext} 
-            disabled={!isCurrentStepValid()} 
-            className="flex-1 h-12 rounded-xl"
-          >
-            {getNextStep(currentStep) ? "Volgende" : "Opslaan"}
-          </Button>
-        </div>
+            {/* CTA */}
+            <div className="p-6 pt-4 border-t bg-background flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={handleClose} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                Later
+              </Button>
+              <Button 
+                onClick={handleNext} 
+                disabled={!isCurrentStepValid() || isSaving} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                {isSaving ? "Opslaan..." : currentStep === "bundle" ? "Versturen" : "Volgende"}
+              </Button>
+            </div>
+          </>
+        )}
       </MobileModalContent>
     </MobileModal>
   );
