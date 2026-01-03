@@ -253,7 +253,7 @@ export const InviteHouseholdDialog = ({
                           <Phone className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                           <Input
                             type="tel"
-                            placeholder="06 12 34 56 78"
+                            placeholder="06 12345678 of +31 6 12345678"
                             value={entry.phone}
                             onChange={(e) => updateEntry(entry.id, "phone", e.target.value)}
                             disabled={entry.status === "sent" || entry.status === "sending"}

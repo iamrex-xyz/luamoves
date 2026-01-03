@@ -2,9 +2,9 @@ import { z } from "zod";
 
 // Dutch phone number validation
 export const phoneSchema = z.string()
-  .transform(val => val.replace(/\s/g, ''))
+  .transform(val => val.replace(/[\s\-]/g, ''))
   .refine(val => val === '' || /^(\+31|0)[1-9][0-9]{8}$/.test(val), {
-    message: "Voer een geldig Nederlands telefoonnummer in (bijv. 0612345678)"
+    message: "Voer een geldig Nederlands telefoonnummer in (bijv. 06 12345678 of +31 6 12345678)"
   });
 
 // Email validation
@@ -84,8 +84,8 @@ export const isSameAddress = (address1: string, address2: string): boolean => {
   return false;
 };
 
-// Clean phone number (remove spaces)
-export const cleanPhone = (phone: string): string => phone.replace(/\s/g, '');
+// Clean phone number (remove spaces and dashes)
+export const cleanPhone = (phone: string): string => phone.replace(/[\s\-]/g, '');
 
 // Clean email (trim and lowercase)
 export const cleanEmail = (email: string): string => email.trim().toLowerCase();
