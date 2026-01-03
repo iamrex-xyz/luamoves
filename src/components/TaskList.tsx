@@ -611,6 +611,7 @@ export const TaskList = ({
         open={activeDialog === "inviteHousehold"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInvitesSent={refreshTasks}
+        onRequestLogin={onSignupClick}
       />
 
       <MovingFeedbackDialog

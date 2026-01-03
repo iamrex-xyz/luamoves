@@ -303,6 +303,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         open={activeDialog === "inviteHousehold"}
         onOpenChange={(open) => !open && closeActiveDialog()}
         onInvitesSent={refreshTasks}
+        onRequestLogin={onSignupClick}
       />
       <EnergyQuestionsDialog
         open={activeDialog === "energy"}
