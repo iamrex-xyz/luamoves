@@ -408,6 +408,18 @@ export const InviteHouseholdDialog = ({
             {allSent ? (
               <>
                 <Button
+                  variant="outline"
+                  onClick={() => {
+                    // Add a new entry and reset allSent state
+                    addEntry();
+                    setAllSent(false);
+                  }}
+                  className="w-full h-11 rounded-xl"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nog iemand uitnodigen
+                </Button>
+                <Button
                   onClick={() => {
                     onCompleteTask?.();
                     handleClose();
