@@ -14,12 +14,17 @@ const STORAGE_KEYS = {
   HAS_ACCOUNT: "lua_has_account",
   COMPLETED_TASK_COUNT: "lua_completed_task_count",
   
-  // Email capture state (Step 1)
+  // Phone capture state (Step 1 - new flow)
+  PHONE_CAPTURED: "lua_phone_captured",
+  PHONE_PROMPT_SHOWN: "lua_phone_prompt_shown",
+  PHONE_PROMPT_DISMISSED: "lua_phone_prompt_dismissed",
+  CAPTURED_PHONE: "lua_captured_phone",
+  
+  // Email capture state (legacy, keeping for compatibility)
   EMAIL_CAPTURED: "lua_email_captured",
   EMAIL_PROMPT_SHOWN: "lua_email_prompt_shown",
   EMAIL_PROMPT_DISMISSED: "lua_email_prompt_dismissed",
   CAPTURED_EMAIL: "lua_captured_email",
-  CAPTURED_PHONE: "lua_captured_phone",
   
   // Account creation state (Step 2)
   ACCOUNT_PROMPT_SHOWN: "lua_account_prompt_shown",
@@ -153,7 +158,44 @@ export const useGuestStorage = () => {
     }
   }, []);
 
-  // === EMAIL PROMPT FLAGS (Step 1) ===
+  // === PHONE PROMPT FLAGS (Step 1 - new flow) ===
+  const isPhoneCaptured = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.PHONE_CAPTURED) === "true";
+  }, []);
+
+  const setPhoneCaptured = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.PHONE_CAPTURED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.PHONE_CAPTURED);
+    }
+  }, []);
+
+  const isPhonePromptShown = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.PHONE_PROMPT_SHOWN) === "true";
+  }, []);
+
+  const setPhonePromptShown = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.PHONE_PROMPT_SHOWN, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.PHONE_PROMPT_SHOWN);
+    }
+  }, []);
+
+  const isPhonePromptDismissed = useCallback((): boolean => {
+    return localStorage.getItem(STORAGE_KEYS.PHONE_PROMPT_DISMISSED) === "true";
+  }, []);
+
+  const setPhonePromptDismissed = useCallback((value: boolean) => {
+    if (value) {
+      localStorage.setItem(STORAGE_KEYS.PHONE_PROMPT_DISMISSED, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.PHONE_PROMPT_DISMISSED);
+    }
+  }, []);
+
+  // === EMAIL PROMPT FLAGS (legacy, keeping for compatibility) ===
   const isEmailPromptShown = useCallback((): boolean => {
     return localStorage.getItem(STORAGE_KEYS.EMAIL_PROMPT_SHOWN) === "true";
   }, []);
@@ -282,7 +324,15 @@ export const useGuestStorage = () => {
     hasAccount,
     setHasAccount,
     
-    // Email prompt flags (Step 1)
+    // Phone prompt flags (Step 1 - new flow)
+    isPhoneCaptured,
+    setPhoneCaptured,
+    isPhonePromptShown,
+    setPhonePromptShown,
+    isPhonePromptDismissed,
+    setPhonePromptDismissed,
+    
+    // Email prompt flags (legacy)
     isEmailPromptShown,
     setEmailPromptShown,
     isEmailPromptDismissed,

@@ -6,8 +6,8 @@ import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
-import { EmailCaptureDialog } from "@/components/EmailCaptureDialog";
-import { SignupPromptDialog } from "@/components/SignupPromptDialog";
+import { PhoneCaptureDialog } from "@/components/PhoneCaptureDialog";
+import { AccountCreationDialog } from "@/components/AccountCreationDialog";
 // MilestoneCelebrationDialog removed - not used in strict flow
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { User } from "@supabase/supabase-js";
@@ -430,24 +430,27 @@ const Index = () => {
           />
         )}
 
-        {/* Email capture dialog */}
-        <EmailCaptureDialog
-          open={signupFlow.showEmailCapture}
-          onOpenChange={signupFlow.setShowEmailCapture}
-          onEmailSubmit={signupFlow.handleEmailSubmit}
-          onDismiss={signupFlow.handleEmailDismiss}
-          isHardBlock={signupFlow.isEmailHardBlock}
+        {/* Phone capture dialog (Step 1) */}
+        <PhoneCaptureDialog
+          open={signupFlow.showPhoneCapture}
+          onOpenChange={signupFlow.setShowPhoneCapture}
+          onPhoneSubmit={signupFlow.handlePhoneSubmit}
+          onDismiss={signupFlow.handlePhoneDismiss}
+          isHardBlock={signupFlow.isPhoneHardBlock}
         />
 
-        {/* Signup prompt dialog */}
-        <SignupPromptDialog
-          open={signupFlow.showSignupPrompt}
-          onOpenChange={signupFlow.setShowSignupPrompt}
-          onSignupComplete={signupFlow.handleSignupComplete}
-          onDefer={signupFlow.handleSignupDefer}
-          onPasswordSet={signupFlow.handlePasswordSet}
-          capturedEmail={signupFlow.capturedEmail}
-          isHardBlock={signupFlow.isSignupHardBlock}
+        {/* Account creation dialog (Step 2) */}
+        <AccountCreationDialog
+          open={signupFlow.showAccountCreation}
+          onOpenChange={signupFlow.setShowAccountCreation}
+          onAccountCreated={signupFlow.handleAccountCreated}
+          onDefer={signupFlow.handleAccountDefer}
+          onLoginRequest={() => {
+            signupFlow.setShowAccountCreation(false);
+            setCurrentView("auth");
+          }}
+          capturedPhone={signupFlow.capturedPhone}
+          isHardBlock={signupFlow.isAccountHardBlock}
         />
 
       </div>
