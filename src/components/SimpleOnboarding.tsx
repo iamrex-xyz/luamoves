@@ -217,7 +217,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     </div>
   );
 
-  const ToggleOption = ({ active, onClick, icon: Icon, label }: { active: boolean; onClick: () => void; icon: any; label: string }) => (
+  const ToggleOption = ({ active, onClick, icon: Icon, label, description }: { active: boolean; onClick: () => void; icon: any; label: string; description?: string }) => (
     <button
       onClick={onClick}
       className={cn(
@@ -231,7 +231,12 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       )}>
         <Icon className={cn("w-5 h-5", active ? "text-white" : "text-muted-foreground")} />
       </div>
-      <span className={cn("text-sm font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+      <div className="flex flex-col items-start">
+        <span className={cn("text-sm font-medium", active ? "text-foreground" : "text-muted-foreground")}>{label}</span>
+        {description && (
+          <span className="text-xs text-muted-foreground">{description}</span>
+        )}
+      </div>
     </button>
   );
 
@@ -432,8 +437,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <div className="space-y-3">
               <Label className="text-xs text-muted-foreground uppercase tracking-wide">Wat voor woning? (optioneel)</Label>
               <div className="grid grid-cols-2 gap-3">
-                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType(propertyType === 'apartment' ? null : 'apartment')} icon={Building2} label="Appartement" />
-                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType(propertyType === 'house' ? null : 'house')} icon={Home} label="Huis" />
+                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType(propertyType === 'apartment' ? null : 'apartment')} icon={Building2} label="Appartement" description="Met VvE of huurflat" />
+                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType(propertyType === 'house' ? null : 'house')} icon={Home} label="Huis" description="Vrijstaand of rijtje" />
               </div>
             </div>
 
