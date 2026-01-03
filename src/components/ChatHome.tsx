@@ -22,18 +22,25 @@ type ChatHomeProps = {
 
 export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: ChatHomeProps) => {
   const [activeTab, setActiveTab] = useState<"partner" | "lua">("lua");
-  const [hasPartner, setHasPartner] = useState(false);
+  const [hasCollaborators, setHasCollaborators] = useState(false);
   const [livesAlone, setLivesAlone] = useState(false);
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const [showPartnerInvite, setShowPartnerInvite] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkPartnerStatus();
+    checkCollaboratorStatus();
     trackEvent("chat_home_viewed");
   }, []);
 
-  const checkPartnerStatus = async () => {
+  // Auto-switch to collaborator chat if there are collaborators
+  useEffect(() => {
+    if (!loading && hasCollaborators && !isGuest) {
+      setActiveTab("partner");
+    }
+  }, [loading, hasCollaborators, isGuest]);
+
+  const checkCollaboratorStatus = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -57,9 +64,9 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
         .or(`owner_user_id.eq.${user.id},collaborator_user_id.eq.${user.id}`)
         .not("accepted_at", "is", null);
 
-      setHasPartner((collaborators?.length || 0) > 0);
+      setHasCollaborators((collaborators?.length || 0) > 0);
     } catch (error) {
-      console.error("Error checking partner status:", error);
+      console.error("Error checking collaborator status:", error);
     } finally {
       setLoading(false);
     }
@@ -70,11 +77,11 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
     if (value === "lua") {
       trackEvent("chat_lua_opened");
     } else {
-      trackEvent("chat_partner_opened");
+      trackEvent("chat_collaborator_opened");
     }
   };
 
-  const handlePartnerTabClick = () => {
+  const handleCollaboratorTabClick = () => {
     if (isGuest) {
       if (onSignupClick) {
         onSignupClick();
@@ -84,11 +91,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
       return;
     }
     setActiveTab("partner");
-    trackEvent("chat_partner_opened");
-  };
-
-  const handleAddPartner = () => {
-    onNavigate("settings");
+    trackEvent("chat_collaborator_opened");
   };
 
   if (loading) {
@@ -122,13 +125,13 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
               onClick={(e) => {
                 if (isGuest) {
                   e.preventDefault();
-                  handlePartnerTabClick();
+                  handleCollaboratorTabClick();
                 }
               }}
               className="flex items-center gap-2"
             >
               <Users className="w-4 h-4" />
-              Partner(s)
+              Medeverhuizers
             </TabsTrigger>
           </TabsList>
 
@@ -137,7 +140,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
           </TabsContent>
 
           <TabsContent value="partner" className="mt-0">
-            {livesAlone && !hasPartner ? (
+            {livesAlone && !hasCollaborators ? (
               <Card className="p-6 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
                   <Users className="w-8 h-8 text-muted-foreground" />
@@ -148,10 +151,10 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
                 </p>
                 <Button variant="outline" onClick={() => setShowPartnerInvite(true)} className="gap-2">
                   <UserPlus className="w-4 h-4" />
-                  Toch iemand uitnodigen
+                  Medeverhuizer toevoegen
                 </Button>
               </Card>
-            ) : !hasPartner ? (
+            ) : !hasCollaborators ? (
               <Card className="p-6 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <Users className="w-8 h-8 text-primary" />
@@ -162,7 +165,7 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
                 </p>
                 <Button onClick={() => setShowPartnerInvite(true)} className="gap-2">
                   <UserPlus className="w-4 h-4" />
-                  Huisgenoot toevoegen
+                  Medeverhuizer toevoegen
                 </Button>
               </Card>
             ) : (
@@ -178,18 +181,18 @@ export const ChatHome = ({ movingInfo, onNavigate, isGuest, onSignupClick }: Cha
         onOpenChange={setShowSignupPrompt}
         onSignupComplete={() => {
           setShowSignupPrompt(false);
-          checkPartnerStatus();
+          checkCollaboratorStatus();
         }}
         capturedEmail=""
       />
 
-      {/* Partner invite dialog */}
+      {/* Collaborator invite dialog */}
       <InvitePartnerDialog
         open={showPartnerInvite}
         onOpenChange={setShowPartnerInvite}
         onInviteSent={() => {
           setShowPartnerInvite(false);
-          checkPartnerStatus();
+          checkCollaboratorStatus();
         }}
       />
 
