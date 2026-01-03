@@ -20,6 +20,90 @@ export const useTasks = (movingInfo: MovingInfo) => {
     loadTasks();
   }, [movingInfo]);
 
+  // Realtime subscription for task updates from other household members
+  useEffect(() => {
+    if (isGuest) return;
+
+    const channel = supabase
+      .channel('tasks-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks'
+        },
+        async (payload) => {
+          console.log('Realtime task update:', payload);
+          
+          // Get current user to check if this update is from someone else
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          const newRecord = payload.new as { 
+            user_id?: string; 
+            task_id?: string; 
+            status?: string;
+            assigned_to?: string | null;
+            assigned_to_email?: string | null;
+            assigned_by?: string | null;
+            assigned_at?: string | null;
+            notes?: string | null;
+          };
+          
+          // Only process updates for tasks in our household (same user_id or assigned to us)
+          if (newRecord.user_id !== user.id && newRecord.assigned_to !== user.id) {
+            return;
+          }
+
+          // Check if this update was made by someone else
+          const wasAssignedByOther = newRecord.assigned_by && newRecord.assigned_by !== user.id;
+
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            setTasks((prevTasks) => {
+              const taskIndex = prevTasks.findIndex((t) => t.id === newRecord.task_id);
+              
+              if (taskIndex === -1) {
+                // Task not in list, reload to get full data
+                loadTasks();
+                return prevTasks;
+              }
+
+              // Update existing task with new data
+              const updatedTasks = [...prevTasks];
+              updatedTasks[taskIndex] = {
+                ...updatedTasks[taskIndex],
+                status: (newRecord.status as "todo" | "in_progress" | "done") || updatedTasks[taskIndex].status,
+                assignedTo: newRecord.assigned_to ?? updatedTasks[taskIndex].assignedTo,
+                assignedToEmail: newRecord.assigned_to_email ?? updatedTasks[taskIndex].assignedToEmail,
+                assignedBy: newRecord.assigned_by ?? updatedTasks[taskIndex].assignedBy,
+                assignedAt: newRecord.assigned_at ?? updatedTasks[taskIndex].assignedAt,
+                notes: newRecord.notes ?? updatedTasks[taskIndex].notes,
+              };
+
+              return updatedTasks;
+            });
+
+            // Show notification if task was assigned to current user by someone else
+            if (wasAssignedByOther && newRecord.assigned_to === user.id) {
+              const task = tasks.find((t) => t.id === newRecord.task_id);
+              if (task) {
+                toast({
+                  title: "Nieuwe taak toegewezen",
+                  description: `"${task.title}" is aan jou toegewezen.`,
+                });
+              }
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [isGuest, tasks, toast]);
+
   const loadTasks = async () => {
     try {
       setIsLoading(true);
