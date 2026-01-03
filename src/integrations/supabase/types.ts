@@ -83,6 +83,48 @@ export type Database = {
         }
         Relationships: []
       }
+      household_members: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          invite_token: string | null
+          invited_at: string | null
+          member_user_id: string | null
+          name: string | null
+          owner_user_id: string
+          phone: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string | null
+          invited_at?: string | null
+          member_user_id?: string | null
+          name?: string | null
+          owner_user_id: string
+          phone: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token?: string | null
+          invited_at?: string | null
+          member_user_id?: string | null
+          name?: string | null
+          owner_user_id?: string
+          phone?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       moving_collaborators: {
         Row: {
           accepted_at: string | null
