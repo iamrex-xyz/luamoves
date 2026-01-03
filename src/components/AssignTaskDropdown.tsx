@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { UserCircle, Mail, Check, Loader2 } from "lucide-react";
+import { UserCircle, Mail, Check, Loader2, Users } from "lucide-react";
 
 type Collaborator = {
   id: string;
@@ -33,6 +33,7 @@ export const AssignTaskDropdown = ({
   onAssignmentChange,
 }: AssignTaskDropdownProps) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+  const [householdMembers, setHouseholdMembers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [customEmail, setCustomEmail] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -40,6 +41,7 @@ export const AssignTaskDropdown = ({
 
   useEffect(() => {
     loadCollaborators();
+    loadHouseholdMembers();
   }, []);
 
   const loadCollaborators = async () => {
@@ -59,6 +61,27 @@ export const AssignTaskDropdown = ({
     }
   };
 
+  const loadHouseholdMembers = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("household_names")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) throw error;
+      
+      // Filter out empty names
+      const members = (data?.household_names || []).filter((name: string) => name && name.trim() !== "");
+      setHouseholdMembers(members);
+    } catch (error) {
+      console.error("Error loading household members:", error);
+    }
+  };
+
   const assignTask = async (userId: string | null, email: string | null) => {
     setIsLoading(true);
     try {
@@ -75,7 +98,7 @@ export const AssignTaskDropdown = ({
       toast({
         title: "Taak toegewezen",
         description: email 
-          ? `Toegewezen aan ${email}` 
+          ? `Taak toegewezen aan ${email}` 
           : userId 
           ? "Toegewezen aan collaborator"
           : "Toewijzing verwijderd",
@@ -84,6 +107,42 @@ export const AssignTaskDropdown = ({
       onAssignmentChange();
     } catch (error) {
       console.error("Error assigning task:", error);
+      toast({
+        title: "Fout bij toewijzen",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const assignToHouseholdMember = async (memberName: string) => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await supabase
+        .from("tasks")
+        .upsert({
+          user_id: user.id,
+          task_id: taskId,
+          assigned_to: null,
+          assigned_to_email: memberName, // Store household member name as "email" for display
+        }, {
+          onConflict: "user_id,task_id",
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Taak toegewezen",
+        description: `Taak toegewezen aan ${memberName}`,
+      });
+
+      onAssignmentChange();
+    } catch (error) {
+      console.error("Error assigning task to household member:", error);
       toast({
         title: "Fout bij toewijzen",
         variant: "destructive",
@@ -114,7 +173,7 @@ export const AssignTaskDropdown = ({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    await assignTask(user.id, null);
+    await assignTask(user.id, "Ik");
   };
 
   const getCurrentAssignee = () => {
@@ -156,14 +215,38 @@ export const AssignTaskDropdown = ({
         <DropdownMenuItem onClick={handleAssignToSelf}>
           <UserCircle className="w-4 h-4 mr-2" />
           Mezelf
-          {!currentAssignee && <Check className="w-4 h-4 ml-auto" />}
+          {currentAssignee === "Ik" && <Check className="w-4 h-4 ml-auto" />}
         </DropdownMenuItem>
 
+        {/* Household Members */}
+        {householdMembers.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              Huishouden
+            </DropdownMenuLabel>
+            {householdMembers.map((member) => (
+              <DropdownMenuItem
+                key={member}
+                onClick={() => assignToHouseholdMember(member)}
+              >
+                <UserCircle className="w-4 h-4 mr-2" />
+                <span className="truncate">{member}</span>
+                {currentAssignee === member && (
+                  <Check className="w-4 h-4 ml-auto" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
+
+        {/* Collaborators (invited via email) */}
         {collaborators.length > 0 && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Collaborators
+              Uitgenodigde collaborators
             </DropdownMenuLabel>
             {collaborators.map((collab) => (
               <DropdownMenuItem
