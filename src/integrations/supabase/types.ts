@@ -155,6 +155,36 @@ export type Database = {
         }
         Relationships: []
       }
+      moving_company_feedback: {
+        Row: {
+          created_at: string
+          explanation: string
+          id: string
+          moving_company_name: string | null
+          moving_date: string | null
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          explanation: string
+          id?: string
+          moving_company_name?: string | null
+          moving_date?: string | null
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          explanation?: string
+          id?: string
+          moving_company_name?: string | null
+          moving_date?: string | null
+          rating?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       moving_documents: {
         Row: {
           category: string

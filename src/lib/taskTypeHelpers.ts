@@ -31,11 +31,23 @@ export const isInternetTask = (task: Task): boolean => {
 export const isMovingTask = (task: Task): boolean => {
   const titleLower = task.title.toLowerCase();
   const idLower = task.id.toLowerCase();
+  // Exclude feedback task from moving task detection
+  if (isMovingFeedbackTask(task)) return false;
   return (
     (titleLower.includes("verhuisbedrijf") || titleLower.includes("helpers")) ||
     (titleLower.includes("regel") && (titleLower.includes("verhuis") || titleLower.includes("helpers"))) ||
     idLower.includes("verhuisbedrijf") ||
     idLower.includes("moving-company")
+  );
+};
+
+export const isMovingFeedbackTask = (task: Task): boolean => {
+  const titleLower = task.title.toLowerCase();
+  const idLower = task.id.toLowerCase();
+  return (
+    idLower.includes("moving-feedback") ||
+    idLower.includes("verhuisbedrijf-feedback") ||
+    (titleLower.includes("feedback") && titleLower.includes("verhuisbedrijf"))
   );
 };
 
@@ -288,6 +300,7 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isEnergyTask(task) ||
     isInternetTask(task) ||
     isMovingTask(task) ||
+    isMovingFeedbackTask(task) ||
     isBoxesTask(task) ||
     isInsuranceTask(task) ||
     isLiabilityTask(task) ||
@@ -306,6 +319,14 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isBudgetTask(task) ||
     isInviteHouseholdTask(task)
   );
+};
+
+// Get custom button label for specific task types
+export const getTaskButtonLabel = (task: Task): string | null => {
+  if (isMovingFeedbackTask(task)) {
+    return "Feedback achterlaten";
+  }
+  return null;
 };
 
 // Task type to redirect URL mapping
