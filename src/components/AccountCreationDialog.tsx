@@ -180,35 +180,42 @@ export const AccountCreationDialog = ({
   return (
     <MobileModal open={open} onOpenChange={() => {}}>
       <MobileModalContent 
-        className="max-h-[85vh]"
+        className="max-h-[80vh]"
         showCloseButton={canDismiss}
         onCloseClick={handleLater}
         onPointerDownOutside={(e) => !canDismiss && e.preventDefault()}
         onEscapeKeyDown={(e) => !canDismiss && e.preventDefault()}
       >
-        <div className="flex-1 overflow-y-auto px-6 py-4">
-          <div className="text-center space-y-3 mb-6">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <Shield className="w-7 h-7 text-primary-foreground" />
+        <div className="px-5 py-4">
+          {/* Compact header */}
+          <div className="text-center mb-4">
+            <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
+              <Shield className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">
-                {isHardBlock 
-                  ? "Account aanmaken om door te gaan"
-                  : "Maak je account aan"
-                }
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                Zo kun je altijd inloggen en verder gaan waar je gebleven was.
-              </p>
-            </div>
+            <h2 className="text-xl font-bold">
+              {isHardBlock ? "Account aanmaken" : "Maak je account aan"}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Bewaar je voortgang en log overal in.
+            </p>
           </div>
 
-          <div className="space-y-4">
+          {/* Compact form */}
+          <div className="space-y-3">
+            {/* Phone (read-only, shown first) */}
+            {capturedPhone && (
+              <div className="space-y-1">
+                <Label className="text-sm text-muted-foreground">Telefoonnummer</Label>
+                <div className="h-11 px-3 rounded-lg bg-muted/50 border border-border/50 flex items-center">
+                  <span className="text-sm text-foreground">{capturedPhone}</span>
+                </div>
+              </div>
+            )}
+
             {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="account-email" className="flex items-center gap-2 text-base">
-                <Mail className="w-4 h-4 text-muted-foreground" />
+            <div className="space-y-1">
+              <Label htmlFor="account-email" className="text-sm flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-muted-foreground" />
                 E-mailadres
               </Label>
               <Input
@@ -221,33 +228,33 @@ export const AccountCreationDialog = ({
                   if (emailError) setEmailError("");
                 }}
                 className={cn(
-                  "h-14 rounded-xl text-base",
+                  "h-11 rounded-lg text-sm",
                   emailError && "border-destructive focus-visible:ring-destructive"
                 )}
               />
               {emailError && (
-                <p className="text-sm text-destructive">{emailError}</p>
+                <p className="text-xs text-destructive">{emailError}</p>
               )}
             </div>
 
             {/* Password */}
-            <div className="space-y-2">
-              <Label htmlFor="account-password" className="flex items-center gap-2 text-base">
-                <Lock className="w-4 h-4 text-muted-foreground" />
+            <div className="space-y-1">
+              <Label htmlFor="account-password" className="text-sm flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-muted-foreground" />
                 Wachtwoord
               </Label>
               <div className="relative">
                 <Input
                   id="account-password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Minimaal 8 tekens met 1 cijfer"
+                  placeholder="Min. 8 tekens, 1 cijfer"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (passwordError) setPasswordError("");
                   }}
                   className={cn(
-                    "h-14 rounded-xl pr-12 text-base",
+                    "h-11 rounded-lg pr-10 text-sm",
                     passwordError && "border-destructive focus-visible:ring-destructive"
                   )}
                   onKeyDown={(e) => {
@@ -259,82 +266,74 @@ export const AccountCreationDialog = ({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {passwordError && (
-                <p className="text-sm text-destructive">{passwordError}</p>
+                <p className="text-xs text-destructive">{passwordError}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Compact CTA section */}
+          <div className="mt-4 space-y-2">
+            <Button 
+              onClick={handleCreateAccount}
+              disabled={!canSubmit || isLoading}
+              className="w-full h-11 rounded-lg text-base font-semibold"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Even geduld...
+                </>
+              ) : (
+                <>
+                  Account aanmaken
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
+
+            {canDismiss && (
+              <Button 
+                variant="ghost" 
+                onClick={handleLater}
+                className="w-full h-9 rounded-lg text-sm text-muted-foreground"
+              >
+                Nu niet
+              </Button>
+            )}
+
+            {/* Secondary actions - compact row */}
+            <div className="flex items-center justify-center gap-3 text-xs pt-1">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Wachtwoord vergeten?
+              </button>
+              {onLoginRequest && (
+                <>
+                  <span className="text-border">•</span>
+                  <button
+                    type="button"
+                    onClick={onLoginRequest}
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Log in
+                  </button>
+                </>
               )}
             </div>
 
-            {/* Show saved phone if available */}
-            {capturedPhone && (
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-                <p className="text-sm text-muted-foreground">Je telefoonnummer</p>
-                <p className="font-medium">{capturedPhone}</p>
-              </div>
-            )}
+            <p className="text-[11px] text-center text-muted-foreground pt-1">
+              Door aan te melden ga je akkoord met onze voorwaarden.
+            </p>
           </div>
-        </div>
-
-        {/* CTA */}
-        <div className="p-6 pt-4 border-t bg-background space-y-3">
-          <Button 
-            onClick={handleCreateAccount}
-            disabled={!canSubmit || isLoading}
-            className="w-full h-14 rounded-xl text-lg font-semibold"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Account aanmaken...
-              </>
-            ) : (
-              <>
-                Account aanmaken
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </>
-            )}
-          </Button>
-
-          {canDismiss && (
-            <Button 
-              variant="ghost" 
-              onClick={handleLater}
-              className="w-full h-12 rounded-xl text-base text-muted-foreground"
-            >
-              Nu niet
-            </Button>
-          )}
-
-          <div className="text-center space-y-2 pt-2">
-            <button
-              type="button"
-              onClick={() => setShowForgotPassword(true)}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Wachtwoord vergeten?
-            </button>
-            {onLoginRequest && (
-              <button
-                type="button"
-                onClick={onLoginRequest}
-                className="text-sm text-primary hover:text-primary/80 transition-colors block w-full"
-              >
-                Al een account? Log in
-              </button>
-            )}
-          </div>
-
-          <p className="text-xs text-center text-muted-foreground">
-            Door aan te melden ga je akkoord met onze voorwaarden.
-          </p>
         </div>
       </MobileModalContent>
 
