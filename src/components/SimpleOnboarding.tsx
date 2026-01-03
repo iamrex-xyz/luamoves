@@ -296,7 +296,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   Jouw verhuizing,<br /><span className="text-primary">geregeld.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-muted-foreground max-w-md leading-relaxed">
-                  Lua is je slimme verhuisassistent. Wij ontzorgen, jij focust op je nieuwe thuis!
+                  Lua is je slimme verhuisassistent. Jij focust op je nieuwe thuis en wij ontzorgen!
                 </p>
               </div>
               <div className="relative h-52 md:h-56">
