@@ -8,6 +8,7 @@ import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, Use
 type TaskListItemProps = {
   task: Task;
   isCompleting: boolean;
+  isNewAssignment?: boolean;
   onTaskClick: (task: Task) => void;
   onCheckboxClick: (e: React.MouseEvent, task: Task) => void;
   onRegelenClick: (e: React.MouseEvent, task: Task) => void;
@@ -18,6 +19,7 @@ type TaskListItemProps = {
 export const TaskListItem = ({
   task,
   isCompleting,
+  isNewAssignment,
   onTaskClick,
   onCheckboxClick,
   onRegelenClick,
@@ -142,9 +144,16 @@ export const TaskListItem = ({
                   {task.deadlineLabel}
                 </span>
                 {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                  <span className="flex items-center gap-1 text-xs text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded-full">
+                  <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
+                    isNewAssignment 
+                      ? "text-white bg-primary animate-pulse" 
+                      : "text-primary/80 bg-primary/10"
+                  }`}>
                     <UserCircle className="w-3 h-3 shrink-0" />
                     {task.assignedToEmail}
+                    {isNewAssignment && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
                   </span>
                 )}
               </div>
