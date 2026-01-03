@@ -371,7 +371,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Button>
-                <p className="text-sm text-muted-foreground">Gratis, geen account nodig.</p>
+                <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
               </div>
             </div>
           </section>
@@ -460,7 +460,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Button>
-                <p className="text-sm text-muted-foreground">Gratis, geen account nodig.</p>
+                <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
               </div>
             </div>
           </section>
