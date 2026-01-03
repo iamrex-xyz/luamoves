@@ -298,7 +298,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   Lua is je slimme verhuisassistent. Wij ontzorgen, jij focust op je nieuwe thuis!
                 </p>
               </div>
-              <div className="relative h-52 md:h-56 mb-10">
+              <div className="relative h-52 md:h-56">
                 <div className="absolute top-5 left-3 right-3 h-full bg-white/60 rounded-2xl shadow-lg transform rotate-2" />
                 <div className="absolute top-2.5 left-1.5 right-1.5 h-full bg-white/80 rounded-2xl shadow-lg transform -rotate-1" />
                 <div className="absolute inset-0 bg-white rounded-2xl shadow-2xl shadow-primary/20 p-5 flex flex-col">
@@ -343,11 +343,11 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center">
+              <div className="w-full mt-4">
                 <Button 
                   onClick={handleNext}
                   size="sm"
-                  className="h-11 px-6 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
+                  className="w-full h-11 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
                 >
                   Maak mijn verhuisplan
                   <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
