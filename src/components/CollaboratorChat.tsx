@@ -143,7 +143,7 @@ export const CollaboratorChat = () => {
       <div className="p-4 border-b">
         <div className="flex items-center gap-2">
           <MessageCircle className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold">Chat met teamleden</h3>
+          <h3 className="font-semibold">Chat met medeverhuizers</h3>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export const CollaboratorChat = () => {
           <div className="text-center text-muted-foreground py-8">
             <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p>Nog geen berichten</p>
-            <p className="text-sm">Start een gesprek met je teamleden</p>
+            <p className="text-sm">Start een gesprek met je medeverhuizers</p>
           </div>
         ) : (
           <div className="space-y-3">
