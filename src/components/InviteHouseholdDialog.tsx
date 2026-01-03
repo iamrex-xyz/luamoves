@@ -40,6 +40,18 @@ const validatePhone = (phone: string): boolean => {
   return cleaned.replace(/\D/g, "").length >= 10;
 };
 
+const validateName = (name: string): { valid: boolean; error?: string } => {
+  const trimmed = name.trim();
+  if (trimmed.length < 2) {
+    return { valid: false, error: "Naam moet minimaal 2 karakters zijn" };
+  }
+  // Only allow letters, spaces, and common name characters (hyphens, apostrophes)
+  if (!/^[a-zA-ZÀ-ÿ\s\-']+$/.test(trimmed)) {
+    return { valid: false, error: "Naam mag geen speciale tekens bevatten" };
+  }
+  return { valid: true };
+};
+
 const formatPhoneDisplay = (phone: string): string => {
   const cleaned = phone.replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+31")) {
@@ -82,50 +94,70 @@ export const InviteHouseholdDialog = ({
   };
 
   const handleSendInvites = async () => {
-    // Validate all entries
-    const validEntries = entries.filter(e => e.phone.trim() !== "");
+    // Validate all entries - both phone and name are required
+    const filledEntries = entries.filter(e => e.phone.trim() !== "" || e.name.trim() !== "");
     
-    if (validEntries.length === 0) {
+    if (filledEntries.length === 0) {
       toast({
-        title: "Vul minimaal één telefoonnummer in",
+        title: "Vul minimaal één mede-verhuizer in",
         variant: "destructive",
       });
       return;
     }
 
-    // Check for missing names
-    const missingNames = validEntries.filter(e => !e.name.trim());
-    if (missingNames.length > 0) {
-      setEntries(prev => prev.map(e => 
-        missingNames.find(mn => mn.id === e.id) 
-          ? { ...e, status: "error" as const, error: "Naam is verplicht" }
-          : e
-      ));
+    // Validate each entry
+    let hasErrors = false;
+    const updatedEntries = entries.map(e => {
+      if (e.phone.trim() === "" && e.name.trim() === "") {
+        return e; // Empty entry, skip
+      }
+      
+      // Check phone
+      if (!e.phone.trim()) {
+        hasErrors = true;
+        return { ...e, status: "error" as const, error: "Telefoonnummer is verplicht" };
+      }
+      
+      if (!validatePhone(e.phone)) {
+        hasErrors = true;
+        return { ...e, status: "error" as const, error: "Ongeldig telefoonnummer" };
+      }
+      
+      // Check name
+      if (!e.name.trim()) {
+        hasErrors = true;
+        return { ...e, status: "error" as const, error: "Naam is verplicht" };
+      }
+      
+      const nameValidation = validateName(e.name);
+      if (!nameValidation.valid) {
+        hasErrors = true;
+        return { ...e, status: "error" as const, error: nameValidation.error };
+      }
+      
+      return e;
+    });
+
+    if (hasErrors) {
+      setEntries(updatedEntries);
       return;
     }
 
-    const invalidEntries = validEntries.filter(e => !validatePhone(e.phone));
-    if (invalidEntries.length > 0) {
-      setEntries(prev => prev.map(e => 
-        invalidEntries.find(ie => ie.id === e.id) 
-          ? { ...e, status: "error" as const, error: "Ongeldig telefoonnummer" }
-          : e
-      ));
-      return;
-    }
+    // Get entries that need to be sent
+    const entriesToSend = filledEntries.filter(e => e.status !== "sent");
 
     setIsSending(true);
-    trackEvent("household_invite_started", { count: validEntries.length });
+    trackEvent("household_invite_started", { count: entriesToSend.length });
 
     // Send invites one by one
-    for (const entry of validEntries) {
+    for (const entry of entriesToSend) {
       setEntries(prev => prev.map(e => 
         e.id === entry.id ? { ...e, status: "sending" } : e
       ));
 
       try {
         const { data, error } = await supabase.functions.invoke("send-household-invite", {
-          body: { phone: entry.phone, name: entry.name || undefined }
+          body: { phone: entry.phone, name: entry.name }
         });
 
         if (error) throw error;
@@ -154,7 +186,7 @@ export const InviteHouseholdDialog = ({
     setIsSending(false);
 
     // Check if all sent successfully
-    const allSuccess = validEntries.every(e => 
+    const allSuccess = entriesToSend.every(e => 
       entries.find(curr => curr.id === e.id)?.status === "sent"
     );
 
@@ -162,7 +194,7 @@ export const InviteHouseholdDialog = ({
     setTimeout(() => {
       setEntries(prev => {
         const sentCount = prev.filter(e => e.status === "sent").length;
-        if (sentCount === validEntries.length) {
+        if (sentCount === entriesToSend.length) {
           setAllSent(true);
           toast({
             title: "Uitnodigingen verstuurd! 🎉",
