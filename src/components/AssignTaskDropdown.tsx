@@ -85,13 +85,20 @@ export const AssignTaskDropdown = ({
   const assignTask = async (userId: string | null, email: string | null) => {
     setIsLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Use upsert to handle both new and existing task records
       const { error } = await supabase
         .from("tasks")
-        .update({
+        .upsert({
+          user_id: user.id,
+          task_id: taskId,
           assigned_to: userId,
           assigned_to_email: email,
-        })
-        .eq("task_id", taskId);
+        }, {
+          onConflict: "user_id,task_id",
+        });
 
       if (error) throw error;
 
