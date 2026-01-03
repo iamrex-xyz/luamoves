@@ -309,15 +309,16 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
           </div>
-          <div className="absolute bottom-8 right-5">
-            <div className="flex items-center gap-2.5 group">
-              <span className="text-sm text-muted-foreground">Start nu</span>
-              <div className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <svg className="w-4 h-4 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
+          <div className="flex justify-center mt-8">
+            <Button 
+              onClick={handleNext}
+              className="h-14 px-8 text-lg rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-lg"
+            >
+              Maak mijn verhuisplan
+              <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Button>
           </div>
         </div>
 
@@ -344,7 +345,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </h2>
               <div className="grid gap-6">
                 {[
-                  { step: "1", title: "Start met je verhuischecklist", desc: "Vul je verhuisdatum en adres in" },
+                  { step: "1", title: "Start met je gepersonaliseerde verhuischecklist", desc: "Vul je verhuisdatum en adres in" },
                   { step: "2", title: "Vul alleen in wat nodig is", desc: "We vragen alleen wat relevant is voor jou" },
                   { step: "3", title: "Lua regelt of komt bij je terug", desc: "Wij doen het werk, jij houdt overzicht" },
                 ].map((item) => (
@@ -365,26 +366,33 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           {/* Section 3: Wat Lua voor je regelt */}
           <section className="px-5 py-16 bg-white">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">
-                Wat Lua voor je regelt
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-center">
+                Wat Lua gratis voor je regelt
               </h2>
-              <div className="flex flex-wrap justify-center gap-3">
+              <p className="text-muted-foreground text-center mb-8">
+                Lua helpt je bij alle belangrijke verhuistaken
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  "Energie",
-                  "Internet",
-                  "Verhuisbedrijf",
-                  "Verzekeringen",
-                  "Post doorsturen",
-                  "Schoonmaak",
-                  "Adreswijzigingen",
-                  "Sleutels",
+                  { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af" },
+                  { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres" },
+                  { title: "Verhuisbedrijf", desc: "Vraag offertes aan bij betrouwbare verhuizers" },
+                  { title: "Verzekeringen", desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan" },
+                  { title: "Post doorsturen", desc: "Regel je postdoorstuurservice bij PostNL" },
+                  { title: "Adreswijzigingen", desc: "Geef je nieuwe adres door aan alle instanties" },
                 ].map((item) => (
-                  <span
-                    key={item}
-                    className="px-4 py-2 bg-primary-light text-primary rounded-full text-sm font-medium"
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-3 p-4 bg-primary-light/50 rounded-xl"
                   >
-                    {item}
-                  </span>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Check className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-foreground">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -413,17 +421,18 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           <section className="px-5 py-16 bg-white">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                Klaar om te beginnen?
+                Klaar om te verhuizen?
               </h2>
               <p className="text-muted-foreground mb-6">
                 Start wanneer jij wilt. Geen verplichtingen.
               </p>
               <Button 
                 onClick={handleNext}
-                className="h-14 px-8 text-lg rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-lg"
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground underline underline-offset-4"
               >
-                Start mijn verhuischecklist
-                <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                Maak mijn verhuisplan
+                <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Button>
