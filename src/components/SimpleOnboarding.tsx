@@ -343,7 +343,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                 </div>
               </div>
-              <div className="w-full mt-6 md:mt-5">
+              <div className="w-full mt-8">
                 <Button 
                   onClick={handleNext}
                   size="sm"
