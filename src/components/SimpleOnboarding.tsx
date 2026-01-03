@@ -343,19 +343,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                   </div>
                 </div>
               </div>
+              <div className="flex justify-center mt-6">
+                <Button 
+                  onClick={handleNext}
+                  size="sm"
+                  className="h-11 px-6 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
+                >
+                  Maak mijn verhuisplan
+                  <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="flex justify-center mt-8" style={{ marginTop: '-30px' }}>
-            <Button 
-              onClick={handleNext}
-              size="sm"
-              className="h-11 px-6 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
-            >
-              Maak mijn verhuisplan
-              <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Button>
           </div>
         </div>
 
