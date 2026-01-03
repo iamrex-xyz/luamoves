@@ -4,7 +4,9 @@ import {
   MobileModalContent,
 } from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
-import { Check, Sparkles, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Sparkles, Info, CheckCircle2, Zap, Home, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import {
@@ -45,13 +47,15 @@ const energySuppliers = [
   "Frank Energie",
 ];
 
-type Step = "supplier" | "smartMeter" | "connectionType";
+const woningTypes = [
+  { value: "appartement", label: "Appartement" },
+  { value: "tussenwoning", label: "Tussenwoning" },
+  { value: "hoekwoning", label: "Hoekwoning" },
+  { value: "twee_onder_een_kap", label: "2-onder-1-kap" },
+  { value: "vrijstaand", label: "Vrijstaande woning" },
+];
 
-const stepExplanations = {
-  supplier: "Zo kunnen we zien of overstappen voordeliger is dan verlengen.",
-  smartMeter: "Met een slimme meter kun je makkelijker en sneller overstappen.",
-  connectionType: "Dit bepaalt welke energiecontracten we je kunnen aanbieden.",
-};
+type Step = "address" | "woningType" | "supplier" | "usage" | "confirmation";
 
 export const EnergyQuestionsDialog = ({
   open,
@@ -61,233 +65,281 @@ export const EnergyQuestionsDialog = ({
   onRedirect,
 }: EnergyQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [currentStep, setCurrentStep] = useState<Step>("supplier");
+  const [currentStep, setCurrentStep] = useState<Step>("address");
+  const [address, setAddress] = useState<string>("");
+  const [woningType, setWoningType] = useState<string>("");
   const [supplier, setSupplier] = useState<string>("");
-  const [smartMeter, setSmartMeter] = useState<string>("");
-  const [connectionType, setConnectionType] = useState<string>("");
-  // Determine which steps are needed based on existing data
-  const needsSupplier = !movingInfo.energyCurrentSupplier;
-  const needsSmartMeter = !movingInfo.hasSmartMeter;
-  const needsConnectionType = !movingInfo.energyConnectionType;
+  const [estimatedGas, setEstimatedGas] = useState<string>("");
+  const [estimatedElectricity, setEstimatedElectricity] = useState<string>("");
+  const [isSaving, setIsSaving] = useState(false);
 
   // Reset state when dialog opens
   useEffect(() => {
     if (open) {
+      setAddress(movingInfo.newAddress || "");
+      setWoningType((movingInfo as any).housingPropertyType || "");
       setSupplier(movingInfo.energyCurrentSupplier || "");
-      setSmartMeter(movingInfo.hasSmartMeter || "");
-      setConnectionType(movingInfo.energyConnectionType || "");
-      
-      // Start at first needed step
-      if (needsSupplier) {
-        setCurrentStep("supplier");
-      } else if (needsSmartMeter) {
-        setCurrentStep("smartMeter");
-      } else if (needsConnectionType) {
-        setCurrentStep("connectionType");
-      }
+      setEstimatedGas("");
+      setEstimatedElectricity("");
+      setCurrentStep("address");
     }
-  }, [open, movingInfo, needsSupplier, needsSmartMeter, needsConnectionType]);
-
-  // If no questions needed, redirect immediately
-  useEffect(() => {
-    if (open && !needsSupplier && !needsSmartMeter && !needsConnectionType) {
-      onOpenChange(false);
-      onRedirect();
-    }
-  }, [open, needsSupplier, needsSmartMeter, needsConnectionType, onOpenChange, onRedirect]);
-
-  const getNextStep = (current: Step): Step | null => {
-    if (current === "supplier" && needsSmartMeter) return "smartMeter";
-    if (current === "supplier" && needsConnectionType) return "connectionType";
-    if (current === "smartMeter" && needsConnectionType) return "connectionType";
-    return null;
-  };
+  }, [open, movingInfo]);
 
   const handleNext = async () => {
-    const next = getNextStep(currentStep);
-    if (next) {
-      setCurrentStep(next);
-    } else {
-      // All questions answered, save and redirect
-      const data: Partial<MovingInfo> = {};
-      if (needsSupplier) data.energyCurrentSupplier = supplier;
-      if (needsSmartMeter) data.hasSmartMeter = smartMeter as "yes" | "no" | "unknown";
-      if (needsConnectionType) data.energyConnectionType = connectionType as "gas_stroom" | "alleen_stroom";
+    if (currentStep === "address") {
+      setCurrentStep("woningType");
+    } else if (currentStep === "woningType") {
+      setCurrentStep("supplier");
+    } else if (currentStep === "supplier") {
+      setCurrentStep("usage");
+    } else if (currentStep === "usage") {
+      // Save all data and show confirmation
+      setIsSaving(true);
       
-      // Save to Supabase profile
-      await saveToProfile(data);
+      const data: Record<string, any> = {
+        newAddress: address,
+        housingPropertyType: woningType,
+        energyCurrentSupplier: supplier,
+        energyEstimatedGas: estimatedGas ? parseInt(estimatedGas) : null,
+        energyEstimatedElectricity: estimatedElectricity ? parseInt(estimatedElectricity) : null,
+      };
       
+      // Map to profile column names
+      const profileData: Record<string, any> = {
+        new_address: address,
+        housing_property_type: woningType,
+        energy_current_supplier: supplier,
+        energy_estimated_gas: estimatedGas ? parseInt(estimatedGas) : null,
+        energy_estimated_electricity: estimatedElectricity ? parseInt(estimatedElectricity) : null,
+      };
+      
+      await saveToProfile(profileData);
       onComplete(data);
-      onOpenChange(false);
-      onRedirect();
-    }
-  };
-  const isCurrentStepValid = () => {
-    switch (currentStep) {
-      case "supplier":
-        return supplier !== "";
-      case "smartMeter":
-        return smartMeter !== "";
-      case "connectionType":
-        return connectionType !== "";
+      
+      setIsSaving(false);
+      setCurrentStep("confirmation");
     }
   };
 
-  const handleLater = () => {
+  const isCurrentStepValid = () => {
+    switch (currentStep) {
+      case "address":
+        return address.trim().length >= 5;
+      case "woningType":
+        return woningType !== "";
+      case "supplier":
+        return supplier !== "";
+      case "usage":
+        return true; // Usage is optional
+      case "confirmation":
+        return true;
+    }
+  };
+
+  const handleClose = () => {
     onOpenChange(false);
   };
 
-  // Don't render if no questions needed
-  if (!needsSupplier && !needsSmartMeter && !needsConnectionType) {
-    return null;
-  }
-
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
-      <MobileModalContent className="max-h-[80vh]">
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {/* Lua avatar + message */}
-          <div className="flex gap-3 mb-6">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
+      <MobileModalContent className="max-h-[85vh]">
+        {currentStep === "confirmation" ? (
+          // Confirmation screen
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-muted-foreground mb-1">Lua</p>
-              <div className="bg-muted/50 rounded-2xl rounded-tl-md px-4 py-3">
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              Gegevens ontvangen!
+            </h2>
+            <p className="text-muted-foreground mb-8 max-w-[280px]">
+              We gaan nu de beste energiedeals voor je zoeken. Je hoort snel van ons.
+            </p>
+            <Button 
+              onClick={handleClose}
+              className="w-full max-w-[200px] h-12 rounded-xl"
+            >
+              Sluiten
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {/* Progress indicator */}
+              <div className="flex gap-1 mb-6">
+                {["address", "woningType", "supplier", "usage"].map((step, idx) => (
+                  <div 
+                    key={step}
+                    className={cn(
+                      "h-1 flex-1 rounded-full transition-colors",
+                      idx <= ["address", "woningType", "supplier", "usage"].indexOf(currentStep)
+                        ? "bg-primary"
+                        : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Lua avatar + message */}
+              <div className="flex gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Lua</p>
+                  <div className="bg-muted/50 rounded-2xl rounded-tl-md px-4 py-3">
+                    {currentStep === "address" && (
+                      <p className="text-foreground">
+                        Op welk adres wil je energie aansluiten? 🏠
+                      </p>
+                    )}
+                    {currentStep === "woningType" && (
+                      <p className="text-foreground">
+                        Wat voor type woning is het? Dit helpt bij het inschatten van je verbruik.
+                      </p>
+                    )}
+                    {currentStep === "supplier" && (
+                      <p className="text-foreground">
+                        Wie is je huidige energieleverancier? ⚡
+                      </p>
+                    )}
+                    {currentStep === "usage" && (
+                      <p className="text-foreground">
+                        Heb je een idee van je jaarlijkse verbruik? (optioneel) 📊
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Input based on step */}
+              <div className="space-y-4">
+                {currentStep === "address" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm flex items-center gap-2">
+                      <Home className="w-4 h-4 text-muted-foreground" />
+                      Adres nieuwe woning
+                    </Label>
+                    <Input
+                      type="text"
+                      placeholder="Straatnaam 123, Plaats"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="h-14 rounded-xl text-base"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Vul je volledige adres in inclusief huisnummer en plaats
+                    </p>
+                  </div>
+                )}
+
+                {currentStep === "woningType" && (
+                  <div className="space-y-2">
+                    {woningTypes.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => setWoningType(option.value)}
+                        className={cn(
+                          "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
+                          woningType === option.value
+                            ? "border-primary bg-primary-light"
+                            : "border-muted hover:border-primary/50 bg-white"
+                        )}
+                      >
+                        <span className={cn(
+                          "font-medium",
+                          woningType === option.value ? "text-foreground" : "text-muted-foreground"
+                        )}>
+                          {option.label}
+                        </span>
+                        {woningType === option.value && (
+                          <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {currentStep === "supplier" && (
-                  <p className="text-foreground">
-                    Om de beste deal voor je te vinden, wil ik even wat weten. Wie is je huidige energieleverancier? ⚡
-                  </p>
+                  <Select value={supplier} onValueChange={setSupplier}>
+                    <SelectTrigger className="w-full h-14 rounded-xl text-base border-2 border-muted hover:border-primary/50 transition-all">
+                      <SelectValue placeholder="Kies je huidige leverancier" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64 bg-background z-50">
+                      {energySuppliers.map((s) => (
+                        <SelectItem key={s} value={s} className="py-3">
+                          {s}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="unknown" className="py-3 text-muted-foreground">
+                        Weet ik niet / heb ik niet
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 )}
-                {currentStep === "smartMeter" && (
-                  <p className="text-foreground">
-                    Heeft je woning een slimme meter? Dan is overstappen extra makkelijk 📸
-                  </p>
-                )}
-                {currentStep === "connectionType" && (
-                  <p className="text-foreground">
-                    Wat wil je aansluiten op je nieuwe adres? 🔌
-                  </p>
+
+                {currentStep === "usage" && (
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                      <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-blue-700">
+                        Dit is optioneel. We kunnen je verbruik ook inschatten op basis van je woningtype.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-yellow-500" />
+                        Elektriciteit (kWh per jaar)
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="bijv. 3500"
+                        value={estimatedElectricity}
+                        onChange={(e) => setEstimatedElectricity(e.target.value)}
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-orange-500" />
+                        Gas (m³ per jaar)
+                      </Label>
+                      <Input
+                        type="number"
+                        placeholder="bijv. 1500"
+                        value={estimatedGas}
+                        onChange={(e) => setEstimatedGas(e.target.value)}
+                        className="h-12 rounded-xl"
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Why this question */}
-          <div className="flex items-start gap-2 px-2 py-2 mb-4 bg-blue-50 rounded-lg border border-blue-100">
-            <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-blue-700">{stepExplanations[currentStep]}</p>
-          </div>
-
-          {/* Task context */}
-          <p className="text-xs text-muted-foreground mb-4 px-2">
-            Voor: <span className="font-medium text-foreground">Energiecontract kiezen</span>
-          </p>
-
-          {/* Input based on step */}
-          <div className="space-y-3">
-            {currentStep === "supplier" && (
-              <Select value={supplier} onValueChange={setSupplier}>
-                <SelectTrigger className="w-full h-14 rounded-xl text-base border-2 border-muted hover:border-primary/50 transition-all">
-                  <SelectValue placeholder="Kies je huidige leverancier" />
-                </SelectTrigger>
-                <SelectContent className="max-h-64 bg-background z-50">
-                  {energySuppliers.map((s) => (
-                    <SelectItem key={s} value={s} className="py-3">
-                      {s}
-                    </SelectItem>
-                  ))}
-                  <SelectItem value="unknown" className="py-3 text-muted-foreground">
-                    Weet ik niet / heb ik niet
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-
-            {currentStep === "smartMeter" && (
-              <div className="space-y-2">
-                {[
-                  { value: "yes", label: "Ja, slimme meter" },
-                  { value: "no", label: "Nee, normale meter" },
-                  { value: "unknown", label: "Weet ik niet" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setSmartMeter(option.value)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
-                      smartMeter === option.value
-                        ? "border-primary bg-primary-light"
-                        : "border-muted hover:border-primary/50 bg-white"
-                    )}
-                  >
-                    <span className={cn(
-                      "font-medium",
-                      smartMeter === option.value ? "text-foreground" : "text-muted-foreground"
-                    )}>
-                      {option.label}
-                    </span>
-                    {smartMeter === option.value && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {currentStep === "connectionType" && (
-              <div className="space-y-2">
-                {[
-                  { value: "gas_stroom", label: "Gas & stroom" },
-                  { value: "alleen_stroom", label: "Alleen stroom" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setConnectionType(option.value)}
-                    className={cn(
-                      "w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between",
-                      connectionType === option.value
-                        ? "border-primary bg-primary-light"
-                        : "border-muted hover:border-primary/50 bg-white"
-                    )}
-                  >
-                    <span className={cn(
-                      "font-medium",
-                      connectionType === option.value ? "text-foreground" : "text-muted-foreground"
-                    )}>
-                      {option.label}
-                    </span>
-                    {connectionType === option.value && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="p-6 pt-4 border-t bg-background flex gap-3">
-          <Button 
-            variant="outline" 
-            onClick={handleLater} 
-            className="flex-1 h-12 rounded-xl"
-          >
-            Later
-          </Button>
-          <Button 
-            onClick={handleNext} 
-            disabled={!isCurrentStepValid()} 
-            className="flex-1 h-12 rounded-xl"
-          >
-            {getNextStep(currentStep) ? "Volgende" : "Opslaan"}
-          </Button>
-        </div>
+            {/* CTA */}
+            <div className="p-6 pt-4 border-t bg-background flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={handleClose} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                Later
+              </Button>
+              <Button 
+                onClick={handleNext} 
+                disabled={!isCurrentStepValid() || isSaving} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                {isSaving ? "Opslaan..." : currentStep === "usage" ? "Versturen" : "Volgende"}
+              </Button>
+            </div>
+          </>
+        )}
       </MobileModalContent>
     </MobileModal>
   );
