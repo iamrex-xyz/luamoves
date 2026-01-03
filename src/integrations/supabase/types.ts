@@ -586,6 +586,8 @@ export type Database = {
       }
       tasks: {
         Row: {
+          assigned_at: string | null
+          assigned_by: string | null
           assigned_to: string | null
           assigned_to_email: string | null
           created_at: string
@@ -597,6 +599,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
           assigned_to?: string | null
           assigned_to_email?: string | null
           created_at?: string
@@ -608,6 +612,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
           assigned_to?: string | null
           assigned_to_email?: string | null
           created_at?: string
