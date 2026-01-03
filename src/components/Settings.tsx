@@ -101,18 +101,8 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
     <div className="min-h-screen pb-20 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
       {/* Header */}
       <div className="px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between">
-          <div onClick={handleLogoClick} className="cursor-pointer">
-            <LuaLogo size="md" />
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onLogout}
-            className="h-10 w-10 rounded-full hover:bg-secondary"
-          >
-            <LogOut className="w-5 h-5 text-muted-foreground" />
-          </Button>
+        <div onClick={handleLogoClick} className="cursor-pointer">
+          <LuaLogo size="md" />
         </div>
       </div>
 
@@ -136,6 +126,16 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
             <ReminderSettingsListItem onClick={() => setReminderSheetOpen(true)} />
           </div>
         </div>
+
+        {/* Sign Out Button */}
+        <Button
+          variant="outline"
+          onClick={onLogout}
+          className="w-full rounded-xl h-12 text-destructive border-destructive/30 hover:bg-destructive/10"
+        >
+          <LogOut className="w-5 h-5 mr-2" />
+          Uitloggen
+        </Button>
 
         <ReminderSettingsSheet open={reminderSheetOpen} onOpenChange={setReminderSheetOpen} />
       </div>
