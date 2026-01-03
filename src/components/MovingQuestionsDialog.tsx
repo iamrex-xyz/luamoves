@@ -1,15 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  MobileModal,
+  MobileModalContent,
+} from "@/components/ui/mobile-modal";
 import { Button } from "@/components/ui/button";
-import { Building2, ArrowUp, DoorOpen, Package, Check, Piano, Refrigerator, PackageOpen, Info } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { 
+  Building2, 
+  ArrowUp, 
+  Check, 
+  Sparkles, 
+  CheckCircle2, 
+  Home, 
+  MapPin, 
+  CalendarIcon,
+  Ruler,
+  Layers
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { nl } from "date-fns/locale";
 
 type MovingQuestionsDialogProps = {
   open: boolean;
@@ -19,14 +38,15 @@ type MovingQuestionsDialogProps = {
   onRedirect: () => void;
 };
 
-type Step = 'floor' | 'elevator' | 'rooms' | 'items';
+type Step = 'dates' | 'addresses' | 'details' | 'confirmation';
 
-const stepExplanations: Record<Step, string> = {
-  floor: "Verhuizers rekenen extra voor hogere verdiepingen. Zo krijg je een nauwkeurige offerte.",
-  elevator: "Een lift maakt de verhuizing sneller en goedkoper.",
-  rooms: "Dit helpt bij het inschatten van de benodigde tijd en manuren.",
-  items: "Speciale items vereisen extra zorg en soms speciale apparatuur.",
-};
+const woningTypes = [
+  { value: "appartement", label: "Appartement" },
+  { value: "tussenwoning", label: "Tussenwoning" },
+  { value: "hoekwoning", label: "Hoekwoning" },
+  { value: "twee_onder_een_kap", label: "2-onder-1-kap" },
+  { value: "vrijstaand", label: "Vrijstaande woning" },
+];
 
 const floorOptions = [
   { value: 'begane-grond', label: 'Begane grond' },
@@ -36,17 +56,12 @@ const floorOptions = [
   { value: '4+', label: '4e of hoger' },
 ];
 
-const roomOptions = [
-  { value: '1-2', label: '1-2 kamers' },
-  { value: '3-4', label: '3-4 kamers' },
-  { value: '5-6', label: '5-6 kamers' },
-  { value: '7+', label: '7 of meer' },
-];
-
-const specialItemOptions = [
-  { value: 'piano', label: 'Piano/Vleugel', icon: Piano },
-  { value: 'witgoed', label: 'Witgoed', icon: Refrigerator },
-  { value: 'inpakservice', label: 'Inpakservice nodig', icon: PackageOpen },
+const sizeOptions = [
+  { value: "10-20", label: "10-20 m³ (studio/1-kamer)" },
+  { value: "20-40", label: "20-40 m³ (2-3 kamers)" },
+  { value: "40-60", label: "40-60 m³ (4-5 kamers)" },
+  { value: "60-80", label: "60-80 m³ (grote woning)" },
+  { value: "80+", label: "80+ m³ (zeer groot)" },
 ];
 
 export const MovingQuestionsDialog = ({
@@ -56,269 +71,387 @@ export const MovingQuestionsDialog = ({
   onComplete,
   onRedirect,
 }: MovingQuestionsDialogProps) => {
-  const [step, setStep] = useState<Step>('floor');
+  const [step, setStep] = useState<Step>('dates');
+  const [movingDate, setMovingDate] = useState<Date | undefined>(
+    movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined
+  );
+  const [oldAddress, setOldAddress] = useState(movingInfo.oldAddress || '');
+  const [newAddress, setNewAddress] = useState(movingInfo.newAddress || '');
+  const [woningType, setWoningType] = useState((movingInfo as any).housingPropertyType || '');
   const [floorLevel, setFloorLevel] = useState(movingInfo.floorLevel || '');
   const [hasElevator, setHasElevator] = useState(movingInfo.hasElevator || '');
-  const [numberOfRooms, setNumberOfRooms] = useState(movingInfo.numberOfRooms || '');
-  const [specialItems, setSpecialItems] = useState<string[]>(movingInfo.specialItems || []);
+  const [movingSize, setMovingSize] = useState((movingInfo as any).movingSize || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const steps: Step[] = [];
-  if (!movingInfo.floorLevel) steps.push('floor');
-  if (!movingInfo.hasElevator) steps.push('elevator');
-  if (!movingInfo.numberOfRooms) steps.push('rooms');
-  if (!movingInfo.specialItems || movingInfo.specialItems.length === 0) steps.push('items');
-
-  const currentStepIndex = steps.indexOf(step);
-  const isLastStep = currentStepIndex === steps.length - 1;
+  // Reset state when dialog opens
+  useEffect(() => {
+    if (open) {
+      setMovingDate(movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined);
+      setOldAddress(movingInfo.oldAddress || '');
+      setNewAddress(movingInfo.newAddress || '');
+      setWoningType((movingInfo as any).housingPropertyType || '');
+      setFloorLevel(movingInfo.floorLevel || '');
+      setHasElevator(movingInfo.hasElevator || '');
+      setMovingSize((movingInfo as any).movingSize || '');
+      setStep('dates');
+    }
+  }, [open, movingInfo]);
 
   const handleNext = async () => {
-    if (isLastStep) {
+    if (step === 'dates') {
+      setStep('addresses');
+    } else if (step === 'addresses') {
+      setStep('details');
+    } else if (step === 'details') {
       setIsSubmitting(true);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
+          // Save all data to profile
           await supabase
             .from('profiles')
             .update({
+              moving_date: movingDate?.toISOString().split('T')[0] || null,
+              old_address: oldAddress || null,
+              new_address: newAddress || null,
+              housing_property_type: woningType || null,
               floor_level: floorLevel || null,
               has_elevator: hasElevator || null,
-              number_of_rooms: numberOfRooms || null,
-              special_items: specialItems.length > 0 ? specialItems : [],
+              home_size_m2: movingSize || null,
             })
             .eq('user_id', user.id);
+
+          // Update task status to "in_progress" (offertes aangevraagd)
+          const movingTaskIds = [
+            'rent-fase2-verhuisbedrijf',
+            'buy-fase2-verhuisbedrijf',
+          ];
+          
+          for (const taskId of movingTaskIds) {
+            await supabase
+              .from('tasks')
+              .upsert({
+                user_id: user.id,
+                task_id: taskId,
+                status: 'in_progress',
+              }, {
+                onConflict: 'user_id,task_id',
+              });
+          }
         }
         
         onComplete({
+          movingDate: movingDate?.toISOString(),
+          oldAddress,
+          newAddress,
+          housingPropertyType: woningType,
           floorLevel,
           hasElevator,
-          numberOfRooms,
-          specialItems,
-        });
-        onRedirect();
-        onOpenChange(false);
+          movingSize,
+        } as any);
+        
+        setStep('confirmation');
       } catch (error) {
         console.error('Error saving moving preferences:', error);
       } finally {
         setIsSubmitting(false);
       }
-    } else {
-      setStep(steps[currentStepIndex + 1]);
     }
-  };
-
-  const handleBack = () => {
-    if (currentStepIndex > 0) {
-      setStep(steps[currentStepIndex - 1]);
-    }
-  };
-
-  const toggleSpecialItem = (item: string) => {
-    setSpecialItems(prev => 
-      prev.includes(item) 
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
   };
 
   const canProceed = () => {
     switch (step) {
-      case 'floor': return !!floorLevel;
-      case 'elevator': return !!hasElevator;
-      case 'rooms': return !!numberOfRooms;
-      case 'items': return true; // Optional step
-      default: return false;
+      case 'dates':
+        return !!movingDate;
+      case 'addresses':
+        return oldAddress.trim().length >= 5 && newAddress.trim().length >= 5;
+      case 'details':
+        return woningType !== '' && floorLevel !== '' && hasElevator !== '' && movingSize !== '';
+      default:
+        return false;
     }
   };
 
-  const OptionButton = ({ 
-    selected, 
-    onClick, 
-    icon: Icon, 
-    label 
-  }: { 
-    selected: boolean; 
-    onClick: () => void; 
-    icon: any; 
-    label: string;
-  }) => (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all w-full text-left",
-        selected 
-          ? "border-primary bg-primary-light" 
-          : "border-muted bg-white hover:border-primary/50"
-      )}
-    >
-      <div className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0",
-        selected ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted"
-      )}>
-        <Icon className={cn("w-5 h-5", selected ? "text-white" : "text-muted-foreground")} />
-      </div>
-      <span className={cn("font-medium", selected ? "text-foreground" : "text-muted-foreground")}>
-        {label}
-      </span>
-      {selected && (
-        <div className="ml-auto w-6 h-6 bg-primary rounded-full flex items-center justify-center shrink-0">
-          <Check className="w-3 h-3 text-white" />
-        </div>
-      )}
-    </button>
-  );
-
-  const renderStep = () => {
-    switch (step) {
-      case 'floor':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold text-foreground">Op welke verdieping woon je?</h3>
-            </div>
-            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
-              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-700">{stepExplanations.floor}</p>
-            </div>
-            <div className="space-y-2">
-              {floorOptions.map((option) => (
-                <OptionButton
-                  key={option.value}
-                  selected={floorLevel === option.value}
-                  onClick={() => setFloorLevel(option.value)}
-                  icon={Building2}
-                  label={option.label}
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'elevator':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold text-foreground">Is er een lift aanwezig?</h3>
-            </div>
-            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
-              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-700">{stepExplanations.elevator}</p>
-            </div>
-            <div className="space-y-2">
-              <OptionButton
-                selected={hasElevator === 'ja'}
-                onClick={() => setHasElevator('ja')}
-                icon={ArrowUp}
-                label="Ja, er is een lift"
-              />
-              <OptionButton
-                selected={hasElevator === 'nee'}
-                onClick={() => setHasElevator('nee')}
-                icon={Building2}
-                label="Nee, geen lift"
-              />
-              <OptionButton
-                selected={hasElevator === 'nvt'}
-                onClick={() => setHasElevator('nvt')}
-                icon={DoorOpen}
-                label="Niet van toepassing"
-              />
-            </div>
-          </div>
-        );
-
-      case 'rooms':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold text-foreground">Hoeveel kamers verhuis je?</h3>
-            </div>
-            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
-              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-700">{stepExplanations.rooms}</p>
-            </div>
-            <div className="space-y-2">
-              {roomOptions.map((option) => (
-                <OptionButton
-                  key={option.value}
-                  selected={numberOfRooms === option.value}
-                  onClick={() => setNumberOfRooms(option.value)}
-                  icon={DoorOpen}
-                  label={option.label}
-                />
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'items':
-        return (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <h3 className="text-xl font-semibold text-foreground">Zijn er speciale items?</h3>
-            </div>
-            <div className="flex items-start gap-2 px-2 py-2 bg-blue-50 rounded-lg border border-blue-100">
-              <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-blue-700">{stepExplanations.items}</p>
-            </div>
-            <p className="text-muted-foreground text-sm">Selecteer wat van toepassing is (optioneel).</p>
-            <div className="space-y-2">
-              {specialItemOptions.map((option) => (
-                <OptionButton
-                  key={option.value}
-                  selected={specialItems.includes(option.value)}
-                  onClick={() => toggleSpecialItem(option.value)}
-                  icon={option.icon}
-                  label={option.label}
-                />
-              ))}
-            </div>
-          </div>
-        );
-    }
+  const handleClose = () => {
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" />
-            Verhuisdetails
-          </DialogTitle>
-        </DialogHeader>
-
-        {/* Progress indicator */}
-        <div className="flex gap-1 mb-4">
-          {steps.map((_, idx) => (
-            <div 
-              key={idx} 
-              className={cn(
-                "h-1 flex-1 rounded-full transition-all",
-                idx <= currentStepIndex ? "bg-primary" : "bg-muted"
-              )} 
-            />
-          ))}
-        </div>
-
-        {renderStep()}
-
-        <div className="flex justify-between mt-6">
-          {currentStepIndex > 0 ? (
-            <Button variant="ghost" onClick={handleBack}>
-              Terug
+    <MobileModal open={open} onOpenChange={onOpenChange}>
+      <MobileModalContent className="max-h-[90vh]">
+        {step === 'confirmation' ? (
+          // Confirmation screen
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-3">
+              Aanvraag ontvangen!
+            </h2>
+            <p className="text-muted-foreground mb-2 max-w-[280px]">
+              We gaan offertes opvragen bij betrouwbare verhuisbedrijven.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8 max-w-[280px]">
+              Je ontvangt binnenkort vergelijkbare offertes in je inbox.
+            </p>
+            <Button 
+              onClick={handleClose}
+              className="w-full max-w-[200px] h-12 rounded-xl"
+            >
+              Sluiten
             </Button>
-          ) : (
-            <div />
-          )}
-          <Button 
-            onClick={handleNext} 
-            disabled={!canProceed() || isSubmitting}
-          >
-            {isSubmitting ? "Opslaan..." : isLastStep ? "Bekijk aanbiedingen" : "Volgende"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </div>
+        ) : (
+          <>
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              {/* Progress indicator */}
+              <div className="flex gap-1 mb-6">
+                {["dates", "addresses", "details"].map((s, idx) => (
+                  <div 
+                    key={s}
+                    className={cn(
+                      "h-1 flex-1 rounded-full transition-colors",
+                      idx <= ["dates", "addresses", "details"].indexOf(step)
+                        ? "bg-primary"
+                        : "bg-muted"
+                    )}
+                  />
+                ))}
+              </div>
+
+              {/* Lua avatar + message */}
+              <div className="flex gap-3 mb-6">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground mb-1">Lua</p>
+                  <div className="bg-muted/50 rounded-2xl rounded-tl-md px-4 py-3">
+                    {step === "dates" && (
+                      <p className="text-foreground">
+                        Wanneer ga je verhuizen? 📅
+                      </p>
+                    )}
+                    {step === "addresses" && (
+                      <p className="text-foreground">
+                        Waar verhuis je vandaan en naartoe? 🏠
+                      </p>
+                    )}
+                    {step === "details" && (
+                      <p className="text-foreground">
+                        Nog een paar details voor een goede offerte 📦
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Input based on step */}
+              <div className="space-y-4">
+                {step === "dates" && (
+                  <div className="space-y-2">
+                    <Label className="text-sm flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                      Verhuisdatum
+                    </Label>
+                    <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full h-14 justify-start text-left font-normal rounded-xl text-base",
+                            !movingDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {movingDate ? format(movingDate, "d MMMM yyyy", { locale: nl }) : "Kies een datum"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 z-50" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={movingDate}
+                          onSelect={(date) => {
+                            setMovingDate(date);
+                            setCalendarOpen(false);
+                          }}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                )}
+
+                {step === "addresses" && (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        Oud adres (waar je nu woont)
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="Straatnaam 123, Plaats"
+                        value={oldAddress}
+                        onChange={(e) => setOldAddress(e.target.value)}
+                        className="h-14 rounded-xl text-base"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2">
+                        <Home className="w-4 h-4 text-muted-foreground" />
+                        Nieuw adres
+                      </Label>
+                      <Input
+                        type="text"
+                        placeholder="Straatnaam 123, Plaats"
+                        value={newAddress}
+                        onChange={(e) => setNewAddress(e.target.value)}
+                        className="h-14 rounded-xl text-base"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {step === "details" && (
+                  <>
+                    {/* Woningtype */}
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2 mb-2">
+                        <Building2 className="w-4 h-4 text-muted-foreground" />
+                        Type woning
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {woningTypes.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setWoningType(option.value)}
+                            className={cn(
+                              "p-3 rounded-xl border-2 transition-all text-sm",
+                              woningType === option.value
+                                ? "border-primary bg-primary-light text-foreground"
+                                : "border-muted hover:border-primary/50 bg-white text-muted-foreground"
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Grootte */}
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2 mb-2">
+                        <Ruler className="w-4 h-4 text-muted-foreground" />
+                        Geschatte grootte
+                      </Label>
+                      <div className="space-y-2">
+                        {sizeOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setMovingSize(option.value)}
+                            className={cn(
+                              "w-full p-3 rounded-xl border-2 transition-all flex items-center justify-between text-sm",
+                              movingSize === option.value
+                                ? "border-primary bg-primary-light"
+                                : "border-muted hover:border-primary/50 bg-white"
+                            )}
+                          >
+                            <span className={cn(
+                              "font-medium",
+                              movingSize === option.value ? "text-foreground" : "text-muted-foreground"
+                            )}>
+                              {option.label}
+                            </span>
+                            {movingSize === option.value && (
+                              <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Verdieping */}
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2 mb-2">
+                        <Layers className="w-4 h-4 text-muted-foreground" />
+                        Verdieping (nieuwe woning)
+                      </Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {floorOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setFloorLevel(option.value)}
+                            className={cn(
+                              "p-2 rounded-xl border-2 transition-all text-xs",
+                              floorLevel === option.value
+                                ? "border-primary bg-primary-light text-foreground"
+                                : "border-muted hover:border-primary/50 bg-white text-muted-foreground"
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Lift */}
+                    <div className="space-y-2">
+                      <Label className="text-sm flex items-center gap-2 mb-2">
+                        <ArrowUp className="w-4 h-4 text-muted-foreground" />
+                        Is er een lift?
+                      </Label>
+                      <div className="flex gap-2">
+                        {[
+                          { value: "ja", label: "Ja" },
+                          { value: "nee", label: "Nee" },
+                          { value: "nvt", label: "N.v.t." },
+                        ].map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => setHasElevator(option.value)}
+                            className={cn(
+                              "flex-1 p-3 rounded-xl border-2 transition-all text-sm font-medium",
+                              hasElevator === option.value
+                                ? "border-primary bg-primary-light text-foreground"
+                                : "border-muted hover:border-primary/50 bg-white text-muted-foreground"
+                            )}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="p-6 pt-4 border-t bg-background flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={handleClose} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                Later
+              </Button>
+              <Button 
+                onClick={handleNext} 
+                disabled={!canProceed() || isSubmitting} 
+                className="flex-1 h-12 rounded-xl"
+              >
+                {isSubmitting ? "Versturen..." : step === "details" ? "Offertes aanvragen" : "Volgende"}
+              </Button>
+            </div>
+          </>
+        )}
+      </MobileModalContent>
+    </MobileModal>
   );
 };
