@@ -106,16 +106,8 @@ export const EnergyQuestionsDialog = ({
         energyEstimatedElectricity: estimatedElectricity ? parseInt(estimatedElectricity) : null,
       };
       
-      // Map to profile column names
-      const profileData: Record<string, any> = {
-        new_address: address,
-        housing_property_type: woningType,
-        energy_current_supplier: supplier,
-        energy_estimated_gas: estimatedGas ? parseInt(estimatedGas) : null,
-        energy_estimated_electricity: estimatedElectricity ? parseInt(estimatedElectricity) : null,
-      };
-      
-      await saveToProfile(profileData);
+      // Save using MovingInfo field names (hook converts to DB columns)
+      await saveToProfile(data);
       onComplete(data);
       
       setIsSaving(false);

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Package, DoorOpen, Wine, Check, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 type BoxesQuestionsDialogProps = {
   open: boolean;
@@ -35,6 +35,7 @@ export const BoxesQuestionsDialog = ({
   onComplete,
   onRedirect,
 }: BoxesQuestionsDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState<Step>('rooms');
   const [numberOfRooms, setNumberOfRooms] = useState(movingInfo.numberOfRooms || '');
   const [hasFragileItems, setHasFragileItems] = useState(movingInfo.hasFragileItems || '');
@@ -70,21 +71,15 @@ export const BoxesQuestionsDialog = ({
     if (step === 'advice') {
       setIsSubmitting(true);
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase
-            .from('profiles')
-            .update({
-              number_of_rooms: numberOfRooms || movingInfo.numberOfRooms || null,
-              has_fragile_items: hasFragileItems || movingInfo.hasFragileItems || null,
-            })
-            .eq('user_id', user.id);
-        }
-        
-        onComplete({
+        const data = {
           numberOfRooms: numberOfRooms || movingInfo.numberOfRooms,
           hasFragileItems: hasFragileItems || movingInfo.hasFragileItems,
-        });
+        };
+        
+        // Save using profileSync hook
+        await saveToProfile(data);
+        
+        onComplete(data);
         onRedirect();
         onOpenChange(false);
       } catch (error) {

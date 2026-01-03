@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Home, Building2, Info } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
+import { useProfileSync } from "@/hooks/useProfileSync";
 
 interface ParkingQuestionsDialogProps {
   open: boolean;
@@ -75,12 +76,19 @@ export function ParkingQuestionsDialog({
     }
   };
 
-  const handleComplete = () => {
-    onComplete({
+  const { saveToProfile } = useProfileSync();
+
+  const handleComplete = async () => {
+    const data = {
       propertyType: propertyType as "house" | "apartment" | "studio",
       floorLevel,
       municipality
-    } as Partial<MovingInfo>);
+    };
+    
+    // Save using profileSync hook
+    await saveToProfile(data);
+    
+    onComplete(data as Partial<MovingInfo>);
     onOpenChange(false);
     onRedirect();
   };

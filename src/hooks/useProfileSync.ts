@@ -63,6 +63,8 @@ export const useProfileSync = () => {
       // Energy questions
       if (data.energyCurrentSupplier !== undefined) profileUpdate.energy_current_supplier = data.energyCurrentSupplier || null;
       if (data.energyConnectionType !== undefined) profileUpdate.energy_connection_type = data.energyConnectionType || null;
+      if ((data as any).energyEstimatedGas !== undefined) profileUpdate.energy_estimated_gas = (data as any).energyEstimatedGas || null;
+      if ((data as any).energyEstimatedElectricity !== undefined) profileUpdate.energy_estimated_electricity = (data as any).energyEstimatedElectricity || null;
 
       // Internet questions
       if (data.hasFiber !== undefined) profileUpdate.has_fiber = data.hasFiber || null;

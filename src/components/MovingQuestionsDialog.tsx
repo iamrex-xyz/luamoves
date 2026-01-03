@@ -27,6 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
+import { useProfileSync } from "@/hooks/useProfileSync";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -73,6 +74,7 @@ export const MovingQuestionsDialog = ({
   onRedirect,
   onCompleteTask,
 }: MovingQuestionsDialogProps) => {
+  const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState<Step>('dates');
   const [movingDate, setMovingDate] = useState<Date | undefined>(
     movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined
@@ -108,23 +110,22 @@ export const MovingQuestionsDialog = ({
     } else if (step === 'details') {
       setIsSubmitting(true);
       try {
+        // Save all data using profileSync hook
+        const profileData = {
+          movingDate: movingDate?.toISOString().split('T')[0] || undefined,
+          oldAddress: oldAddress || undefined,
+          newAddress: newAddress || undefined,
+          housingPropertyType: woningType || undefined,
+          floorLevel: floorLevel || undefined,
+          hasElevator: hasElevator || undefined,
+          homeSizeM2: movingSize || undefined,
+        };
+        
+        await saveToProfile(profileData);
+
+        // Update task status to "in_progress" (offertes aangevraagd)
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          // Save all data to profile
-          await supabase
-            .from('profiles')
-            .update({
-              moving_date: movingDate?.toISOString().split('T')[0] || null,
-              old_address: oldAddress || null,
-              new_address: newAddress || null,
-              housing_property_type: woningType || null,
-              floor_level: floorLevel || null,
-              has_elevator: hasElevator || null,
-              home_size_m2: movingSize || null,
-            })
-            .eq('user_id', user.id);
-
-          // Update task status to "in_progress" (offertes aangevraagd)
           const movingTaskIds = [
             'rent-fase2-verhuisbedrijf',
             'buy-fase2-verhuisbedrijf',
