@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SimpleOnboarding } from "@/components/SimpleOnboarding";
 import { Auth } from "@/components/Auth";
 import { Dashboard } from "@/components/Dashboard";
@@ -8,6 +9,7 @@ import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
 import { PhoneCaptureDialog } from "@/components/PhoneCaptureDialog";
 import { AccountCreationDialog } from "@/components/AccountCreationDialog";
+import { HouseholdInviteSignup } from "@/components/HouseholdInviteSignup";
 // MilestoneCelebrationDialog removed - not used in strict flow
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { User } from "@supabase/supabase-js";
@@ -23,10 +25,13 @@ export type { MovingInfo } from "@/types/moving";
 const LOCAL_STORAGE_KEY = "lua_moving_info";
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
   const [currentView, setCurrentView] = useState<AppView>("onboarding");
   const [loading, setLoading] = useState(true);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [inviteData, setInviteData] = useState<{ phone: string; name?: string; ownerUserId: string } | null>(null);
   const { toast } = useToast();
 
   // Use guest storage hook
@@ -178,6 +183,55 @@ const Index = () => {
     }
   };
 
+  // Check for invite token in URL
+  useEffect(() => {
+    const token = searchParams.get("invite");
+    if (token && !user) {
+      setInviteToken(token);
+      // Fetch invite data
+      const fetchInviteData = async () => {
+        const { data, error } = await supabase
+          .from("household_members")
+          .select("phone, name, owner_user_id, status")
+          .eq("invite_token", token)
+          .maybeSingle();
+
+        if (error || !data) {
+          toast({
+            title: "Ongeldige uitnodiging",
+            description: "Deze uitnodigingslink is niet meer geldig.",
+            variant: "destructive",
+          });
+          setInviteToken(null);
+          // Remove invite param from URL
+          searchParams.delete("invite");
+          setSearchParams(searchParams);
+          return;
+        }
+
+        if (data.status === "active") {
+          toast({
+            title: "Al geaccepteerd",
+            description: "Je bent al lid van dit huishouden. Log in om verder te gaan.",
+          });
+          setInviteToken(null);
+          searchParams.delete("invite");
+          setSearchParams(searchParams);
+          setCurrentView("auth");
+          return;
+        }
+
+        setInviteData({
+          phone: data.phone,
+          name: data.name || undefined,
+          ownerUserId: data.owner_user_id,
+        });
+      };
+
+      fetchInviteData();
+    }
+  }, [searchParams, user, toast, setSearchParams]);
+
   // Initialize app
   useEffect(() => {
     const initializeApp = async () => {
@@ -186,6 +240,11 @@ const Index = () => {
       if (session?.user) {
         setUser(session.user);
         await loadUserProfile(session.user.id);
+        // Clear invite token if user is logged in
+        if (searchParams.get("invite")) {
+          searchParams.delete("invite");
+          setSearchParams(searchParams);
+        }
         return;
       }
 
@@ -216,6 +275,12 @@ const Index = () => {
         }
 
         if (session?.user && event === "SIGNED_IN") {
+          // Clear invite token after sign in
+          setInviteToken(null);
+          setInviteData(null);
+          searchParams.delete("invite");
+          setSearchParams(searchParams);
+          
           setTimeout(() => {
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
@@ -229,7 +294,7 @@ const Index = () => {
     initializeApp();
 
     return () => subscription.unsubscribe();
-  }, [loadUserProfile]);
+  }, [loadUserProfile, searchParams, setSearchParams]);
 
   // Handlers
   const handleOnboardingComplete = (info: MovingInfo) => {
@@ -452,6 +517,29 @@ const Index = () => {
           capturedPhone={signupFlow.capturedPhone}
           isHardBlock={signupFlow.isAccountHardBlock}
         />
+
+        {/* Household invite signup dialog */}
+        {inviteToken && inviteData && (
+          <HouseholdInviteSignup
+            open={!!inviteToken && !!inviteData}
+            onOpenChange={() => {
+              setInviteToken(null);
+              setInviteData(null);
+              searchParams.delete("invite");
+              setSearchParams(searchParams);
+            }}
+            inviteToken={inviteToken}
+            phone={inviteData.phone}
+            name={inviteData.name}
+            ownerUserId={inviteData.ownerUserId}
+            onComplete={() => {
+              setInviteToken(null);
+              setInviteData(null);
+              searchParams.delete("invite");
+              setSearchParams(searchParams);
+            }}
+          />
+        )}
 
       </div>
     </ErrorBoundary>

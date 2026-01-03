@@ -33,6 +33,7 @@ import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestion
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
+import { InviteHouseholdDialog } from "@/components/InviteHouseholdDialog";
 import { BudgetDialog } from "@/components/BudgetDialog";
 import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
@@ -86,6 +87,7 @@ export const TaskList = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const [documentTask, setDocumentTask] = useState<Task | null>(null);
+  const [showInviteHousehold, setShowInviteHousehold] = useState(false);
 
   const { tasks, isLoading, toggleTaskStatus, refreshTasks } = useTasks(movingInfo);
   const { toast } = useToast();
@@ -603,6 +605,12 @@ export const TaskList = ({
           }
           setActiveDialog(null);
         }}
+      />
+
+      <InviteHouseholdDialog
+        open={showInviteHousehold}
+        onOpenChange={setShowInviteHousehold}
+        onInvitesSent={refreshTasks}
       />
 
       <DocumentUploadSheet

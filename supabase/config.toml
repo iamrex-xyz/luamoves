@@ -11,3 +11,12 @@ verify_jwt = false
 
 [functions.send-partner-invite]
 verify_jwt = true
+
+[functions.send-household-invite]
+verify_jwt = true
+
+[functions.notify-task-assignment]
+verify_jwt = true
+
+[functions.lua-chat]
+verify_jwt = true

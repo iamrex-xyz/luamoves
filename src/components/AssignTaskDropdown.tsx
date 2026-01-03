@@ -19,8 +19,17 @@ type Collaborator = {
   collaborator_user_id: string | null;
 };
 
+type HouseholdMember = {
+  id: string;
+  name: string | null;
+  phone: string;
+  status: string;
+  member_user_id: string | null;
+};
+
 type AssignTaskDropdownProps = {
   taskId: string;
+  taskTitle?: string;
   currentAssignedTo?: string | null;
   currentAssignedEmail?: string | null;
   onAssignmentChange: () => void;
@@ -28,12 +37,14 @@ type AssignTaskDropdownProps = {
 
 export const AssignTaskDropdown = ({
   taskId,
+  taskTitle,
   currentAssignedTo,
   currentAssignedEmail,
   onAssignmentChange,
 }: AssignTaskDropdownProps) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [householdMembers, setHouseholdMembers] = useState<string[]>([]);
+  const [householdMembers, setHouseholdMembers] = useState<HouseholdMember[]>([]);
+  const [legacyHouseholdNames, setLegacyHouseholdNames] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [customEmail, setCustomEmail] = useState("");
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -66,17 +77,28 @@ export const AssignTaskDropdown = ({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Load from new household_members table (active members only)
+      const { data: members, error: membersError } = await supabase
+        .from("household_members")
+        .select("*")
+        .eq("owner_user_id", user.id)
+        .eq("status", "active");
+
+      if (!membersError && members) {
+        setHouseholdMembers(members);
+      }
+
+      // Also load legacy household_names from profiles as fallback
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("household_names")
         .eq("user_id", user.id)
         .single();
 
-      if (error) throw error;
-      
-      // Filter out empty names
-      const members = (data?.household_names || []).filter((name: string) => name && name.trim() !== "");
-      setHouseholdMembers(members);
+      if (!profileError && profile) {
+        const names = (profile.household_names || []).filter((name: string) => name && name.trim() !== "");
+        setLegacyHouseholdNames(names);
+      }
     } catch (error) {
       console.error("Error loading household members:", error);
     }
@@ -123,7 +145,60 @@ export const AssignTaskDropdown = ({
     }
   };
 
-  const assignToHouseholdMember = async (memberName: string) => {
+  const assignToHouseholdMember = async (member: HouseholdMember) => {
+    setIsLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const displayName = member.name || member.phone;
+
+      const { error } = await supabase
+        .from("tasks")
+        .upsert({
+          user_id: user.id,
+          task_id: taskId,
+          assigned_to: member.member_user_id,
+          assigned_to_email: displayName,
+        }, {
+          onConflict: "user_id,task_id",
+        });
+
+      if (error) throw error;
+
+      // Send WhatsApp notification
+      if (member.phone && taskTitle) {
+        try {
+          await supabase.functions.invoke("notify-task-assignment", {
+            body: { 
+              taskTitle, 
+              assignedToPhone: member.phone 
+            }
+          });
+        } catch (notifyError) {
+          console.error("Error sending WhatsApp notification:", notifyError);
+          // Don't fail the assignment if notification fails
+        }
+      }
+
+      toast({
+        title: "Taak toegewezen",
+        description: `Taak toegewezen aan ${displayName}`,
+      });
+
+      onAssignmentChange();
+    } catch (error) {
+      console.error("Error assigning task to household member:", error);
+      toast({
+        title: "Fout bij toewijzen",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const assignToLegacyMember = async (memberName: string) => {
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -135,7 +210,7 @@ export const AssignTaskDropdown = ({
           user_id: user.id,
           task_id: taskId,
           assigned_to: null,
-          assigned_to_email: memberName, // Store household member name as "email" for display
+          assigned_to_email: memberName,
         }, {
           onConflict: "user_id,task_id",
         });
@@ -226,7 +301,7 @@ export const AssignTaskDropdown = ({
           {currentAssignee === "Ik" && <Check className="w-4 h-4 ml-auto" />}
         </DropdownMenuItem>
 
-        {/* Household Members */}
+        {/* Household Members (from new table) */}
         {householdMembers.length > 0 && (
           <>
             <DropdownMenuSeparator />
@@ -234,14 +309,40 @@ export const AssignTaskDropdown = ({
               <Users className="w-3.5 h-3.5" />
               Huishouden
             </DropdownMenuLabel>
-            {householdMembers.map((member) => (
+            {householdMembers.map((member) => {
+              const displayName = member.name || member.phone;
+              return (
+                <DropdownMenuItem
+                  key={member.id}
+                  onSelect={() => assignToHouseholdMember(member)}
+                >
+                  <UserCircle className="w-4 h-4 mr-2" />
+                  <span className="truncate">{displayName}</span>
+                  {currentAssignee === displayName && (
+                    <Check className="w-4 h-4 ml-auto" />
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
+          </>
+        )}
+
+        {/* Legacy Household Names (from profile) */}
+        {legacyHouseholdNames.length > 0 && householdMembers.length === 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              Huishouden
+            </DropdownMenuLabel>
+            {legacyHouseholdNames.map((name) => (
               <DropdownMenuItem
-                key={member}
-                onSelect={() => assignToHouseholdMember(member)}
+                key={name}
+                onSelect={() => assignToLegacyMember(name)}
               >
                 <UserCircle className="w-4 h-4 mr-2" />
-                <span className="truncate">{member}</span>
-                {currentAssignee === member && (
+                <span className="truncate">{name}</span>
+                {currentAssignee === name && (
                   <Check className="w-4 h-4 ml-auto" />
                 )}
               </DropdownMenuItem>

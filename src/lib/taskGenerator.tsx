@@ -124,6 +124,23 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
   const tasks: Task[] = [];
 
   // =====================================================
+  // TAAK 0 — Huisgenoten uitnodigen (altijd eerste taak)
+  // =====================================================
+  const inviteDeadline = createDeadline(-28, 'urgent');
+  
+  tasks.push({
+    id: "rent-fase0-invite-household",
+    title: "Huisgenoten & familie uitnodigen",
+    category: "Samenwerken",
+    description: "Nodig je huisgenoten of familieleden uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+    ...inviteDeadline,
+    phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+    status: "todo",
+    icon: <Users className="w-4 h-4" />,
+    priority: 0, // Highest priority to appear first
+  });
+
+  // =====================================================
   // FASE 1 — Even landen (4-3 weken voor verhuizing)
   // =====================================================
   const fase1Deadline = createDeadline(-28, 'urgent');
@@ -705,6 +722,23 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
   };
 
   const tasks: Task[] = [];
+
+  // =====================================================
+  // TAAK 0 — Huisgenoten uitnodigen (altijd eerste taak)
+  // =====================================================
+  const inviteDeadline = createDeadline(-28, 'urgent');
+  
+  tasks.push({
+    id: "buy-fase0-invite-household",
+    title: "Huisgenoten & familie uitnodigen",
+    category: "Samenwerken",
+    description: "Nodig je huisgenoten of familieleden uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+    ...inviteDeadline,
+    phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+    status: "todo",
+    icon: <Users className="w-4 h-4" />,
+    priority: 0, // Highest priority to appear first
+  });
 
   // =====================================================
   // FASE 1 — Even landen (4-3 weken voor verhuizing)
