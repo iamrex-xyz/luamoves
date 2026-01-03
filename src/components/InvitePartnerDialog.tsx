@@ -246,7 +246,7 @@ export const InvitePartnerDialog = ({
               <div className="space-y-4">
                 <Input
                   type="tel"
-                  placeholder="06-12345678"
+                  placeholder="06 12345678 of +31 6 12345678"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="h-14 rounded-xl text-base text-center"
