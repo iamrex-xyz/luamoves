@@ -43,18 +43,6 @@ const TestimonialCarousel = () => {
             — {testimonial.name}, {testimonial.location}
           </p>
         </div>
-        <div className="flex justify-center gap-2 mt-4">
-          {testimonials.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentIndex(idx)}
-              className={cn(
-                "w-2 h-2 rounded-full transition-all",
-                idx === currentIndex ? "bg-primary w-4" : "bg-muted"
-              )}
-            />
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -357,7 +345,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
           </div>
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-8 -mb-5">
             <Button 
               onClick={handleNext}
               size="sm"
