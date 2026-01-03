@@ -449,16 +449,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <p className="text-muted-foreground mb-6">
                 Start wanneer jij wilt. Geen verplichtingen.
               </p>
-              <Button 
-                onClick={handleNext}
-                variant="ghost"
-                className="text-muted-foreground hover:text-foreground underline underline-offset-4"
-              >
-                Maak mijn verhuisplan
-                <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Button>
+              <div className="flex flex-col items-center gap-2">
+                <Button 
+                  onClick={handleNext}
+                  variant="ghost"
+                  className="text-muted-foreground hover:text-foreground underline underline-offset-4"
+                >
+                  Start mijn verhuizing
+                  <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Button>
+                <p className="text-sm text-muted-foreground">Gratis, geen account nodig.</p>
+              </div>
             </div>
           </section>
         </div>
