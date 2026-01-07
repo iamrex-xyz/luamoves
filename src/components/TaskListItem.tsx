@@ -125,7 +125,7 @@ export const TaskListItem = ({
           {/* ROW 1: Title zone (36px fixed) */}
           <div className="h-[36px] overflow-hidden min-w-0 self-start">
             <h4
-              className={`font-semibold text-[15px] leading-[18px] whitespace-normal break-words ${
+              className={`font-medium text-[14px] leading-[18px] whitespace-normal break-words ${
                 isCompleting
                   ? "line-through text-primary-foreground"
                   : task.status === "done"
