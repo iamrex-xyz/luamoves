@@ -90,12 +90,12 @@ export const TaskListItem = ({
           }
         }}
       >
-        <div className="flex gap-3">
-          {/* Checkbox - vertically centered */}
+        <div className="flex items-center gap-3">
+          {/* Checkbox */}
           <button 
             type="button"
             aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
-            className="shrink-0 self-center cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
+            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
             disabled={isCompleting}
           >
@@ -114,10 +114,9 @@ export const TaskListItem = ({
             )}
           </button>
           
-          {/* Content area - stacked layout for mobile */}
+          {/* Content - title and deadline stacked left */}
           <div className="flex-1 min-w-0">
-            {/* Title - full width */}
-            <h4 className={`font-semibold text-[15px] leading-snug transition-all duration-200 ${
+            <h4 className={`font-semibold text-[15px] leading-tight truncate ${
               isCompleting 
                 ? "line-through text-primary-foreground" 
                 : task.status === "done" 
@@ -126,65 +125,56 @@ export const TaskListItem = ({
             }`}>
               {task.title}
             </h4>
-            
-            {/* Bottom row: timing + actions */}
-            <div className="flex items-center justify-between mt-1.5">
-              {/* Left: timing + badges */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                  isCompleting 
-                    ? "text-primary-foreground/80" 
-                    : isTaskOverdue 
-                      ? "text-destructive/80"
-                      : isDueToday
-                        ? "text-warning/80"
-                        : "text-muted-foreground"
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className={`flex items-center gap-1 text-xs ${
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isTaskOverdue 
+                    ? "text-destructive/80"
+                    : isDueToday
+                      ? "text-warning/80"
+                      : "text-muted-foreground"
+              }`}>
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                {task.deadlineLabel}
+              </span>
+              {getUrgencyBadge()}
+              {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+                <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
+                  isNewAssignment 
+                    ? "text-white bg-primary animate-pulse" 
+                    : "text-primary/80 bg-primary/10"
                 }`}>
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                  {task.deadlineLabel}
+                  <UserCircle className="w-3 h-3 shrink-0" />
+                  <span className="truncate max-w-[80px]">{task.assignedToEmail}</span>
                 </span>
-                {getUrgencyBadge()}
-                {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                  <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
-                    isNewAssignment 
-                      ? "text-white bg-primary animate-pulse" 
-                      : "text-primary/80 bg-primary/10"
-                  }`}>
-                    <UserCircle className="w-3 h-3 shrink-0" />
-                    {task.assignedToEmail}
-                    {isNewAssignment && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                    )}
-                  </span>
-                )}
-              </div>
-              
-              {/* Right: action buttons */}
-              <div className="flex items-center gap-1 shrink-0 ml-2">
-                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md"
-                    onClick={(e) => onDocumentClick(e, task)}
-                  >
-                    <FileText className="w-3 h-3 mr-0.5" />
-                    Docs
-                  </Button>
-                )}
-                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
-                    onClick={(e) => onRegelenClick(e, task)}
-                  >
-                    {getTaskButtonLabel(task) || "Regelen"}
-                    <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
-                )}
-              </div>
+              )}
             </div>
+          </div>
+          
+          {/* Actions - always same space, right aligned */}
+          <div className="flex items-center gap-1 shrink-0">
+            {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md"
+                onClick={(e) => onDocumentClick(e, task)}
+              >
+                <FileText className="w-3.5 h-3.5" />
+              </Button>
+            )}
+            {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 px-2 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
+                onClick={(e) => onRegelenClick(e, task)}
+              >
+                Regelen
+                <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
