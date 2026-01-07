@@ -538,7 +538,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <span>Terug</span>
             </button>
             <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+              <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
               <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </div>
@@ -635,7 +635,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               <span>Terug</span>
             </button>
             <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+              <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
               <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </div>
@@ -717,34 +717,42 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   // Step 5: Generating
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-      <div className="p-4 sm:p-6 flex justify-between items-center">
-        <span className="text-sm font-medium text-muted-foreground">verhuisplanner</span>
+      {/* Header */}
+      <div className="p-4 flex justify-between items-center shrink-0">
+        <LuaLogo size="sm" />
+        <div className="flex gap-1">
+          {[1, 2, 3, 4].map((num) => (
+            <div key={num} className="w-8 h-1 rounded-full transition-all bg-primary" />
+          ))}
+        </div>
       </div>
-      <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-          <div className="space-y-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 pb-8">
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto flex flex-col justify-center min-h-[calc(100vh-180px)]">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
               Momentje,<br /><span className="text-primary">we regelen het!</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-md">Je persoonlijke checklist wordt voor je klaargezet.</p>
+            <p className="text-sm text-muted-foreground">Je persoonlijke checklist wordt voor je klaargezet.</p>
           </div>
-          <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
-            <div className="space-y-3">
+          <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-4 sm:p-6">
+            <div className="space-y-2">
               {generatingSteps.map((stepText, index) => (
                 <div key={index} className={cn(
-                  "flex items-center gap-4 p-4 rounded-2xl transition-all duration-300",
+                  "flex items-center gap-3 p-3 rounded-2xl transition-all duration-300",
                   index === currentGeneratingStep && "bg-primary-light",
                   completedSteps.includes(index) && "opacity-60"
                 )}>
                   <div className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300",
+                    "w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0",
                     completedSteps.includes(index) ? "bg-gradient-to-br from-primary to-primary/80" : index === currentGeneratingStep ? "bg-primary-light border-2 border-primary" : "bg-muted"
                   )}>
                     {completedSteps.includes(index) && <Check className="w-5 h-5 text-white" />}
                     {index === currentGeneratingStep && <div className="w-3 h-3 bg-primary rounded-full animate-pulse" />}
                   </div>
                   <span className={cn(
-                    "font-medium transition-all duration-300",
+                    "text-sm font-medium transition-all duration-300",
                     index === currentGeneratingStep && "text-foreground",
                     completedSteps.includes(index) && "text-muted-foreground",
                     index > currentGeneratingStep && "text-muted-foreground/50"
