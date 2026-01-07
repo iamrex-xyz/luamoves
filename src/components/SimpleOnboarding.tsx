@@ -482,7 +482,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   if (step === 2) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-4 sm:p-6 flex justify-between items-center">
+        {/* Header */}
+        <div className="p-4 flex justify-between items-center shrink-0">
           <LuaLogo size="sm" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
@@ -490,30 +491,32 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto flex flex-col justify-center min-h-[calc(100vh-180px)]">
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
                 Wanneer is de<br /><span className="text-primary">grote dag?</span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-md">Met je verhuisdatum maken we een persoonlijk stappenplan voor je.</p>
+              <p className="text-sm text-muted-foreground">Met je verhuisdatum maken we een persoonlijk stappenplan voor je.</p>
             </div>
-            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-4 sm:p-6">
               <Popover>
                 <PopoverTrigger asChild>
                   <button className={cn(
-                    "w-full flex items-center justify-between p-4 rounded-2xl border-2 border-dashed transition-all hover:border-primary hover:bg-primary-light/50",
+                    "w-full flex items-center justify-between p-3 sm:p-4 rounded-2xl border-2 border-dashed transition-all hover:border-primary hover:bg-primary-light/50",
                     movingDate ? "border-primary bg-primary-light/50" : "border-muted"
                   )}>
-                    <div className="flex items-center gap-4">
-                      <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-colors", movingDate ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
-                        <CalendarIcon className={cn("w-6 h-6", movingDate ? "text-white" : "text-muted-foreground")} />
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={cn("w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center transition-colors", movingDate ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                        <CalendarIcon className={cn("w-5 h-5 sm:w-6 sm:h-6", movingDate ? "text-white" : "text-muted-foreground")} />
                       </div>
                       <div className="text-left">
-                        <p className={cn("font-semibold", movingDate ? "text-foreground" : "text-muted-foreground")}>
+                        <p className={cn("font-semibold text-sm sm:text-base", movingDate ? "text-foreground" : "text-muted-foreground")}>
                           {movingDate ? format(movingDate, "d MMMM yyyy", { locale: nl }) : "Kies een datum"}
                         </p>
-                        <p className="text-sm text-muted-foreground">{movingDate ? "Je verhuisdatum" : "Klik om te selecteren"}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{movingDate ? "Je verhuisdatum" : "Klik om te selecteren"}</p>
                       </div>
                     </div>
                     {movingDate && <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"><Check className="w-4 h-4 text-white" /></div>}
@@ -524,18 +527,22 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
                 </PopoverContent>
               </Popover>
             </div>
-            <div className="flex items-center justify-between pt-4">
-              <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                <span>Terug</span>
-              </button>
-              <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
-                <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                </div>
-              </button>
-            </div>
+          </div>
+        </div>
+
+        {/* Fixed footer navigation */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-primary-light via-primary-light to-transparent pt-8">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <span>Terug</span>
+            </button>
+            <button onClick={handleNext} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
+              <span className="text-muted-foreground group-hover:text-foreground transition-colors">Volgende</span>
+              <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </div>
+            </button>
           </div>
         </div>
       </div>
@@ -643,7 +650,8 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   if (step === 4) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        <div className="p-4 sm:p-6 flex justify-between items-center">
+        {/* Header */}
+        <div className="p-4 flex justify-between items-center shrink-0">
           <LuaLogo size="sm" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
@@ -651,49 +659,55 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             ))}
           </div>
         </div>
-        <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 pb-8 sm:pb-12 max-w-2xl mx-auto w-full">
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-24">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto flex flex-col justify-center min-h-[calc(100vh-180px)]">
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
                 Waar ga je<br /><span className="text-primary">naartoe?</span>
               </h1>
-              <p className="text-lg text-muted-foreground max-w-md">Met je adres maken we taken op maat voor jouw gemeente.</p>
+              <p className="text-sm text-muted-foreground">Met je adres maken we taken op maat voor jouw gemeente.</p>
             </div>
-            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-4 sm:p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="postcode" className="text-sm font-medium text-muted-foreground">Postcode</Label>
-                  <Input id="postcode" placeholder="1234 AB" value={postcode} onChange={(e) => setPostcode(e.target.value.toUpperCase())} maxLength={7} className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary" />
+                  <Input id="postcode" placeholder="1234 AB" value={postcode} onChange={(e) => setPostcode(e.target.value.toUpperCase())} maxLength={7} className="h-12 text-base rounded-xl border-2 border-muted focus:border-primary" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="houseNumber" className="text-sm font-medium text-muted-foreground">Huisnummer</Label>
-                  <Input id="houseNumber" placeholder="12" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary" />
+                  <Input id="houseNumber" placeholder="12" value={houseNumber} onChange={(e) => setHouseNumber(e.target.value)} className="h-12 text-base rounded-xl border-2 border-muted focus:border-primary" />
                 </div>
               </div>
               {postcode && houseNumber && (
-                <div className="flex items-center gap-3 p-4 bg-primary-light rounded-2xl animate-in fade-in duration-300">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+                <div className="flex items-center gap-3 p-3 bg-primary-light rounded-2xl animate-in fade-in duration-300">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shrink-0">
                     {isLoadingAddress ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check className="w-5 h-5 text-white" />}
                   </div>
-                  <div>
-                    <p className="font-semibold text-foreground">{streetName ? `${streetName} ${houseNumber}` : `${postcode} ${houseNumber}`}</p>
-                    <p className="text-sm text-muted-foreground">{streetName && cityName ? `${postcode}, ${cityName}` : "Je nieuwe adres"}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground text-sm truncate">{streetName ? `${streetName} ${houseNumber}` : `${postcode} ${houseNumber}`}</p>
+                    <p className="text-xs text-muted-foreground truncate">{streetName && cityName ? `${postcode}, ${cityName}` : "Je nieuwe adres"}</p>
                   </div>
                 </div>
               )}
             </div>
-            <div className="flex items-center justify-between pt-4">
-              <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                <span>Terug</span>
-              </button>
-              <button onClick={handleStartGenerating} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors">Genereer checklist</span>
-                <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                </div>
-              </button>
-            </div>
+          </div>
+        </div>
+
+        {/* Fixed footer navigation */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-primary-light via-primary-light to-transparent pt-8">
+          <div className="flex items-center justify-between max-w-lg mx-auto">
+            <button onClick={() => setStep(step - 1)} className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <span>Terug</span>
+            </button>
+            <button onClick={handleStartGenerating} disabled={!isStepValid()} className={cn("flex items-center gap-3 group", !isStepValid() && "opacity-40 pointer-events-none")}>
+              <span className="text-muted-foreground group-hover:text-foreground transition-colors text-sm">Genereer checklist</span>
+              <div className="w-12 h-12 bg-foreground rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-5 h-5 text-background" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              </div>
+            </button>
           </div>
         </div>
       </div>
