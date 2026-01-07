@@ -169,27 +169,26 @@ export const TaskListItem = ({
             </div>
 
             {/* Right: action buttons (ONLY in date row) */}
-            <div className="flex items-center gap-1 shrink-0 ml-2">
+            <div className="flex items-center gap-2 shrink-0 ml-2">
               {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded"
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                   onClick={(e) => onDocumentClick(e, task)}
+                  aria-label="Documenten bekijken"
                 >
-                  <FileText className="w-3.5 h-3.5" />
-                </Button>
+                  <FileText className="w-4 h-4" />
+                </button>
               )}
               {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded"
+                <button
+                  type="button"
+                  className="flex items-center text-[12px] text-primary hover:text-primary/80 font-medium transition-colors"
                   onClick={(e) => onRegelenClick(e, task)}
                 >
                   {getTaskButtonLabel(task) || "Regelen"}
-                  <ChevronRight className="w-3 h-3 ml-0.5" />
-                </Button>
+                  <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                </button>
               )}
             </div>
           </div>
