@@ -116,7 +116,7 @@ export const TaskListItem = ({
           
           {/* Content - title and deadline stacked left */}
           <div className="flex-1 min-w-0">
-            <h4 className={`font-semibold text-[15px] leading-tight truncate ${
+            <h4 className={`font-semibold text-[15px] leading-snug line-clamp-2 ${
               isCompleting 
                 ? "line-through text-primary-foreground" 
                 : task.status === "done" 
