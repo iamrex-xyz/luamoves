@@ -81,7 +81,7 @@ export const TaskListItem = ({
         role="button"
         tabIndex={0}
         aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
-        className={`group relative px-3 py-2.5 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
+        className={`group relative px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -90,36 +90,36 @@ export const TaskListItem = ({
           }
         }}
       >
-        <div className="flex items-start gap-2">
-          {/* Checkbox - fixed width */}
+        <div className="flex gap-3">
+          {/* Checkbox - vertically centered */}
           <button 
             type="button"
             aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
-            className="shrink-0 mt-0.5 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
+            className="shrink-0 self-center cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
             disabled={isCompleting}
           >
             {isCompleting ? (
-              <CheckCircle2 className="h-5 w-5 text-primary-foreground animate-scale-in" aria-hidden="true" />
+              <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
             ) : task.status === "done" ? (
-              <CheckCircle2 className="h-5 w-5 text-primary" aria-hidden="true" />
+              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
-              <Circle className={`h-5 w-5 transition-colors ${
+              <Circle className={`h-6 w-6 transition-colors ${
                 isTaskOverdue 
-                  ? "text-destructive/60 group-hover:text-destructive" 
+                  ? "text-destructive/40 group-hover:text-destructive" 
                   : isDueToday 
-                    ? "text-warning/60 group-hover:text-warning"
-                    : "text-muted-foreground/50 group-hover:text-primary/50"
+                    ? "text-warning/40 group-hover:text-warning"
+                    : "text-muted-foreground/30 group-hover:text-primary/50"
               }`} aria-hidden="true" />
             )}
           </button>
           
-          {/* Content area - two column grid */}
-          <div className="flex-1 min-w-0 grid grid-cols-[1fr_auto] gap-x-2">
-            {/* Left column: title + timing (fixed position) */}
-            <div className="min-w-0">
-              <div className="flex items-start gap-2">
-                <h4 className={`font-medium text-sm leading-snug transition-all duration-200 ${
+          {/* Content area - flexible layout */}
+          <div className="flex-1 min-w-0">
+            {/* Top row: title + actions */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <h4 className={`font-semibold text-[15px] leading-snug transition-all duration-200 ${
                   isCompleting 
                     ? "line-through text-primary-foreground" 
                     : task.status === "done" 
@@ -128,60 +128,62 @@ export const TaskListItem = ({
                 }`}>
                   {task.title}
                 </h4>
-                {getUrgencyBadge()}
               </div>
-              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                  isCompleting 
-                    ? "text-primary-foreground/80" 
-                    : isTaskOverdue 
-                      ? "text-destructive/80"
-                      : isDueToday
-                        ? "text-warning/80"
-                        : "text-muted-foreground"
-                }`}>
-                  <Clock className="w-3 h-3 shrink-0" />
-                  {task.deadlineLabel}
-                </span>
-                {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                  <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
-                    isNewAssignment 
-                      ? "text-white bg-primary animate-pulse" 
-                      : "text-primary/80 bg-primary/10"
-                  }`}>
-                    <UserCircle className="w-3 h-3 shrink-0" />
-                    {task.assignedToEmail}
-                    {isNewAssignment && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                    )}
-                  </span>
+              
+              {/* Action buttons - aligned to top right */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-lg"
+                    onClick={(e) => onDocumentClick(e, task)}
+                  >
+                    <FileText className="w-3.5 h-3.5 mr-1" />
+                    Docs
+                  </Button>
+                )}
+                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-lg"
+                    onClick={(e) => onRegelenClick(e, task)}
+                  >
+                    {getTaskButtonLabel(task) || "Regelen"}
+                    <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                  </Button>
                 )}
               </div>
             </div>
             
-            {/* Right column: actions (optional, does not affect left column) */}
-            <div className="flex items-center gap-1 self-center">
-              {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium"
-                  onClick={(e) => onDocumentClick(e, task)}
-                >
-                  <FileText className="w-3 h-3 mr-0.5" />
-                  Docs
-                </Button>
-              )}
-              {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
-                  onClick={(e) => onRegelenClick(e, task)}
-                >
-                  {getTaskButtonLabel(task) || "Regelen"}
-                  <ChevronRight className="w-3 h-3 ml-0.5" />
-                </Button>
+            {/* Bottom row: timing + badges */}
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isTaskOverdue 
+                    ? "text-destructive/80"
+                    : isDueToday
+                      ? "text-warning/80"
+                      : "text-muted-foreground"
+              }`}>
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                {task.deadlineLabel}
+              </span>
+              {getUrgencyBadge()}
+              {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+                <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
+                  isNewAssignment 
+                    ? "text-white bg-primary animate-pulse" 
+                    : "text-primary/80 bg-primary/10"
+                }`}>
+                  <UserCircle className="w-3 h-3 shrink-0" />
+                  {task.assignedToEmail}
+                  {isNewAssignment && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  )}
+                </span>
               )}
             </div>
           </div>
