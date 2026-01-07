@@ -127,64 +127,88 @@ export const TaskListItem = ({
               {task.title}
             </h4>
             
-            {/* Bottom row: timing + actions */}
-            <div className="flex items-center justify-between mt-1.5">
-              {/* Left: timing + badges */}
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                  isCompleting 
-                    ? "text-primary-foreground/80" 
-                    : isTaskOverdue 
-                      ? "text-destructive/80"
-                      : isDueToday
-                        ? "text-warning/80"
-                        : "text-muted-foreground"
+            {/* Timing row */}
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
+                isCompleting 
+                  ? "text-primary-foreground/80" 
+                  : isTaskOverdue 
+                    ? "text-destructive/80"
+                    : isDueToday
+                      ? "text-warning/80"
+                      : "text-muted-foreground"
+              }`}>
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                {task.deadlineLabel}
+              </span>
+              {getUrgencyBadge()}
+              {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+                <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
+                  isNewAssignment 
+                    ? "text-white bg-primary animate-pulse" 
+                    : "text-primary/80 bg-primary/10"
                 }`}>
-                  <Clock className="w-3.5 h-3.5 shrink-0" />
-                  {task.deadlineLabel}
+                  <UserCircle className="w-3 h-3 shrink-0" />
+                  {task.assignedToEmail}
+                  {isNewAssignment && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  )}
                 </span>
-                {getUrgencyBadge()}
-                {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                  <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
-                    isNewAssignment 
-                      ? "text-white bg-primary animate-pulse" 
-                      : "text-primary/80 bg-primary/10"
-                  }`}>
-                    <UserCircle className="w-3 h-3 shrink-0" />
-                    {task.assignedToEmail}
-                    {isNewAssignment && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                    )}
-                  </span>
-                )}
-              </div>
+              )}
               
-              {/* Right: action buttons */}
-              <div className="flex items-center gap-1 shrink-0 ml-2">
-                {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md"
-                    onClick={(e) => onDocumentClick(e, task)}
-                  >
-                    <FileText className="w-3 h-3 mr-0.5" />
-                    Docs
-                  </Button>
-                )}
-                {task.status !== "done" && !isCompleting && hasAffiliateOptions(task) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-6 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
-                    onClick={(e) => onRegelenClick(e, task)}
-                  >
-                    {getTaskButtonLabel(task) || "Regelen"}
-                    <ChevronRight className="w-3 h-3 ml-0.5" />
-                  </Button>
-                )}
-              </div>
+              {/* Action buttons - inline when only 1, separate row when 2+ */}
+              {task.status !== "done" && !isCompleting && (task.hasDocumentLink || hasAffiliateOptions(task)) && (
+                <>
+                  {/* Single button: show inline */}
+                  {(task.hasDocumentLink && !hasAffiliateOptions(task)) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md ml-auto"
+                      onClick={(e) => onDocumentClick(e, task)}
+                    >
+                      <FileText className="w-3 h-3 mr-0.5" />
+                      Docs
+                    </Button>
+                  )}
+                  {(!task.hasDocumentLink && hasAffiliateOptions(task)) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md ml-auto"
+                      onClick={(e) => onRegelenClick(e, task)}
+                    >
+                      {getTaskButtonLabel(task) || "Regelen"}
+                      <ChevronRight className="w-3 h-3 ml-0.5" />
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
+            
+            {/* Separate action row when both buttons are present */}
+            {task.status !== "done" && !isCompleting && task.hasDocumentLink && hasAffiliateOptions(task) && (
+              <div className="flex items-center gap-2 mt-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-3 text-xs text-muted-foreground hover:text-foreground font-medium rounded-lg flex-1"
+                  onClick={(e) => onDocumentClick(e, task)}
+                >
+                  <FileText className="w-3.5 h-3.5 mr-1.5" />
+                  Documenten
+                </Button>
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="h-7 px-3 text-xs font-medium rounded-lg flex-1"
+                  onClick={(e) => onRegelenClick(e, task)}
+                >
+                  {getTaskButtonLabel(task) || "Regelen"}
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
