@@ -114,19 +114,23 @@ export const TaskListItem = ({
             )}
           </button>
           
-          {/* Content - title and deadline stacked left */}
-          <div className="flex-1 min-w-0">
-            <h4 className={`font-semibold text-[15px] leading-snug line-clamp-2 ${
-              isCompleting 
-                ? "line-through text-primary-foreground" 
-                : task.status === "done" 
-                  ? "line-through text-muted-foreground" 
-                  : "text-foreground"
-            }`}>
-              {task.title}
-            </h4>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className={`flex items-center gap-1 text-xs ${
+          {/* Content - fixed height zones */}
+          <div className="flex-1 min-w-0 h-[52px] flex flex-col justify-between">
+            {/* Title zone - fixed height for 2 lines */}
+            <div className="h-[36px] overflow-hidden">
+              <h4 className={`font-semibold text-[15px] leading-[18px] line-clamp-2 ${
+                isCompleting 
+                  ? "line-through text-primary-foreground" 
+                  : task.status === "done" 
+                    ? "line-through text-muted-foreground" 
+                    : "text-foreground"
+              }`}>
+                {task.title}
+              </h4>
+            </div>
+            {/* Date zone - fixed height */}
+            <div className="h-[16px] flex items-center gap-2">
+              <span className={`flex items-center gap-1 text-xs leading-none ${
                 isCompleting 
                   ? "text-primary-foreground/80" 
                   : isTaskOverdue 
