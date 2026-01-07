@@ -90,11 +90,9 @@ export const TaskListItem = ({
           }
         }}
       >
-        <div
-          className="grid grid-cols-[28px,1fr] gap-x-3"
-          style={{ gridTemplateRows: "36px 4px 20px" }}
-        >
-          {/* Checkbox (spans all rows, centered) */}
+        {/* Fixed 2-row grid: title row + date row. Checkbox spans both. */}
+        <div className="grid grid-cols-[28px_1fr] grid-rows-[36px_20px] gap-x-3 gap-y-1">
+          {/* Checkbox column (spans both rows) */}
           <button
             type="button"
             aria-label={
@@ -102,7 +100,7 @@ export const TaskListItem = ({
                 ? `Markeer "${task.title}" als niet voltooid`
                 : `Markeer "${task.title}" als voltooid`
             }
-            className="row-span-3 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center"
+            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
             disabled={isCompleting}
           >
@@ -124,8 +122,8 @@ export const TaskListItem = ({
             )}
           </button>
 
-          {/* Title zone (row 1: fixed 36px for max 2 lines) */}
-          <div className="h-[36px] overflow-hidden min-w-0 pr-1">
+          {/* ROW 1: Title zone (36px fixed) */}
+          <div className="h-[36px] overflow-hidden min-w-0 self-start">
             <h4
               className={`font-semibold text-[15px] leading-[18px] whitespace-normal break-words ${
                 isCompleting
@@ -139,13 +137,10 @@ export const TaskListItem = ({
             </h4>
           </div>
 
-          {/* Spacer row (row 2: fixed 4px gap) */}
-          <div className="h-[4px]" aria-hidden="true" />
-
-          {/* Date + Actions row (row 3: fixed 20px, same baseline) */}
-          <div className="h-[20px] min-w-0 flex items-center justify-between pr-1">
+          {/* ROW 2: Date + Actions (20px fixed, all actions here) */}
+          <div className="h-[20px] min-w-0 flex items-center justify-between">
             {/* Left: date + badges */}
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-center gap-2 min-w-0 overflow-hidden">
               <span
                 className={`flex items-center gap-1 text-xs leading-none shrink-0 ${
                   isCompleting
@@ -173,13 +168,13 @@ export const TaskListItem = ({
               )}
             </div>
 
-            {/* Right: action buttons (same row as date) */}
+            {/* Right: action buttons (ONLY in date row) */}
             <div className="flex items-center gap-1 shrink-0 ml-2">
               {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md"
+                  className="h-5 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded"
                   onClick={(e) => onDocumentClick(e, task)}
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -189,11 +184,11 @@ export const TaskListItem = ({
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="h-6 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
+                  className="h-5 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded"
                   onClick={(e) => onRegelenClick(e, task)}
                 >
                   {getTaskButtonLabel(task) || "Regelen"}
-                  <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                  <ChevronRight className="w-3 h-3 ml-0.5" />
                 </Button>
               )}
             </div>
