@@ -428,6 +428,15 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         }}
       />
 
+      {/* Floating Start Button */}
+      <Button
+        onClick={() => onNavigate("tasks")}
+        className="fixed bottom-24 right-4 z-50 h-14 px-6 rounded-full shadow-xl shadow-primary/30"
+      >
+        Start
+        <ArrowRight className="w-5 h-5 ml-2" />
+      </Button>
+
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
     </main>
   );
