@@ -611,8 +611,24 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground uppercase tracking-wide">Voorzieningen (optioneel)</Label>
               <div className="grid grid-cols-2 gap-3">
-                <ToggleOption active={hasGarden} onClick={() => setHasGarden(!hasGarden)} icon={Trees} label="Tuin" />
-                <ToggleOption active={hasParking} onClick={() => setHasParking(!hasParking)} icon={Car} label="Parkeren" />
+                <button onClick={() => setHasGarden(!hasGarden)} className={cn(
+                  "flex items-center gap-3 p-3 rounded-2xl border transition-all",
+                  hasGarden ? "border-primary bg-primary-light" : "border-border bg-card hover:border-primary/50"
+                )}>
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0", hasGarden ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Trees className={cn("w-5 h-5", hasGarden ? "text-white" : "text-muted-foreground")} />
+                  </div>
+                  <span className={cn("text-sm font-medium", hasGarden ? "text-foreground" : "text-muted-foreground")}>Tuin</span>
+                </button>
+                <button onClick={() => setHasParking(!hasParking)} className={cn(
+                  "flex items-center gap-3 p-3 rounded-2xl border transition-all",
+                  hasParking ? "border-primary bg-primary-light" : "border-border bg-card hover:border-primary/50"
+                )}>
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0", hasParking ? "bg-gradient-to-br from-primary to-primary/80" : "bg-muted")}>
+                    <Car className={cn("w-5 h-5", hasParking ? "text-white" : "text-muted-foreground")} />
+                  </div>
+                  <span className={cn("text-sm font-medium", hasParking ? "text-foreground" : "text-muted-foreground")}>Parkeren</span>
+                </button>
               </div>
             </div>
 
