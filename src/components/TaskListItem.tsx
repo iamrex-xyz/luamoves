@@ -90,74 +90,93 @@ export const TaskListItem = ({
           }
         }}
       >
-        <div className="flex items-center gap-3">
-          {/* Checkbox */}
-          <button 
+        <div
+          className="grid grid-cols-[28px,1fr,92px] grid-rows-[36px,16px] gap-x-3"
+          style={{ gridTemplateAreas: `"check title actions" "check meta actions"` }}
+        >
+          {/* Checkbox (spans both rows) */}
+          <button
             type="button"
-            aria-label={task.status === "done" ? `Markeer "${task.title}" als niet voltooid` : `Markeer "${task.title}" als voltooid`}
-            className="shrink-0 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full"
+            aria-label={
+              task.status === "done"
+                ? `Markeer "${task.title}" als niet voltooid`
+                : `Markeer "${task.title}" als voltooid`
+            }
+            className="cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full place-self-center"
             onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
             disabled={isCompleting}
+            style={{ gridArea: "check" }}
           >
             {isCompleting ? (
               <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
-              <Circle className={`h-6 w-6 transition-colors ${
-                isTaskOverdue 
-                  ? "text-destructive/40 group-hover:text-destructive" 
-                  : isDueToday 
-                    ? "text-warning/40 group-hover:text-warning"
-                    : "text-muted-foreground/30 group-hover:text-primary/50"
-              }`} aria-hidden="true" />
+              <Circle
+                className={`h-6 w-6 transition-colors ${
+                  isTaskOverdue
+                    ? "text-destructive/40 group-hover:text-destructive"
+                    : isDueToday
+                      ? "text-warning/40 group-hover:text-warning"
+                      : "text-muted-foreground/30 group-hover:text-primary/50"
+                }`}
+                aria-hidden="true"
+              />
             )}
           </button>
-          
-          {/* Content - fixed height zones */}
-          <div className="flex-1 min-w-0 h-[52px] flex flex-col justify-between">
-            {/* Title zone - fixed height for 2 lines */}
-            <div className="h-[36px] overflow-hidden">
-              <h4 className={`font-semibold text-[15px] leading-[18px] line-clamp-2 ${
-                isCompleting 
-                  ? "line-through text-primary-foreground" 
-                  : task.status === "done" 
-                    ? "line-through text-muted-foreground" 
+
+          {/* Title zone (fixed height: 2 lines max) */}
+          <div className="h-[36px] overflow-hidden min-w-0" style={{ gridArea: "title" }}>
+            <h4
+              className={`font-semibold text-[15px] leading-[18px] whitespace-normal break-words ${
+                isCompleting
+                  ? "line-through text-primary-foreground"
+                  : task.status === "done"
+                    ? "line-through text-muted-foreground"
                     : "text-foreground"
-              }`}>
-                {task.title}
-              </h4>
-            </div>
-            {/* Date zone - fixed height */}
-            <div className="h-[16px] flex items-center gap-2">
-              <span className={`flex items-center gap-1 text-xs leading-none ${
-                isCompleting 
-                  ? "text-primary-foreground/80" 
-                  : isTaskOverdue 
+              }`}
+            >
+              {task.title}
+            </h4>
+          </div>
+
+          {/* Date/meta zone (fixed height) */}
+          <div
+            className="h-[16px] overflow-hidden min-w-0 flex items-center gap-2"
+            style={{ gridArea: "meta" }}
+          >
+            <span
+              className={`flex items-center gap-1 text-xs leading-none ${
+                isCompleting
+                  ? "text-primary-foreground/80"
+                  : isTaskOverdue
                     ? "text-destructive/80"
                     : isDueToday
                       ? "text-warning/80"
                       : "text-muted-foreground"
-              }`}>
-                <Clock className="w-3.5 h-3.5 shrink-0" />
-                {task.deadlineLabel}
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              {task.deadlineLabel}
+            </span>
+            {getUrgencyBadge()}
+            {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+              <span
+                className={`flex items-center gap-1 text-xs px-1.5 h-4 rounded-full ${
+                  isNewAssignment ? "text-white bg-primary animate-pulse" : "text-primary/80 bg-primary/10"
+                }`}
+              >
+                <UserCircle className="w-3 h-3 shrink-0" />
+                <span className="truncate max-w-[80px]">{task.assignedToEmail}</span>
               </span>
-              {getUrgencyBadge()}
-              {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
-                  isNewAssignment 
-                    ? "text-white bg-primary animate-pulse" 
-                    : "text-primary/80 bg-primary/10"
-                }`}>
-                  <UserCircle className="w-3 h-3 shrink-0" />
-                  <span className="truncate max-w-[80px]">{task.assignedToEmail}</span>
-                </span>
-              )}
-            </div>
+            )}
           </div>
-          
-          {/* Actions - always same space, right aligned */}
-          <div className="flex items-center gap-1 shrink-0">
+
+          {/* Actions (reserved width; spans both rows) */}
+          <div
+            className="flex items-center justify-end gap-1 place-self-center"
+            style={{ gridArea: "actions" }}
+          >
             {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
               <Button
                 size="sm"
@@ -175,7 +194,7 @@ export const TaskListItem = ({
                 className="h-7 px-2 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
                 onClick={(e) => onRegelenClick(e, task)}
               >
-                Regelen
+                {getTaskButtonLabel(task) || "Regelen"}
                 <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
               </Button>
             )}
