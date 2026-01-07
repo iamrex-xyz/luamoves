@@ -221,7 +221,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     switch (step) {
       case 1: return true;
       case 2: return !!movingDate;
-      case 3: return !!housingType; // Property type is now optional
+      case 3: return !!housingType && !!propertyType;
       case 4: return postcode.length >= 4 && houseNumber.length > 0;
       default: return false;
     }
@@ -598,12 +598,12 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
 
-            {/* Woningtype (optioneel) */}
+            {/* Woningtype */}
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Wat voor woning? (optioneel)</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wide">Wat voor woning?</Label>
               <div className="grid grid-cols-2 gap-3">
-                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType(propertyType === 'apartment' ? null : 'apartment')} icon={Building2} label="Appartement" description="Met VvE of huurflat" />
-                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType(propertyType === 'house' ? null : 'house')} icon={Home} label="Huis" description="Vrijstaand of rijtje" />
+                <ToggleOption active={propertyType === 'apartment'} onClick={() => setPropertyType('apartment')} icon={Building2} label="Appartement" description="Met VvE of huurflat" />
+                <ToggleOption active={propertyType === 'house'} onClick={() => setPropertyType('house')} icon={Home} label="Huis" description="Vrijstaand of rijtje" />
               </div>
             </div>
 
