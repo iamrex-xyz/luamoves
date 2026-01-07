@@ -114,32 +114,61 @@ export const TaskListItem = ({
             )}
           </button>
           
-          {/* Content area - flexible layout */}
+          {/* Content area - stacked layout for mobile */}
           <div className="flex-1 min-w-0">
-            {/* Top row: title + actions */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex-1 min-w-0">
-                <h4 className={`font-semibold text-[15px] leading-snug transition-all duration-200 ${
+            {/* Title - full width */}
+            <h4 className={`font-semibold text-[15px] leading-snug transition-all duration-200 ${
+              isCompleting 
+                ? "line-through text-primary-foreground" 
+                : task.status === "done" 
+                  ? "line-through text-muted-foreground" 
+                  : "text-foreground"
+            }`}>
+              {task.title}
+            </h4>
+            
+            {/* Bottom row: timing + actions */}
+            <div className="flex items-center justify-between mt-1.5">
+              {/* Left: timing + badges */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
                   isCompleting 
-                    ? "line-through text-primary-foreground" 
-                    : task.status === "done" 
-                      ? "line-through text-muted-foreground" 
-                      : "text-foreground"
+                    ? "text-primary-foreground/80" 
+                    : isTaskOverdue 
+                      ? "text-destructive/80"
+                      : isDueToday
+                        ? "text-warning/80"
+                        : "text-muted-foreground"
                 }`}>
-                  {task.title}
-                </h4>
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  {task.deadlineLabel}
+                </span>
+                {getUrgencyBadge()}
+                {task.assignedToEmail && task.status !== "done" && !isCompleting && (
+                  <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
+                    isNewAssignment 
+                      ? "text-white bg-primary animate-pulse" 
+                      : "text-primary/80 bg-primary/10"
+                  }`}>
+                    <UserCircle className="w-3 h-3 shrink-0" />
+                    {task.assignedToEmail}
+                    {isNewAssignment && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
+                  </span>
+                )}
               </div>
               
-              {/* Action buttons - aligned to top right */}
-              <div className="flex items-center gap-1.5 shrink-0">
+              {/* Right: action buttons */}
+              <div className="flex items-center gap-1 shrink-0 ml-2">
                 {task.status !== "done" && !isCompleting && task.hasDocumentLink && (
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-lg"
+                    className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-foreground hover:bg-secondary font-medium rounded-md"
                     onClick={(e) => onDocumentClick(e, task)}
                   >
-                    <FileText className="w-3.5 h-3.5 mr-1" />
+                    <FileText className="w-3 h-3 mr-0.5" />
                     Docs
                   </Button>
                 )}
@@ -147,44 +176,14 @@ export const TaskListItem = ({
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="h-7 px-2 text-xs text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-lg"
+                    className="h-6 px-1.5 text-[11px] text-primary hover:text-primary/80 hover:bg-primary/5 font-medium rounded-md"
                     onClick={(e) => onRegelenClick(e, task)}
                   >
                     {getTaskButtonLabel(task) || "Regelen"}
-                    <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
+                    <ChevronRight className="w-3 h-3 ml-0.5" />
                   </Button>
                 )}
               </div>
-            </div>
-            
-            {/* Bottom row: timing + badges */}
-            <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className={`flex items-center gap-1 text-xs transition-colors duration-200 ${
-                isCompleting 
-                  ? "text-primary-foreground/80" 
-                  : isTaskOverdue 
-                    ? "text-destructive/80"
-                    : isDueToday
-                      ? "text-warning/80"
-                      : "text-muted-foreground"
-              }`}>
-                <Clock className="w-3.5 h-3.5 shrink-0" />
-                {task.deadlineLabel}
-              </span>
-              {getUrgencyBadge()}
-              {task.assignedToEmail && task.status !== "done" && !isCompleting && (
-                <span className={`flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full ${
-                  isNewAssignment 
-                    ? "text-white bg-primary animate-pulse" 
-                    : "text-primary/80 bg-primary/10"
-                }`}>
-                  <UserCircle className="w-3 h-3 shrink-0" />
-                  {task.assignedToEmail}
-                  {isNewAssignment && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                  )}
-                </span>
-              )}
             </div>
           </div>
         </div>
