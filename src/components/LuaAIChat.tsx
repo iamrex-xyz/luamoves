@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,19 @@ import { MovingInfo } from "@/pages/Index";
 import { trackEvent } from "@/lib/analytics";
 import { toast } from "sonner";
 import { useChatHistory } from "@/hooks/useChatHistory";
+import { useTasks } from "@/hooks/useTasks";
+import { differenceInDays } from "date-fns";
 
 type LuaAIChatProps = {
   movingInfo: MovingInfo;
+};
+
+type TaskSummary = {
+  total: number;
+  completed: number;
+  percentage: number;
+  urgentTasks: Array<{ title: string; deadline: string; category: string }>;
+  openByCategory: Record<string, number>;
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/lua-chat`;
@@ -20,6 +30,46 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Fetch tasks for context
+  const { tasks } = useTasks(movingInfo);
+  
+  // Build task summary for AI context
+  const taskSummary: TaskSummary = useMemo(() => {
+    const now = new Date();
+    const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    const completed = tasks.filter(t => t.status === "done").length;
+    const total = tasks.length;
+    
+    // Find urgent tasks (deadline within 7 days, not done)
+    const urgentTasks = tasks
+      .filter(t => {
+        if (t.status === "done") return false;
+        const deadline = new Date(t.deadline);
+        return deadline <= sevenDaysFromNow && deadline >= now;
+      })
+      .map(t => ({
+        title: t.title,
+        deadline: t.deadlineLabel,
+        category: t.category
+      }))
+      .slice(0, 5); // Limit to 5 urgent tasks
+    
+    // Count open tasks by category
+    const openByCategory: Record<string, number> = {};
+    tasks.filter(t => t.status !== "done").forEach(t => {
+      openByCategory[t.category] = (openByCategory[t.category] || 0) + 1;
+    });
+    
+    return {
+      total,
+      completed,
+      percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+      urgentTasks,
+      openByCategory
+    };
+  }, [tasks]);
 
   useEffect(() => {
     scrollToBottom();
@@ -59,6 +109,7 @@ export const LuaAIChat = ({ movingInfo }: LuaAIChatProps) => {
             content: m.content,
           })),
           movingInfo,
+          taskSummary,
         }),
       });
 
