@@ -183,6 +183,17 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Package className="w-4 h-4" />,
       priority: 2,
+    },
+    {
+      id: "rent-fase1-planning-deadlines",
+      title: "Verhuisplanning & deadlines controleren",
+      category: "Planning",
+      description: "Maak een overzicht van alle belangrijke data en deadlines voor je verhuizing.",
+      ...fase1LaterDeadline,
+      phase: "Even landen",
+      status: "todo",
+      icon: <ClipboardCheck className="w-4 h-4" />,
+      priority: 2,
     }
   );
 
@@ -240,6 +251,30 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       icon: <Package className="w-4 h-4" />,
       priority: 2,
       affiliateLink: "https://www.verhuisdozen.nl/",
+    },
+    {
+      id: "rent-fase2-energie-beeindigen",
+      title: "Huidig energiecontract beëindigen of verhuizen",
+      category: "Nutsvoorzieningen",
+      description: "Zeg je huidige energiecontract op of neem het mee naar je nieuwe adres.",
+      ...fase2NormalDeadline,
+      phase: "Slim vooruit regelen",
+      status: "todo",
+      icon: <Zap className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.independer.nl/energie/intro.aspx",
+    },
+    {
+      id: "rent-fase2-internet-beeindigen",
+      title: "Huidig internetabonnement beëindigen of verhuizen",
+      category: "Nutsvoorzieningen",
+      description: "Zeg je huidige internetabonnement op of neem het mee naar je nieuwe adres.",
+      ...fase2NormalDeadline,
+      phase: "Slim vooruit regelen",
+      status: "todo",
+      icon: <Wifi className="w-4 h-4" />,
+      priority: 2,
+      affiliateLink: "https://www.independer.nl/internet/intro.aspx",
     }
   );
 
@@ -365,6 +400,39 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Trash2 className="w-4 h-4" />,
       priority: 3,
+    },
+    {
+      id: "rent-fase4-bank-adreswijziging",
+      title: "Adreswijziging doorgeven aan bank(en)",
+      category: "Administratie",
+      description: "Meld je nieuwe adres bij je bank(en) via de app of website.",
+      ...fase4NormalDeadline,
+      phase: "De praktische puzzel",
+      status: "todo",
+      icon: <Euro className="w-4 h-4" />,
+      priority: 2,
+    },
+    {
+      id: "rent-fase4-verzekeraars-adreswijziging",
+      title: "Adreswijziging doorgeven aan verzekeraars",
+      category: "Administratie",
+      description: "Update je adres bij al je verzekeraars om de dekking te behouden.",
+      ...fase4NormalDeadline,
+      phase: "De praktische puzzel",
+      status: "todo",
+      icon: <Shield className="w-4 h-4" />,
+      priority: 2,
+    },
+    {
+      id: "rent-fase4-abonnementen-adreswijziging",
+      title: "Adreswijziging doorgeven aan abonnementen & webshops",
+      category: "Administratie",
+      description: "Pas je adres aan bij webshops, streamingdiensten en andere abonnementen.",
+      ...fase4LaterDeadline,
+      phase: "De praktische puzzel",
+      status: "todo",
+      icon: <FileText className="w-4 h-4" />,
+      priority: 3,
     }
   );
 
@@ -461,7 +529,29 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
       priority: 1,
-      // Geen affiliate - bevestiging van eerdere boeking
+    },
+    {
+      id: "rent-fase5-internet-modem",
+      title: "Internetinstallatie & modem vooraf controleren",
+      category: "Nutsvoorzieningen",
+      description: "Check of je modem en installatie-afspraak klaar zijn voor je nieuwe woning.",
+      ...fase5Deadline,
+      phase: "Bijna daar",
+      status: "todo",
+      icon: <Wifi className="w-4 h-4" />,
+      priority: 2,
+    },
+    {
+      id: "rent-fase5-eindinspectie-oude-woning",
+      title: "Eindinspectie oude woning voorbereiden",
+      category: "Administratie",
+      description: "Bereid de eindinspectie voor: maak schoon, repareer kleine gebreken en maak foto's.",
+      ...fase5Deadline,
+      phase: "Bijna daar",
+      status: "todo",
+      icon: <ClipboardCheck className="w-4 h-4" />,
+      priority: 2,
+      hasDocumentLink: true,
     }
   );
 
@@ -519,6 +609,17 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Truck className="w-4 h-4" />,
       priority: 2,
+    },
+    {
+      id: "rent-fase6-noodpakket",
+      title: "Verhuisdag-noodpakket klaarleggen",
+      category: "Verhuizing",
+      description: "Leg een tas klaar met eten, drinken, toiletpapier, schoonmaakmiddelen en basisgereedschap.",
+      ...moveDayDeadline,
+      phase: "Verhuisdag",
+      status: "todo",
+      icon: <Package className="w-4 h-4" />,
+      priority: 1,
     }
   );
 
@@ -606,6 +707,17 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
       status: "todo",
       icon: <Euro className="w-4 h-4" />,
       priority: 3,
+    },
+    {
+      id: "rent-fase7-borg-eindafrekening",
+      title: "Borgterugbetaling & eindafrekening opvolgen",
+      category: "Financieel",
+      description: "Check of je de borg terugkrijgt en de eindafrekening klopt.",
+      ...postMove2Weeks,
+      phase: "Welkom thuis",
+      status: "todo",
+      icon: <Euro className="w-4 h-4" />,
+      priority: 2,
     }
   );
 
