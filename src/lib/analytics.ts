@@ -1,7 +1,19 @@
-// Simple analytics tracking (non-identifiable)
-// In production, this would send to an analytics service
+// Google Analytics 4 tracking integration
+// Measurement ID: G-V7TKL2CJNP
+
+declare global {
+  interface Window {
+    gtag: (...args: unknown[]) => void;
+    dataLayer: unknown[];
+  }
+}
 
 export const trackEvent = (eventName: string, properties?: Record<string, unknown>) => {
+  // Send to Google Analytics 4
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, properties);
+  }
+  
   // Log to console in development
   if (import.meta.env.DEV) {
     console.log(`[Analytics] ${eventName}`, properties || {});
@@ -19,6 +31,15 @@ export const trackEvent = (eventName: string, properties?: Record<string, unknow
     localStorage.setItem("lua_analytics", JSON.stringify(events.slice(-50)));
   } catch {
     // Ignore storage errors
+  }
+};
+
+// Track page views (call on route changes)
+export const trackPageView = (path: string) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', 'G-V7TKL2CJNP', {
+      page_path: path,
+    });
   }
 };
 
