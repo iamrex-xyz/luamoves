@@ -14,6 +14,7 @@ const ADMIN_DOMAINS = [
 
 export const useAdminCheck = () => {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
@@ -22,7 +23,16 @@ export const useAdminCheck = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user?.email) {
+        if (!user) {
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+          setIsLoading(false);
+          return;
+        }
+
+        setIsAuthenticated(true);
+
+        if (!user.email) {
           setIsAdmin(false);
           setIsLoading(false);
           return;
@@ -51,6 +61,7 @@ export const useAdminCheck = () => {
         setIsAdmin(isAdminEmail || isAdminDomain || hasAdminRole);
       } catch (error) {
         console.error('Error checking admin status:', error);
+        setIsAuthenticated(false);
         setIsAdmin(false);
       } finally {
         setIsLoading(false);
@@ -66,5 +77,5 @@ export const useAdminCheck = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return { isAdmin, isLoading, userEmail };
+  return { isAdmin, isAuthenticated, isLoading, userEmail };
 };
