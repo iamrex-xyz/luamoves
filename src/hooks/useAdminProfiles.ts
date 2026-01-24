@@ -62,42 +62,48 @@ export const useAdminProfiles = (isAdmin: boolean) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchProfiles = async () => {
+    if (!isAdmin) {
+      setProfiles([]);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Fetch from the admin view - this only returns data if user is admin
+      const { data, error: fetchError } = await supabase
+        .from('admin_profiles_view')
+        .select('*')
+        .order('updated_at', { ascending: false });
+
+      if (fetchError) {
+        console.error('Error fetching admin profiles:', fetchError);
+        setError('Kon profielen niet laden');
+        setProfiles([]);
+      } else {
+        setProfiles(data || []);
+      }
+    } catch (err) {
+      console.error('Error in useAdminProfiles:', err);
+      setError('Er ging iets mis');
+      setProfiles([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProfiles = async () => {
-      if (!isAdmin) {
-        setProfiles([]);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Fetch from the admin view - this only returns data if user is admin
-        const { data, error: fetchError } = await supabase
-          .from('admin_profiles_view')
-          .select('*')
-          .order('updated_at', { ascending: false });
-
-        if (fetchError) {
-          console.error('Error fetching admin profiles:', fetchError);
-          setError('Kon profielen niet laden');
-          setProfiles([]);
-        } else {
-          setProfiles(data || []);
-        }
-      } catch (err) {
-        console.error('Error in useAdminProfiles:', err);
-        setError('Er ging iets mis');
-        setProfiles([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchProfiles();
   }, [isAdmin]);
 
-  return { profiles, isLoading, error, refetch: () => {} };
+  const updateProfile = (updatedProfile: AdminProfile) => {
+    setProfiles(prev => 
+      prev.map(p => p.id === updatedProfile.id ? updatedProfile : p)
+    );
+  };
+
+  return { profiles, isLoading, error, refetch: fetchProfiles, updateProfile };
 };
