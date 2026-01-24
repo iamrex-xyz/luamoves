@@ -51,8 +51,21 @@ export type AdminProfile = {
   number_of_bedrooms: string | null;
   garden_service_type: string | null;
   renovation_budget: string | null;
-  renovation_start_date: string | null;
   moving_budget: number | null;
+  renovation_start_date: string | null;
+  // New intake fields
+  hypotheek_koopsom: number | null;
+  hypotheek_werksituatie: string | null;
+  hypotheek_heeft_partner: string | null;
+  hypotheek_doel: string | null;
+  notaris_dienst: string | null;
+  taxatie_doel: string | null;
+  taxatie_voorkeursdatum: string | null;
+  slot_aantal_deuren: string | null;
+  slot_veiligheidsniveau: string | null;
+  slot_montage: string | null;
+  verhuislift_locatie: string | null;
+  bouwkundige_keuring_voorkeursdatum: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -291,6 +291,7 @@ export type Database = {
         Row: {
           adults: number | null
           birth_date: string | null
+          bouwkundige_keuring_voorkeursdatum: string | null
           building_access: string | null
           building_year: string | null
           children: number | null
@@ -319,6 +320,10 @@ export type Database = {
           household_names: string[] | null
           household_type: string | null
           housing_property_type: string | null
+          hypotheek_doel: string | null
+          hypotheek_heeft_partner: string | null
+          hypotheek_koopsom: number | null
+          hypotheek_werksituatie: string | null
           id: string
           insurance_value: string | null
           internet_bundle: string | null
@@ -331,6 +336,7 @@ export type Database = {
           municipality: string | null
           needs_contractor_help: boolean | null
           new_address: string | null
+          notaris_dienst: string | null
           number_of_bedrooms: string | null
           number_of_floors: string | null
           number_of_rooms: string | null
@@ -343,14 +349,21 @@ export type Database = {
           renovation_start_date: string | null
           renovation_type: string | null
           service_type: string | null
+          slot_aantal_deuren: string | null
+          slot_montage: string | null
+          slot_veiligheidsniveau: string | null
           special_items: string[] | null
+          taxatie_doel: string | null
+          taxatie_voorkeursdatum: string | null
           updated_at: string
           user_id: string
+          verhuislift_locatie: string | null
           works_from_home: string | null
         }
         Insert: {
           adults?: number | null
           birth_date?: string | null
+          bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
           building_year?: string | null
           children?: number | null
@@ -379,6 +392,10 @@ export type Database = {
           household_names?: string[] | null
           household_type?: string | null
           housing_property_type?: string | null
+          hypotheek_doel?: string | null
+          hypotheek_heeft_partner?: string | null
+          hypotheek_koopsom?: number | null
+          hypotheek_werksituatie?: string | null
           id?: string
           insurance_value?: string | null
           internet_bundle?: string | null
@@ -391,6 +408,7 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          notaris_dienst?: string | null
           number_of_bedrooms?: string | null
           number_of_floors?: string | null
           number_of_rooms?: string | null
@@ -403,14 +421,21 @@ export type Database = {
           renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
+          slot_aantal_deuren?: string | null
+          slot_montage?: string | null
+          slot_veiligheidsniveau?: string | null
           special_items?: string[] | null
+          taxatie_doel?: string | null
+          taxatie_voorkeursdatum?: string | null
           updated_at?: string
           user_id: string
+          verhuislift_locatie?: string | null
           works_from_home?: string | null
         }
         Update: {
           adults?: number | null
           birth_date?: string | null
+          bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
           building_year?: string | null
           children?: number | null
@@ -439,6 +464,10 @@ export type Database = {
           household_names?: string[] | null
           household_type?: string | null
           housing_property_type?: string | null
+          hypotheek_doel?: string | null
+          hypotheek_heeft_partner?: string | null
+          hypotheek_koopsom?: number | null
+          hypotheek_werksituatie?: string | null
           id?: string
           insurance_value?: string | null
           internet_bundle?: string | null
@@ -451,6 +480,7 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          notaris_dienst?: string | null
           number_of_bedrooms?: string | null
           number_of_floors?: string | null
           number_of_rooms?: string | null
@@ -463,9 +493,15 @@ export type Database = {
           renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
+          slot_aantal_deuren?: string | null
+          slot_montage?: string | null
+          slot_veiligheidsniveau?: string | null
           special_items?: string[] | null
+          taxatie_doel?: string | null
+          taxatie_voorkeursdatum?: string | null
           updated_at?: string
           user_id?: string
+          verhuislift_locatie?: string | null
           works_from_home?: string | null
         }
         Relationships: []
@@ -652,6 +688,7 @@ export type Database = {
       admin_profiles_view: {
         Row: {
           adults: number | null
+          bouwkundige_keuring_voorkeursdatum: string | null
           building_access: string | null
           building_year: string | null
           children: number | null
@@ -677,6 +714,10 @@ export type Database = {
           home_size_m2: string | null
           household_names: string[] | null
           housing_property_type: string | null
+          hypotheek_doel: string | null
+          hypotheek_heeft_partner: string | null
+          hypotheek_koopsom: number | null
+          hypotheek_werksituatie: string | null
           id: string | null
           insurance_value: string | null
           internet_bundle: string | null
@@ -689,6 +730,7 @@ export type Database = {
           municipality: string | null
           needs_contractor_help: boolean | null
           new_address: string | null
+          notaris_dienst: string | null
           number_of_bedrooms: string | null
           number_of_floors: string | null
           number_of_rooms: string | null
@@ -700,13 +742,20 @@ export type Database = {
           renovation_start_date: string | null
           renovation_type: string | null
           service_type: string | null
+          slot_aantal_deuren: string | null
+          slot_montage: string | null
+          slot_veiligheidsniveau: string | null
           special_items: string[] | null
+          taxatie_doel: string | null
+          taxatie_voorkeursdatum: string | null
           updated_at: string | null
           user_id: string | null
+          verhuislift_locatie: string | null
           works_from_home: string | null
         }
         Insert: {
           adults?: number | null
+          bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
           building_year?: string | null
           children?: number | null
@@ -732,6 +781,10 @@ export type Database = {
           home_size_m2?: string | null
           household_names?: string[] | null
           housing_property_type?: string | null
+          hypotheek_doel?: string | null
+          hypotheek_heeft_partner?: string | null
+          hypotheek_koopsom?: number | null
+          hypotheek_werksituatie?: string | null
           id?: string | null
           insurance_value?: string | null
           internet_bundle?: string | null
@@ -744,6 +797,7 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          notaris_dienst?: string | null
           number_of_bedrooms?: string | null
           number_of_floors?: string | null
           number_of_rooms?: string | null
@@ -755,13 +809,20 @@ export type Database = {
           renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
+          slot_aantal_deuren?: string | null
+          slot_montage?: string | null
+          slot_veiligheidsniveau?: string | null
           special_items?: string[] | null
+          taxatie_doel?: string | null
+          taxatie_voorkeursdatum?: string | null
           updated_at?: string | null
           user_id?: string | null
+          verhuislift_locatie?: string | null
           works_from_home?: string | null
         }
         Update: {
           adults?: number | null
+          bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
           building_year?: string | null
           children?: number | null
@@ -787,6 +848,10 @@ export type Database = {
           home_size_m2?: string | null
           household_names?: string[] | null
           housing_property_type?: string | null
+          hypotheek_doel?: string | null
+          hypotheek_heeft_partner?: string | null
+          hypotheek_koopsom?: number | null
+          hypotheek_werksituatie?: string | null
           id?: string | null
           insurance_value?: string | null
           internet_bundle?: string | null
@@ -799,6 +864,7 @@ export type Database = {
           municipality?: string | null
           needs_contractor_help?: boolean | null
           new_address?: string | null
+          notaris_dienst?: string | null
           number_of_bedrooms?: string | null
           number_of_floors?: string | null
           number_of_rooms?: string | null
@@ -810,9 +876,15 @@ export type Database = {
           renovation_start_date?: string | null
           renovation_type?: string | null
           service_type?: string | null
+          slot_aantal_deuren?: string | null
+          slot_montage?: string | null
+          slot_veiligheidsniveau?: string | null
           special_items?: string[] | null
+          taxatie_doel?: string | null
+          taxatie_voorkeursdatum?: string | null
           updated_at?: string | null
           user_id?: string | null
+          verhuislift_locatie?: string | null
           works_from_home?: string | null
         }
         Relationships: []
