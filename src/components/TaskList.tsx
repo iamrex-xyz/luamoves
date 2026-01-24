@@ -546,6 +546,7 @@ export const TaskList = ({
           forwardingDuration: movingInfo.forwardingDuration,
           householdNames: movingInfo.householdNames
         }}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <PostNLPreparationDialog
