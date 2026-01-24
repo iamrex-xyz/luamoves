@@ -13,6 +13,7 @@ export type MovingInfo = {
   isVve?: boolean;
   currentSituation?: "rent" | "buy" | "parents" | "other";
   hasJob?: boolean;
+  adults?: number;
   children?: number;
   pets?: number;
   // Smart questions velden
