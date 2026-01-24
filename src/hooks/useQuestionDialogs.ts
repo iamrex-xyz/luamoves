@@ -57,6 +57,13 @@ export type QuestionDialogType =
   | "partnerInvite"
   | "budget"
   | "inviteHousehold"
+  | "hypotheek"
+  | "bouwkundigeKeuring"
+  | "notaris"
+  | "taxatie"
+  | "opstal"
+  | "slotcilinder"
+  | "verhuislift"
   | null;
 
 export type SmartQuestionState = {
@@ -125,11 +132,8 @@ export const useQuestionDialogs = (
     }
     
     if (isBoxesTask(task)) {
-      if (needsBoxesQuestions(movingInfo)) {
-        setActiveDialog("boxes");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Dozen-taak opent altijd het intakeformulier
+      setActiveDialog("boxes");
       return;
     }
     
@@ -140,11 +144,8 @@ export const useQuestionDialogs = (
     }
     
     if (isLiabilityTask(task)) {
-      if (needsLiabilityQuestions(movingInfo)) {
-        setActiveDialog("liability");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Aansprakelijkheidsverzekering-taak opent altijd het intakeformulier
+      setActiveDialog("liability");
       return;
     }
     
@@ -154,8 +155,8 @@ export const useQuestionDialogs = (
     }
     
     if (isVerhuisliftTask(task)) {
-      // Verhuislift gaat direct naar deals (vragen worden via smart questions gesteld)
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Verhuislift-taak opent altijd het intakeformulier
+      setActiveDialog("verhuislift");
       return;
     }
     
@@ -166,36 +167,51 @@ export const useQuestionDialogs = (
     }
     
     if (isSmokeDetectorTask(task)) {
-      if (needsSmokeDetectorQuestions(movingInfo)) {
-        setActiveDialog("smokeDetector");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Rookmelder-taak opent altijd het intakeformulier
+      setActiveDialog("smokeDetector");
       return;
     }
     
     if (isGardenTask(task)) {
-      if (needsGardenQuestions(movingInfo)) {
-        setActiveDialog("garden");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Tuin-taak opent altijd het intakeformulier
+      setActiveDialog("garden");
       return;
     }
     
     if (isRenovationTask(task)) {
-      if (needsRenovationQuestions(movingInfo)) {
-        setActiveDialog("renovation");
-        return;
-      }
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+      // Renovatie-taak opent altijd het intakeformulier
+      setActiveDialog("renovation");
       return;
     }
     
-    // KOOP-specifieke taken - direct naar deals (geen extra vragen nodig)
-    if (isHypothekTask(task) || isBouwkundigeKeuringTask(task) || isNotarisTask(task) || 
-        isTaxatieTask(task) || isOpstalTask(task) || isSlotTask(task)) {
-      navigate(`/deals?task=${encodeURIComponent(task.title)}`);
+    // KOOP-specifieke taken - openen intakeformulieren
+    if (isHypothekTask(task)) {
+      setActiveDialog("hypotheek");
+      return;
+    }
+    
+    if (isBouwkundigeKeuringTask(task)) {
+      setActiveDialog("bouwkundigeKeuring");
+      return;
+    }
+    
+    if (isNotarisTask(task)) {
+      setActiveDialog("notaris");
+      return;
+    }
+    
+    if (isTaxatieTask(task)) {
+      setActiveDialog("taxatie");
+      return;
+    }
+    
+    if (isOpstalTask(task)) {
+      setActiveDialog("opstal");
+      return;
+    }
+    
+    if (isSlotTask(task)) {
+      setActiveDialog("slotcilinder");
       return;
     }
     

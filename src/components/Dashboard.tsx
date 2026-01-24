@@ -26,6 +26,13 @@ import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestion
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
 import { BudgetDialog } from "@/components/BudgetDialog";
+import { HypotheekQuestionsDialog } from "@/components/HypotheekQuestionsDialog";
+import { BouwkundigeKeuringQuestionsDialog } from "@/components/BouwkundigeKeuringQuestionsDialog";
+import { NotarisQuestionsDialog } from "@/components/NotarisQuestionsDialog";
+import { TaxatieQuestionsDialog } from "@/components/TaxatieQuestionsDialog";
+import { OpstalQuestionsDialog } from "@/components/OpstalQuestionsDialog";
+import { SlotcilinderQuestionsDialog } from "@/components/SlotcilinderQuestionsDialog";
+import { VerhuisliftQuestionsDialog } from "@/components/VerhuisliftQuestionsDialog";
 import {
   CheckCircle2,
   Plus,
@@ -426,6 +433,56 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           handleDialogComplete({ movingBudget: budget } as any);
           closeActiveDialog();
         }}
+      />
+
+      <HypotheekQuestionsDialog
+        open={activeDialog === "hypotheek"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <BouwkundigeKeuringQuestionsDialog
+        open={activeDialog === "bouwkundigeKeuring"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <NotarisQuestionsDialog
+        open={activeDialog === "notaris"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <TaxatieQuestionsDialog
+        open={activeDialog === "taxatie"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <OpstalQuestionsDialog
+        open={activeDialog === "opstal"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <SlotcilinderQuestionsDialog
+        open={activeDialog === "slotcilinder"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <VerhuisliftQuestionsDialog
+        open={activeDialog === "verhuislift"}
+        onOpenChange={(open) => !open && closeActiveDialog()}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
