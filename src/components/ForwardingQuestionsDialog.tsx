@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, CheckCircle2, Check } from "lucide-react";
 import { useProfileSync } from "@/hooks/useProfileSync";
+
 interface ForwardingQuestionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,6 +22,7 @@ interface ForwardingQuestionsDialogProps {
     forwardingDuration?: string;
     householdNames?: string[];
   };
+  onCompleteTask?: () => void;
 }
 
 export function ForwardingQuestionsDialog({
@@ -28,7 +30,8 @@ export function ForwardingQuestionsDialog({
   onOpenChange,
   onComplete,
   onRedirect,
-  existingData
+  existingData,
+  onCompleteTask
 }: ForwardingQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
@@ -36,12 +39,15 @@ export function ForwardingQuestionsDialog({
   const [forwardingDuration, setForwardingDuration] = useState("");
   const [householdNames, setHouseholdNames] = useState<string[]>([]);
   const [newName, setNewName] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
       setForwardingStartDate(existingData?.forwardingStartDate || "");
       setForwardingDuration(existingData?.forwardingDuration || "");
       setHouseholdNames(existingData?.householdNames || []);
+      setShowConfirmation(false);
       
       // Calculate which step to start from based on existing data
       if (!existingData?.forwardingStartDate) {
@@ -89,9 +95,21 @@ export function ForwardingQuestionsDialog({
     await saveToProfile(data);
     
     onComplete(data);
-    onOpenChange(false);
-    onRedirect();
+    
+    // Show confirmation instead of closing immediately
+    setShowConfirmation(true);
   };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    onOpenChange(false);
+  };
+
+  const handleGoToPostNL = () => {
+    onRedirect();
+    handleClose();
+  };
+
   const addName = () => {
     if (newName.trim() && !householdNames.includes(newName.trim())) {
       setHouseholdNames([...householdNames, newName.trim()]);
@@ -109,6 +127,52 @@ export function ForwardingQuestionsDialog({
       addName();
     }
   };
+
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              Je kunt nu je post laten doorsturen via PostNL.
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={handleGoToPostNL}
+                className="w-full"
+              >
+                Naar PostNL
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -201,7 +265,7 @@ export function ForwardingQuestionsDialog({
                 disabled={householdNames.length === 0}
                 className="w-full"
               >
-                Naar PostNL
+                Doorsturen
               </Button>
             </div>
           )}
