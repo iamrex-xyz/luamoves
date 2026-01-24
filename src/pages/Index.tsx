@@ -188,44 +188,56 @@ const Index = () => {
     const token = searchParams.get("invite");
     if (token && !user) {
       setInviteToken(token);
-      // Fetch invite data
+      // Fetch invite data via secure edge function
       const fetchInviteData = async () => {
-        const { data, error } = await supabase
-          .from("household_members")
-          .select("phone, name, owner_user_id, status")
-          .eq("invite_token", token)
-          .maybeSingle();
+        try {
+          const response = await supabase.functions.invoke("verify-household-invite", {
+            body: { invite_token: token },
+          });
 
-        if (error || !data) {
+          if (response.error || !response.data?.success || !response.data?.data) {
+            toast({
+              title: "Ongeldige uitnodiging",
+              description: "Deze uitnodigingslink is niet meer geldig.",
+              variant: "destructive",
+            });
+            setInviteToken(null);
+            // Remove invite param from URL
+            searchParams.delete("invite");
+            setSearchParams(searchParams);
+            return;
+          }
+
+          const inviteInfo = response.data.data;
+
+          if (inviteInfo.status === "active") {
+            toast({
+              title: "Al geaccepteerd",
+              description: "Je bent al lid van dit huishouden. Log in om verder te gaan.",
+            });
+            setInviteToken(null);
+            searchParams.delete("invite");
+            setSearchParams(searchParams);
+            setCurrentView("auth");
+            return;
+          }
+
+          setInviteData({
+            phone: inviteInfo.phone,
+            name: inviteInfo.name || undefined,
+            ownerUserId: inviteInfo.owner_user_id,
+          });
+        } catch (error) {
+          console.error("Error verifying invite:", error);
           toast({
-            title: "Ongeldige uitnodiging",
-            description: "Deze uitnodigingslink is niet meer geldig.",
+            title: "Fout",
+            description: "Er ging iets mis bij het controleren van de uitnodiging.",
             variant: "destructive",
           });
           setInviteToken(null);
-          // Remove invite param from URL
           searchParams.delete("invite");
           setSearchParams(searchParams);
-          return;
         }
-
-        if (data.status === "active") {
-          toast({
-            title: "Al geaccepteerd",
-            description: "Je bent al lid van dit huishouden. Log in om verder te gaan.",
-          });
-          setInviteToken(null);
-          searchParams.delete("invite");
-          setSearchParams(searchParams);
-          setCurrentView("auth");
-          return;
-        }
-
-        setInviteData({
-          phone: data.phone,
-          name: data.name || undefined,
-          ownerUserId: data.owner_user_id,
-        });
       };
 
       fetchInviteData();
