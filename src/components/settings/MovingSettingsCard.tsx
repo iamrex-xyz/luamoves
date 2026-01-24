@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -7,12 +7,13 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { MovingInfo } from "@/pages/Index";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Home as HomeIcon, Calendar } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { validateAddressPostcode, isSameAddress as checkSameAddress } from "@/lib/validation";
+import { useAutosave } from "@/hooks/useAutosave";
+import { AutosaveIndicator } from "@/components/ui/autosave-indicator";
 
 type MovingSettingsCardProps = {
   movingInfo: MovingInfo;
@@ -20,8 +21,6 @@ type MovingSettingsCardProps = {
 };
 
 export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardProps) => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [oldAddressError, setOldAddressError] = useState<string | null>(null);
   const [newAddressError, setNewAddressError] = useState<string | null>(null);
@@ -37,6 +36,57 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     movingInfo.keyHandoverDate ? new Date(movingInfo.keyHandoverDate) : undefined
   );
   const [renovationType, setRenovationType] = useState(movingInfo.renovationType || "none");
+
+  const saveToDatabase = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Only validate if addresses have values
+    if (oldAddress) {
+      const result = validateAddressPostcode(oldAddress);
+      if (!result.isValid) throw new Error("Invalid old address");
+    }
+    if (newAddress) {
+      const result = validateAddressPostcode(newAddress);
+      if (!result.isValid) throw new Error("Invalid new address");
+    }
+
+    // Check for same address
+    if (oldAddress && newAddress && checkSameAddress(oldAddress, newAddress)) {
+      throw new Error("Same address");
+    }
+
+    const movingDateStr = movingDateObj ? format(movingDateObj, "yyyy-MM-dd") : movingDate;
+    const keyHandoverDateStr = keyHandoverDateObj ? format(keyHandoverDateObj, "yyyy-MM-dd") : keyHandoverDate;
+
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          user_id: user.id,
+          old_address: oldAddress || null,
+          new_address: newAddress || null,
+          moving_date: movingDateStr || null,
+          key_handover_date: keyHandoverDateStr || null,
+          renovation_type: renovationType,
+        } as any,
+        { onConflict: "user_id" }
+      );
+
+    if (error) throw error;
+
+    // Update parent state
+    onUpdate({
+      ...movingInfo,
+      oldAddress,
+      newAddress,
+      movingDate: movingDateStr,
+      keyHandoverDate: keyHandoverDateStr || undefined,
+      renovationType: renovationType as "none" | "small" | "large",
+    });
+  }, [oldAddress, newAddress, movingDate, movingDateObj, keyHandoverDate, keyHandoverDateObj, renovationType, movingInfo, onUpdate]);
+
+  const { triggerSave, status } = useAutosave(saveToDatabase);
 
   useEffect(() => {
     loadProfile();
@@ -84,11 +134,36 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
   const handleOldAddressChange = (value: string) => {
     setOldAddress(value);
     if (oldAddressError) validatePostcode(value, setOldAddressError);
+    // Only trigger autosave if valid or empty
+    if (!value || validateAddressPostcode(value).isValid) {
+      triggerSave();
+    }
   };
 
   const handleNewAddressChange = (value: string) => {
     setNewAddress(value);
     if (newAddressError) validatePostcode(value, setNewAddressError);
+    // Only trigger autosave if valid or empty
+    if (!value || validateAddressPostcode(value).isValid) {
+      triggerSave();
+    }
+  };
+
+  const handleMovingDateSelect = (date: Date | undefined) => {
+    setMovingDateObj(date);
+    if (date) setMovingDate(format(date, "yyyy-MM-dd"));
+    triggerSave();
+  };
+
+  const handleKeyHandoverDateSelect = (date: Date | undefined) => {
+    setKeyHandoverDateObj(date);
+    if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
+    triggerSave();
+  };
+
+  const handleRenovationTypeChange = (value: string) => {
+    setRenovationType(value as "none" | "small" | "large");
+    triggerSave();
   };
 
   const isSameAddress = () => checkSameAddress(oldAddress, newAddress);
@@ -103,70 +178,6 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return keyHandoverDateObj < today;
-  };
-
-  const hasValidationErrors = isSameAddress() || isKeyHandoverAfterMoving() || isKeyHandoverInPast() || !!oldAddressError || !!newAddressError;
-
-  const handleSave = async () => {
-    const oldValid = validatePostcode(oldAddress, setOldAddressError);
-    const newValid = validatePostcode(newAddress, setNewAddressError);
-    
-    if (!oldValid || !newValid) {
-      toast({ title: "Fout", description: "Corrigeer de adresgegevens.", variant: "destructive" });
-      return;
-    }
-
-    if (isSameAddress()) {
-      toast({ 
-        title: "Even checken", 
-        description: "Je oude en nieuwe adres zijn hetzelfde — waarschijnlijk per ongeluk verkeerd ingevuld?", 
-        variant: "destructive" 
-      });
-      return;
-    }
-
-    if (isKeyHandoverAfterMoving()) {
-      toast({ title: "Fout", description: "De sleuteloverdracht kan niet na de verhuisdatum liggen.", variant: "destructive" });
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const movingDateStr = movingDateObj ? format(movingDateObj, "yyyy-MM-dd") : movingDate;
-      const keyHandoverDateStr = keyHandoverDateObj ? format(keyHandoverDateObj, "yyyy-MM-dd") : keyHandoverDate;
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          old_address: oldAddress,
-          new_address: newAddress,
-          moving_date: movingDateStr,
-          key_handover_date: keyHandoverDateStr || null,
-          renovation_type: renovationType,
-        })
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-
-      onUpdate({
-        ...movingInfo,
-        oldAddress,
-        newAddress,
-        movingDate: movingDateStr,
-        keyHandoverDate: keyHandoverDateStr || undefined,
-        renovationType: renovationType as "none" | "small" | "large",
-      });
-
-      toast({ title: "Opgeslagen", description: "Verhuizing details zijn bijgewerkt." });
-    } catch (error) {
-      console.error("Error saving:", error);
-      toast({ title: "Fout", description: "Kon verhuizing details niet opslaan.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   if (isInitialLoading) {
@@ -204,7 +215,6 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-11 w-full rounded-xl" />
           </div>
-          <Skeleton className="h-11 w-full rounded-xl" />
         </div>
       </div>
     );
@@ -213,14 +223,17 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
       <div className="p-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <HomeIcon className="w-5 h-5 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <HomeIcon className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">Verhuizing details</h2>
+              <p className="text-xs text-muted-foreground">Adressen en datums</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-semibold text-foreground">Verhuizing details</h2>
-            <p className="text-xs text-muted-foreground">Adressen en datums</p>
-          </div>
+          <AutosaveIndicator status={status} />
         </div>
       </div>
 
@@ -269,10 +282,7 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
                 <CalendarComponent
                   mode="single"
                   selected={movingDateObj}
-                  onSelect={(date) => {
-                    setMovingDateObj(date);
-                    if (date) setMovingDate(format(date, "yyyy-MM-dd"));
-                  }}
+                  onSelect={handleMovingDateSelect}
                   initialFocus
                   className="pointer-events-auto"
                 />
@@ -300,10 +310,7 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
                 <CalendarComponent
                   mode="single"
                   selected={keyHandoverDateObj}
-                  onSelect={(date) => {
-                    setKeyHandoverDateObj(date);
-                    if (date) setKeyHandoverDate(format(date, "yyyy-MM-dd"));
-                  }}
+                  onSelect={handleKeyHandoverDateSelect}
                   disabled={(date) => {
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
@@ -324,7 +331,7 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
 
         <div>
           <Label className="text-xs text-muted-foreground uppercase tracking-wide">Verbouwing</Label>
-          <Select value={renovationType} onValueChange={(value) => setRenovationType(value as "none" | "small" | "large")}>
+          <Select value={renovationType} onValueChange={handleRenovationTypeChange}>
             <SelectTrigger className="rounded-xl h-11">
               <SelectValue />
             </SelectTrigger>
@@ -335,10 +342,6 @@ export const MovingSettingsCard = ({ movingInfo, onUpdate }: MovingSettingsCardP
             </SelectContent>
           </Select>
         </div>
-
-        <Button onClick={handleSave} disabled={isLoading || hasValidationErrors} className="w-full rounded-xl h-11">
-          Opslaan
-        </Button>
       </div>
     </div>
   );

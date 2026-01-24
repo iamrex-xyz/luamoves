@@ -1,25 +1,55 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Phone, Cake } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { validatePhone as validatePhoneUtil, cleanPhone } from "@/lib/validation";
+import { useAutosave } from "@/hooks/useAutosave";
+import { AutosaveIndicator } from "@/components/ui/autosave-indicator";
 
 export const PersonalInfoCard = () => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [birthDate, setBirthDate] = useState("");
   const [birthDateObj, setBirthDateObj] = useState<Date | undefined>(undefined);
+
+  const saveToDatabase = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Only validate if phone has value
+    if (phone) {
+      const result = validatePhoneUtil(phone);
+      if (!result.isValid) {
+        throw new Error("Invalid phone");
+      }
+    }
+
+    const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
+    const cleanedPhone = cleanPhone(phone);
+
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          user_id: user.id,
+          phone: cleanedPhone || null,
+          birth_date: birthDateStr || null,
+        } as any,
+        { onConflict: "user_id" }
+      );
+
+    if (error) throw error;
+  }, [phone, birthDate, birthDateObj]);
+
+  const { triggerSave, status } = useAutosave(saveToDatabase);
 
   useEffect(() => {
     loadProfile();
@@ -56,41 +86,22 @@ export const PersonalInfoCard = () => {
     return result.isValid;
   };
 
-  const handleSave = async () => {
-    if (phone && !validatePhone(phone)) {
-      toast({ title: "Fout", description: "Corrigeer het telefoonnummer.", variant: "destructive" });
-      return;
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPhone(value);
+    if (phoneError) validatePhone(value);
+    // Only trigger autosave if valid or empty
+    if (!value || validatePhoneUtil(value).isValid) {
+      triggerSave();
     }
+  };
 
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
-      const cleanedPhone = cleanPhone(phone);
-
-      // Upsert so the profile row is guaranteed to exist
-      const { error } = await supabase
-        .from("profiles")
-        .upsert(
-          {
-            user_id: user.id,
-            phone: cleanedPhone || null,
-            birth_date: birthDateStr || null,
-          } as any,
-          { onConflict: "user_id" }
-        );
-
-      if (error) throw error;
-
-      toast({ title: "Opgeslagen", description: "Persoonlijke gegevens zijn bijgewerkt." });
-    } catch (error) {
-      console.error("Error saving:", error);
-      toast({ title: "Fout", description: "Kon persoonlijke gegevens niet opslaan.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
+  const handleBirthDateSelect = (date: Date | undefined) => {
+    setBirthDateObj(date);
+    if (date) {
+      setBirthDate(format(date, "yyyy-MM-dd"));
     }
+    triggerSave();
   };
 
   if (isInitialLoading) {
@@ -114,7 +125,6 @@ export const PersonalInfoCard = () => {
             <Skeleton className="h-3 w-24" />
             <Skeleton className="h-11 w-full rounded-xl" />
           </div>
-          <Skeleton className="h-11 w-full rounded-xl" />
         </div>
       </div>
     );
@@ -123,14 +133,17 @@ export const PersonalInfoCard = () => {
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
       <div className="p-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Phone className="w-5 h-5 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Phone className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">Persoonlijke gegevens</h2>
+              <p className="text-xs text-muted-foreground">Contact en geboortedatum</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-semibold text-foreground">Persoonlijke gegevens</h2>
-            <p className="text-xs text-muted-foreground">Contact en geboortedatum</p>
-          </div>
+          <AutosaveIndicator status={status} />
         </div>
       </div>
 
@@ -141,10 +154,7 @@ export const PersonalInfoCard = () => {
             type="tel"
             placeholder="06 12345678"
             value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-              if (phoneError) validatePhone(e.target.value);
-            }}
+            onChange={handlePhoneChange}
             onBlur={() => phone && validatePhone(phone)}
             className={cn("rounded-xl h-11", phoneError && "border-destructive")}
           />
@@ -167,10 +177,7 @@ export const PersonalInfoCard = () => {
               <CalendarComponent
                 mode="single"
                 selected={birthDateObj}
-                onSelect={(date) => {
-                  setBirthDateObj(date);
-                  if (date) setBirthDate(format(date, "yyyy-MM-dd"));
-                }}
+                onSelect={handleBirthDateSelect}
                 disabled={(date) => date > new Date()}
                 defaultMonth={birthDateObj || new Date(1990, 0, 1)}
                 initialFocus
@@ -182,10 +189,6 @@ export const PersonalInfoCard = () => {
             </PopoverContent>
           </Popover>
         </div>
-
-        <Button onClick={handleSave} disabled={isLoading || !!phoneError} className="w-full rounded-xl h-11">
-          Opslaan
-        </Button>
       </div>
     </div>
   );
