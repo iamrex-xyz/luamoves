@@ -3,33 +3,49 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Shield, Loader2, Mail, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LuaLogo } from "@/components/LuaLogo";
 
 export const AdminLoginForm = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { toast } = useToast();
 
-  const handleForgotPassword = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!email.trim()) {
       toast({
         title: "Vul je e-mailadres in",
-        description: "Voer eerst je e-mailadres in om een reset link te ontvangen.",
+        description: "E-mailadres is verplicht.",
         variant: "destructive",
       });
       return;
     }
 
-    setIsResetting(true);
+    // Check if email is from allowed domains
+    const allowedDomains = ['lua.nl', 'luamoves.nl'];
+    const emailDomain = email.trim().split('@')[1]?.toLowerCase();
+    
+    if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+      toast({
+        title: "Ongeldig e-mailadres",
+        description: "Gebruik een @lua.nl of @luamoves.nl e-mailadres.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/admin`,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/admin`,
+        },
       });
 
       if (error) {
@@ -39,53 +55,12 @@ export const AdminLoginForm = () => {
           variant: "destructive",
         });
       } else {
+        setEmailSent(true);
         toast({
           title: "E-mail verzonden",
-          description: "Check je inbox voor de wachtwoord reset link.",
+          description: "Check je inbox voor de inloglink.",
         });
       }
-    } catch (error) {
-      console.error("Password reset error:", error);
-      toast({
-        title: "Fout",
-        description: "Er is een onverwachte fout opgetreden.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsResetting(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email.trim() || !password.trim()) {
-      toast({
-        title: "Vul alle velden in",
-        description: "E-mail en wachtwoord zijn verplicht.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Inloggen mislukt",
-          description: error.message === "Invalid login credentials" 
-            ? "Ongeldige inloggegevens. Controleer je e-mail en wachtwoord."
-            : error.message,
-          variant: "destructive",
-        });
-      }
-      // If successful, the auth state change will trigger a re-render
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -97,6 +72,32 @@ export const AdminLoginForm = () => {
       setIsLoading(false);
     }
   };
+
+  if (emailSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <div className="flex justify-center mb-4">
+            <LuaLogo size="lg" />
+          </div>
+          <div className="flex items-center justify-center gap-2 text-primary">
+            <CheckCircle className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-semibold">Check je inbox</h1>
+          <p className="text-sm text-muted-foreground">
+            We hebben een inloglink gestuurd naar <strong>{email}</strong>
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => setEmailSent(false)}
+          >
+            Ander e-mailadres gebruiken
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -111,7 +112,7 @@ export const AdminLoginForm = () => {
           </div>
           <h1 className="text-2xl font-semibold">Inloggen</h1>
           <p className="text-sm text-muted-foreground">
-            Log in met je @lua.nl of @luamoves.nl account
+            Voer je @lua.nl of @luamoves.nl e-mailadres in
           </p>
         </div>
 
@@ -133,60 +134,14 @@ export const AdminLoginForm = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Wachtwoord</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="pl-10 pr-10"
-                autoComplete="current-password"
-                disabled={isLoading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                tabIndex={-1}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Bezig met inloggen...
+                Link versturen...
               </>
             ) : (
-              "Inloggen"
-            )}
-          </Button>
-
-          <Button
-            type="button"
-            variant="link"
-            className="w-full text-sm"
-            disabled={isLoading || isResetting}
-            onClick={handleForgotPassword}
-          >
-            {isResetting ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                E-mail versturen...
-              </>
-            ) : (
-              "Wachtwoord vergeten?"
+              "Stuur inloglink"
             )}
           </Button>
         </form>
