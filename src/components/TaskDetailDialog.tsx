@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { EditDeadlinePopover } from "@/components/EditDeadlinePopover";
 import { AssignTaskDropdown } from "@/components/AssignTaskDropdown";
+import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
 import {
   Calendar,
   User,
@@ -25,6 +26,7 @@ import {
   AlertCircle,
   Save,
   X,
+  Sparkles,
 } from "lucide-react";
 
 type TaskDetailDialogProps = {
@@ -34,6 +36,7 @@ type TaskDetailDialogProps = {
   onTaskUpdate: () => void;
   onTaskAssignment?: (taskId: string, assignedEmail: string | null) => void;
   onToggleStatus?: (taskId: string) => void;
+  onRegelenClick?: (e: React.MouseEvent, task: Task) => void;
 };
 
 export const TaskDetailDialog = ({
@@ -43,6 +46,7 @@ export const TaskDetailDialog = ({
   onTaskUpdate,
   onTaskAssignment,
   onToggleStatus,
+  onRegelenClick,
 }: TaskDetailDialogProps) => {
   const [notes, setNotes] = useState("");
   const [localAssignedEmail, setLocalAssignedEmail] = useState<string | null>(null);
@@ -119,12 +123,22 @@ export const TaskDetailDialog = ({
     }
   };
 
+  const handleRegelenButtonClick = (e: React.MouseEvent) => {
+    if (task && onRegelenClick) {
+      onRegelenClick(e, task);
+      onOpenChange(false);
+    }
+  };
+
   if (!task) return null;
 
   const isOverdue = new Date(task.deadline) < new Date() && task.status !== "done";
   const daysUntilDeadline = Math.ceil(
     (new Date(task.deadline).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
   );
+
+  const showRegelenCTA = task.status !== "done" && hasAffiliateOptions(task) && onRegelenClick;
+  const regelenButtonLabel = getTaskButtonLabel(task) || "Regel dit voor mij";
 
   const getStatusBadge = () => {
     if (task.status === "done") {
@@ -184,6 +198,23 @@ export const TaskDetailDialog = ({
               {getStatusBadge()}
             </div>
           </div>
+
+          {/* Prominent CTA for Regelen tasks */}
+          {showRegelenCTA && (
+            <div className="mb-6">
+              <Button
+                onClick={handleRegelenButtonClick}
+                size="lg"
+                className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg active:scale-[0.98] transition-all"
+              >
+                <Sparkles className="w-5 h-5 mr-2" />
+                {regelenButtonLabel}
+              </Button>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Wij regelen de beste deals voor jou
+              </p>
+            </div>
+          )}
 
           <div className="space-y-6">
             {/* Description */}
@@ -300,6 +331,7 @@ export const TaskDetailDialog = ({
                 onToggleStatus(task.id);
                 onOpenChange(false);
               }}
+              variant={showRegelenCTA ? "outline" : "default"}
               className="w-full h-12 rounded-xl active:scale-[0.98] transition-transform"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />

@@ -465,6 +465,7 @@ export const TaskList = ({
         onTaskUpdate={refreshTasks}
         onTaskAssignment={updateTaskAssignment}
         onToggleStatus={handleTaskToggle}
+        onRegelenClick={handleRegelenClick}
       />
       <TaskDealDialog task={dealTask} open={!!dealTask} onOpenChange={(open) => !open && setDealTask(null)} />
       
