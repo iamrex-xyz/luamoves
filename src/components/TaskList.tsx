@@ -517,6 +517,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("boxes")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <InsuranceQuestionsDialog
@@ -534,6 +535,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("liability")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <ForwardingQuestionsDialog
@@ -582,6 +584,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("smokeDetector")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <GardenQuestionsDialog
@@ -590,6 +593,7 @@ export const TaskList = ({
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onRedirect={() => handleDialogRedirect("garden")}
+        onCompleteTask={handleCompleteCurrentTask}
       />
 
       <RenovationQuestionsDialog
@@ -604,6 +608,7 @@ export const TaskList = ({
           }
         }}
         onRedirect={() => handleDialogRedirect("renovation")}
+        onCompleteTask={handleCompleteCurrentTask}
         existingData={{
           renovationBudget: (movingInfo as any).renovationBudget,
           renovationStartDate: (movingInfo as any).renovationStartDate ? new Date((movingInfo as any).renovationStartDate) : undefined,

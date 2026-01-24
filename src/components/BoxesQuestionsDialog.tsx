@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Package, DoorOpen, Wine, Check, Sparkles } from "lucide-react";
+import { Package, DoorOpen, Wine, Check, Sparkles, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
@@ -17,9 +17,10 @@ type BoxesQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (updatedInfo: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 };
 
-type Step = 'rooms' | 'fragile' | 'advice';
+type Step = 'rooms' | 'fragile' | 'advice' | 'confirmation';
 
 const roomOptions = [
   { value: '1-2', label: '1-2 kamers', boxes: 15 },
@@ -34,6 +35,7 @@ export const BoxesQuestionsDialog = ({
   movingInfo,
   onComplete,
   onRedirect,
+  onCompleteTask,
 }: BoxesQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState<Step>('rooms');
@@ -80,8 +82,8 @@ export const BoxesQuestionsDialog = ({
         await saveToProfile(data);
         
         onComplete(data);
-        onRedirect();
-        onOpenChange(false);
+        // Show confirmation screen instead of redirecting
+        setStep('confirmation');
       } catch (error) {
         console.error('Error saving boxes preferences:', error);
       } finally {
@@ -99,6 +101,18 @@ export const BoxesQuestionsDialog = ({
     if (currentStepIndex > 0) {
       setStep(steps[currentStepIndex - 1]);
     }
+  };
+
+  const handleClose = () => {
+    setStep('rooms');
+    setNumberOfRooms(movingInfo.numberOfRooms || '');
+    setHasFragileItems(movingInfo.hasFragileItems || '');
+    onOpenChange(false);
+  };
+
+  const handleGoToDeals = () => {
+    onRedirect();
+    handleClose();
   };
 
   const canProceed = () => {
@@ -146,6 +160,53 @@ export const BoxesQuestionsDialog = ({
       )}
     </button>
   );
+
+  // Confirmation screen
+  if (step === 'confirmation') {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              Je advies: ~{boxRecommendation} verhuisdozen
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={handleGoToDeals}
+                className="w-full"
+              >
+                Bekijk aanbiedingen
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   const renderStep = () => {
     switch (step) {
@@ -266,7 +327,7 @@ export const BoxesQuestionsDialog = ({
             onClick={handleNext} 
             disabled={!canProceed() || isSubmitting}
           >
-            {isSubmitting ? "Opslaan..." : step === 'advice' ? "Bekijk aanbiedingen" : "Volgende"}
+            {isSubmitting ? "Opslaan..." : step === 'advice' ? "Opslaan" : "Volgende"}
           </Button>
         </div>
       </DialogContent>

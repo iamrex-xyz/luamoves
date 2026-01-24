@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Check } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
@@ -13,6 +13,7 @@ interface SmokeDetectorQuestionsDialogProps {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 }
 
 export function SmokeDetectorQuestionsDialog({
@@ -20,19 +21,23 @@ export function SmokeDetectorQuestionsDialog({
   onOpenChange,
   movingInfo,
   onComplete,
-  onRedirect
+  onRedirect,
+  onCompleteTask,
 }: SmokeDetectorQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [numberOfFloors, setNumberOfFloors] = useState("");
   const [numberOfBedrooms, setNumberOfBedrooms] = useState("");
   const [showAdvice, setShowAdvice] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
       setNumberOfFloors((movingInfo as any).numberOfFloors || "");
       setNumberOfBedrooms((movingInfo as any).numberOfBedrooms || "");
       setShowAdvice(false);
+      setShowConfirmation(false);
       
       // Calculate which step to start from based on existing data
       if (!(movingInfo as any).numberOfFloors) {
@@ -76,9 +81,68 @@ export function SmokeDetectorQuestionsDialog({
     await saveToProfile(data);
     
     onComplete(data);
-    onOpenChange(false);
-    onRedirect();
+    setShowConfirmation(true);
   };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    setShowAdvice(false);
+    setStep(1);
+    onOpenChange(false);
+  };
+
+  const handleGoToDeals = () => {
+    onRedirect();
+    handleClose();
+  };
+
+  // Confirmation screen
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              Advies: {calculateSmokeDetectors()} rookmelders nodig
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={handleGoToDeals}
+                className="w-full"
+              >
+                Bekijk rookmelders
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -174,7 +238,7 @@ export function SmokeDetectorQuestionsDialog({
                 onClick={handleComplete}
                 className="w-full"
               >
-                Bekijk rookmelders
+                Opslaan
               </Button>
             </div>
           )}

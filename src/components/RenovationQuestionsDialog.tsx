@@ -5,11 +5,12 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Info } from "lucide-react";
+import { CalendarIcon, Info, CheckCircle2, Check } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useProfileSync } from "@/hooks/useProfileSync";
+
 interface RenovationQuestionsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -18,6 +19,7 @@ interface RenovationQuestionsDialogProps {
     renovationStartDate?: Date;
   }) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
   existingData: {
     renovationBudget?: string;
     renovationStartDate?: Date;
@@ -41,12 +43,15 @@ export function RenovationQuestionsDialog({
   onOpenChange,
   onComplete,
   onRedirect,
+  onCompleteTask,
   existingData,
 }: RenovationQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [budget, setBudget] = useState(existingData.renovationBudget || "");
   const [startDate, setStartDate] = useState<Date | undefined>(existingData.renovationStartDate);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   const needsBudget = !existingData.renovationBudget;
   const needsStartDate = !existingData.renovationStartDate;
 
@@ -77,8 +82,20 @@ export function RenovationQuestionsDialog({
       renovationBudget: budget || existingData.renovationBudget,
       renovationStartDate: startDate || existingData.renovationStartDate,
     });
-    onRedirect();
+    setShowConfirmation(true);
   };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    setStep(1);
+    onOpenChange(false);
+  };
+
+  const handleGoToDeals = () => {
+    onRedirect();
+    handleClose();
+  };
+
   const canProceed = () => {
     if (step === 1) return !!budget;
     if (step === 2) return !!startDate;
@@ -101,6 +118,53 @@ export function RenovationQuestionsDialog({
     }
     return current;
   };
+
+  // Confirmation screen
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              We zoeken passende aannemers voor je renovatie.
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={handleGoToDeals}
+                className="w-full"
+              >
+                Bekijk aannemers
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -172,7 +236,7 @@ export function RenovationQuestionsDialog({
             Annuleren
           </Button>
           <Button onClick={handleNext} disabled={!canProceed()}>
-            {(step === 2) || (step === 1 && !needsStartDate) ? "Voltooien" : "Volgende"}
+            {(step === 2) || (step === 1 && !needsStartDate) ? "Opslaan" : "Volgende"}
           </Button>
         </div>
       </DialogContent>

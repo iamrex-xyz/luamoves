@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { TreePine, Leaf, Shovel, Info } from "lucide-react";
+import { TreePine, Leaf, Shovel, Info, CheckCircle2, Check } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
@@ -13,6 +13,7 @@ interface GardenQuestionsDialogProps {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 }
 
 const stepExplanations = {
@@ -26,19 +27,23 @@ export function GardenQuestionsDialog({
   onOpenChange,
   movingInfo,
   onComplete,
-  onRedirect
+  onRedirect,
+  onCompleteTask,
 }: GardenQuestionsDialogProps) {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
   const [hasGarden, setHasGarden] = useState<boolean | null>(null);
   const [gardenSize, setGardenSize] = useState("");
   const [gardenServiceType, setGardenServiceType] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
       setHasGarden(movingInfo.hasGarden ?? null);
       setGardenSize(movingInfo.gardenSize || "");
       setGardenServiceType((movingInfo as any).gardenServiceType || "");
+      setShowConfirmation(false);
       
       // Calculate which step to start from based on existing data
       if (movingInfo.hasGarden === undefined || movingInfo.hasGarden === null) {
@@ -59,11 +64,11 @@ export function GardenQuestionsDialog({
   const handleNext = async () => {
     if (step === 1) {
       if (hasGarden === false) {
-        // No garden, complete immediately
+        // No garden, complete immediately with confirmation
         const data = { hasGarden: false };
         await saveToProfile(data);
         onComplete(data);
-        onOpenChange(false);
+        setShowConfirmation(true);
         return;
       }
       if (hasGarden === true) {
@@ -99,9 +104,69 @@ export function GardenQuestionsDialog({
     await saveToProfile(data);
     
     onComplete(data);
-    onOpenChange(false);
-    onRedirect();
+    setShowConfirmation(true);
   };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    setStep(1);
+    onOpenChange(false);
+  };
+
+  const handleGoToDeals = () => {
+    onRedirect();
+    handleClose();
+  };
+
+  // Confirmation screen
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              {hasGarden ? "We zoeken passende hoveniers voor je." : "Je hebt aangegeven geen tuin te hebben."}
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              {hasGarden && (
+                <Button 
+                  onClick={handleGoToDeals}
+                  className="w-full"
+                >
+                  Bekijk hoveniers
+                </Button>
+              )}
+              <Button 
+                variant={hasGarden ? "outline" : "default"}
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -136,7 +201,7 @@ export function GardenQuestionsDialog({
                 disabled={hasGarden === null}
                 className="w-full"
               >
-                {hasGarden === false ? "Afsluiten" : "Volgende"}
+                {hasGarden === false ? "Opslaan" : "Volgende"}
               </Button>
             </div>
           )}
@@ -204,7 +269,7 @@ export function GardenQuestionsDialog({
                 disabled={!gardenServiceType}
                 className="w-full"
               >
-                Bekijk hoveniers
+                Opslaan
               </Button>
             </div>
           )}

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Shield, Baby, PawPrint, ArrowRight, Info } from "lucide-react";
+import { Shield, Baby, PawPrint, ArrowRight, Info, CheckCircle2, Check } from "lucide-react";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
@@ -19,6 +19,7 @@ type LiabilityQuestionsDialogProps = {
   movingInfo: MovingInfo;
   onComplete: (data: Partial<MovingInfo>) => void;
   onRedirect: () => void;
+  onCompleteTask?: () => void;
 };
 
 const stepExplanations = {
@@ -32,6 +33,7 @@ export const LiabilityQuestionsDialog = ({
   movingInfo,
   onComplete,
   onRedirect,
+  onCompleteTask,
 }: LiabilityQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
   const [step, setStep] = useState(1);
@@ -39,6 +41,8 @@ export const LiabilityQuestionsDialog = ({
   const [hasPets, setHasPets] = useState<"yes" | "no" | "">(
     movingInfo.pets !== undefined && movingInfo.pets > 0 ? "yes" : ""
   );
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Determine which questions to ask
   const needsChildrenQuestion = movingInfo.children === undefined || movingInfo.children === null;
   const needsPetsQuestion = movingInfo.pets === undefined || movingInfo.pets === null;
@@ -50,7 +54,7 @@ export const LiabilityQuestionsDialog = ({
     if (step === 1 && needsPetsQuestion) {
       setStep(2);
     } else {
-      // Complete and redirect
+      // Complete and show confirmation
       const updates: Partial<MovingInfo> = {};
       if (needsChildrenQuestion) {
         updates.children = numberOfChildren;
@@ -63,10 +67,21 @@ export const LiabilityQuestionsDialog = ({
       await saveToProfile(updates);
       
       onComplete(updates);
-      onOpenChange(false);
-      onRedirect();
+      setShowConfirmation(true);
     }
   };
+
+  const handleClose = () => {
+    setShowConfirmation(false);
+    setStep(1);
+    onOpenChange(false);
+  };
+
+  const handleGoToDeals = () => {
+    onRedirect();
+    handleClose();
+  };
+
   const getCurrentStep = () => {
     if (step === 1 && needsChildrenQuestion) return 1;
     if (step === 2 || (!needsChildrenQuestion && needsPetsQuestion)) return totalSteps;
@@ -75,6 +90,53 @@ export const LiabilityQuestionsDialog = ({
 
   // Skip to relevant step on mount
   const effectiveStep = !needsChildrenQuestion && needsPetsQuestion ? 2 : step;
+
+  // Confirmation screen
+  if (showConfirmation) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-center">
+              Gegevens opgeslagen!
+            </h2>
+            <p className="text-muted-foreground text-center text-sm">
+              We kunnen nu passende verzekeringen voor je zoeken.
+            </p>
+            <div className="w-full space-y-2 mt-4">
+              <Button 
+                onClick={handleGoToDeals}
+                className="w-full"
+              >
+                Bekijk aanbiedingen
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  onCompleteTask?.();
+                  handleClose();
+                }}
+                className="w-full"
+              >
+                <Check className="w-4 h-4 mr-2" />
+                Taak afronden
+              </Button>
+              <Button 
+                variant="ghost"
+                onClick={handleClose}
+                className="w-full text-muted-foreground"
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -179,7 +241,7 @@ export const LiabilityQuestionsDialog = ({
             }
             className="w-full"
           >
-            {(effectiveStep === 1 && needsPetsQuestion) ? "Volgende" : "Bekijk aanbiedingen"}
+            {(effectiveStep === 1 && needsPetsQuestion) ? "Volgende" : "Opslaan"}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
