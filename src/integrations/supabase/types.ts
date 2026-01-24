@@ -626,17 +626,213 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      admin_profiles_view: {
+        Row: {
+          adults: number | null
+          building_access: string | null
+          building_year: string | null
+          children: number | null
+          children_ages: string | null
+          created_at: string | null
+          current_housing_situation: string | null
+          energy_connection_type: string | null
+          energy_current_supplier: string | null
+          floor_level: string | null
+          forwarding_duration: string | null
+          forwarding_start_date: string | null
+          garden_service_type: string | null
+          garden_size: string | null
+          glasvezel: string | null
+          has_elevator: string | null
+          has_fiber: string | null
+          has_fragile_items: string | null
+          has_garden: boolean | null
+          has_gas: string | null
+          has_job: boolean | null
+          has_parking: boolean | null
+          has_smart_meter: string | null
+          home_size_m2: string | null
+          household_names: string[] | null
+          housing_property_type: string | null
+          id: string | null
+          insurance_value: string | null
+          internet_bundle: string | null
+          internet_speed_preference: string | null
+          is_vve: boolean | null
+          key_handover_date: string | null
+          moving_budget: number | null
+          moving_date: string | null
+          moving_type: string | null
+          municipality: string | null
+          needs_contractor_help: boolean | null
+          new_address: string | null
+          number_of_bedrooms: string | null
+          number_of_floors: string | null
+          number_of_rooms: string | null
+          old_address: string | null
+          pets: number | null
+          phone: string | null
+          preferred_service_date: string | null
+          renovation_budget: string | null
+          renovation_start_date: string | null
+          renovation_type: string | null
+          service_type: string | null
+          special_items: string[] | null
+          updated_at: string | null
+          user_id: string | null
+          works_from_home: string | null
+        }
+        Insert: {
+          adults?: number | null
+          building_access?: string | null
+          building_year?: string | null
+          children?: number | null
+          children_ages?: string | null
+          created_at?: string | null
+          current_housing_situation?: string | null
+          energy_connection_type?: string | null
+          energy_current_supplier?: string | null
+          floor_level?: string | null
+          forwarding_duration?: string | null
+          forwarding_start_date?: string | null
+          garden_service_type?: string | null
+          garden_size?: string | null
+          glasvezel?: string | null
+          has_elevator?: string | null
+          has_fiber?: string | null
+          has_fragile_items?: string | null
+          has_garden?: boolean | null
+          has_gas?: string | null
+          has_job?: boolean | null
+          has_parking?: boolean | null
+          has_smart_meter?: string | null
+          home_size_m2?: string | null
+          household_names?: string[] | null
+          housing_property_type?: string | null
+          id?: string | null
+          insurance_value?: string | null
+          internet_bundle?: string | null
+          internet_speed_preference?: string | null
+          is_vve?: boolean | null
+          key_handover_date?: string | null
+          moving_budget?: number | null
+          moving_date?: string | null
+          moving_type?: string | null
+          municipality?: string | null
+          needs_contractor_help?: boolean | null
+          new_address?: string | null
+          number_of_bedrooms?: string | null
+          number_of_floors?: string | null
+          number_of_rooms?: string | null
+          old_address?: string | null
+          pets?: number | null
+          phone?: string | null
+          preferred_service_date?: string | null
+          renovation_budget?: string | null
+          renovation_start_date?: string | null
+          renovation_type?: string | null
+          service_type?: string | null
+          special_items?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          works_from_home?: string | null
+        }
+        Update: {
+          adults?: number | null
+          building_access?: string | null
+          building_year?: string | null
+          children?: number | null
+          children_ages?: string | null
+          created_at?: string | null
+          current_housing_situation?: string | null
+          energy_connection_type?: string | null
+          energy_current_supplier?: string | null
+          floor_level?: string | null
+          forwarding_duration?: string | null
+          forwarding_start_date?: string | null
+          garden_service_type?: string | null
+          garden_size?: string | null
+          glasvezel?: string | null
+          has_elevator?: string | null
+          has_fiber?: string | null
+          has_fragile_items?: string | null
+          has_garden?: boolean | null
+          has_gas?: string | null
+          has_job?: boolean | null
+          has_parking?: boolean | null
+          has_smart_meter?: string | null
+          home_size_m2?: string | null
+          household_names?: string[] | null
+          housing_property_type?: string | null
+          id?: string | null
+          insurance_value?: string | null
+          internet_bundle?: string | null
+          internet_speed_preference?: string | null
+          is_vve?: boolean | null
+          key_handover_date?: string | null
+          moving_budget?: number | null
+          moving_date?: string | null
+          moving_type?: string | null
+          municipality?: string | null
+          needs_contractor_help?: boolean | null
+          new_address?: string | null
+          number_of_bedrooms?: string | null
+          number_of_floors?: string | null
+          number_of_rooms?: string | null
+          old_address?: string | null
+          pets?: number | null
+          phone?: string | null
+          preferred_service_date?: string | null
+          renovation_budget?: string | null
+          renovation_start_date?: string | null
+          renovation_type?: string | null
+          service_type?: string | null
+          special_items?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+          works_from_home?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_assignee_email: {
         Args: { assignee_email_fallback: string; assignee_user_id: string }
         Returns: string
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       task_status: "todo" | "in_progress" | "done"
     }
     CompositeTypes: {
@@ -765,6 +961,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       task_status: ["todo", "in_progress", "done"],
     },
   },
