@@ -8,6 +8,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility";
 import Index from "./pages/Index";
 import { TaskDeals } from "./pages/TaskDeals";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -34,6 +35,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
+              <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
