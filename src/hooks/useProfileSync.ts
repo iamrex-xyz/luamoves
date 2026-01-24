@@ -121,6 +121,9 @@ export const useProfileSync = () => {
       // Bouwkundige keuring intake fields
       if ((data as any).bouwkundigeKeuringVoorkeursdatum !== undefined) profileUpdate.bouwkundige_keuring_voorkeursdatum = (data as any).bouwkundigeKeuringVoorkeursdatum || null;
 
+      // Opstal intake fields
+      if ((data as any).opstalDakType !== undefined) profileUpdate.opstal_dak_type = (data as any).opstalDakType || null;
+
       // Only update if there's something to update
       if (Object.keys(profileUpdate).length === 0) {
         return { success: true, synced: false };
