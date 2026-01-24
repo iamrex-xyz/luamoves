@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useAdminProfiles, AdminProfile } from "@/hooks/useAdminProfiles";
 import { AdminProfileCard } from "./AdminProfileCard";
+import { AdminLoginForm } from "./AdminLoginForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -55,27 +56,9 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     );
   }
 
-  // First check: Must be authenticated
+  // First check: Must be authenticated - show login form
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Alert variant="destructive" className="max-w-md">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Niet ingelogd</AlertTitle>
-          <AlertDescription>
-            Je moet eerst inloggen om het admin dashboard te bekijken.
-          </AlertDescription>
-          <Button 
-            variant="outline" 
-            className="mt-4 w-full"
-            onClick={onBack}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Naar inloggen
-          </Button>
-        </Alert>
-      </div>
-    );
+    return <AdminLoginForm />;
   }
 
   // Second check: Must have admin rights
