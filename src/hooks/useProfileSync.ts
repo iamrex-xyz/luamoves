@@ -97,6 +97,30 @@ export const useProfileSync = () => {
       if (data.phone !== undefined) profileUpdate.phone = data.phone || null;
       if (data.movingBudget !== undefined) profileUpdate.moving_budget = data.movingBudget || null;
 
+      // Hypotheek intake fields
+      if ((data as any).hypotheekKoopsom !== undefined) profileUpdate.hypotheek_koopsom = (data as any).hypotheekKoopsom || null;
+      if ((data as any).hypotheekWerkSituatie !== undefined) profileUpdate.hypotheek_werksituatie = (data as any).hypotheekWerkSituatie || null;
+      if ((data as any).hypotheekHeeftPartner !== undefined) profileUpdate.hypotheek_heeft_partner = (data as any).hypotheekHeeftPartner || null;
+      if ((data as any).hypotheekDoel !== undefined) profileUpdate.hypotheek_doel = (data as any).hypotheekDoel || null;
+
+      // Notaris intake fields
+      if ((data as any).notarisDienst !== undefined) profileUpdate.notaris_dienst = (data as any).notarisDienst || null;
+
+      // Taxatie intake fields
+      if ((data as any).taxatieDoel !== undefined) profileUpdate.taxatie_doel = (data as any).taxatieDoel || null;
+      if ((data as any).taxatieVoorkeursdatum !== undefined) profileUpdate.taxatie_voorkeursdatum = (data as any).taxatieVoorkeursdatum || null;
+
+      // Slotcilinder intake fields
+      if ((data as any).slotAantalDeuren !== undefined) profileUpdate.slot_aantal_deuren = (data as any).slotAantalDeuren || null;
+      if ((data as any).slotVeiligheidsniveau !== undefined) profileUpdate.slot_veiligheidsniveau = (data as any).slotVeiligheidsniveau || null;
+      if ((data as any).slotMontage !== undefined) profileUpdate.slot_montage = (data as any).slotMontage || null;
+
+      // Verhuislift intake fields
+      if ((data as any).verhuisliftLocatie !== undefined) profileUpdate.verhuislift_locatie = (data as any).verhuisliftLocatie || null;
+
+      // Bouwkundige keuring intake fields
+      if ((data as any).bouwkundigeKeuringVoorkeursdatum !== undefined) profileUpdate.bouwkundige_keuring_voorkeursdatum = (data as any).bouwkundigeKeuringVoorkeursdatum || null;
+
       // Only update if there's something to update
       if (Object.keys(profileUpdate).length === 0) {
         return { success: true, synced: false };

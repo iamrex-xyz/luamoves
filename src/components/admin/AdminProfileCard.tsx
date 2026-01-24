@@ -110,6 +110,28 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
       ]
     },
     {
+      title: "Hypotheek",
+      icon: <Home className="w-4 h-4" />,
+      hasData: !!(localProfile.hypotheek_koopsom || localProfile.hypotheek_doel || localProfile.hypotheek_werksituatie),
+      fields: [
+        { label: "Koopsom", key: "hypotheek_koopsom", type: "number", dbKey: "hypotheek_koopsom" },
+        { label: "Werksituatie", key: "hypotheek_werksituatie", dbKey: "hypotheek_werksituatie" },
+        { label: "Heeft partner", key: "hypotheek_heeft_partner", dbKey: "hypotheek_heeft_partner" },
+        { label: "Doel hypotheek", key: "hypotheek_doel", dbKey: "hypotheek_doel" },
+      ]
+    },
+    {
+      title: "Notaris & Taxatie",
+      icon: <Shield className="w-4 h-4" />,
+      hasData: !!(localProfile.notaris_dienst || localProfile.taxatie_doel || localProfile.taxatie_voorkeursdatum),
+      fields: [
+        { label: "Notaris dienst", key: "notaris_dienst", dbKey: "notaris_dienst" },
+        { label: "Taxatie doel", key: "taxatie_doel", dbKey: "taxatie_doel" },
+        { label: "Taxatie voorkeursdatum", key: "taxatie_voorkeursdatum", type: "date", dbKey: "taxatie_voorkeursdatum" },
+        { label: "Bouwk. keuring datum", key: "bouwkundige_keuring_voorkeursdatum", type: "date", dbKey: "bouwkundige_keuring_voorkeursdatum" },
+      ]
+    },
+    {
       title: "Energie",
       icon: <Zap className="w-4 h-4" />,
       hasData: !!(localProfile.energy_current_supplier || localProfile.energy_connection_type || localProfile.has_gas),
@@ -131,11 +153,24 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
       ]
     },
     {
-      title: "Verhuizing",
+      title: "Verhuizing & Lift",
       icon: <Truck className="w-4 h-4" />,
-      hasData: !!(localProfile.floor_level || localProfile.has_elevator || (localProfile.special_items && localProfile.special_items.length > 0)),
+      hasData: !!(localProfile.floor_level || localProfile.has_elevator || localProfile.verhuislift_locatie || localProfile.building_access),
       fields: [
         { label: "Gemeente", key: "municipality", dbKey: "municipality" },
+        { label: "Verdieping", key: "floor_level", dbKey: "floor_level" },
+        { label: "Toegang gebouw", key: "building_access", dbKey: "building_access" },
+        { label: "Verhuislift locatie", key: "verhuislift_locatie", dbKey: "verhuislift_locatie" },
+      ]
+    },
+    {
+      title: "Sloten",
+      icon: <Shield className="w-4 h-4" />,
+      hasData: !!(localProfile.slot_aantal_deuren || localProfile.slot_veiligheidsniveau || localProfile.slot_montage),
+      fields: [
+        { label: "Aantal deuren", key: "slot_aantal_deuren", dbKey: "slot_aantal_deuren" },
+        { label: "Veiligheidsniveau", key: "slot_veiligheidsniveau", dbKey: "slot_veiligheidsniveau" },
+        { label: "Montage", key: "slot_montage", dbKey: "slot_montage" },
       ]
     },
     {
@@ -143,11 +178,12 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
       icon: <Package className="w-4 h-4" />,
       hasData: !!(localProfile.number_of_rooms || localProfile.has_fragile_items),
       fields: [
+        { label: "Aantal kamers", key: "number_of_rooms", dbKey: "number_of_rooms" },
         { label: "Breekbare spullen", key: "has_fragile_items", dbKey: "has_fragile_items" },
       ]
     },
     {
-      title: "Verzekeringen & Overig",
+      title: "Verzekeringen & Renovatie",
       icon: <Shield className="w-4 h-4" />,
       hasData: !!(localProfile.insurance_value || localProfile.renovation_budget),
       fields: [
