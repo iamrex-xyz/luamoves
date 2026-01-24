@@ -102,10 +102,16 @@ export const useProfileSync = () => {
         return { success: true, synced: false };
       }
 
+      // Upsert so the profile row is guaranteed to exist
       const { error } = await supabase
         .from('profiles')
-        .update(profileUpdate)
-        .eq('user_id', user.id);
+        .upsert(
+          {
+            user_id: user.id,
+            ...profileUpdate,
+          } as any,
+          { onConflict: 'user_id' }
+        );
 
       if (error) {
         console.error('Error saving to profile:', error);

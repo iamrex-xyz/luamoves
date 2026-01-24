@@ -125,7 +125,9 @@ const Index = () => {
       
       await supabase
         .from('profiles')
-        .update({
+        .upsert(
+          {
+          user_id: userId,
           old_address: info.oldAddress,
           new_address: info.newAddress,
           moving_date: info.movingDate || null,
@@ -174,8 +176,9 @@ const Index = () => {
           renovation_budget: info.renovationBudget || null,
           renovation_start_date: info.renovationStartDate || null,
           phone: capturedPhone,
-        } as any)
-        .eq('user_id', userId);
+        } as any,
+          { onConflict: 'user_id' }
+        );
 
       // Clear local storage after sync
       localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -336,7 +339,9 @@ const Index = () => {
       try {
         await supabase
           .from('profiles')
-          .update({
+          .upsert(
+            {
+            user_id: user.id,
             old_address: updatedInfo.oldAddress || null,
             new_address: updatedInfo.newAddress || null,
             moving_date: updatedInfo.movingDate || null,
@@ -384,8 +389,9 @@ const Index = () => {
             garden_service_type: updatedInfo.gardenServiceType || null,
             renovation_budget: updatedInfo.renovationBudget || null,
             renovation_start_date: updatedInfo.renovationStartDate || null,
-          } as any)
-          .eq('user_id', user.id);
+          } as any,
+            { onConflict: 'user_id' }
+          );
       } catch (error) {
         console.error('Error updating profile:', error);
       }

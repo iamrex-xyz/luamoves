@@ -279,15 +279,19 @@ export const SignupPromptDialog = ({
         }
         
         // Update profile with the data
+        // Use upsert so the profile row is guaranteed to exist
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({
-            old_address: getFullOldAddress(),
-            key_handover_date: keyHandoverDate ? format(keyHandoverDate, "yyyy-MM-dd") : null,
-            household_type: householdType || null,
-            phone: phone.trim() || null,
-          })
-          .eq('user_id', data.user.id);
+          .upsert(
+            {
+              user_id: data.user.id,
+              old_address: getFullOldAddress(),
+              key_handover_date: keyHandoverDate ? format(keyHandoverDate, "yyyy-MM-dd") : null,
+              household_type: householdType || null,
+              phone: phone.trim() || null,
+            } as any,
+            { onConflict: 'user_id' }
+          );
 
         if (profileError) {
           console.error('Error updating profile:', profileError);
