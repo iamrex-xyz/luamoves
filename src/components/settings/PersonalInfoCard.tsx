@@ -70,10 +70,17 @@ export const PersonalInfoCard = () => {
       const birthDateStr = birthDateObj ? format(birthDateObj, "yyyy-MM-dd") : birthDate;
       const cleanedPhone = cleanPhone(phone);
 
+      // Upsert so the profile row is guaranteed to exist
       const { error } = await supabase
         .from("profiles")
-        .update({ phone: cleanedPhone || null, birth_date: birthDateStr || null })
-        .eq("user_id", user.id);
+        .upsert(
+          {
+            user_id: user.id,
+            phone: cleanedPhone || null,
+            birth_date: birthDateStr || null,
+          } as any,
+          { onConflict: "user_id" }
+        );
 
       if (error) throw error;
 
