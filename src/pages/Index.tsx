@@ -98,6 +98,7 @@ const Index = () => {
         renovationBudget: (profile as any).renovation_budget,
         renovationStartDate: (profile as any).renovation_start_date,
         housingPropertyType: (profile as any).housing_property_type,
+        phone: (profile as any).phone,
       };
       setMovingInfo(info);
       setCurrentView("dashboard");
@@ -119,6 +120,9 @@ const Index = () => {
   // Sync local data to profile
   const syncLocalDataToProfile = async (userId: string, info: MovingInfo) => {
     try {
+      // Get captured phone from localStorage if not in info
+      const capturedPhone = localStorage.getItem("lua_captured_phone") || info.phone || null;
+      
       await supabase
         .from('profiles')
         .update({
@@ -129,7 +133,7 @@ const Index = () => {
           moving_type: info.type,
           renovation_type: info.renovationType || "none",
           needs_contractor_help: info.needsContractorHelp || false,
-          housing_property_type: info.propertyType || null,
+          housing_property_type: info.propertyType || info.housingPropertyType || null,
           has_garden: info.hasGarden || false,
           has_parking: info.hasParking || false,
           is_vve: info.isVve || false,
@@ -169,7 +173,7 @@ const Index = () => {
           garden_service_type: info.gardenServiceType || null,
           renovation_budget: info.renovationBudget || null,
           renovation_start_date: info.renovationStartDate || null,
-          phone: info.phone || null,
+          phone: capturedPhone,
         } as any)
         .eq('user_id', userId);
 
@@ -178,6 +182,7 @@ const Index = () => {
       localStorage.removeItem("lua_email_prompted");
       localStorage.removeItem("lua_signup_prompted");
       localStorage.removeItem("lua_captured_email");
+      localStorage.removeItem("lua_captured_phone");
     } catch (error) {
       console.error('Error syncing data:', error);
     }
