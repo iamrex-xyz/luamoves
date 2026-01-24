@@ -12,7 +12,49 @@ export const AdminLoginForm = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const { toast } = useToast();
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      toast({
+        title: "Vul je e-mailadres in",
+        description: "Voer eerst je e-mailadres in om een reset link te ontvangen.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsResetting(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/admin`,
+      });
+
+      if (error) {
+        toast({
+          title: "Fout bij verzenden",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "E-mail verzonden",
+          description: "Check je inbox voor de wachtwoord reset link.",
+        });
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+      toast({
+        title: "Fout",
+        description: "Er is een onverwachte fout opgetreden.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +170,23 @@ export const AdminLoginForm = () => {
               </>
             ) : (
               "Inloggen"
+            )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="link"
+            className="w-full text-sm"
+            disabled={isLoading || isResetting}
+            onClick={handleForgotPassword}
+          >
+            {isResetting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                E-mail versturen...
+              </>
+            ) : (
+              "Wachtwoord vergeten?"
             )}
           </Button>
         </form>
