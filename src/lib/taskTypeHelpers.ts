@@ -191,9 +191,8 @@ export const isNotarisTask = (task: Task): boolean => {
   const titleLower = task.title.toLowerCase();
   const idLower = task.id.toLowerCase();
   return (
-    (titleLower.includes("notaris") && titleLower.includes("kiezen")) ||
-    idLower.includes("notaris-kiezen") ||
-    (idLower.includes("notaris") && !titleLower.includes("levering") && !titleLower.includes("conceptakte"))
+    titleLower.includes("notaris") ||
+    idLower.includes("notaris")
   );
 };
 
