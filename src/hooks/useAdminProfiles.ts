@@ -66,6 +66,10 @@ export type AdminProfile = {
   slot_montage: string | null;
   verhuislift_locatie: string | null;
   bouwkundige_keuring_voorkeursdatum: string | null;
+  opstal_dak_type: string | null;
+  // Energy fields
+  energy_estimated_gas: number | null;
+  energy_estimated_electricity: number | null;
   created_at: string;
   updated_at: string;
 };

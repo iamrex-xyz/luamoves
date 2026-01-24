@@ -123,7 +123,7 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
     {
       title: "Notaris & Taxatie",
       icon: <Shield className="w-4 h-4" />,
-      hasData: !!(localProfile.notaris_dienst || localProfile.taxatie_doel || localProfile.taxatie_voorkeursdatum),
+      hasData: !!(localProfile.notaris_dienst || localProfile.taxatie_doel || localProfile.taxatie_voorkeursdatum || localProfile.bouwkundige_keuring_voorkeursdatum),
       fields: [
         { label: "Notaris dienst", key: "notaris_dienst", dbKey: "notaris_dienst" },
         { label: "Taxatie doel", key: "taxatie_doel", dbKey: "taxatie_doel" },
@@ -132,14 +132,24 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
       ]
     },
     {
+      title: "Opstalverzekering",
+      icon: <Shield className="w-4 h-4" />,
+      hasData: !!(localProfile.opstal_dak_type),
+      fields: [
+        { label: "Daktype", key: "opstal_dak_type", dbKey: "opstal_dak_type" },
+      ]
+    },
+    {
       title: "Energie",
       icon: <Zap className="w-4 h-4" />,
-      hasData: !!(localProfile.energy_current_supplier || localProfile.energy_connection_type || localProfile.has_gas),
+      hasData: !!(localProfile.energy_current_supplier || localProfile.energy_connection_type || localProfile.has_gas || localProfile.energy_estimated_gas || localProfile.energy_estimated_electricity),
       fields: [
         { label: "Huidige leverancier", key: "energy_current_supplier", dbKey: "energy_current_supplier" },
         { label: "Aansluiting", key: "energy_connection_type", dbKey: "energy_connection_type" },
         { label: "Gas aansluiting", key: "has_gas", dbKey: "has_gas" },
         { label: "Slimme meter", key: "has_smart_meter", dbKey: "has_smart_meter" },
+        { label: "Geschat gasverbruik", key: "energy_estimated_gas", type: "number", dbKey: "energy_estimated_gas" },
+        { label: "Geschat stroomverbruik", key: "energy_estimated_electricity", type: "number", dbKey: "energy_estimated_electricity" },
       ]
     },
     {
