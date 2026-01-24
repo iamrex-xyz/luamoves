@@ -1,19 +1,38 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 import { Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAutosave } from "@/hooks/useAutosave";
+import { AutosaveIndicator } from "@/components/ui/autosave-indicator";
 
 export const HouseholdSettingsCard = () => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [pets, setPets] = useState(0);
+
+  const saveToDatabase = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("profiles")
+      .upsert(
+        {
+          user_id: user.id,
+          adults,
+          children,
+          pets,
+        } as any,
+        { onConflict: "user_id" }
+      );
+
+    if (error) throw error;
+  }, [adults, children, pets]);
+
+  const { triggerSave, status } = useAutosave(saveToDatabase);
 
   useEffect(() => {
     loadProfile();
@@ -42,26 +61,22 @@ export const HouseholdSettingsCard = () => {
     }
   };
 
-  const handleSave = async () => {
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+  const handleAdultsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 1;
+    setAdults(Math.max(1, value));
+    triggerSave();
+  };
 
-      const { error } = await supabase
-        .from("profiles")
-        .update({ adults, children, pets })
-        .eq("user_id", user.id);
+  const handleChildrenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 0;
+    setChildren(Math.max(0, value));
+    triggerSave();
+  };
 
-      if (error) throw error;
-
-      toast({ title: "Opgeslagen", description: "Huishouden details zijn bijgewerkt." });
-    } catch (error) {
-      console.error("Error saving:", error);
-      toast({ title: "Fout", description: "Kon huishouden details niet opslaan.", variant: "destructive" });
-    } finally {
-      setIsLoading(false);
-    }
+  const handlePetsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value) || 0;
+    setPets(Math.max(0, value));
+    triggerSave();
   };
 
   if (isInitialLoading) {
@@ -91,7 +106,6 @@ export const HouseholdSettingsCard = () => {
               <Skeleton className="h-11 w-full rounded-xl" />
             </div>
           </div>
-          <Skeleton className="h-11 w-full rounded-xl" />
         </div>
       </div>
     );
@@ -100,14 +114,17 @@ export const HouseholdSettingsCard = () => {
   return (
     <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden">
       <div className="p-4 border-b border-border/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-info" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-info/10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-info" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-foreground">Huishouden</h2>
+              <p className="text-xs text-muted-foreground">Bewoners en huisdieren</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-semibold text-foreground">Huishouden</h2>
-            <p className="text-xs text-muted-foreground">Bewoners en huisdieren</p>
-          </div>
+          <AutosaveIndicator status={status} />
         </div>
       </div>
 
@@ -119,7 +136,7 @@ export const HouseholdSettingsCard = () => {
               type="number"
               min="1"
               value={adults}
-              onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
+              onChange={handleAdultsChange}
               className="rounded-xl h-11"
             />
           </div>
@@ -130,7 +147,7 @@ export const HouseholdSettingsCard = () => {
               type="number"
               min="0"
               value={children}
-              onChange={(e) => setChildren(parseInt(e.target.value) || 0)}
+              onChange={handleChildrenChange}
               className="rounded-xl h-11"
             />
           </div>
@@ -141,15 +158,11 @@ export const HouseholdSettingsCard = () => {
               type="number"
               min="0"
               value={pets}
-              onChange={(e) => setPets(parseInt(e.target.value) || 0)}
+              onChange={handlePetsChange}
               className="rounded-xl h-11"
             />
           </div>
         </div>
-
-        <Button onClick={handleSave} disabled={isLoading} className="w-full rounded-xl h-11">
-          Opslaan
-        </Button>
       </div>
     </div>
   );
