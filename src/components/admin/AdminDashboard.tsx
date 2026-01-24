@@ -20,7 +20,7 @@ type AdminDashboardProps = {
 };
 
 export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
-  const { isAdmin, isLoading: isCheckingAdmin, userEmail } = useAdminCheck();
+  const { isAdmin, isAuthenticated, isLoading: isCheckingAdmin, userEmail } = useAdminCheck();
   const { profiles, isLoading: isLoadingProfiles, error, refetch, updateProfile } = useAdminProfiles(isAdmin);
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -55,6 +55,30 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
     );
   }
 
+  // First check: Must be authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Niet ingelogd</AlertTitle>
+          <AlertDescription>
+            Je moet eerst inloggen om het admin dashboard te bekijken.
+          </AlertDescription>
+          <Button 
+            variant="outline" 
+            className="mt-4 w-full"
+            onClick={onBack}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Naar inloggen
+          </Button>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Second check: Must have admin rights
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
