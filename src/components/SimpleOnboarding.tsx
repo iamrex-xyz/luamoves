@@ -96,6 +96,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
   const [propertyType, setPropertyType] = useState<'apartment' | 'house' | null>(null);
   const [hasGarden, setHasGarden] = useState(false);
   const [hasParking, setHasParking] = useState(false);
+  const [adultsCount, setAdultsCount] = useState(1);
   const [childrenCount, setChildrenCount] = useState(0);
   const [petsCount, setPetsCount] = useState(0);
   const [hasJob, setHasJob] = useState(true);
@@ -194,6 +195,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           hasParking,
           isVve: propertyType === 'apartment',
           hasJob,
+          adults: adultsCount,
           children: childrenCount,
           pets: petsCount,
           phone: phoneNumber ? `${countryCode}${phoneNumber}` : undefined,
@@ -227,7 +229,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     }
   };
 
-  const CounterControl = ({ value, onChange, label, icon: Icon }: { value: number; onChange: (v: number) => void; label: string; icon: any }) => (
+  const CounterControl = ({ value, onChange, label, icon: Icon, min = 0 }: { value: number; onChange: (v: number) => void; label: string; icon: any; min?: number }) => (
     <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
@@ -237,9 +239,9 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
       </div>
       <div className="flex items-center gap-3">
         <button
-          onClick={() => onChange(Math.max(0, value - 1))}
+          onClick={() => onChange(Math.max(min, value - 1))}
           className="w-9 h-9 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors disabled:opacity-40"
-          disabled={value === 0}
+          disabled={value <= min}
         >
           <Minus className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -636,6 +638,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground uppercase tracking-wide">Je huishouden (optioneel)</Label>
               <div className="space-y-2">
+                <CounterControl value={adultsCount} onChange={setAdultsCount} label="Volwassenen" icon={Users} min={1} />
                 <CounterControl value={childrenCount} onChange={setChildrenCount} label="Kinderen" icon={Baby} />
                 <CounterControl value={petsCount} onChange={setPetsCount} label="Huisdieren" icon={Dog} />
               </div>
