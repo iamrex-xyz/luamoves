@@ -115,17 +115,23 @@ export const AccountCreationDialog = ({
       if (error) throw error;
 
       if (data.user) {
+        // Get phone from prop or localStorage fallback
+        const phoneToSave = capturedPhone || localStorage.getItem("lua_captured_phone");
+        
         // Update profile with phone number if we have it
-        if (capturedPhone) {
+        if (phoneToSave) {
           const { error: profileError } = await supabase
             .from('profiles')
             .update({
-              phone: capturedPhone,
+              phone: phoneToSave,
             })
             .eq('user_id', data.user.id);
 
           if (profileError) {
             console.error('Error updating profile with phone:', profileError);
+          } else {
+            // Clear localStorage after successful save
+            localStorage.removeItem("lua_captured_phone");
           }
         }
 
