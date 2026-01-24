@@ -28,11 +28,17 @@ import { InsuranceQuestionsDialog } from "@/components/InsuranceQuestionsDialog"
 import { LiabilityQuestionsDialog } from "@/components/LiabilityQuestionsDialog";
 import { ForwardingQuestionsDialog } from "@/components/ForwardingQuestionsDialog";
 import { PostNLPreparationDialog } from "@/components/PostNLPreparationDialog";
-
 import { CleaningQuestionsDialog } from "@/components/CleaningQuestionsDialog";
 import { SmokeDetectorQuestionsDialog } from "@/components/SmokeDetectorQuestionsDialog";
 import { GardenQuestionsDialog } from "@/components/GardenQuestionsDialog";
 import { RenovationQuestionsDialog } from "@/components/RenovationQuestionsDialog";
+import { HypotheekQuestionsDialog } from "@/components/HypotheekQuestionsDialog";
+import { BouwkundigeKeuringQuestionsDialog } from "@/components/BouwkundigeKeuringQuestionsDialog";
+import { NotarisQuestionsDialog } from "@/components/NotarisQuestionsDialog";
+import { TaxatieQuestionsDialog } from "@/components/TaxatieQuestionsDialog";
+import { OpstalQuestionsDialog } from "@/components/OpstalQuestionsDialog";
+import { SlotcilinderQuestionsDialog } from "@/components/SlotcilinderQuestionsDialog";
+import { VerhuisliftQuestionsDialog } from "@/components/VerhuisliftQuestionsDialog";
 import { InvitePartnerDialog } from "@/components/InvitePartnerDialog";
 import { InviteHouseholdDialog } from "@/components/InviteHouseholdDialog";
 import { BudgetDialog } from "@/components/BudgetDialog";
@@ -639,6 +645,56 @@ export const TaskList = ({
         onOpenChange={(open) => !open && setActiveDialog(null)}
         onInvitesSent={refreshTasks}
         onRequestLogin={onSignupClick}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+
+      <HypotheekQuestionsDialog
+        open={activeDialog === "hypotheek"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <BouwkundigeKeuringQuestionsDialog
+        open={activeDialog === "bouwkundigeKeuring"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <NotarisQuestionsDialog
+        open={activeDialog === "notaris"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <TaxatieQuestionsDialog
+        open={activeDialog === "taxatie"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <OpstalQuestionsDialog
+        open={activeDialog === "opstal"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <SlotcilinderQuestionsDialog
+        open={activeDialog === "slotcilinder"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
+        onCompleteTask={handleCompleteCurrentTask}
+      />
+      <VerhuisliftQuestionsDialog
+        open={activeDialog === "verhuislift"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        movingInfo={movingInfo}
+        onComplete={handleDialogComplete}
         onCompleteTask={handleCompleteCurrentTask}
       />
 
