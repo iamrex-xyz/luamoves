@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { useAdminProfiles } from "@/hooks/useAdminProfiles";
+import { useAdminProfiles, AdminProfile } from "@/hooks/useAdminProfiles";
 import { AdminProfileCard } from "./AdminProfileCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,8 @@ import {
   Users, 
   AlertCircle,
   ArrowLeft,
-  Loader2
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -20,8 +21,19 @@ type AdminDashboardProps = {
 
 export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const { isAdmin, isLoading: isCheckingAdmin, userEmail } = useAdminCheck();
-  const { profiles, isLoading: isLoadingProfiles, error } = useAdminProfiles(isAdmin);
+  const { profiles, isLoading: isLoadingProfiles, error, refetch, updateProfile } = useAdminProfiles(isAdmin);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetch();
+    setIsRefreshing(false);
+  };
+
+  const handleUpdateProfile = (profile: AdminProfile) => {
+    updateProfile(profile);
+  };
 
   // Filter profiles based on search
   const filteredProfiles = profiles.filter((profile) => {
@@ -85,9 +97,20 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                 <h1 className="text-lg font-semibold">Admin Dashboard</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span>{profiles.length} gebruikers</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4" />
+                <span>{profiles.length} gebruikers</span>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                Ververs
+              </Button>
             </div>
           </div>
         </div>
@@ -129,7 +152,11 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
         ) : (
           <div className="space-y-4">
             {filteredProfiles.map((profile) => (
-              <AdminProfileCard key={profile.id} profile={profile} />
+              <AdminProfileCard 
+                key={profile.id} 
+                profile={profile} 
+                onUpdate={handleUpdateProfile}
+              />
             ))}
           </div>
         )}

@@ -12,27 +12,38 @@ import {
   Package, 
   Shield,
   User,
-  Phone,
   Calendar,
   MapPin
 } from "lucide-react";
 import { AdminProfile } from "@/hooks/useAdminProfiles";
+import { AdminEditableField } from "./AdminEditableField";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
+import { toast } from "sonner";
 
 type AdminProfileCardProps = {
   profile: AdminProfile;
+  onUpdate: (profile: AdminProfile) => void;
+};
+
+type FieldConfig = {
+  label: string;
+  key: keyof AdminProfile;
+  type?: "text" | "number" | "date";
+  dbKey?: string;
 };
 
 type DataSection = {
   title: string;
   icon: React.ReactNode;
-  fields: { label: string; value: string | null | undefined }[];
+  fields: FieldConfig[];
   hasData: boolean;
 };
 
-export const AdminProfileCard = ({ profile }: AdminProfileCardProps) => {
+export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [localProfile, setLocalProfile] = useState(profile);
 
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
@@ -43,106 +54,113 @@ export const AdminProfileCard = ({ profile }: AdminProfileCardProps) => {
     }
   };
 
-  const formatBoolean = (val: boolean | null | undefined) => {
-    if (val === null || val === undefined) return null;
-    return val ? 'Ja' : 'Nee';
-  };
+  const handleSaveField = async (fieldKey: string, value: string) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ [fieldKey]: value || null })
+        .eq('user_id', profile.user_id);
 
-  const formatArray = (arr: string[] | null) => {
-    if (!arr || arr.length === 0) return null;
-    return arr.join(', ');
+      if (error) throw error;
+
+      const updatedProfile = { 
+        ...localProfile, 
+        [fieldKey]: value || null,
+        updated_at: new Date().toISOString()
+      } as AdminProfile;
+      
+      setLocalProfile(updatedProfile);
+      onUpdate(updatedProfile);
+      toast.success("Opgeslagen");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Kon niet opslaan");
+      throw error;
+    }
   };
 
   const sections: DataSection[] = [
     {
       title: "Basis informatie",
       icon: <User className="w-4 h-4" />,
-      hasData: !!(profile.phone || profile.old_address || profile.new_address || profile.moving_date),
+      hasData: !!(localProfile.phone || localProfile.old_address || localProfile.new_address || localProfile.moving_date),
       fields: [
-        { label: "Telefoon", value: profile.phone },
-        { label: "Oud adres", value: profile.old_address },
-        { label: "Nieuw adres", value: profile.new_address },
-        { label: "Verhuisdatum", value: formatDate(profile.moving_date) },
-        { label: "Sleuteloverdracht", value: formatDate(profile.key_handover_date) },
-        { label: "Type", value: profile.moving_type === 'buy' ? 'Koop' : profile.moving_type === 'rent' ? 'Huur' : null },
+        { label: "Telefoon", key: "phone", dbKey: "phone" },
+        { label: "Oud adres", key: "old_address", dbKey: "old_address" },
+        { label: "Nieuw adres", key: "new_address", dbKey: "new_address" },
+        { label: "Verhuisdatum", key: "moving_date", type: "date", dbKey: "moving_date" },
+        { label: "Sleuteloverdracht", key: "key_handover_date", type: "date", dbKey: "key_handover_date" },
+        { label: "Type (buy/rent)", key: "moving_type", dbKey: "moving_type" },
       ]
     },
     {
       title: "Woning",
       icon: <Home className="w-4 h-4" />,
-      hasData: !!(profile.housing_property_type || profile.home_size_m2 || profile.building_year),
+      hasData: !!(localProfile.housing_property_type || localProfile.home_size_m2 || localProfile.building_year),
       fields: [
-        { label: "Woningtype", value: profile.housing_property_type },
-        { label: "Oppervlakte", value: profile.home_size_m2 ? `${profile.home_size_m2} m²` : null },
-        { label: "Bouwjaar", value: profile.building_year },
-        { label: "Aantal kamers", value: profile.number_of_rooms },
-        { label: "Verdiepingen", value: profile.number_of_floors },
-        { label: "Slaapkamers", value: profile.number_of_bedrooms },
-        { label: "Heeft tuin", value: formatBoolean(profile.has_garden) },
-        { label: "Tuingrootte", value: profile.garden_size },
-        { label: "Heeft parkeren", value: formatBoolean(profile.has_parking) },
-        { label: "VvE", value: formatBoolean(profile.is_vve) },
-        { label: "Lift aanwezig", value: profile.has_elevator },
-        { label: "Verdieping", value: profile.floor_level },
+        { label: "Woningtype", key: "housing_property_type", dbKey: "housing_property_type" },
+        { label: "Oppervlakte (m²)", key: "home_size_m2", dbKey: "home_size_m2" },
+        { label: "Bouwjaar", key: "building_year", dbKey: "building_year" },
+        { label: "Aantal kamers", key: "number_of_rooms", dbKey: "number_of_rooms" },
+        { label: "Verdiepingen", key: "number_of_floors", dbKey: "number_of_floors" },
+        { label: "Slaapkamers", key: "number_of_bedrooms", dbKey: "number_of_bedrooms" },
+        { label: "Tuingrootte", key: "garden_size", dbKey: "garden_size" },
+        { label: "Lift aanwezig", key: "has_elevator", dbKey: "has_elevator" },
+        { label: "Verdieping", key: "floor_level", dbKey: "floor_level" },
       ]
     },
     {
       title: "Energie",
       icon: <Zap className="w-4 h-4" />,
-      hasData: !!(profile.energy_current_supplier || profile.energy_connection_type || profile.has_gas),
+      hasData: !!(localProfile.energy_current_supplier || localProfile.energy_connection_type || localProfile.has_gas),
       fields: [
-        { label: "Huidige leverancier", value: profile.energy_current_supplier },
-        { label: "Aansluiting", value: profile.energy_connection_type },
-        { label: "Gas aansluiting", value: profile.has_gas },
-        { label: "Slimme meter", value: profile.has_smart_meter },
+        { label: "Huidige leverancier", key: "energy_current_supplier", dbKey: "energy_current_supplier" },
+        { label: "Aansluiting", key: "energy_connection_type", dbKey: "energy_connection_type" },
+        { label: "Gas aansluiting", key: "has_gas", dbKey: "has_gas" },
+        { label: "Slimme meter", key: "has_smart_meter", dbKey: "has_smart_meter" },
       ]
     },
     {
       title: "Internet",
       icon: <Wifi className="w-4 h-4" />,
-      hasData: !!(profile.has_fiber || profile.internet_speed_preference || profile.internet_bundle),
+      hasData: !!(localProfile.has_fiber || localProfile.internet_speed_preference || localProfile.internet_bundle),
       fields: [
-        { label: "Glasvezel", value: profile.has_fiber || profile.glasvezel },
-        { label: "Snelheid voorkeur", value: profile.internet_speed_preference },
-        { label: "Bundel", value: profile.internet_bundle },
+        { label: "Glasvezel", key: "has_fiber", dbKey: "has_fiber" },
+        { label: "Snelheid voorkeur", key: "internet_speed_preference", dbKey: "internet_speed_preference" },
+        { label: "Bundel", key: "internet_bundle", dbKey: "internet_bundle" },
       ]
     },
     {
       title: "Verhuizing",
       icon: <Truck className="w-4 h-4" />,
-      hasData: !!(profile.floor_level || profile.has_elevator || profile.special_items?.length),
+      hasData: !!(localProfile.floor_level || localProfile.has_elevator || (localProfile.special_items && localProfile.special_items.length > 0)),
       fields: [
-        { label: "Verdieping", value: profile.floor_level },
-        { label: "Lift", value: profile.has_elevator },
-        { label: "Speciale items", value: formatArray(profile.special_items) },
-        { label: "Gemeente", value: profile.municipality },
+        { label: "Gemeente", key: "municipality", dbKey: "municipality" },
       ]
     },
     {
       title: "Verhuisdozen",
       icon: <Package className="w-4 h-4" />,
-      hasData: !!(profile.number_of_rooms || profile.has_fragile_items),
+      hasData: !!(localProfile.number_of_rooms || localProfile.has_fragile_items),
       fields: [
-        { label: "Aantal kamers", value: profile.number_of_rooms },
-        { label: "Breekbare spullen", value: profile.has_fragile_items },
+        { label: "Breekbare spullen", key: "has_fragile_items", dbKey: "has_fragile_items" },
       ]
     },
     {
       title: "Verzekeringen & Overig",
       icon: <Shield className="w-4 h-4" />,
-      hasData: !!(profile.insurance_value || profile.renovation_budget),
+      hasData: !!(localProfile.insurance_value || localProfile.renovation_budget),
       fields: [
-        { label: "Verzekerde waarde", value: profile.insurance_value },
-        { label: "Renovatie budget", value: profile.renovation_budget },
-        { label: "Renovatie startdatum", value: formatDate(profile.renovation_start_date) },
-        { label: "Verhuisbudget", value: profile.moving_budget ? `€${profile.moving_budget}` : null },
+        { label: "Verzekerde waarde", key: "insurance_value", dbKey: "insurance_value" },
+        { label: "Renovatie budget", key: "renovation_budget", dbKey: "renovation_budget" },
+        { label: "Renovatie startdatum", key: "renovation_start_date", type: "date", dbKey: "renovation_start_date" },
       ]
     },
   ];
 
   const filledSections = sections.filter(s => s.hasData);
   const filledFieldsCount = sections.reduce((count, section) => {
-    return count + section.fields.filter(f => f.value).length;
+    return count + section.fields.filter(f => localProfile[f.key]).length;
   }, 0);
 
   return (
@@ -152,19 +170,19 @@ export const AdminProfileCard = ({ profile }: AdminProfileCardProps) => {
           <div className="space-y-1">
             <CardTitle className="text-base flex items-center gap-2">
               <User className="w-4 h-4 text-muted-foreground" />
-              {profile.phone || 'Geen telefoon'}
+              {localProfile.phone || 'Geen telefoon'}
             </CardTitle>
             <div className="flex flex-wrap gap-1.5 text-sm text-muted-foreground">
-              {profile.new_address && (
+              {localProfile.new_address && (
                 <span className="flex items-center gap-1">
                   <MapPin className="w-3 h-3" />
-                  {profile.new_address.substring(0, 30)}{profile.new_address.length > 30 ? '...' : ''}
+                  {localProfile.new_address.substring(0, 30)}{localProfile.new_address.length > 30 ? '...' : ''}
                 </span>
               )}
-              {profile.moving_date && (
+              {localProfile.moving_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
-                  {formatDate(profile.moving_date)}
+                  {formatDate(localProfile.moving_date)}
                 </span>
               )}
             </div>
@@ -196,30 +214,29 @@ export const AdminProfileCard = ({ profile }: AdminProfileCardProps) => {
 
       {isExpanded && (
         <CardContent className="pt-4 space-y-4">
-          {sections.map((section) => {
-            const filledFields = section.fields.filter(f => f.value);
-            if (filledFields.length === 0) return null;
-
-            return (
-              <div key={section.title} className="space-y-2">
-                <h4 className="text-sm font-medium flex items-center gap-2 text-muted-foreground">
-                  {section.icon}
-                  {section.title}
-                </h4>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 pl-6">
-                  {filledFields.map((field) => (
-                    <div key={field.label} className="text-sm">
-                      <span className="text-muted-foreground">{field.label}:</span>{' '}
-                      <span className="font-medium">{field.value}</span>
-                    </div>
-                  ))}
-                </div>
+          {sections.map((section) => (
+            <div key={section.title} className="space-y-1">
+              <h4 className="text-sm font-medium flex items-center gap-2 text-muted-foreground mb-2">
+                {section.icon}
+                {section.title}
+              </h4>
+              <div className="pl-6 space-y-0.5">
+                {section.fields.map((field) => (
+                  <AdminEditableField
+                    key={field.key}
+                    label={field.label}
+                    value={localProfile[field.key] as string | null}
+                    fieldKey={field.dbKey || field.key}
+                    type={field.type}
+                    onSave={handleSaveField}
+                  />
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
 
           <div className="pt-2 border-t text-xs text-muted-foreground">
-            Laatst bijgewerkt: {formatDate(profile.updated_at)}
+            Laatst bijgewerkt: {formatDate(localProfile.updated_at)}
           </div>
         </CardContent>
       )}
