@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { MessageSquareHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,26 @@ function getAnonymousSessionId(): string {
     localStorage.setItem(storageKey, sessionId);
   }
   return sessionId;
+}
+
+// Context to allow external components to open the feedback modal
+interface FeedbackContextType {
+  openFeedback: () => void;
+}
+
+const FeedbackContext = createContext<FeedbackContextType | null>(null);
+
+export function useFeedback() {
+  const context = useContext(FeedbackContext);
+  if (!context) {
+    throw new Error("useFeedback must be used within FeedbackButton");
+  }
+  return context;
+}
+
+// Safe hook that doesn't throw if context is missing
+export function useFeedbackSafe() {
+  return useContext(FeedbackContext);
 }
 
 export function FeedbackButton() {
@@ -90,11 +110,13 @@ export function FeedbackButton() {
     }
   };
 
+  const openFeedback = () => setOpen(true);
+
   // Success state
   if (isSubmitted && open) {
     return (
-      <>
-        <FloatingButton onClick={() => setOpen(true)} />
+      <FeedbackContext.Provider value={{ openFeedback }}>
+        <FloatingButton onClick={openFeedback} />
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-md">
             <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -108,13 +130,13 @@ export function FeedbackButton() {
             </div>
           </DialogContent>
         </Dialog>
-      </>
+      </FeedbackContext.Provider>
     );
   }
 
   return (
-    <>
-      <FloatingButton onClick={() => setOpen(true)} />
+    <FeedbackContext.Provider value={{ openFeedback }}>
+      <FloatingButton onClick={openFeedback} />
       
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
@@ -185,7 +207,7 @@ export function FeedbackButton() {
           </div>
         </DialogContent>
       </Dialog>
-    </>
+    </FeedbackContext.Provider>
   );
 }
 
