@@ -575,6 +575,36 @@ export type Database = {
         }
         Relationships: []
       }
+      soft_launch_feedback: {
+        Row: {
+          anonymous_session_id: string | null
+          category: string | null
+          created_at: string
+          feedback_text: string
+          id: string
+          page_or_flow: string | null
+          user_id: string | null
+        }
+        Insert: {
+          anonymous_session_id?: string | null
+          category?: string | null
+          created_at?: string
+          feedback_text: string
+          id?: string
+          page_or_flow?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          anonymous_session_id?: string | null
+          category?: string | null
+          created_at?: string
+          feedback_text?: string
+          id?: string
+          page_or_flow?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       task_deadlines: {
         Row: {
           created_at: string | null
