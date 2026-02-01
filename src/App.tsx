@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility";
+import { FeedbackButton } from "@/components/FeedbackButton";
 import Index from "./pages/Index";
 import { TaskDeals } from "./pages/TaskDeals";
 import Admin from "./pages/Admin";
@@ -32,6 +33,7 @@ function App() {
           <ScreenReaderAnnouncer />
           
           <BrowserRouter>
+            <FeedbackButton />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
