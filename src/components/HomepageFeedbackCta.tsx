@@ -5,8 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * A small, always-visible feedback CTA for the homepage.
- * Positioned above the floating feedback button, designed to be
- * clearly discoverable without competing with main CTAs.
+ * Positioned above the bottom nav, clearly visible.
  */
 export function HomepageFeedbackCta() {
   const feedbackContext = useFeedbackSafe();
@@ -16,25 +15,27 @@ export function HomepageFeedbackCta() {
   };
 
   return (
-    <div className="fixed bottom-32 right-4 z-40 md:bottom-16 md:right-6">
-      <Button
-        onClick={handleClick}
-        variant="ghost"
-        size="sm"
-        className={cn(
-          "gap-1.5 rounded-full px-3 h-9",
-          "bg-white/90 backdrop-blur-sm shadow-md",
-          "border border-border/50",
-          "text-muted-foreground hover:text-primary hover:bg-primary/5",
-          "transition-all duration-200"
-        )}
-      >
-        <MessageSquareHeart className="h-4 w-4" />
-        <span className="text-xs font-medium">Feedback</span>
-      </Button>
-      <p className="text-[10px] text-muted-foreground/70 text-center mt-1 px-1">
-        Loop je ergens tegenaan?
-      </p>
+    <div className="fixed bottom-24 right-4 z-[60] md:bottom-8 md:right-6">
+      <div className="flex flex-col items-end gap-1">
+        <Button
+          onClick={handleClick}
+          variant="outline"
+          size="sm"
+          className={cn(
+            "gap-2 rounded-full px-4 h-10",
+            "bg-white shadow-lg shadow-primary/15",
+            "border-primary/20 hover:border-primary/40",
+            "text-foreground hover:text-primary hover:bg-primary/5",
+            "transition-all duration-200"
+          )}
+        >
+          <MessageSquareHeart className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">Feedback</span>
+        </Button>
+        <span className="text-[10px] text-muted-foreground mr-2">
+          Loop je ergens tegenaan?
+        </span>
+      </div>
     </div>
   );
 }
