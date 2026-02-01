@@ -12,12 +12,7 @@ import { TaskDeals } from "./pages/TaskDeals";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
-// Wrapper to conditionally hide floating button on homepage
-function FeedbackWrapper() {
-  const location = useLocation();
-  const isHomepage = location.pathname === "/";
-  return <FeedbackButton hideFloatingButton={isHomepage} />;
-}
+// Global feedback button - visible on all pages
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,7 +35,7 @@ function App() {
           <ScreenReaderAnnouncer />
           
           <BrowserRouter>
-            <FeedbackWrapper />
+            <FeedbackButton />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
