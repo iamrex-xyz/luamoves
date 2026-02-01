@@ -53,7 +53,12 @@ export function useFeedbackSafe() {
   return useContext(FeedbackContext);
 }
 
-export function FeedbackButton() {
+interface FeedbackButtonProps {
+  /** Hide the floating button (useful when showing a custom CTA instead) */
+  hideFloatingButton?: boolean;
+}
+
+export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonProps) {
   const [open, setOpen] = useState(false);
   const [feedbackText, setFeedbackText] = useState("");
   const [category, setCategory] = useState<string | undefined>(undefined);
@@ -116,7 +121,7 @@ export function FeedbackButton() {
   if (isSubmitted && open) {
     return (
       <FeedbackContext.Provider value={{ openFeedback }}>
-        <FloatingButton onClick={openFeedback} />
+        {!hideFloatingButton && <FloatingButton onClick={openFeedback} />}
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="sm:max-w-md">
             <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -136,7 +141,7 @@ export function FeedbackButton() {
 
   return (
     <FeedbackContext.Provider value={{ openFeedback }}>
-      <FloatingButton onClick={openFeedback} />
+      {!hideFloatingButton && <FloatingButton onClick={openFeedback} />}
       
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">

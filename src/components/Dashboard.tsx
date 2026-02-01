@@ -33,7 +33,7 @@ import { TaxatieQuestionsDialog } from "@/components/TaxatieQuestionsDialog";
 import { OpstalQuestionsDialog } from "@/components/OpstalQuestionsDialog";
 import { SlotcilinderQuestionsDialog } from "@/components/SlotcilinderQuestionsDialog";
 import { VerhuisliftQuestionsDialog } from "@/components/VerhuisliftQuestionsDialog";
-import { FeedbackNudge } from "@/components/FeedbackNudge";
+import { HomepageFeedbackCta } from "@/components/HomepageFeedbackCta";
 import {
   CheckCircle2,
   Plus,
@@ -168,7 +168,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
       aria-label="Dashboard"
     >
       <ConfettiCelebration trigger={showConfetti} onComplete={() => setShowConfetti(false)} />
-      <FeedbackNudge />
+      <HomepageFeedbackCta />
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
         <LuaLogo size="md" />
