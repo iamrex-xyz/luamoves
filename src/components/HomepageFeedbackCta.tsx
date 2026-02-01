@@ -10,7 +10,9 @@ import { cn } from "@/lib/utils";
 export function HomepageFeedbackCta() {
   const feedbackContext = useFeedbackSafe();
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     feedbackContext?.openFeedback();
   };
 
