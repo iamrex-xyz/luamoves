@@ -217,10 +217,34 @@ export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonPro
 }
 
 function FloatingButton({ onClick }: { onClick: () => void }) {
+  const location = useLocation();
+  const isOnboarding = location.pathname === "/";
+  
+  // Defensive positioning to NEVER overlap with other UI:
+  // - ALWAYS left side on all viewports to avoid right-side CTAs
+  // - Mobile: above BottomNav (bottom-[72px])
+  // - Desktop on onboarding: same left position (Start button is on right)
+  // - Desktop on other pages: can move to right since no floating CTAs there
+  
   return (
-    <div className="fixed bottom-20 right-4 z-50 md:bottom-6 md:right-6">
+    <div 
+      className={cn(
+        "fixed z-40 transition-all duration-200",
+        // Always left side, above BottomNav on mobile
+        "left-4 bottom-[72px]",
+        // Desktop: left on onboarding pages (to avoid Start/Volgende buttons on right)
+        // Right on other pages (no floating CTAs there)
+        isOnboarding 
+          ? "md:left-6 md:bottom-6" 
+          : "md:left-auto md:right-6 md:bottom-6"
+      )}
+    >
       <Button
-        onClick={onClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          onClick();
+        }}
         variant="outline"
         size="sm"
         className={cn(
