@@ -12,7 +12,7 @@ import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
-import { HomepageFeedbackCta } from "@/components/HomepageFeedbackCta";
+
 
 const testimonials = [
   { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
@@ -352,10 +352,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
           </div>
 
         </div>
-
-        {/* Floating Feedback Button - Above Start (outside clickable area) */}
-        <HomepageFeedbackCta />
-
         {/* Floating Start Button (outside clickable area) */}
         <Button
           onClick={handleNext}
