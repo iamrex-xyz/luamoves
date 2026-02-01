@@ -6,12 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight, MessageSquareHeart } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
+import { useFeedbackSafe } from "@/components/FeedbackButton";
 
 const testimonials = [
   { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
@@ -229,6 +230,37 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
     }
   };
 
+  // Feedback CTA for onboarding - positioned above Start button
+  const FeedbackCta = () => {
+    const feedbackContext = useFeedbackSafe();
+    
+    return (
+      <div className="fixed bottom-24 right-6 z-50 flex flex-col items-end gap-1">
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            feedbackContext?.openFeedback();
+          }}
+          variant="outline"
+          size="sm"
+          className={cn(
+            "gap-2 rounded-full px-4 h-10",
+            "bg-white shadow-lg shadow-primary/15",
+            "border-primary/20 hover:border-primary/40",
+            "text-foreground hover:text-primary hover:bg-primary/5",
+            "transition-all duration-200"
+          )}
+        >
+          <MessageSquareHeart className="h-4 w-4 text-primary" />
+          <span className="text-sm font-medium">Feedback</span>
+        </Button>
+        <span className="text-[10px] text-muted-foreground/80 mr-2">
+          Loop je ergens tegenaan?
+        </span>
+      </div>
+    );
+  };
+
   const CounterControl = ({ value, onChange, label, icon: Icon, min = 0 }: { value: number; onChange: (v: number) => void; label: string; icon: any; min?: number }) => (
     <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border">
       <div className="flex items-center gap-3">
@@ -348,6 +380,9 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
               </div>
             </div>
           </div>
+
+          {/* Floating Feedback Button - Above Start */}
+          <FeedbackCta />
 
           {/* Floating Start Button */}
           <Button
