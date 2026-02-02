@@ -124,6 +124,21 @@ export const HouseholdInviteSignup = ({
           console.error('Error updating household member:', memberError);
         }
 
+        // Sync contact to Bird CRM (fire and forget - don't block signup)
+        supabase.functions.invoke('sync-bird-contact', {
+          body: {
+            email: email,
+            phone: phone,
+            userId: data.user.id,
+          }
+        }).then(({ error }) => {
+          if (error) {
+            console.error('[Bird CRM] Sync error:', error);
+          } else {
+            console.log('[Bird CRM] Contact synced successfully');
+          }
+        });
+
         trackEvent("household_invite_accepted");
         
         toast({
