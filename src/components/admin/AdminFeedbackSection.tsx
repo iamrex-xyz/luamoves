@@ -143,23 +143,28 @@ export function AdminFeedbackSection() {
               <span className="text-muted-foreground/50">—</span>
               <Badge 
                 variant="secondary" 
-                className="font-mono text-xs py-0 bg-primary/10 text-primary border-primary/20"
+                className="text-xs py-0 bg-primary/10 text-primary border-primary/20"
               >
                 <MapPin className="w-3 h-3 mr-1" />
                 {getDisplayPageLabel(item.page_or_flow)}
               </Badge>
-              {/* Clickable link to the exact page */}
+              {/* Show route path and clickable link */}
               {item.page_route && (
-                <a
-                  href={item.page_route}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
-                  title={`Open ${item.page_route} in nieuw tabblad`}
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  <span>Open pagina</span>
-                </a>
+                <div className="flex items-center gap-2">
+                  <code className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                    {item.page_route}
+                  </code>
+                  <a
+                    href={item.page_route}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
+                    title={`Open ${item.page_route} in nieuw tabblad`}
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>Open</span>
+                  </a>
+                </div>
               )}
             </div>
             

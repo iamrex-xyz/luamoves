@@ -3,16 +3,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility";
 import { FeedbackButton } from "@/components/FeedbackButton";
 import Index from "./pages/Index";
+
 import { TaskDeals } from "./pages/TaskDeals";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
-
-// Global feedback button - visible on all pages
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +37,9 @@ function App() {
             <FeedbackButton />
             <Routes>
               <Route path="/" element={<Index />} />
+              {/* Dutch SEO-friendly onboarding routes */}
+              <Route path="/aanmelden" element={<Navigate to="/aanmelden/welkom" replace />} />
+              <Route path="/aanmelden/:stap" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
