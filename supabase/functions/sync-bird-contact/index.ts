@@ -58,14 +58,11 @@ serve(async (req) => {
       identifiers.push({ key: "phonenumber", value: normalizedPhone });
     }
 
+    // Build contact payload - note: custom attributes require definition in Bird workspace schema first
+    // For now, we only send the basic contact info (displayName + identifiers)
     const contactPayload = {
       displayName: email.split("@")[0], // Use email prefix as display name
       identifiers,
-      attributes: {
-        source: "lua-app",
-        userId: userId,
-        createdAt: new Date().toISOString(),
-      }
     };
 
     // Create contact in Bird CRM using workspace-specific endpoint
