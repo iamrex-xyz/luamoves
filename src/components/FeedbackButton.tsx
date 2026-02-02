@@ -22,6 +22,39 @@ const FEEDBACK_CATEGORIES = [
   { value: "other", label: "Iets anders" },
 ] as const;
 
+// Human-readable labels for routes
+const ROUTE_LABELS: Record<string, string> = {
+  "/": "Homepage",
+  "/deals": "Partner deals",
+  "/admin": "Admin dashboard",
+  // Add more routes as needed
+};
+
+/**
+ * Convert a route path to a human-readable label.
+ * Falls back to a formatted version of the path if no mapping exists.
+ */
+function getPageLabel(pathname: string): string {
+  // Direct match
+  if (ROUTE_LABELS[pathname]) {
+    return ROUTE_LABELS[pathname];
+  }
+  
+  // If path is just "/", return Homepage
+  if (pathname === "/") {
+    return "Homepage";
+  }
+  
+  // For unknown routes, convert path to readable format
+  // e.g., "/moving-company" → "Moving company"
+  const cleanPath = pathname.replace(/^\//, "").replace(/-/g, " ");
+  if (cleanPath) {
+    return cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+  }
+  
+  return "Onbekende pagina";
+}
+
 // Generate or retrieve anonymous session ID
 function getAnonymousSessionId(): string {
   const storageKey = "lua_feedback_session_id";
@@ -90,12 +123,15 @@ export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonPro
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Store human-readable label (e.g., "Homepage") instead of raw path
+      const pageLabel = getPageLabel(location.pathname);
+      
       const { error } = await supabase.from("soft_launch_feedback").insert({
         user_id: user?.id || null,
         anonymous_session_id: user ? null : getAnonymousSessionId(),
         feedback_text: feedbackText.trim(),
         category: category || null,
-        page_or_flow: location.pathname,
+        page_or_flow: pageLabel,
       });
 
       if (error) throw error;
