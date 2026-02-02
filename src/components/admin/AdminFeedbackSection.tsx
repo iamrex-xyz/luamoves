@@ -30,6 +30,33 @@ const CATEGORY_COLORS: Record<string, string> = {
   other: "bg-gray-100 text-gray-800 border-gray-200",
 };
 
+/**
+ * Normalize page_or_flow for display.
+ * Handles legacy raw paths like "/" and converts them to readable labels.
+ */
+function getDisplayPageLabel(pageOrFlow: string | null): string {
+  if (!pageOrFlow || pageOrFlow.trim() === "") {
+    return "Onbekende pagina";
+  }
+  
+  // Handle legacy raw "/" values
+  if (pageOrFlow === "/") {
+    return "Homepage";
+  }
+  
+  // If it's still a raw path (starts with /), convert it
+  if (pageOrFlow.startsWith("/")) {
+    const cleanPath = pageOrFlow.replace(/^\//, "").replace(/-/g, " ");
+    if (cleanPath) {
+      return cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+    }
+    return "Homepage";
+  }
+  
+  // Already a readable label
+  return pageOrFlow;
+}
+
 export function AdminFeedbackSection() {
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -118,7 +145,7 @@ export function AdminFeedbackSection() {
                 className="font-mono text-xs py-0 bg-primary/10 text-primary border-primary/20"
               >
                 <MapPin className="w-3 h-3 mr-1" />
-                {item.page_or_flow || "Onbekend"}
+                {getDisplayPageLabel(item.page_or_flow)}
               </Badge>
             </div>
             
