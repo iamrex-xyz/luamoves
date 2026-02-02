@@ -583,6 +583,7 @@ export type Database = {
           feedback_text: string
           id: string
           page_or_flow: string | null
+          page_route: string | null
           user_id: string | null
         }
         Insert: {
@@ -592,6 +593,7 @@ export type Database = {
           feedback_text: string
           id?: string
           page_or_flow?: string | null
+          page_route?: string | null
           user_id?: string | null
         }
         Update: {
@@ -601,6 +603,7 @@ export type Database = {
           feedback_text?: string
           id?: string
           page_or_flow?: string | null
+          page_route?: string | null
           user_id?: string | null
         }
         Relationships: []

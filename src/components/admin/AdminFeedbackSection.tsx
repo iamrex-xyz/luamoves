@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, MessageSquare, Calendar, MapPin, Tag } from "lucide-react";
+import { Loader2, MessageSquare, Calendar, MapPin, Tag, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -11,6 +11,7 @@ interface FeedbackItem {
   feedback_text: string;
   category: string | null;
   page_or_flow: string | null;
+  page_route: string | null;
   created_at: string;
   user_id: string | null;
   anonymous_session_id: string | null;
@@ -147,6 +148,19 @@ export function AdminFeedbackSection() {
                 <MapPin className="w-3 h-3 mr-1" />
                 {getDisplayPageLabel(item.page_or_flow)}
               </Badge>
+              {/* Clickable link to the exact page */}
+              {item.page_route && (
+                <a
+                  href={item.page_route}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 hover:underline transition-colors"
+                  title={`Open ${item.page_route} in nieuw tabblad`}
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  <span>Open pagina</span>
+                </a>
+              )}
             </div>
             
             {/* Feedback text */}
