@@ -57,6 +57,28 @@ export const Onboarding = ({ onComplete, onLogin }: OnboardingProps) => {
 
   const totalSteps = getTotalSteps();
 
+  // Step identifiers for URL tracking (used for feedback context)
+  const STEP_IDS: Record<number, string> = {
+    1: "welcome",
+    2: "intro",
+    3: "new-address",
+    4: "old-address",
+    5: "rent-or-buy",
+    6: "move-date",
+    7: "key-date",
+    8: "loading",
+    9: "success",
+    10: "account",
+  };
+
+  // Update URL hash when step changes (for feedback tracking)
+  useEffect(() => {
+    const stepId = STEP_IDS[step];
+    if (stepId) {
+      window.history.replaceState(null, "", `#step=${stepId}`);
+    }
+  }, [step]);
+
   // Automatically advance from loading screen to success screen
   useEffect(() => {
     if (step === 8) {

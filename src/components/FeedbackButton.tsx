@@ -22,37 +22,87 @@ const FEEDBACK_CATEGORIES = [
   { value: "other", label: "Iets anders" },
 ] as const;
 
-// Human-readable labels for routes
+// Human-readable labels for routes (including step identifiers)
 const ROUTE_LABELS: Record<string, string> = {
+  // Main routes
   "/": "Homepage",
   "/deals": "Partner deals",
   "/admin": "Admin dashboard",
-  // Add more routes as needed
+  
+  // Onboarding steps (SimpleOnboarding)
+  "/#step=welcome": "Onboarding: Welkom",
+  "/#step=moving-date": "Onboarding: Verhuisdatum",
+  "/#step=housing-type": "Onboarding: Woningtype",
+  "/#step=address": "Onboarding: Adres invullen",
+  "/#step=generating": "Onboarding: Plan genereren",
+  
+  // Legacy onboarding steps (Onboarding.tsx)
+  "/#step=intro": "Onboarding: Introductie",
+  "/#step=new-address": "Onboarding: Nieuw adres",
+  "/#step=old-address": "Onboarding: Huidig adres",
+  "/#step=rent-or-buy": "Onboarding: Huren of kopen",
+  "/#step=move-date": "Onboarding: Verhuisdatum",
+  "/#step=key-date": "Onboarding: Sleuteloverdracht",
+  "/#step=loading": "Onboarding: Laden",
+  "/#step=success": "Onboarding: Succes",
+  "/#step=account": "Onboarding: Account aanmaken",
 };
 
 /**
- * Convert a route path to a human-readable label.
+ * Convert a route path (including hash) to a human-readable label.
  * Falls back to a formatted version of the path if no mapping exists.
  */
-function getPageLabel(pathname: string): string {
+function getPageLabel(pathname: string, hash: string): string {
+  // Build full route with hash
+  const fullRoute = hash ? `${pathname}${hash}` : pathname;
+  
   // Direct match
+  if (ROUTE_LABELS[fullRoute]) {
+    return ROUTE_LABELS[fullRoute];
+  }
+  
+  // Try matching just the hash part for onboarding steps
+  if (hash && ROUTE_LABELS[`/${hash}`]) {
+    return ROUTE_LABELS[`/${hash}`];
+  }
+  
+  // Try matching pathname without hash
   if (ROUTE_LABELS[pathname]) {
+    // If there's a step hash, append it
+    if (hash && hash.includes("step=")) {
+      const stepId = hash.replace("#step=", "");
+      const stepLabel = stepId.replace(/-/g, " ");
+      return `${ROUTE_LABELS[pathname]}: ${stepLabel.charAt(0).toUpperCase() + stepLabel.slice(1)}`;
+    }
     return ROUTE_LABELS[pathname];
   }
   
   // If path is just "/", return Homepage
-  if (pathname === "/") {
+  if (pathname === "/" && !hash) {
     return "Homepage";
   }
   
   // For unknown routes, convert path to readable format
-  // e.g., "/moving-company" → "Moving company"
   const cleanPath = pathname.replace(/^\//, "").replace(/-/g, " ");
   if (cleanPath) {
-    return cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+    const label = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
+    if (hash && hash.includes("step=")) {
+      const stepId = hash.replace("#step=", "");
+      return `${label}: ${stepId.replace(/-/g, " ")}`;
+    }
+    return label;
   }
   
+  // Log warning for unresolved routes
+  console.warn(`[Feedback] Could not resolve page label for: ${fullRoute}`);
   return "Onbekende pagina";
+}
+
+/**
+ * Build the full page route including hash for deep linking
+ */
+function getFullPageRoute(pathname: string, hash: string): string {
+  return hash ? `${pathname}${hash}` : pathname;
 }
 
 // Generate or retrieve anonymous session ID
@@ -123,9 +173,9 @@ export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonPro
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Capture both raw route and human-readable label
-      const pageRoute = location.pathname;
-      const pageLabel = getPageLabel(pageRoute);
+      // Capture both raw route (including hash for step tracking) and human-readable label
+      const pageRoute = getFullPageRoute(location.pathname, location.hash);
+      const pageLabel = getPageLabel(location.pathname, location.hash);
       
       // Log warning if we couldn't resolve to a known page
       if (pageLabel === "Onbekende pagina") {

@@ -117,6 +117,26 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   const totalSteps = 5; // Welcome, date, housing+property, address, generating (phone moved to Settings)
 
+  // Step identifiers for URL tracking (used for feedback context)
+  const STEP_IDS: Record<number, string> = {
+    1: "welcome",
+    2: "moving-date",
+    3: "housing-type",
+    4: "address",
+    5: "generating",
+  };
+
+  // Update URL hash when step changes (for feedback tracking)
+  useEffect(() => {
+    const stepId = STEP_IDS[step];
+    if (stepId) {
+      window.history.replaceState(null, "", `#step=${stepId}`);
+    }
+    return () => {
+      // Clean up hash only when unmounting completely (not on step change)
+    };
+  }, [step]);
+
   // Animate tasks on welcome screen
   useEffect(() => {
     if (step === 1) {
