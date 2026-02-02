@@ -96,36 +96,45 @@ export function AdminFeedbackSection() {
       {feedback.map((item) => (
         <Card key={item.id} className="overflow-hidden">
           <CardHeader className="pb-2">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 space-y-1">
-                <p className="text-sm text-foreground whitespace-pre-wrap">
-                  {item.feedback_text}
-                </p>
-              </div>
-              {item.category && (
+            {/* Top row: Date — Category — Page (prominent display) */}
+            <div className="flex flex-wrap items-center gap-2 text-xs mb-2">
+              <span className="text-muted-foreground">
+                {format(new Date(item.created_at), "d MMM yyyy", { locale: nl })}
+              </span>
+              <span className="text-muted-foreground/50">—</span>
+              {item.category ? (
                 <Badge 
                   variant="outline" 
-                  className={`shrink-0 ${CATEGORY_COLORS[item.category] || CATEGORY_COLORS.other}`}
+                  className={`text-xs py-0 ${CATEGORY_COLORS[item.category] || CATEGORY_COLORS.other}`}
                 >
                   {CATEGORY_LABELS[item.category] || item.category}
                 </Badge>
+              ) : (
+                <span className="text-muted-foreground italic">Geen categorie</span>
               )}
+              <span className="text-muted-foreground/50">—</span>
+              <Badge 
+                variant="secondary" 
+                className="font-mono text-xs py-0 bg-primary/10 text-primary border-primary/20"
+              >
+                <MapPin className="w-3 h-3 mr-1" />
+                {item.page_or_flow || "Onbekend"}
+              </Badge>
             </div>
+            
+            {/* Feedback text */}
+            <p className="text-sm text-foreground whitespace-pre-wrap">
+              {item.feedback_text}
+            </p>
           </CardHeader>
-          <CardContent className="pt-2">
-            <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+          <CardContent className="pt-1 pb-3">
+            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 <span>
-                  {format(new Date(item.created_at), "d MMM yyyy 'om' HH:mm", { locale: nl })}
+                  {format(new Date(item.created_at), "HH:mm", { locale: nl })}
                 </span>
               </div>
-              {item.page_or_flow && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3" />
-                  <span className="font-mono">{item.page_or_flow}</span>
-                </div>
-              )}
               <div className="flex items-center gap-1">
                 <Tag className="w-3 h-3" />
                 <span>{item.user_id ? "Ingelogde gebruiker" : "Anoniem"}</span>
