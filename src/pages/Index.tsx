@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useParams, useNavigate, useLocation } from "react-router-dom";
 import { SimpleOnboarding } from "@/components/SimpleOnboarding";
 import { Auth } from "@/components/Auth";
 import { Dashboard } from "@/components/Dashboard";
@@ -24,8 +24,30 @@ export type { MovingInfo } from "@/types/moving";
 
 const LOCAL_STORAGE_KEY = "lua_moving_info";
 
+// Dutch SEO-friendly step configuration
+const AANMELDEN_STEPS = {
+  welkom: { step: 1, path: "/aanmelden/welkom" },
+  verhuisdatum: { step: 2, path: "/aanmelden/verhuisdatum" },
+  woningtype: { step: 3, path: "/aanmelden/woningtype" },
+  adres: { step: 4, path: "/aanmelden/adres" },
+  overzicht: { step: 5, path: "/aanmelden/overzicht" },
+} as const;
+
+type AanmeldenStepId = keyof typeof AANMELDEN_STEPS;
+
+const STEP_NUMBER_TO_ID: Record<number, AanmeldenStepId> = {
+  1: "welkom",
+  2: "verhuisdatum",
+  3: "woningtype",
+  4: "adres",
+  5: "overzicht",
+};
+
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { stap } = useParams<{ stap?: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [movingInfo, setMovingInfo] = useState<MovingInfo | null>(null);
   const [currentView, setCurrentView] = useState<AppView>("onboarding");
@@ -442,13 +464,35 @@ const Index = () => {
     );
   }
 
+  // Determine initial step from URL for /aanmelden/:stap routes
+  const isAanmeldenRoute = location.pathname.startsWith("/aanmelden");
+  const currentStepId = stap as AanmeldenStepId | undefined;
+  const initialStep = currentStepId && AANMELDEN_STEPS[currentStepId] 
+    ? AANMELDEN_STEPS[currentStepId].step 
+    : 1;
+
+  // Handle step changes for URL routing
+  const handleStepChange = (stepNumber: number) => {
+    const stepId = STEP_NUMBER_TO_ID[stepNumber];
+    if (stepId && AANMELDEN_STEPS[stepId] && isAanmeldenRoute) {
+      navigate(AANMELDEN_STEPS[stepId].path, { replace: true });
+    }
+  };
+
   // Onboarding
   if (currentView === "onboarding") {
+    // Redirect to /aanmelden/welkom if on root and showing onboarding
+    if (location.pathname === "/" && !searchParams.get("invite")) {
+      // Stay on root for now, but use Dutch routes when navigating
+    }
+    
     return (
       <ErrorBoundary>
         <SimpleOnboarding 
           onComplete={handleOnboardingComplete} 
-          onLogin={() => setCurrentView("auth")} 
+          onLogin={() => setCurrentView("auth")}
+          initialStep={isAanmeldenRoute ? initialStep : 1}
+          onStepChange={isAanmeldenRoute ? handleStepChange : undefined}
         />
       </ErrorBoundary>
     );

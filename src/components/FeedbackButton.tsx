@@ -22,78 +22,69 @@ const FEEDBACK_CATEGORIES = [
   { value: "other", label: "Iets anders" },
 ] as const;
 
-// Human-readable labels for routes (including step identifiers)
+// Human-readable Dutch labels for routes
 const ROUTE_LABELS: Record<string, string> = {
   // Main routes
   "/": "Homepage",
   "/deals": "Partner deals",
   "/admin": "Admin dashboard",
   
-  // Onboarding steps (SimpleOnboarding)
-  "/#step=welcome": "Onboarding: Welkom",
-  "/#step=moving-date": "Onboarding: Verhuisdatum",
-  "/#step=housing-type": "Onboarding: Woningtype",
-  "/#step=address": "Onboarding: Adres invullen",
-  "/#step=generating": "Onboarding: Plan genereren",
+  // Dutch SEO-friendly onboarding routes
+  "/aanmelden": "Aanmelden",
+  "/aanmelden/welkom": "Welkom",
+  "/aanmelden/verhuisdatum": "Verhuisdatum kiezen",
+  "/aanmelden/woningtype": "Woningtype kiezen",
+  "/aanmelden/adres": "Adres invullen",
+  "/aanmelden/overzicht": "Plan genereren",
   
-  // Legacy onboarding steps (Onboarding.tsx)
-  "/#step=intro": "Onboarding: Introductie",
-  "/#step=new-address": "Onboarding: Nieuw adres",
-  "/#step=old-address": "Onboarding: Huidig adres",
-  "/#step=rent-or-buy": "Onboarding: Huren of kopen",
-  "/#step=move-date": "Onboarding: Verhuisdatum",
-  "/#step=key-date": "Onboarding: Sleuteloverdracht",
-  "/#step=loading": "Onboarding: Laden",
-  "/#step=success": "Onboarding: Succes",
-  "/#step=account": "Onboarding: Account aanmaken",
+  // Legacy hash-based steps (for backward compatibility)
+  "/#step=welcome": "Welkom",
+  "/#step=moving-date": "Verhuisdatum kiezen",
+  "/#step=housing-type": "Woningtype kiezen",
+  "/#step=address": "Adres invullen",
+  "/#step=generating": "Plan genereren",
 };
 
 /**
- * Convert a route path (including hash) to a human-readable label.
- * Falls back to a formatted version of the path if no mapping exists.
+ * Convert a route path to a human-readable Dutch label.
+ * Prioritizes Dutch SEO-friendly routes.
  */
 function getPageLabel(pathname: string, hash: string): string {
-  // Build full route with hash
+  // Build full route with hash for legacy support
   const fullRoute = hash ? `${pathname}${hash}` : pathname;
   
-  // Direct match
+  // Direct match on pathname (preferred - Dutch routes)
+  if (ROUTE_LABELS[pathname]) {
+    return ROUTE_LABELS[pathname];
+  }
+  
+  // Check full route with hash (legacy support)
   if (ROUTE_LABELS[fullRoute]) {
     return ROUTE_LABELS[fullRoute];
   }
   
-  // Try matching just the hash part for onboarding steps
-  if (hash && ROUTE_LABELS[`/${hash}`]) {
-    return ROUTE_LABELS[`/${hash}`];
+  // Check for /aanmelden/* pattern with unknown step
+  if (pathname.startsWith("/aanmelden/")) {
+    const stepSlug = pathname.replace("/aanmelden/", "");
+    // Convert slug to readable label
+    const label = stepSlug
+      .split("-")
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    return label || "Aanmelden";
   }
   
-  // Try matching pathname without hash
-  if (ROUTE_LABELS[pathname]) {
-    // If there's a step hash, append it
-    if (hash && hash.includes("step=")) {
-      const stepId = hash.replace("#step=", "");
-      const stepLabel = stepId.replace(/-/g, " ");
-      return `${ROUTE_LABELS[pathname]}: ${stepLabel.charAt(0).toUpperCase() + stepLabel.slice(1)}`;
-    }
-    return ROUTE_LABELS[pathname];
-  }
-  
-  // If path is just "/", return Homepage
+  // If path is just "/" without hash, return Homepage
   if (pathname === "/" && !hash) {
     return "Homepage";
   }
   
-  // For unknown routes, convert path to readable format
+  // For other unknown routes, convert path to readable format
   const cleanPath = pathname.replace(/^\//, "").replace(/-/g, " ");
   if (cleanPath) {
-    const label = cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
-    if (hash && hash.includes("step=")) {
-      const stepId = hash.replace("#step=", "");
-      return `${label}: ${stepId.replace(/-/g, " ")}`;
-    }
-    return label;
+    return cleanPath.charAt(0).toUpperCase() + cleanPath.slice(1);
   }
   
-  // Log warning for unresolved routes
   console.warn(`[Feedback] Could not resolve page label for: ${fullRoute}`);
   return "Onbekende pagina";
 }

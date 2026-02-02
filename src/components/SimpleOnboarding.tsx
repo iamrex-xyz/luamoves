@@ -70,6 +70,10 @@ const countryCodes = [
 type SimpleOnboardingProps = {
   onComplete: (info: MovingInfo) => void;
   onLogin: () => void;
+  /** Optional: Start at a specific step (for URL-based routing) */
+  initialStep?: number;
+  /** Optional: Callback when step changes (for URL sync) */
+  onStepChange?: (step: number) => void;
 };
 
 const generatingSteps = [
@@ -79,8 +83,8 @@ const generatingSteps = [
   "Bijna klaar!",
 ];
 
-export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps) => {
-  const [step, setStep] = useState(1);
+export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepChange }: SimpleOnboardingProps) => {
+  const [step, setStepInternal] = useState(initialStep);
   const [movingDate, setMovingDate] = useState<Date | undefined>(undefined);
   const [housingType, setHousingType] = useState<'rent' | 'buy' | 'unknown' | null>(null);
   const [postcode, setPostcode] = useState("");
@@ -117,25 +121,18 @@ export const SimpleOnboarding = ({ onComplete, onLogin }: SimpleOnboardingProps)
 
   const totalSteps = 5; // Welcome, date, housing+property, address, generating (phone moved to Settings)
 
-  // Step identifiers for URL tracking (used for feedback context)
-  const STEP_IDS: Record<number, string> = {
-    1: "welcome",
-    2: "moving-date",
-    3: "housing-type",
-    4: "address",
-    5: "generating",
+  // Wrapper for setStep that also notifies parent for URL routing
+  const setStep = (newStep: number) => {
+    setStepInternal(newStep);
+    onStepChange?.(newStep);
   };
 
-  // Update URL hash when step changes (for feedback tracking)
+  // Sync step from URL on initial load or when initialStep changes
   useEffect(() => {
-    const stepId = STEP_IDS[step];
-    if (stepId) {
-      window.history.replaceState(null, "", `#step=${stepId}`);
+    if (initialStep !== step) {
+      setStepInternal(initialStep);
     }
-    return () => {
-      // Clean up hash only when unmounting completely (not on step change)
-    };
-  }, [step]);
+  }, [initialStep]);
 
   // Animate tasks on welcome screen
   useEffect(() => {
