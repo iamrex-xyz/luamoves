@@ -6,7 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const BIRD_API_URL = "https://api.bird.com/workspaces";
+const BIRD_WORKSPACE_ID = "65485fd5-fbad-4d0b-b51a-dccf866fe97d";
+const BIRD_API_URL = `https://api.bird.com/workspaces/${BIRD_WORKSPACE_ID}`;
 
 interface ContactPayload {
   email: string;
@@ -67,11 +68,9 @@ serve(async (req) => {
       }
     };
 
-    // Create contact in Bird CRM
-    // Note: The Bird Contacts API endpoint format is:
-    // POST https://api.bird.com/workspaces/{workspaceId}/contacts
-    // Since we don't have workspace ID, we'll use the general contacts endpoint
-    const response = await fetch("https://contacts.bird.com/contacts", {
+    // Create contact in Bird CRM using workspace-specific endpoint
+    console.log(`[Bird CRM] Using workspace: ${BIRD_WORKSPACE_ID}`);
+    const response = await fetch(`${BIRD_API_URL}/contacts`, {
       method: "POST",
       headers: {
         "Authorization": `AccessKey ${BIRD_CONTACTS_API_KEY}`,
