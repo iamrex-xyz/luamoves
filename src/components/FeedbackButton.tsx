@@ -123,8 +123,14 @@ export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonPro
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Store human-readable label (e.g., "Homepage") instead of raw path
-      const pageLabel = getPageLabel(location.pathname);
+      // Capture both raw route and human-readable label
+      const pageRoute = location.pathname;
+      const pageLabel = getPageLabel(pageRoute);
+      
+      // Log warning if we couldn't resolve to a known page
+      if (pageLabel === "Onbekende pagina") {
+        console.warn(`[Feedback] Unknown page route: ${pageRoute}`);
+      }
       
       const { error } = await supabase.from("soft_launch_feedback").insert({
         user_id: user?.id || null,
@@ -132,7 +138,8 @@ export function FeedbackButton({ hideFloatingButton = false }: FeedbackButtonPro
         feedback_text: feedbackText.trim(),
         category: category || null,
         page_or_flow: pageLabel,
-      });
+        page_route: pageRoute,
+      } as any); // Type assertion needed until types regenerate
 
       if (error) throw error;
 
