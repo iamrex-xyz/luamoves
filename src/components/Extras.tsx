@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { FileText, Upload, Trash2, Download, FolderOpen, Users, X, Image, File, Eye } from "lucide-react";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { FileText, Upload, Trash2, Download, FolderOpen, Users, X, Image, File, Eye, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -14,7 +14,6 @@ import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { BottomNav } from "./BottomNav";
 import { LuaLogo } from "@/components/LuaLogo";
-
 type ExtrasProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   isGuest?: boolean;
@@ -31,6 +30,7 @@ type Document = {
   description: string | null;
   upload_date: string | null;
   created_at: string | null;
+  task_id: string | null;
 };
 
 export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
@@ -197,26 +197,44 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
     return File;
   };
 
-  // Group documents by category
-  const documentsByCategory = documents.reduce((acc, doc) => {
-    const category = doc.category || "overig";
-    if (!acc[category]) acc[category] = [];
-    acc[category].push(doc);
-    return acc;
-  }, {} as Record<string, Document[]>);
+  // Group documents by task (primary) then by category for non-task docs
+  const documentsByTask = useMemo(() => {
+    const byTask: Record<string, { title: string; docs: Document[] }> = {};
+    const withoutTask: Document[] = [];
+
+    documents.forEach((doc) => {
+      if (doc.task_id) {
+        if (!byTask[doc.task_id]) {
+          // Use description as task title fallback (it's set to task.title on upload)
+          byTask[doc.task_id] = {
+            title: doc.description || doc.task_id,
+            docs: [],
+          };
+        }
+        byTask[doc.task_id].docs.push(doc);
+      } else {
+        withoutTask.push(doc);
+      }
+    });
+
+    return { byTask, withoutTask };
+  }, [documents]);
+
+  // Group non-task documents by category
+  const documentsByCategory = useMemo(() => {
+    return documentsByTask.withoutTask.reduce((acc, doc) => {
+      const category = doc.category || "overig";
+      if (!acc[category]) acc[category] = [];
+      acc[category].push(doc);
+      return acc;
+    }, {} as Record<string, Document[]>);
+  }, [documentsByTask.withoutTask]);
 
   const categoryLabels: Record<string, string> = {
     contract: "Contracten",
     meterstand: "Meterstanden",
     checklist: "Checklists",
     factuur: "Facturen",
-    "Even landen": "Even landen",
-    "Slim vooruit regelen": "Slim vooruit regelen",
-    "Papier & zekerheid": "Papier & zekerheid",
-    "De praktische puzzel": "De praktische puzzel",
-    "Bijna daar": "Bijna daar",
-    "Verhuisdag": "Verhuisdag",
-    "Welkom thuis": "Welkom thuis",
     overig: "Overig",
   };
 
@@ -359,13 +377,77 @@ export const Extras = ({ onNavigate, isGuest, onSignupClick }: ExtrasProps) => {
             <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
               <FolderOpen className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="font-medium mb-1">Nog geen documenten</h3>
+            <h3 className="font-medium mb-1">Hier vind je straks al je verhuisdocumenten</h3>
             <p className="text-sm text-muted-foreground">
-              Hier bewaar je straks je contracten, meterstanden en andere belangrijke bestanden.
+              Upload documenten via de taken of direct hierboven.
             </p>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Documents grouped by task */}
+            {Object.entries(documentsByTask.byTask).map(([taskId, { title, docs }]) => (
+              <div key={taskId}>
+                <div className="flex items-center justify-between mb-2 px-1">
+                  <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-primary" />
+                    {title}
+                  </h3>
+                  <button
+                    onClick={() => onNavigate("tasks")}
+                    className="text-xs text-primary hover:underline flex items-center gap-1"
+                  >
+                    Naar taak
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {docs.map((doc) => {
+                    const Icon = getDocumentIcon(doc.file_type);
+                    const fileType = doc.file_name.split('.').pop()?.toUpperCase() || 'FILE';
+                    
+                    return (
+                      <Card 
+                        key={doc.id} 
+                        className="p-3 hover:bg-secondary/50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (previewUrls[doc.id]) {
+                            setViewingUrl(previewUrls[doc.id]);
+                            setViewingDoc(doc);
+                          } else {
+                            openDocument(doc);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+                            <Icon className="h-5 w-5 text-muted-foreground" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">
+                              {doc.file_name}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-xs text-muted-foreground">{fileType}</span>
+                              {doc.upload_date && (
+                                <>
+                                  <span className="text-muted-foreground/40">•</span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {format(new Date(doc.upload_date), "d MMM", { locale: nl })}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <Eye className="h-4 w-4 text-muted-foreground/50" />
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Documents without task, grouped by category */}
             {Object.entries(documentsByCategory).map(([category, docs]) => (
               <div key={category}>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2 px-1">

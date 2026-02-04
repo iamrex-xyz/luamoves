@@ -47,7 +47,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { TaskListItem } from "@/components/TaskListItem";
 import { PullToRefresh } from "@/components/PullToRefresh";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
-import { DocumentUploadSheet } from "@/components/DocumentUploadSheet";
+import { TaskDocumentModal } from "@/components/TaskDocumentModal";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { CompletedTasksSection } from "@/components/CompletedTasksSection";
 import { useNavigate } from "react-router-dom";
@@ -711,10 +711,11 @@ export const TaskList = ({
         }}
       />
 
-      <DocumentUploadSheet
+      <TaskDocumentModal
         open={!!documentTask}
         onOpenChange={(open) => !open && setDocumentTask(null)}
         task={documentTask}
+        onSignupClick={onSignupClick}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
