@@ -310,13 +310,14 @@ export const AssignTaskDropdown = ({
         <DropdownMenuSeparator />
         
         {showEmailInput ? (
-          <div className="p-2 space-y-2">
+          <div className="p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
             <Input
               type="email"
               placeholder="naam@voorbeeld.nl"
               value={customEmail}
               onChange={(e) => setCustomEmail(e.target.value)}
               onKeyDown={(e) => {
+                e.stopPropagation();
                 if (e.key === "Enter") {
                   handleCustomEmailAssign();
                 }
@@ -328,14 +329,18 @@ export const AssignTaskDropdown = ({
               <Button
                 size="sm"
                 className="flex-1"
-                onClick={handleCustomEmailAssign}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCustomEmailAssign();
+                }}
               >
                 Toewijzen
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   setShowEmailInput(false);
                   setCustomEmail("");
                 }}
@@ -345,7 +350,12 @@ export const AssignTaskDropdown = ({
             </div>
           </div>
         ) : (
-          <DropdownMenuItem onSelect={() => setShowEmailInput(true)}>
+          <DropdownMenuItem 
+            onSelect={(e) => {
+              e.preventDefault();
+              setShowEmailInput(true);
+            }}
+          >
             <Mail className="w-4 h-4 mr-2" />
             Ander e-mailadres...
           </DropdownMenuItem>
