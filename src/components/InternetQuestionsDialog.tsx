@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, Sparkles, CheckCircle2, Wifi, Home, Monitor, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { IntakeIntroStep } from "@/components/IntakeIntroStep";
 import { MovingInfo } from "@/pages/Index";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
@@ -20,7 +21,7 @@ type InternetQuestionsDialogProps = {
   onCompleteTask?: () => void;
 };
 
-type Step = "address" | "speed" | "bundle" | "confirmation";
+type Step = "intro" | "address" | "speed" | "bundle" | "confirmation";
 
 export const InternetQuestionsDialog = ({
   open,
@@ -31,7 +32,7 @@ export const InternetQuestionsDialog = ({
   onCompleteTask,
 }: InternetQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [currentStep, setCurrentStep] = useState<Step>("address");
+  const [currentStep, setCurrentStep] = useState<Step>("intro");
   const [address, setAddress] = useState<string>("");
   const [speedPreference, setSpeedPreference] = useState<string>("");
   const [bundle, setBundle] = useState<string>("");
@@ -45,12 +46,14 @@ export const InternetQuestionsDialog = ({
       setSpeedPreference(movingInfo.internetSpeedPreference || "");
       setBundle(movingInfo.internetBundle || "");
       setWorksFromHome((movingInfo as any).worksFromHome || "");
-      setCurrentStep("address");
+      setCurrentStep("intro");
     }
   }, [open, movingInfo]);
 
   const handleNext = async () => {
-    if (currentStep === "address") {
+    if (currentStep === "intro") {
+      setCurrentStep("address");
+    } else if (currentStep === "address") {
       setCurrentStep("speed");
     } else if (currentStep === "speed") {
       setCurrentStep("bundle");
@@ -94,7 +97,13 @@ export const InternetQuestionsDialog = ({
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
       <MobileModalContent className="max-h-[85vh]">
-        {currentStep === "confirmation" ? (
+        {currentStep === "intro" ? (
+          <IntakeIntroStep 
+            taskType="internet"
+            onContinue={() => setCurrentStep("address")}
+            onCancel={handleClose}
+          />
+        ) : currentStep === "confirmation" ? (
           // Confirmation screen
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
