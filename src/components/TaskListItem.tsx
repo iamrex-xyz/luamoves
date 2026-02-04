@@ -211,7 +211,7 @@ export const TaskListItem = ({
                   className="flex items-center text-[12px] text-primary hover:text-primary/80 font-medium transition-colors"
                   onClick={(e) => onRegelenClick(e, task)}
                 >
-                  {getTaskButtonLabel(task) || "Regelen"}
+                  {getTaskButtonLabel(task)}
                   <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                 </button>
               )}

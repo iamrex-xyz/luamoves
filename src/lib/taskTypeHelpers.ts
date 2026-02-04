@@ -321,11 +321,11 @@ export const hasAffiliateOptions = (task: Task): boolean => {
 };
 
 // Get custom button label for specific task types
-export const getTaskButtonLabel = (task: Task): string | null => {
+export const getTaskButtonLabel = (task: Task): string => {
   if (isMovingFeedbackTask(task)) {
     return "Feedback achterlaten";
   }
-  return null;
+  return "Regel dit voor mij";
 };
 
 // Task type to redirect URL mapping
