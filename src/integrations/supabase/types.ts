@@ -194,6 +194,7 @@ export type Database = {
           file_path: string
           file_type: string
           id: string
+          task_id: string | null
           upload_date: string | null
           user_id: string
         }
@@ -205,6 +206,7 @@ export type Database = {
           file_path: string
           file_type: string
           id?: string
+          task_id?: string | null
           upload_date?: string | null
           user_id: string
         }
@@ -216,6 +218,7 @@ export type Database = {
           file_path?: string
           file_type?: string
           id?: string
+          task_id?: string | null
           upload_date?: string | null
           user_id?: string
         }

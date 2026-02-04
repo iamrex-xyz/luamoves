@@ -33,6 +33,7 @@ import { TaxatieQuestionsDialog } from "@/components/TaxatieQuestionsDialog";
 import { OpstalQuestionsDialog } from "@/components/OpstalQuestionsDialog";
 import { SlotcilinderQuestionsDialog } from "@/components/SlotcilinderQuestionsDialog";
 import { VerhuisliftQuestionsDialog } from "@/components/VerhuisliftQuestionsDialog";
+import { TaskDocumentModal } from "@/components/TaskDocumentModal";
 
 import {
   CheckCircle2,
@@ -56,6 +57,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const [completingTasks, setCompletingTasks] = useState<Set<string>>(new Set());
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
+  const [documentTask, setDocumentTask] = useState<Task | null>(null);
 
   // Question dialogs for affiliate tasks
   const {
@@ -153,11 +155,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
   const dayNumber = moveDate.getDate();
   const monthName = moveDate.toLocaleDateString("nl-NL", { month: "long" });
 
-  // Handler for document click (opens document upload sheet)
+  // Handler for document click (opens document modal)
   const handleDocumentClick = (e: React.MouseEvent, task: Task) => {
     e.stopPropagation();
-    // Document click handler - can be extended if needed
-    handleTaskClick(task);
+    setDocumentTask(task);
   };
 
   return (
@@ -484,6 +485,13 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
         movingInfo={movingInfo}
         onComplete={handleDialogComplete}
         onCompleteTask={handleCompleteCurrentTask}
+      />
+
+      <TaskDocumentModal
+        open={!!documentTask}
+        onOpenChange={(open) => !open && setDocumentTask(null)}
+        task={documentTask}
+        onSignupClick={onSignupClick}
       />
 
       <BottomNav currentView="dashboard" onNavigate={onNavigate} />
