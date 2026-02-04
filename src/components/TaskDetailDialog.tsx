@@ -268,6 +268,7 @@ export const TaskDetailDialog = ({
                 <AssignTaskDropdown
                   taskId={task.id}
                   taskTitle={task.title}
+                  taskDescription={task.description}
                   currentAssignedTo={task.assignedTo}
                   currentAssignedEmail={localAssignedEmail}
                   onAssignmentChange={(assignedEmail) => {
