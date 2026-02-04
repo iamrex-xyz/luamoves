@@ -23,6 +23,7 @@ type Collaborator = {
 type AssignTaskDropdownProps = {
   taskId: string;
   taskTitle?: string;
+  taskDescription?: string;
   currentAssignedTo?: string | null;
   currentAssignedEmail?: string | null;
   onAssignmentChange: (assignedEmail: string | null) => void;
@@ -31,6 +32,7 @@ type AssignTaskDropdownProps = {
 export const AssignTaskDropdown = ({
   taskId,
   taskTitle,
+  taskDescription,
   currentAssignedTo,
   currentAssignedEmail,
   onAssignmentChange,
@@ -88,6 +90,9 @@ export const AssignTaskDropdown = ({
 
       if (error) throw error;
 
+      // Update UI immediately
+      onAssignmentChange(email);
+
       toast({
         title: "Taak toegewezen",
         description: email 
@@ -97,7 +102,26 @@ export const AssignTaskDropdown = ({
           : "Toewijzing verwijderd",
       });
 
-      onAssignmentChange(email);
+      // Send email notification if assigned to an email address (not "Ik" or null)
+      if (email && email !== "Ik" && email.includes("@") && taskTitle) {
+        console.log(`Sending task assignment email to ${email}`);
+        supabase.functions.invoke("send-task-assignment-email", {
+          body: { 
+            recipientEmail: email,
+            taskTitle,
+            taskDescription: taskDescription || undefined,
+            appUrl: window.location.origin,
+          }
+        }).then(({ error: emailError, data }) => {
+          if (emailError) {
+            console.error("Error sending task assignment email:", emailError);
+          } else {
+            console.log("Task assignment email sent:", data);
+          }
+        }).catch((notifyError) => {
+          console.error("Error sending task assignment email:", notifyError);
+        });
+      }
     } catch (error) {
       console.error("Error assigning task:", error);
       toast({
