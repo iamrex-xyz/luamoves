@@ -1,18 +1,20 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
 import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
+import { TaskDocument } from "@/hooks/useTaskDocuments";
 
 type TaskListItemProps = {
   task: Task;
   isCompleting: boolean;
   isNewAssignment?: boolean;
+  taskDocuments?: TaskDocument[];
   onTaskClick: (task: Task) => void;
   onCheckboxClick: (e: React.MouseEvent, task: Task) => void;
   onRegelenClick: (e: React.MouseEvent, task: Task) => void;
   onDocumentClick: (e: React.MouseEvent, task: Task) => void;
+  onDocumentPreviewClick?: (doc: TaskDocument) => void;
   onSwipeComplete: (taskId: string) => void;
 };
 
@@ -20,10 +22,12 @@ export const TaskListItem = ({
   task,
   isCompleting,
   isNewAssignment,
+  taskDocuments = [],
   onTaskClick,
   onCheckboxClick,
   onRegelenClick,
   onDocumentClick,
+  onDocumentPreviewClick,
   onSwipeComplete,
 }: TaskListItemProps) => {
   const today = new Date();
@@ -70,6 +74,27 @@ export const TaskListItem = ({
       );
     }
     return null;
+  };
+
+  // Get the first document for preview (only for incomplete tasks)
+  const previewDoc = task.status !== "done" && !isCompleting && taskDocuments.length > 0 
+    ? taskDocuments[0] 
+    : null;
+
+  // Truncate filename for display
+  const truncateFilename = (name: string, maxLen: number = 20) => {
+    if (name.length <= maxLen) return name;
+    const ext = name.split('.').pop() || '';
+    const baseName = name.slice(0, name.length - ext.length - 1);
+    const truncatedBase = baseName.slice(0, maxLen - ext.length - 4) + '...';
+    return `${truncatedBase}.${ext}`;
+  };
+
+  const handleDocumentPreviewClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (previewDoc && onDocumentPreviewClick) {
+      onDocumentPreviewClick(previewDoc);
+    }
   };
 
   return (
@@ -193,6 +218,26 @@ export const TaskListItem = ({
             </div>
           </div>
         </div>
+
+        {/* Document preview row - only show for incomplete tasks with documents */}
+        {previewDoc && (
+          <button
+            type="button"
+            onClick={handleDocumentPreviewClick}
+            className="mt-2 ml-[40px] flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-secondary/60 hover:bg-secondary transition-colors max-w-fit"
+            aria-label={`Bekijk document: ${previewDoc.file_name}`}
+          >
+            <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="text-xs text-muted-foreground truncate">
+              {truncateFilename(previewDoc.file_name)}
+            </span>
+            {taskDocuments.length > 1 && (
+              <span className="text-[10px] text-muted-foreground/70 shrink-0">
+                +{taskDocuments.length - 1}
+              </span>
+            )}
+          </button>
+        )}
       </div>
     </SwipeableTaskItem>
   );

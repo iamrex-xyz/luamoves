@@ -52,6 +52,8 @@ import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { CompletedTasksSection } from "@/components/CompletedTasksSection";
 import { useNavigate } from "react-router-dom";
 import { shouldShowTask } from "@/lib/smartQuestions";
+import { useTaskDocuments, TaskDocument } from "@/hooks/useTaskDocuments";
+import { DocumentViewerModal } from "@/components/DocumentViewerModal";
 import {
   Filter,
   Share2,
@@ -95,9 +97,11 @@ export const TaskList = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [prevOpenTasksCount, setPrevOpenTasksCount] = useState<number | null>(null);
   const [documentTask, setDocumentTask] = useState<Task | null>(null);
+  const [viewingDocument, setViewingDocument] = useState<TaskDocument | null>(null);
 
   const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
   const { isNewAssignment, markAssignmentSeen } = useAssignmentNotifications();
+  const { data: taskDocumentsMap = {} } = useTaskDocuments();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -432,6 +436,7 @@ export const TaskList = ({
                           assignedBy: task.assignedBy,
                           assignedAt: task.assignedAt,
                         })}
+                        taskDocuments={taskDocumentsMap[task.id] || []}
                         onTaskClick={handleTaskClick}
                         onCheckboxClick={handleCheckboxClick}
                         onRegelenClick={handleRegelenClick}
@@ -439,6 +444,7 @@ export const TaskList = ({
                           e.stopPropagation();
                           setDocumentTask(task);
                         }}
+                        onDocumentPreviewClick={(doc) => setViewingDocument(doc)}
                         onSwipeComplete={handleTaskToggle}
                       />
                     ))}
@@ -716,6 +722,12 @@ export const TaskList = ({
         onOpenChange={(open) => !open && setDocumentTask(null)}
         task={documentTask}
         onSignupClick={onSignupClick}
+      />
+
+      <DocumentViewerModal
+        document={viewingDocument}
+        open={!!viewingDocument}
+        onOpenChange={(open) => !open && setViewingDocument(null)}
       />
 
       <BottomNav currentView="tasks" onNavigate={onNavigate} />
