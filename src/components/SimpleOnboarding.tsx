@@ -305,7 +305,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
         {/* Hero Section - Above the fold */}
         <div className="min-h-screen flex flex-col cursor-pointer" onClick={handleNext}>
           <div className="px-5 pt-5 pb-3 flex justify-between items-center">
-            <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+            <LuaLogo size="md" />
             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onLogin(); }} className="text-sm text-muted-foreground hover:text-foreground">
               Inloggen
             </Button>
@@ -505,7 +505,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-4 flex justify-between items-center shrink-0">
-          <LuaLogo size="sm" />
+          <LuaLogo size="md" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 1 ? "bg-primary" : "bg-muted"}`} />
@@ -576,7 +576,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-4 flex justify-between items-center shrink-0">
-          <LuaLogo size="sm" />
+          <LuaLogo size="md" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 2 ? "bg-primary" : "bg-muted"}`} />
@@ -690,7 +690,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
         {/* Header */}
         <div className="p-4 flex justify-between items-center shrink-0">
-          <LuaLogo size="sm" />
+          <LuaLogo size="md" />
           <div className="flex gap-1">
             {[1, 2, 3, 4].map((num) => (
               <div key={num} className={`w-8 h-1 rounded-full transition-all ${num <= 3 ? "bg-primary" : "bg-muted"}`} />
@@ -757,7 +757,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
     <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
       {/* Header */}
       <div className="p-4 flex justify-between items-center shrink-0">
-        <LuaLogo size="sm" />
+        <LuaLogo size="md" />
         <div className="flex gap-1">
           {[1, 2, 3, 4].map((num) => (
             <div key={num} className="w-8 h-1 rounded-full transition-all bg-primary" />
