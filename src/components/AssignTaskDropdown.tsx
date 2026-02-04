@@ -104,23 +104,43 @@ export const AssignTaskDropdown = ({
 
       // Send email notification if assigned to an email address (not "Ik" or null)
       if (email && email !== "Ik" && email.includes("@") && taskTitle) {
-        console.log(`Sending task assignment email to ${email}`);
-        supabase.functions.invoke("send-task-assignment-email", {
-          body: { 
-            recipientEmail: email,
-            taskTitle,
-            taskDescription: taskDescription || undefined,
-            appUrl: window.location.origin,
-          }
-        }).then(({ error: emailError, data }) => {
+        console.log(`[AssignTaskDropdown] Sending task assignment email to ${email}`);
+        try {
+          const { error: emailError, data } = await supabase.functions.invoke(
+            "send-task-assignment-email",
+            {
+              body: {
+                recipientEmail: email,
+                taskTitle,
+                taskDescription: taskDescription || undefined,
+                appUrl: window.location.origin,
+              },
+            }
+          );
+
           if (emailError) {
-            console.error("Error sending task assignment email:", emailError);
+            console.error("[AssignTaskDropdown] Email send failed:", emailError);
+            toast({
+              title: "E-mail niet verstuurd",
+              description:
+                emailError.message || "Er ging iets mis bij het versturen van de e-mail.",
+              variant: "destructive",
+            });
           } else {
-            console.log("Task assignment email sent:", data);
+            console.log("[AssignTaskDropdown] Email sent:", data);
+            toast({
+              title: "E-mail verstuurd",
+              description: `We hebben een e-mail gestuurd naar ${email}.`,
+            });
           }
-        }).catch((notifyError) => {
-          console.error("Error sending task assignment email:", notifyError);
-        });
+        } catch (notifyError) {
+          console.error("[AssignTaskDropdown] Email send crashed:", notifyError);
+          toast({
+            title: "E-mail niet verstuurd",
+            description: "Er ging iets mis bij het versturen van de e-mail.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       console.error("Error assigning task:", error);

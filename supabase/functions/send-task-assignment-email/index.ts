@@ -119,7 +119,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("[send-task-assignment-email] Email sent successfully:", result);
 
-    return new Response(JSON.stringify({ success: true, result: emailResponse }), {
+    // Return the parsed API response; the native Response object is not JSON-serializable.
+    return new Response(JSON.stringify({ success: true, result }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
