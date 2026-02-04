@@ -138,7 +138,7 @@ export const TaskDetailDialog = ({
   );
 
   const showRegelenCTA = task.status !== "done" && hasAffiliateOptions(task) && onRegelenClick;
-  const regelenButtonLabel = getTaskButtonLabel(task) || "Regel dit voor mij";
+  const regelenButtonLabel = getTaskButtonLabel(task);
 
   const getStatusBadge = () => {
     if (task.status === "done") {
