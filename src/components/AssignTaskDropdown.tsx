@@ -330,7 +330,12 @@ export const AssignTaskDropdown = ({
         <DropdownMenuSeparator />
         
         {showEmailInput ? (
-          <div className="p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="p-2 space-y-2"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
             <Input
               type="email"
               placeholder="naam@voorbeeld.nl"
@@ -339,6 +344,7 @@ export const AssignTaskDropdown = ({
               onKeyDown={(e) => {
                 e.stopPropagation();
                 if (e.key === "Enter") {
+                  e.preventDefault();
                   handleCustomEmailAssign();
                 }
               }}
@@ -347,23 +353,29 @@ export const AssignTaskDropdown = ({
             />
             <div className="flex gap-2">
               <Button
+                type="button"
                 size="sm"
                 className="flex-1"
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   handleCustomEmailAssign();
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 Toewijzen
               </Button>
               <Button
+                type="button"
                 size="sm"
                 variant="outline"
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   setShowEmailInput(false);
                   setCustomEmail("");
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
               >
                 Annuleer
               </Button>
