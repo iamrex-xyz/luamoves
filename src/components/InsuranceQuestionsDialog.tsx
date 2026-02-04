@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
+import { IntakeIntroStep } from "@/components/IntakeIntroStep";
 import { useProfileSync } from "@/hooks/useProfileSync";
 
 type InsuranceQuestionsDialogProps = {
@@ -27,7 +28,7 @@ type InsuranceQuestionsDialogProps = {
   onCompleteTask?: () => void;
 };
 
-type Step = 'woningType' | 'size' | 'value' | 'confirmation';
+type Step = 'intro' | 'woningType' | 'size' | 'value' | 'confirmation';
 
 const woningTypes = [
   { value: "appartement", label: "Appartement" },
@@ -62,7 +63,7 @@ export const InsuranceQuestionsDialog = ({
   onCompleteTask,
 }: InsuranceQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [step, setStep] = useState<Step>('woningType');
+  const [step, setStep] = useState<Step>('intro');
   const [woningType, setWoningType] = useState((movingInfo as any).housingPropertyType || '');
   const [homeSizeM2, setHomeSizeM2] = useState(movingInfo.homeSizeM2 || '');
   const [insuranceValue, setInsuranceValue] = useState(movingInfo.insuranceValue || '');
@@ -74,12 +75,14 @@ export const InsuranceQuestionsDialog = ({
       setWoningType((movingInfo as any).housingPropertyType || '');
       setHomeSizeM2(movingInfo.homeSizeM2 || '');
       setInsuranceValue(movingInfo.insuranceValue || '');
-      setStep('woningType');
+      setStep('intro');
     }
   }, [open, movingInfo]);
 
   const handleNext = async () => {
-    if (step === 'woningType') {
+    if (step === 'intro') {
+      setStep('woningType');
+    } else if (step === 'woningType') {
       setStep('size');
     } else if (step === 'size') {
       setStep('value');
@@ -121,7 +124,13 @@ export const InsuranceQuestionsDialog = ({
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
       <MobileModalContent className="max-h-[90vh]">
-        {step === 'confirmation' ? (
+        {step === 'intro' ? (
+          <IntakeIntroStep 
+            taskType="insurance"
+            onContinue={() => setStep('woningType')}
+            onCancel={handleClose}
+          />
+        ) : step === 'confirmation' ? (
           // Confirmation screen
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">

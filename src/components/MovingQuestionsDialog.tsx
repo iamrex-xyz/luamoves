@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MovingInfo } from "@/pages/Index";
+import { IntakeIntroStep } from "@/components/IntakeIntroStep";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfileSync } from "@/hooks/useProfileSync";
 import { format } from "date-fns";
@@ -40,7 +41,7 @@ type MovingQuestionsDialogProps = {
   onCompleteTask?: () => void;
 };
 
-type Step = 'dates' | 'addresses' | 'details' | 'confirmation';
+type Step = 'intro' | 'dates' | 'addresses' | 'details' | 'confirmation';
 
 const woningTypes = [
   { value: "appartement", label: "Appartement" },
@@ -75,7 +76,7 @@ export const MovingQuestionsDialog = ({
   onCompleteTask,
 }: MovingQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [step, setStep] = useState<Step>('dates');
+  const [step, setStep] = useState<Step>('intro');
   const [movingDate, setMovingDate] = useState<Date | undefined>(
     movingInfo.movingDate ? new Date(movingInfo.movingDate) : undefined
   );
@@ -98,12 +99,14 @@ export const MovingQuestionsDialog = ({
       setFloorLevel(movingInfo.floorLevel || '');
       setHasElevator(movingInfo.hasElevator || '');
       setMovingSize((movingInfo as any).movingSize || '');
-      setStep('dates');
+      setStep('intro');
     }
   }, [open, movingInfo]);
 
   const handleNext = async () => {
-    if (step === 'dates') {
+    if (step === 'intro') {
+      setStep('dates');
+    } else if (step === 'dates') {
       setStep('addresses');
     } else if (step === 'addresses') {
       setStep('details');
@@ -183,7 +186,13 @@ export const MovingQuestionsDialog = ({
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
       <MobileModalContent className="max-h-[90vh]">
-        {step === 'confirmation' ? (
+        {step === 'intro' ? (
+          <IntakeIntroStep 
+            taskType="moving"
+            onContinue={() => setStep('dates')}
+            onCancel={handleClose}
+          />
+        ) : step === 'confirmation' ? (
           // Confirmation screen
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">

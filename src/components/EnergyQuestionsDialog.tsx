@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, Sparkles, Info, CheckCircle2, Zap, Home, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { IntakeIntroStep } from "@/components/IntakeIntroStep";
 import { MovingInfo } from "@/pages/Index";
 import {
   Select,
@@ -56,7 +57,7 @@ const woningTypes = [
   { value: "vrijstaand", label: "Vrijstaande woning" },
 ];
 
-type Step = "address" | "woningType" | "supplier" | "usage" | "confirmation";
+type Step = "intro" | "address" | "woningType" | "supplier" | "usage" | "confirmation";
 
 export const EnergyQuestionsDialog = ({
   open,
@@ -67,7 +68,7 @@ export const EnergyQuestionsDialog = ({
   onCompleteTask,
 }: EnergyQuestionsDialogProps) => {
   const { saveToProfile } = useProfileSync();
-  const [currentStep, setCurrentStep] = useState<Step>("address");
+  const [currentStep, setCurrentStep] = useState<Step>("intro");
   const [address, setAddress] = useState<string>("");
   const [woningType, setWoningType] = useState<string>("");
   const [supplier, setSupplier] = useState<string>("");
@@ -83,12 +84,14 @@ export const EnergyQuestionsDialog = ({
       setSupplier(movingInfo.energyCurrentSupplier || "");
       setEstimatedGas("");
       setEstimatedElectricity("");
-      setCurrentStep("address");
+      setCurrentStep("intro");
     }
   }, [open, movingInfo]);
 
   const handleNext = async () => {
-    if (currentStep === "address") {
+    if (currentStep === "intro") {
+      setCurrentStep("address");
+    } else if (currentStep === "address") {
       setCurrentStep("woningType");
     } else if (currentStep === "woningType") {
       setCurrentStep("supplier");
@@ -137,7 +140,13 @@ export const EnergyQuestionsDialog = ({
   return (
     <MobileModal open={open} onOpenChange={onOpenChange}>
       <MobileModalContent className="max-h-[85vh]">
-        {currentStep === "confirmation" ? (
+        {currentStep === "intro" ? (
+          <IntakeIntroStep 
+            taskType="energy"
+            onContinue={() => setCurrentStep("address")}
+            onCancel={handleClose}
+          />
+        ) : currentStep === "confirmation" ? (
           // Confirmation screen
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-10 text-center">
             <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-6">
