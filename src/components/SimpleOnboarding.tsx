@@ -517,7 +517,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
         <div className="flex-1 overflow-y-auto px-4 pb-24">
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto flex flex-col justify-center min-h-[calc(100vh-180px)]">
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
                 Wanneer is de<br /><span className="text-primary">grote dag?</span>
               </h1>
               <p className="text-sm text-muted-foreground">Met je verhuisdatum maken we een persoonlijk stappenplan voor je.</p>
@@ -588,7 +588,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
         <div className="flex-1 overflow-y-auto px-4 pb-24">
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto">
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
                 Vertel ons over<br /><span className="text-primary">je nieuwe thuis</span>
               </h1>
               <p className="text-sm text-muted-foreground">Zo maken we je checklist op maat.</p>
@@ -702,7 +702,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
         <div className="flex-1 overflow-y-auto px-4 pb-24">
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700 max-w-lg mx-auto flex flex-col justify-center min-h-[calc(100vh-180px)]">
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground leading-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground leading-tight">
                 Waar ga je<br /><span className="text-primary">naartoe?</span>
               </h1>
               <p className="text-sm text-muted-foreground">Met je adres maken we taken op maat voor jouw gemeente.</p>
