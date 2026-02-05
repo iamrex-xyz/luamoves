@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       collaborator_messages: {
         Row: {
+          anonymous_user_id: string | null
           created_at: string | null
           id: string
           message: string
@@ -23,6 +24,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          anonymous_user_id?: string | null
           created_at?: string | null
           id?: string
           message: string
@@ -30,6 +32,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          anonymous_user_id?: string | null
           created_at?: string | null
           id?: string
           message?: string
@@ -293,6 +296,7 @@ export type Database = {
       profiles: {
         Row: {
           adults: number | null
+          anonymous_user_id: string | null
           birth_date: string | null
           bouwkundige_keuring_voorkeursdatum: string | null
           building_access: string | null
@@ -366,6 +370,7 @@ export type Database = {
         }
         Insert: {
           adults?: number | null
+          anonymous_user_id?: string | null
           birth_date?: string | null
           bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
@@ -439,6 +444,7 @@ export type Database = {
         }
         Update: {
           adults?: number | null
+          anonymous_user_id?: string | null
           birth_date?: string | null
           bouwkundige_keuring_voorkeursdatum?: string | null
           building_access?: string | null
@@ -661,6 +667,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          anonymous_user_id: string | null
           assigned_at: string | null
           assigned_by: string | null
           assigned_to: string | null
@@ -674,6 +681,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          anonymous_user_id?: string | null
           assigned_at?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
@@ -687,6 +695,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          anonymous_user_id?: string | null
           assigned_at?: string | null
           assigned_by?: string | null
           assigned_to?: string | null
@@ -951,6 +960,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_by_email: { Args: never; Returns: boolean }
+      merge_anonymous_to_user: {
+        Args: { p_anonymous_user_id: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
