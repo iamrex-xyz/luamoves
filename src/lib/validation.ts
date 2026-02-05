@@ -1,10 +1,20 @@
 import { z } from "zod";
 
 // Dutch phone number validation
+// Accepts: Dutch mobile (06xxxxxxxx), Dutch landline (0xx-xxxxxxx), International (+xxxxxxxxxxxx)
 export const phoneSchema = z.string()
-  .transform(val => val.replace(/[\s\-]/g, ''))
-  .refine(val => val === '' || /^(\+[1-9][0-9]{0,3}[0-9]{6,14}|0[1-9][0-9]{8})$/.test(val), {
-    message: "Voer een geldig telefoonnummer in"
+  .transform(val => val.replace(/[\s\-\(\)]/g, ''))
+  .refine(val => {
+    if (val === '') return true;
+    // Dutch mobile: 06 followed by 8 digits (10 total)
+    if (/^06\d{8}$/.test(val)) return true;
+    // Dutch landline: 0 followed by 9 digits (10 total)
+    if (/^0[1-9]\d{8}$/.test(val)) return true;
+    // International: + followed by 10-15 digits
+    if (/^\+[1-9]\d{9,14}$/.test(val)) return true;
+    return false;
+  }, {
+    message: "Voer een geldig telefoonnummer in (bijv. 06 12345678)"
   });
 
 // Email validation
