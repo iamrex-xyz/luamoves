@@ -1,22 +1,21 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-anonymous-user-id",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-anonymous-user-id, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const VERSION = "v1.0.1";
 
 interface SendOTPRequest {
   phone: string;
   anonymousUserId?: string;
 }
 
-// Generate a 6-digit OTP
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Format phone for MessageBird (E.164 format)
 const formatPhoneE164 = (phone: string): string => {
   let cleaned = phone.replace(/[^\d+]/g, "");
   
@@ -40,18 +39,26 @@ const validatePhone = (phone: string): boolean => {
   return cleaned.replace(/\D/g, "").length >= 10;
 };
 
-const handler = async (req: Request): Promise<Response> => {
+Deno.serve(async (req: Request): Promise<Response> => {
+  console.log(`[send-otp][${VERSION}] Request received`);
+
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const messagebirdApiKey = Deno.env.get("MESSAGEBIRD_API_KEY");
     const messagebirdChannelId = Deno.env.get("MESSAGEBIRD_CHANNEL_ID");
 
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("[send-otp] Missing Supabase credentials");
+      throw new Error("Server configuration error");
+    }
+
     if (!messagebirdApiKey) {
+      console.error("[send-otp] Missing MESSAGEBIRD_API_KEY");
       throw new Error("MESSAGEBIRD_API_KEY is not configured");
     }
 
@@ -69,21 +76,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     const formattedPhone = formatPhoneE164(phone);
     const otp = generateOTP();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     console.log(`[send-otp] Sending OTP to ${formattedPhone}`);
 
-    // Store OTP in database (create a simple otp_verifications table if not exists)
-    // For now, we'll use a simple approach with the profiles table
-    // In production, you'd want a dedicated otp_codes table with expiration
-    
-    // Try to send via WhatsApp first, fallback to SMS
     let messageSent = false;
     let sendMethod = "unknown";
 
-    // Try WhatsApp via MessageBird Conversations API
+    // Try WhatsApp first
     if (messagebirdChannelId) {
       try {
+        console.log("[send-otp] Attempting WhatsApp via channel:", messagebirdChannelId);
         const whatsappResponse = await fetch("https://conversations.messagebird.com/v1/send", {
           method: "POST",
           headers: {
@@ -106,15 +109,18 @@ const handler = async (req: Request): Promise<Response> => {
           console.log("[send-otp] WhatsApp sent successfully");
         } else {
           const errorText = await whatsappResponse.text();
-          console.log("[send-otp] WhatsApp failed, trying SMS:", errorText);
+          console.log("[send-otp] WhatsApp failed:", errorText);
         }
       } catch (e) {
-        console.log("[send-otp] WhatsApp error, trying SMS:", e);
+        console.log("[send-otp] WhatsApp error:", e);
       }
+    } else {
+      console.log("[send-otp] No WhatsApp channel configured, using SMS");
     }
 
-    // Fallback to SMS via MessageBird
+    // Fallback to SMS
     if (!messageSent) {
+      console.log("[send-otp] Sending SMS...");
       const smsResponse = await fetch("https://rest.messagebird.com/messages", {
         method: "POST",
         headers: {
@@ -133,20 +139,18 @@ const handler = async (req: Request): Promise<Response> => {
         sendMethod = "sms";
         console.log("[send-otp] SMS sent successfully");
       } else {
-        const errorData = await smsResponse.json();
+        const errorData = await smsResponse.text();
         console.error("[send-otp] SMS failed:", errorData);
         throw new Error("Kon verificatiecode niet versturen. Probeer het opnieuw.");
       }
     }
 
-    // Store OTP hash in a temporary storage (we'll create a simple in-memory cache or use Supabase)
-    // For security, we store a hashed version. For MVP, we'll store it directly but with short expiry.
-    // Create an otp_codes entry
+    // Store OTP in database
     const { error: otpError } = await supabase
       .from("otp_codes")
       .upsert({
         phone: formattedPhone,
-        code: otp, // In production, hash this
+        code: otp,
         expires_at: expiresAt.toISOString(),
         anonymous_user_id: anonymousUserId || null,
         created_at: new Date().toISOString(),
@@ -156,8 +160,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (otpError) {
       console.error("[send-otp] Error storing OTP:", otpError);
-      // Don't fail - OTP was sent, just storage failed
     }
+
+    console.log(`[send-otp] Success - method: ${sendMethod}`);
 
     return new Response(
       JSON.stringify({ 
@@ -165,17 +170,17 @@ const handler = async (req: Request): Promise<Response> => {
         method: sendMethod,
         phone: formattedPhone,
         expiresAt: expiresAt.toISOString(),
+        _version: VERSION,
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
 
-  } catch (error: any) {
-    console.error("[send-otp] Error:", error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("[send-otp] Error:", errorMessage);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage, _version: VERSION }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-};
-
-serve(handler);
+});
