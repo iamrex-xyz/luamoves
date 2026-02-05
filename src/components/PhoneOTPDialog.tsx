@@ -404,8 +404,8 @@ export const PhoneOTPDialog = ({
         {step === "success" && (
           <div className="flex-1 flex flex-col items-center justify-center px-6 py-8">
             <div className="text-center space-y-4">
-              <div className="mx-auto w-20 h-20 rounded-full bg-green-100 flex items-center justify-center animate-in zoom-in duration-300">
-                <CheckCircle2 className="w-10 h-10 text-green-600" />
+              <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-10 h-10 text-primary" />
               </div>
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
                 <h2 className="text-2xl font-bold">

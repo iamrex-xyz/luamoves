@@ -7,17 +7,15 @@ import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
-import { PhoneCaptureDialog } from "@/components/PhoneCaptureDialog";
-import { AccountCreationDialog } from "@/components/AccountCreationDialog";
+import { PhoneOTPDialog } from "@/components/PhoneOTPDialog";
 import { HouseholdInviteSignup } from "@/components/HouseholdInviteSignup";
-// MilestoneCelebrationDialog removed - not used in strict flow
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { MovingInfo, AppView } from "@/types/moving";
 import { useGuestStorage } from "@/hooks/useGuestStorage";
-import { useSignupFlow } from "@/hooks/useSignupFlow";
+import { usePhoneAuthFlow } from "@/hooks/usePhoneAuthFlow";
 
 // Re-export MovingInfo for backward compatibility
 export type { MovingInfo } from "@/types/moving";
@@ -59,8 +57,8 @@ const Index = () => {
   // Use guest storage hook
   const guestStorage = useGuestStorage();
 
-  // Use signup flow hook - pass true if user IS logged in
-  const signupFlow = useSignupFlow(!!user);
+  // Use phone-first auth flow hook
+  const phoneAuthFlow = usePhoneAuthFlow(!!user);
 
   // Load user profile from database
   const loadUserProfile = useCallback(async (userId: string) => {
@@ -519,27 +517,27 @@ const Index = () => {
           <Dashboard 
             movingInfo={movingInfo} 
             onNavigate={setCurrentView}
-            onTaskComplete={signupFlow.handleTaskComplete}
-            onSignupClick={signupFlow.handleBadgeClick}
+            onTaskComplete={phoneAuthFlow.handleTaskComplete}
+            onSignupClick={phoneAuthFlow.triggerPhoneDialog}
           />
         )}
         {currentView === "tasks" && movingInfo && (
           <TaskList 
             movingInfo={movingInfo}
             onNavigate={setCurrentView}
-            onTaskComplete={signupFlow.handleTaskComplete}
+            onTaskComplete={phoneAuthFlow.handleTaskComplete}
             onUpdateMovingInfo={handleUpdateMovingInfo}
             isGuest={!user}
-            showAccountBadge={signupFlow.showAccountBadge}
-            onAccountBadgeClick={signupFlow.handleBadgeClick}
-            onSignupClick={signupFlow.handleBadgeClick}
+            showAccountBadge={phoneAuthFlow.showAccountBadge}
+            onAccountBadgeClick={phoneAuthFlow.triggerPhoneDialog}
+            onSignupClick={phoneAuthFlow.triggerPhoneDialog}
           />
         )}
         {currentView === "extras" && movingInfo && (
           <Extras 
             onNavigate={setCurrentView}
             isGuest={!user}
-            onSignupClick={signupFlow.handleBadgeClick}
+            onSignupClick={phoneAuthFlow.triggerPhoneDialog}
           />
         )}
         {currentView === "settings" && movingInfo && (
@@ -549,7 +547,7 @@ const Index = () => {
             onLogout={handleLogout}
             onUpdate={setMovingInfo}
             isGuest={!user}
-            onSignupClick={signupFlow.handleBadgeClick}
+            onSignupClick={phoneAuthFlow.triggerPhoneDialog}
           />
         )}
         {currentView === "chat" && movingInfo && (
@@ -557,31 +555,18 @@ const Index = () => {
             movingInfo={movingInfo}
             onNavigate={setCurrentView}
             isGuest={!user}
-            onSignupClick={signupFlow.handleBadgeClick}
+            onSignupClick={phoneAuthFlow.triggerPhoneDialog}
           />
         )}
 
-        {/* Phone capture dialog (Step 1) */}
-        <PhoneCaptureDialog
-          open={signupFlow.showPhoneCapture}
-          onOpenChange={signupFlow.setShowPhoneCapture}
-          onPhoneSubmit={signupFlow.handlePhoneSubmit}
-          onDismiss={signupFlow.handlePhoneDismiss}
-          isHardBlock={signupFlow.isPhoneHardBlock}
-        />
-
-        {/* Account creation dialog (Step 2) */}
-        <AccountCreationDialog
-          open={signupFlow.showAccountCreation}
-          onOpenChange={signupFlow.setShowAccountCreation}
-          onAccountCreated={signupFlow.handleAccountCreated}
-          onDefer={signupFlow.handleAccountDefer}
-          onLoginRequest={() => {
-            signupFlow.setShowAccountCreation(false);
-            setCurrentView("auth");
-          }}
-          capturedPhone={signupFlow.capturedPhone}
-          isHardBlock={signupFlow.isAccountHardBlock}
+        {/* Phone OTP dialog for passwordless auth */}
+        <PhoneOTPDialog
+          open={phoneAuthFlow.showPhoneOTP}
+          onOpenChange={phoneAuthFlow.setShowPhoneOTP}
+          onVerified={phoneAuthFlow.handlePhoneVerified}
+          onDismiss={phoneAuthFlow.handlePhoneOTPDismiss}
+          anonymousUserId={phoneAuthFlow.anonymousUserId}
+          isHardBlock={phoneAuthFlow.isPhoneOTPHardBlock}
         />
 
         {/* Household invite signup dialog */}
