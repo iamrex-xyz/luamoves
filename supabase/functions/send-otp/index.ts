@@ -84,14 +84,39 @@ Deno.serve(async (req: Request): Promise<Response> => {
     let messageSent = false;
     let sendMethod = "unknown";
 
-    // DEV MODE: Log OTP instead of sending
+    // DEV MODE: Use fixed OTP code 000000
     if (DEV_MODE) {
-      console.log(`[send-otp][DEV] ===========================`);
-      console.log(`[send-otp][DEV] OTP CODE: ${otp}`);
-      console.log(`[send-otp][DEV] PHONE: ${formattedPhone}`);
-      console.log(`[send-otp][DEV] ===========================`);
-      messageSent = true;
-      sendMethod = "dev_mode";
+      const devOtp = "000000";
+      console.log(`[send-otp][DEV] Using fixed OTP: ${devOtp} for ${formattedPhone}`);
+      
+      // Store the fixed OTP instead of the random one
+      const { error: otpError } = await supabase
+        .from("otp_codes")
+        .upsert({
+          phone: formattedPhone,
+          code: devOtp,
+          expires_at: expiresAt.toISOString(),
+          anonymous_user_id: anonymousUserId || null,
+          created_at: new Date().toISOString(),
+        }, {
+          onConflict: "phone",
+        });
+
+      if (otpError) {
+        console.error("[send-otp][DEV] Error storing OTP:", otpError);
+      }
+
+      return new Response(
+        JSON.stringify({ 
+          success: true,
+          method: "dev_mode",
+          phone: formattedPhone,
+          expiresAt: expiresAt.toISOString(),
+          _version: VERSION,
+          _dev: true,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
     // Try WhatsApp first (only if not dev mode)
