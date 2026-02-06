@@ -5,7 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-anonymous-user-id, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const VERSION = "v1.0.1";
+const VERSION = "v1.0.2";
+const DEV_MODE = Deno.env.get("OTP_DEV_MODE") === "true";
 
 interface SendOTPRequest {
   phone: string;
@@ -40,7 +41,7 @@ const validatePhone = (phone: string): boolean => {
 };
 
 Deno.serve(async (req: Request): Promise<Response> => {
-  console.log(`[send-otp][${VERSION}] Request received`);
+  console.log(`[send-otp][${VERSION}] Request received, DEV_MODE=${DEV_MODE}`);
 
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -57,8 +58,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
       throw new Error("Server configuration error");
     }
 
-    if (!messagebirdApiKey) {
-      console.error("[send-otp] Missing MESSAGEBIRD_API_KEY");
+    if (!DEV_MODE && !messagebirdApiKey) {
+      console.error("[send-otp] Missing MESSAGEBIRD_API_KEY (not in dev mode)");
       throw new Error("MESSAGEBIRD_API_KEY is not configured");
     }
 
@@ -83,8 +84,18 @@ Deno.serve(async (req: Request): Promise<Response> => {
     let messageSent = false;
     let sendMethod = "unknown";
 
-    // Try WhatsApp first
-    if (messagebirdChannelId) {
+    // DEV MODE: Log OTP instead of sending
+    if (DEV_MODE) {
+      console.log(`[send-otp][DEV] ===========================`);
+      console.log(`[send-otp][DEV] OTP CODE: ${otp}`);
+      console.log(`[send-otp][DEV] PHONE: ${formattedPhone}`);
+      console.log(`[send-otp][DEV] ===========================`);
+      messageSent = true;
+      sendMethod = "dev_mode";
+    }
+
+    // Try WhatsApp first (only if not dev mode)
+    if (!messageSent && messagebirdChannelId) {
       try {
         console.log("[send-otp] Attempting WhatsApp via channel:", messagebirdChannelId);
         const whatsappResponse = await fetch("https://conversations.messagebird.com/v1/send", {
@@ -118,8 +129,8 @@ Deno.serve(async (req: Request): Promise<Response> => {
       console.log("[send-otp] No WhatsApp channel configured, using SMS");
     }
 
-    // Fallback to SMS
-    if (!messageSent) {
+    // Fallback to SMS (skip in dev mode)
+    if (!messageSent && !DEV_MODE) {
       console.log("[send-otp] Sending SMS...");
       const smsResponse = await fetch("https://rest.messagebird.com/messages", {
         method: "POST",
