@@ -37,7 +37,7 @@ const STORAGE_KEYS = {
 } as const;
 
 // Maximum tasks a guest can complete before forced account creation
-const MAX_GUEST_TASKS = 5;
+const MAX_GUEST_TASKS = 3;
 
 export const useGuestStorage = () => {
   const [movingInfo, setMovingInfoState] = useState<MovingInfo | null>(null);
