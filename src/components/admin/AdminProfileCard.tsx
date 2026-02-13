@@ -12,6 +12,7 @@ import {
   Package, 
   Shield,
   User,
+  Users,
   Calendar,
   MapPin
 } from "lucide-react";
@@ -190,6 +191,7 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
       fields: [
         { label: "Aantal kamers", key: "number_of_rooms", dbKey: "number_of_rooms" },
         { label: "Breekbare spullen", key: "has_fragile_items", dbKey: "has_fragile_items" },
+        { label: "Speciale items", key: "special_items", dbKey: "special_items" },
       ]
     },
     {
@@ -200,6 +202,39 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
         { label: "Verzekerde waarde", key: "insurance_value", dbKey: "insurance_value" },
         { label: "Renovatie budget", key: "renovation_budget", dbKey: "renovation_budget" },
         { label: "Renovatie startdatum", key: "renovation_start_date", type: "date", dbKey: "renovation_start_date" },
+        { label: "Aannemer nodig", key: "needs_contractor_help", dbKey: "needs_contractor_help" },
+      ]
+    },
+    {
+      title: "Post doorsturen",
+      icon: <MapPin className="w-4 h-4" />,
+      hasData: !!(localProfile.forwarding_start_date || localProfile.forwarding_duration),
+      fields: [
+        { label: "Startdatum", key: "forwarding_start_date", type: "date", dbKey: "forwarding_start_date" },
+        { label: "Looptijd", key: "forwarding_duration", dbKey: "forwarding_duration" },
+      ]
+    },
+    {
+      title: "Schoonmaak & Tuin",
+      icon: <Home className="w-4 h-4" />,
+      hasData: !!(localProfile.service_type || localProfile.preferred_service_date || localProfile.garden_service_type),
+      fields: [
+        { label: "Type dienst", key: "service_type", dbKey: "service_type" },
+        { label: "Voorkeursdatum", key: "preferred_service_date", type: "date", dbKey: "preferred_service_date" },
+        { label: "Tuindienst", key: "garden_service_type", dbKey: "garden_service_type" },
+      ]
+    },
+    {
+      title: "Huishouden",
+      icon: <Users className="w-4 h-4" />,
+      hasData: !!(localProfile.adults || localProfile.children || localProfile.pets),
+      fields: [
+        { label: "Volwassenen", key: "adults", type: "number", dbKey: "adults" },
+        { label: "Kinderen", key: "children", type: "number", dbKey: "children" },
+        { label: "Huisdieren", key: "pets", type: "number", dbKey: "pets" },
+        { label: "Leeftijden kinderen", key: "children_ages", dbKey: "children_ages" },
+        { label: "Werkt thuis", key: "works_from_home", dbKey: "works_from_home" },
+        { label: "Huidige situatie", key: "current_housing_situation", dbKey: "current_housing_situation" },
       ]
     },
   ];
