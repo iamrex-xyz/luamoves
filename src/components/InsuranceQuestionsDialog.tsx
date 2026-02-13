@@ -137,10 +137,10 @@ export const InsuranceQuestionsDialog = ({
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-3">
-              Gegevens ontvangen!
+              Wordt geregeld!
             </h2>
             <p className="text-muted-foreground mb-8 max-w-[280px]">
-              Dank je! We zoeken de beste verzekering voor jouw situatie.
+              Lua regelt dit voor je. Je hoort snel van ons.
             </p>
             <div className="w-full max-w-[280px] space-y-2">
               <Button 
