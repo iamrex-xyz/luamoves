@@ -315,8 +315,7 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isTaxatieTask(task) ||
     isOpstalTask(task) ||
     isSlotTask(task) ||
-    isBudgetTask(task) ||
-    isInviteHouseholdTask(task)
+    isBudgetTask(task)
   );
 };
 
