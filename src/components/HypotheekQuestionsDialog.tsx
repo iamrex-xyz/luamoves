@@ -125,7 +125,7 @@ export const HypotheekQuestionsDialog = ({
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-3">
-              Gegevens opgeslagen!
+              Wordt geregeld!
             </h2>
             <p className="text-muted-foreground mb-8 max-w-[280px]">
               Lua gaat aan de slag en komt snel terug met de beste hypotheekadviseurs voor jouw situatie.

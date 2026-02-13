@@ -128,7 +128,7 @@ export function GardenQuestionsDialog({
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
             <h2 className="text-xl font-semibold text-center">
-              Gegevens opgeslagen!
+              Wordt geregeld!
             </h2>
             <p className="text-muted-foreground text-center text-sm">
               {hasGarden ? "We zoeken passende hoveniers voor je." : "Je hebt aangegeven geen tuin te hebben."}
