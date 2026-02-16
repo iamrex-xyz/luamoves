@@ -50,36 +50,25 @@ export type HouseholdInfo = {
 };
 
 // Helper functie voor dynamische deadline labels
-const getDeadlineLabel = (deadline: Date, movingDate: Date): string => {
+const getDeadlineLabel = (deadline: Date, _movingDate: Date): string => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const daysUntilDeadline = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  const daysUntilMove = Math.ceil((movingDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  const weeksBeforeMove = Math.ceil((movingDate.getTime() - deadline.getTime()) / (1000 * 60 * 60 * 24 * 7));
+  const deadlineCopy = new Date(deadline);
+  deadlineCopy.setHours(0, 0, 0, 0);
   
-  // Na verhuizing
-  if (deadline > movingDate) {
-    const daysAfterMove = Math.ceil((deadline.getTime() - movingDate.getTime()) / (1000 * 60 * 60 * 24));
-    if (daysAfterMove <= 1) return "dag na verhuizing";
-    if (daysAfterMove <= 7) return "eerste week na verhuizing";
-    if (daysAfterMove <= 14) return "2 weken na verhuizing";
-    return `${Math.ceil(daysAfterMove / 7)} weken na verhuizing`;
-  }
+  const daysUntilDeadline = Math.ceil((deadlineCopy.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   
-  // Verhuisdag zelf
-  if (daysUntilDeadline === daysUntilMove && daysUntilDeadline >= 0) {
-    return "op verhuisdag";
-  }
+  // Verlopen of vandaag → altijd "Vandaag doen"
+  if (daysUntilDeadline <= 1) return "Vandaag doen";
   
-  // Voor verhuizing
-  if (daysUntilDeadline <= 0) return "vandaag doen";
-  if (daysUntilDeadline <= 2) return "deze week doen";
-  if (daysUntilDeadline <= 7) return "deze week doen";
-  if (weeksBeforeMove <= 1) return "over 1 week doen";
-  if (weeksBeforeMove <= 2) return "over 2 weken doen";
-  if (weeksBeforeMove <= 3) return "over 3 weken doen";
-  return `over ${weeksBeforeMove} weken doen`;
+  // 2–6 dagen → "Deze week doen"
+  if (daysUntilDeadline <= 6) return "Deze week doen";
+  
+  // 7+ dagen → "Over X week/weken doen" (afgerond naar beneden in weken van 7)
+  const weeks = Math.floor(daysUntilDeadline / 7);
+  if (weeks === 1) return "Over 1 week doen";
+  return `Over ${weeks} weken doen`;
 };
 
 export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: HouseholdInfo): Task[] => {
