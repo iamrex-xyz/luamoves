@@ -315,7 +315,8 @@ export const hasAffiliateOptions = (task: Task): boolean => {
     isTaxatieTask(task) ||
     isOpstalTask(task) ||
     isSlotTask(task) ||
-    isBudgetTask(task)
+    isBudgetTask(task) ||
+    isInviteHouseholdTask(task)
   );
 };
 
@@ -323,6 +324,9 @@ export const hasAffiliateOptions = (task: Task): boolean => {
 export const getTaskButtonLabel = (task: Task): string => {
   if (isMovingFeedbackTask(task)) {
     return "Feedback achterlaten";
+  }
+  if (isInviteHouseholdTask(task)) {
+    return "Meteen uitnodigen";
   }
   return "Regel dit voor mij";
 };
