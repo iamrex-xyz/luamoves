@@ -7,7 +7,7 @@ import { TaskList } from "@/components/TaskList";
 import { Extras } from "@/components/Extras";
 import { Settings } from "@/components/Settings";
 import { ChatHome } from "@/components/ChatHome";
-import { PhoneOTPDialog } from "@/components/PhoneOTPDialog";
+import { AccountCreationDialog } from "@/components/AccountCreationDialog";
 import { HouseholdInviteSignup } from "@/components/HouseholdInviteSignup";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { User } from "@supabase/supabase-js";
@@ -559,13 +559,12 @@ const Index = () => {
           />
         )}
 
-        {/* Phone OTP dialog for passwordless auth */}
-        <PhoneOTPDialog
+        {/* Account creation dialog: phone → email → magic link */}
+        <AccountCreationDialog
           open={phoneAuthFlow.showPhoneOTP}
           onOpenChange={phoneAuthFlow.setShowPhoneOTP}
-          onVerified={phoneAuthFlow.handlePhoneVerified}
-          onDismiss={phoneAuthFlow.handlePhoneOTPDismiss}
-          anonymousUserId={phoneAuthFlow.anonymousUserId}
+          onAccountCreated={() => phoneAuthFlow.handlePhoneVerified(phoneAuthFlow.anonymousUserId || "user", false)}
+          onDefer={phoneAuthFlow.handlePhoneOTPDismiss}
           isHardBlock={phoneAuthFlow.isPhoneOTPHardBlock}
         />
 
