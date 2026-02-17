@@ -7,25 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  Eye, 
-  EyeOff, 
   Loader2, 
-  Lock,
   Mail,
+  Phone,
   ArrowRight,
   Shield,
+  CheckCircle2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "@/lib/analytics";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { ForgotPasswordDialog } from "@/components/ForgotPasswordDialog";
+import { validatePhone, cleanPhone } from "@/lib/validation";
 
 const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
-const passwordSchema = z.string()
-  .min(8, "Wachtwoord moet minimaal 8 tekens bevatten")
-  .regex(/[0-9]/, "Wachtwoord moet minimaal 1 cijfer bevatten");
+
+type Step = "phone" | "email" | "check_inbox";
 
 type AccountCreationDialogProps = {
   open: boolean;
@@ -48,149 +46,86 @@ export const AccountCreationDialog = ({
 }: AccountCreationDialogProps) => {
   const { toast } = useToast();
   
+  const [step, setStep] = useState<Step>("phone");
+  const [phone, setPhone] = useState(capturedPhone);
+  const [phoneError, setPhoneError] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [accountCreationStarted, setAccountCreationStarted] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
+      // If phone already captured, skip to email step
+      if (capturedPhone) {
+        setPhone(capturedPhone);
+        setStep("email");
+      } else {
+        setPhone("");
+        setStep("phone");
+      }
       setEmail("");
-      setPassword("");
       setEmailError("");
-      setPasswordError("");
-      setAccountCreationStarted(false);
-      setShowForgotPassword(false);
+      setPhoneError("");
       trackEvent("account_creation_shown");
     }
-  }, [open]);
+  }, [open, capturedPhone]);
 
-  const validateEmail = (): boolean => {
-    const result = emailSchema.safeParse(email);
-    if (!result.success) {
-      setEmailError(result.error.errors[0].message);
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
-
-  const validatePassword = (): boolean => {
-    const result = passwordSchema.safeParse(password);
-    if (!result.success) {
-      setPasswordError(result.error.errors[0].message);
-      return false;
-    }
-    setPasswordError("");
-    return true;
-  };
-
+  const isPhoneValid = phone.trim().length >= 10 && validatePhone(phone).isValid;
   const isEmailValid = useMemo(() => emailSchema.safeParse(email).success, [email]);
-  const isPasswordValid = useMemo(() => passwordSchema.safeParse(password).success, [password]);
-  const canSubmit = isEmailValid && isPasswordValid;
 
-  const handleCreateAccount = async () => {
-    if (!validateEmail() || !validatePassword()) {
+  const handlePhoneNext = () => {
+    const result = validatePhone(phone);
+    if (!result.isValid) {
+      setPhoneError(result.error || "Ongeldig telefoonnummer");
       return;
     }
+    setPhoneError("");
+    // Save phone to localStorage for later use
+    localStorage.setItem("lua_captured_phone", cleanPhone(phone));
+    setStep("email");
+  };
 
+  const handleCreateAccount = async () => {
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) {
+      setEmailError(emailResult.error.errors[0].message);
+      return;
+    }
+    setEmailError("");
     setIsLoading(true);
-    setAccountCreationStarted(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
       if (error) throw error;
 
-      if (data.user) {
-        // Get phone from prop or localStorage fallback
-        const phoneToSave = capturedPhone || localStorage.getItem("lua_captured_phone");
-        
-        // Update profile with phone number if we have it
-        if (phoneToSave) {
-          // Use upsert so the profile row is guaranteed to exist
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert(
-              {
-                user_id: data.user.id,
-                phone: phoneToSave,
-              } as any,
-              { onConflict: 'user_id' }
-            );
+      // Save phone number for after magic link verification
+      const phoneToSave = cleanPhone(phone);
+      localStorage.setItem("lua_captured_phone", phoneToSave);
+      localStorage.setItem("lua_pending_email", email.trim());
 
-          if (profileError) {
-            console.error('Error updating profile with phone:', profileError);
-          } else {
-            // Clear localStorage after successful save
-            localStorage.removeItem("lua_captured_phone");
-          }
-        }
+      trackEvent("account_creation_magic_link_sent");
+      setStep("check_inbox");
 
-        // Sync contact to Bird CRM (fire and forget - don't block signup)
-        supabase.functions.invoke('sync-bird-contact', {
-          body: {
-            email: email,
-            phone: phoneToSave || null,
-            userId: data.user.id,
-          }
-        }).then(({ error }) => {
-          if (error) {
-            console.error('[Bird CRM] Sync error:', error);
-          } else {
-            console.log('[Bird CRM] Contact synced successfully');
-          }
-        });
-
-        trackEvent("account_created");
-        
-        toast({
-          title: "Account aangemaakt! 🎉",
-          description: "Je kunt nu overal verder waar je gebleven was.",
-        });
-        
-        onAccountCreated();
-      }
     } catch (error: any) {
-      setAccountCreationStarted(false);
-      
-      if (error.message?.includes('already registered')) {
-        toast({
-          title: "E-mailadres al in gebruik",
-          description: "Dit e-mailadres is al geregistreerd. Probeer in te loggen.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Fout bij aanmaken account",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Fout bij aanmaken account",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleLater = () => {
-    // Never allow closing if account creation has started
-    if (accountCreationStarted) return;
-    
-    // Only allow "Later" for non-hard-block modals
     if (isHardBlock) return;
-    
     trackEvent("account_creation_skipped");
     if (onDefer) {
       onDefer();
@@ -199,8 +134,7 @@ export const AccountCreationDialog = ({
     }
   };
 
-  // Determine if dialog can be dismissed
-  const canDismiss = !isHardBlock && !accountCreationStarted;
+  const canDismiss = !isHardBlock && step !== "check_inbox";
 
   return (
     <MobileModal open={open} onOpenChange={() => {}}>
@@ -212,163 +146,203 @@ export const AccountCreationDialog = ({
         onEscapeKeyDown={(e) => !canDismiss && e.preventDefault()}
       >
         <div className="px-5 py-4">
-          {/* Compact header */}
-          <div className="text-center mb-4">
-            <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
-              <Shield className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <h2 className="text-xl font-bold">
-              {isHardBlock ? "Account aanmaken" : "Maak je account aan"}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              Bewaar je voortgang en log overal in.
-            </p>
-          </div>
+          {/* Step 1: Phone */}
+          {step === "phone" && (
+            <>
+              <div className="text-center mb-4">
+                <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
+                  <Shield className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <h2 className="text-xl font-bold">Maak je account aan</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Bewaar je voortgang en log overal in.
+                </p>
+              </div>
 
-          {/* Compact form */}
-          <div className="space-y-3">
-            {/* Phone (read-only, shown first) */}
-            {capturedPhone && (
-              <div className="space-y-1">
-                <Label className="text-sm text-muted-foreground">Telefoonnummer</Label>
-                <div className="h-11 px-3 rounded-lg bg-muted/50 border border-border/50 flex items-center">
-                  <span className="text-sm text-foreground">{capturedPhone}</span>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label htmlFor="account-phone" className="text-sm flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                    Telefoonnummer
+                  </Label>
+                  <Input
+                    id="account-phone"
+                    type="tel"
+                    placeholder="06 12345678"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (phoneError) setPhoneError("");
+                    }}
+                    className={cn(
+                      "h-11 rounded-lg text-sm",
+                      phoneError && "border-destructive focus-visible:ring-destructive"
+                    )}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && isPhoneValid) {
+                        handlePhoneNext();
+                      }
+                    }}
+                  />
+                  {phoneError && (
+                    <p className="text-xs text-destructive">{phoneError}</p>
+                  )}
                 </div>
               </div>
-            )}
 
-            {/* Email */}
-            <div className="space-y-1">
-              <Label htmlFor="account-email" className="text-sm flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-                E-mailadres
-              </Label>
-              <Input
-                id="account-email"
-                type="email"
-                placeholder="jouw@email.nl"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (emailError) setEmailError("");
-                }}
-                className={cn(
-                  "h-11 rounded-lg text-sm",
-                  emailError && "border-destructive focus-visible:ring-destructive"
-                )}
-              />
-              {emailError && (
-                <p className="text-xs text-destructive">{emailError}</p>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1">
-              <Label htmlFor="account-password" className="text-sm flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-                Wachtwoord
-              </Label>
-              <div className="relative">
-                <Input
-                  id="account-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min. 8 tekens, 1 cijfer"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (passwordError) setPasswordError("");
-                  }}
-                  className={cn(
-                    "h-11 rounded-lg pr-10 text-sm",
-                    passwordError && "border-destructive focus-visible:ring-destructive"
-                  )}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && canSubmit) {
-                      handleCreateAccount();
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              <div className="mt-4 space-y-2">
+                <Button 
+                  onClick={handlePhoneNext}
+                  disabled={!isPhoneValid}
+                  className="w-full h-11 rounded-lg text-base font-semibold"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-              {passwordError && (
-                <p className="text-xs text-destructive">{passwordError}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Compact CTA section */}
-          <div className="mt-4 space-y-2">
-            <Button 
-              onClick={handleCreateAccount}
-              disabled={!canSubmit || isLoading}
-              className="w-full h-11 rounded-lg text-base font-semibold"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Even geduld...
-                </>
-              ) : (
-                <>
-                  Account aanmaken
+                  Volgende
                   <ArrowRight className="w-4 h-4 ml-2" />
-                </>
-              )}
-            </Button>
+                </Button>
 
-            {canDismiss && (
-              <Button 
-                variant="ghost" 
-                onClick={handleLater}
-                className="w-full h-9 rounded-lg text-sm text-muted-foreground"
-              >
-                Nu niet
-              </Button>
-            )}
-
-            {/* Secondary actions - compact row */}
-            <div className="flex items-center justify-center gap-3 text-xs pt-1">
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(true)}
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Wachtwoord vergeten?
-              </button>
-              {onLoginRequest && (
-                <>
-                  <span className="text-border">•</span>
-                  <button
-                    type="button"
-                    onClick={onLoginRequest}
-                    className="text-primary hover:text-primary/80 transition-colors"
+                {canDismiss && (
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleLater}
+                    className="w-full h-9 rounded-lg text-sm text-muted-foreground"
                   >
-                    Log in
-                  </button>
-                </>
-              )}
-            </div>
+                    Nu niet
+                  </Button>
+                )}
 
-            <p className="text-[11px] text-center text-muted-foreground pt-1">
-              Door aan te melden ga je akkoord met onze voorwaarden.
-            </p>
-          </div>
+                {onLoginRequest && (
+                  <div className="flex items-center justify-center text-xs pt-1">
+                    <button
+                      type="button"
+                      onClick={onLoginRequest}
+                      className="text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Heb je al een account? Log in
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Step 2: Email */}
+          {step === "email" && (
+            <>
+              <div className="text-center mb-4">
+                <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
+                  <Mail className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <h2 className="text-xl font-bold">Bijna klaar!</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Voeg je e-mailadres toe om in te loggen.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {/* Phone (read-only) */}
+                <div className="space-y-1">
+                  <Label className="text-sm text-muted-foreground">Telefoonnummer</Label>
+                  <div className="h-11 px-3 rounded-lg bg-muted/50 border border-border/50 flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">{phone}</span>
+                    <CheckCircle2 className="w-4 h-4 text-primary ml-auto" />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1">
+                  <Label htmlFor="account-email" className="text-sm flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+                    E-mailadres
+                  </Label>
+                  <Input
+                    id="account-email"
+                    type="email"
+                    placeholder="jouw@email.nl"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError("");
+                    }}
+                    className={cn(
+                      "h-11 rounded-lg text-sm",
+                      emailError && "border-destructive focus-visible:ring-destructive"
+                    )}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && isEmailValid) {
+                        handleCreateAccount();
+                      }
+                    }}
+                  />
+                  {emailError && (
+                    <p className="text-xs text-destructive">{emailError}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <Button 
+                  onClick={handleCreateAccount}
+                  disabled={!isEmailValid || isLoading}
+                  className="w-full h-11 rounded-lg text-base font-semibold"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Even geduld...
+                    </>
+                  ) : (
+                    <>
+                      Account aanmaken
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setStep("phone")}
+                  className="w-full h-9 rounded-lg text-sm text-muted-foreground"
+                >
+                  Terug
+                </Button>
+
+                <p className="text-[11px] text-center text-muted-foreground pt-1">
+                  We sturen een inloglink naar je e-mail. Geen wachtwoord nodig.
+                </p>
+              </div>
+            </>
+          )}
+
+          {/* Step 3: Check inbox */}
+          {step === "check_inbox" && (
+            <div className="text-center py-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-in zoom-in duration-300">
+                <CheckCircle2 className="w-8 h-8 text-primary" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Check je inbox</h2>
+              <p className="text-sm text-muted-foreground mb-1">
+                We hebben een inloglink gestuurd naar
+              </p>
+              <p className="text-sm font-medium text-foreground mb-4">{email}</p>
+              <p className="text-xs text-muted-foreground mb-4">
+                Klik op de link in de e-mail om je account te activeren.
+              </p>
+
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setStep("email");
+                  setEmail("");
+                }}
+                className="w-full h-10 rounded-lg text-sm"
+              >
+                Ander e-mailadres gebruiken
+              </Button>
+            </div>
+          )}
         </div>
       </MobileModalContent>
-
-      {/* Forgot Password Dialog */}
-      <ForgotPasswordDialog
-        open={showForgotPassword}
-        onOpenChange={setShowForgotPassword}
-        onBack={() => setShowForgotPassword(false)}
-        defaultEmail={email}
-      />
     </MobileModal>
   );
 };
