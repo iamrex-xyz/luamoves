@@ -97,22 +97,19 @@ export const PhoneOTPDialog = ({
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
-      trackEvent("otp_sent", { method: data.method });
+      trackEvent("phone_saved", { method: "skip_otp" });
+      
+      setStep("success");
       
       toast({
-        title: "Code verstuurd! 📱",
-        description: data.method === "whatsapp" 
-          ? "Check je WhatsApp voor de code." 
-          : "Check je SMS voor de code.",
+        title: "Telefoonnummer opgeslagen! 🎉",
+        description: "Je voortgang is bewaard.",
       });
 
-      setStep("otp");
-      setResendCooldown(60);
-      
-      // Focus first OTP input
+      // Small delay for success animation, then complete
       setTimeout(() => {
-        otpInputRefs.current[0]?.focus();
-      }, 100);
+        onVerified(anonymousUserId || "phone-user", false);
+      }, 1000);
 
     } catch (error: any) {
       toast({
@@ -301,10 +298,10 @@ export const PhoneOTPDialog = ({
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Code versturen...
+                    Opslaan...
                   </>
                 ) : (
-                  "Stuur verificatiecode"
+                  "Opslaan"
                 )}
               </Button>
 
@@ -319,7 +316,7 @@ export const PhoneOTPDialog = ({
               )}
 
               <p className="text-xs text-center text-muted-foreground">
-                Je ontvangt een eenmalige code via WhatsApp of SMS.
+                We gebruiken je nummer alleen om je voortgang te bewaren.
               </p>
             </div>
           </div>
