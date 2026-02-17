@@ -23,7 +23,31 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user && event === 'SIGNED_IN') {
-          // Allow parent to handle data sync
+          // Save pending phone number from registration flow
+          const pendingPhone = localStorage.getItem("lua_captured_phone");
+          if (pendingPhone) {
+            supabase
+              .from('profiles')
+              .upsert(
+                { user_id: session.user.id, phone: pendingPhone } as any,
+                { onConflict: 'user_id' }
+              )
+              .then(({ error }) => {
+                if (!error) {
+                  localStorage.removeItem("lua_captured_phone");
+                  localStorage.removeItem("lua_pending_email");
+                }
+              });
+
+            // Sync to Bird CRM (fire and forget)
+            supabase.functions.invoke('sync-bird-contact', {
+              body: {
+                email: session.user.email,
+                phone: pendingPhone,
+                userId: session.user.id,
+              }
+            });
+          }
         }
       }
     );

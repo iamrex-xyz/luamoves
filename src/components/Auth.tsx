@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { User as SupabaseUser } from "@supabase/supabase-js";
-import { Eye, EyeOff, User as UserIcon, UserPlus, ChevronRight } from "lucide-react";
-import { z } from "zod";
+import { User as UserIcon, UserPlus, ChevronRight, Mail, Loader2, CheckCircle } from "lucide-react";
 
 interface AuthProps {
   onComplete: (user: SupabaseUser) => void;
@@ -14,25 +13,22 @@ interface AuthProps {
   onContinueAsGuest?: () => void;
 }
 
-type AuthScreen = 'initial' | 'login' | 'signup' | 'passwordReset';
+type AuthScreen = 'initial' | 'login' | 'email_sent';
+
+import { z } from "zod";
 
 const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
-const passwordSchema = z.string().min(6, "Wachtwoord moet minimaal 6 tekens bevatten");
 
 export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthProps) => {
   const [loading, setLoading] = useState(false);
   const [screen, setScreen] = useState<AuthScreen>('initial');
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Listen for auth changes (only for new logins/signups)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      // Only call onComplete for new sign-ins, not for existing sessions
       if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
         onComplete(session.user);
       }
@@ -41,52 +37,10 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
     return () => subscription.unsubscribe();
   }, [onComplete]);
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const emailValidation = emailSchema.safeParse(email);
-    if (!emailValidation.success) {
-      toast({
-        title: "Ongeldige invoer",
-        description: emailValidation.error.errors[0].message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/`,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Email verstuurd!",
-        description: "Check je inbox voor de reset link",
-      });
-      
-      setScreen('login');
-      setEmail("");
-    } catch (error: any) {
-      toast({
-        title: "Reset mislukt",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const emailValidation = emailSchema.safeParse(email);
-    const passwordValidation = passwordSchema.safeParse(password);
-    
     if (!emailValidation.success) {
       toast({
         title: "Ongeldige invoer",
@@ -95,29 +49,23 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
       });
       return;
     }
-    
-    if (!passwordValidation.success) {
-      toast({
-        title: "Ongeldige invoer",
-        description: passwordValidation.error.errors[0].message,
-        variant: "destructive",
-      });
-      return;
-    }
 
     try {
       setLoading(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
       });
       
       if (error) throw error;
       
+      setScreen('email_sent');
       toast({
-        title: "Welkom terug!",
-        description: "Je bent succesvol ingelogd",
+        title: "Inloglink verstuurd! 📧",
+        description: "Check je inbox voor de link.",
       });
     } catch (error: any) {
       toast({
@@ -130,71 +78,16 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
     }
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const emailValidation = emailSchema.safeParse(email);
-    const passwordValidation = passwordSchema.safeParse(password);
-    
-    if (!emailValidation.success) {
-      toast({
-        title: "Ongeldige invoer",
-        description: emailValidation.error.errors[0].message,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!passwordValidation.success) {
-      toast({
-        title: "Ongeldige invoer",
-        description: passwordValidation.error.errors[0].message,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      setLoading(true);
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-        },
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Account aangemaakt!",
-        description: "Je bent nu ingelogd",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Registratie mislukt",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial screen - only login option
+  // Initial screen
   if (screen === 'initial') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        {/* Header */}
         <div className="p-6">
           <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
         </div>
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {/* Large headline */}
             <div className="space-y-4">
               <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
                 Welkom
@@ -206,7 +99,6 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
               </p>
             </div>
 
-            {/* Action card */}
             <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-4">
               <button 
                 onClick={() => setScreen('login')} 
@@ -218,7 +110,7 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
                   </div>
                   <div className="text-left">
                     <p className="font-semibold text-foreground">Inloggen</p>
-                    <p className="text-sm text-muted-foreground">Ga verder met je planning</p>
+                    <p className="text-sm text-muted-foreground">Via e-mail inloglink</p>
                   </div>
                 </div>
                 <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -263,169 +155,47 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
     );
   }
 
-  // Password reset screen
-  if (screen === 'passwordReset') {
+  // Email sent confirmation
+  if (screen === 'email_sent') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        {/* Header */}
         <div className="p-6 flex justify-between items-center">
           <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
-          <button
-            onClick={() => {
-              setScreen('login');
-              setEmail("");
-            }}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terug
-          </button>
         </div>
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {/* Large headline */}
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Wachtwoord
-                <br />
-                <span className="text-primary">vergeten?</span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-md">
-                Geen probleem! Vul je email in en we sturen je een reset link.
-              </p>
-            </div>
-
-            {/* Form card */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
-              <form onSubmit={handlePasswordReset} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="jouw@email.nl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
-                  />
-                </div>
-
-                <Button 
-                  type="submit" 
-                  disabled={loading} 
-                  className="w-full h-14 text-base rounded-xl bg-foreground hover:bg-foreground/90"
-                >
-                  {loading ? "Verzenden..." : "Verstuur reset link"}
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Login screen
-  if (screen === 'login') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
-        {/* Header */}
-        <div className="p-6 flex justify-between items-center">
-          <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
-          <button
-            onClick={() => setScreen('initial')}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Terug
-          </button>
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
-            {/* Large headline */}
-            <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Welkom
-                <br />
-                <span className="text-primary">terug!</span>
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-md">
-                Fijn dat je er weer bent. Log in en ga verder waar je was gebleven.
-              </p>
-            </div>
-
-            {/* Form card */}
-            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="jouw@email.nl"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={loading}
-                    className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-muted-foreground">Wachtwoord</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                      className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary pr-12"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                      disabled={loading}
-                    >
-                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </button>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit" 
-                  disabled={loading} 
-                  className="w-full h-14 text-base rounded-xl bg-foreground hover:bg-foreground/90"
-                >
-                  {loading ? "Laden..." : "Inloggen"}
-                </Button>
-              </form>
-
-              <div className="mt-4 pt-4 border-t border-muted space-y-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setScreen('passwordReset');
-                    setPassword("");
-                  }}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors block w-full text-center py-2"
-                  disabled={loading}
-                >
-                  Wachtwoord vergeten?
-                </button>
-                <button
-                  type="button"
-                  onClick={onSignUpRequest}
-                  className="text-sm text-primary hover:text-primary/80 transition-colors block w-full text-center py-2 font-medium"
-                  disabled={loading}
-                >
-                  Nog geen account? Maak er een aan
-                </button>
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center">
+                <CheckCircle className="w-16 h-16 text-primary" />
               </div>
+              <h1 className="text-3xl font-bold text-foreground">Check je inbox</h1>
+              <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                We hebben een inloglink gestuurd naar <strong>{email}</strong>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Klik op de link in de e-mail om in te loggen.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6 space-y-3">
+              <Button
+                variant="outline"
+                className="w-full h-12 rounded-xl"
+                onClick={() => {
+                  setScreen('login');
+                  setEmail("");
+                }}
+              >
+                Ander e-mailadres gebruiken
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full h-10 rounded-xl text-sm text-muted-foreground"
+                onClick={() => setScreen('initial')}
+              >
+                Terug naar start
+              </Button>
             </div>
           </div>
         </div>
@@ -433,6 +203,79 @@ export const Auth = ({ onComplete, onSignUpRequest, onContinueAsGuest }: AuthPro
     );
   }
 
-  // Signup screen removed - users must go through onboarding
-  return null;
+  // Login screen - magic link
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white flex flex-col">
+      <div className="p-6 flex justify-between items-center">
+        <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+        <button
+          onClick={() => setScreen('initial')}
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Terug
+        </button>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center px-6 pb-12 max-w-2xl mx-auto w-full">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="space-y-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
+              Welkom
+              <br />
+              <span className="text-primary">terug!</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-md">
+              Vul je e-mailadres in en we sturen je een inloglink.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-2xl shadow-primary/20 p-6">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5" />
+                  E-mailadres
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="jouw@email.nl"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  className="h-14 text-lg rounded-xl border-2 border-muted focus:border-primary"
+                />
+              </div>
+
+              <Button 
+                type="submit" 
+                disabled={loading} 
+                className="w-full h-14 text-base rounded-xl bg-foreground hover:bg-foreground/90"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Link versturen...
+                  </>
+                ) : (
+                  "Stuur inloglink"
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-4 pt-4 border-t border-muted">
+              <button
+                type="button"
+                onClick={onSignUpRequest}
+                className="text-sm text-primary hover:text-primary/80 transition-colors block w-full text-center py-2 font-medium"
+                disabled={loading}
+              >
+                Nog geen account? Maak er een aan
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
