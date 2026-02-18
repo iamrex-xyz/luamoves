@@ -115,21 +115,21 @@ export const generateTasksForRenter = (movingInfo: MovingInfo, householdInfo?: H
   const tasks: Task[] = [];
 
   // =====================================================
-  // TAAK 0 — Mede-verhuizers uitnodigen (altijd eerste taak)
+  // TAAK 0 — Mede-verhuizers uitnodigen (tijdelijk gedeactiveerd)
   // =====================================================
-  const inviteDeadline = createDeadline(-28, 'urgent');
-  
-  tasks.push({
-    id: "invite-household-members",
-    title: "Mede-verhuizers uitnodigen",
-    category: "Samenwerken",
-    description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
-    ...inviteDeadline,
-    phase: "Fase 1 - Je nieuwe thuis is bevestigd",
-    status: "todo",
-    icon: <Users className="w-4 h-4" />,
-    priority: 0, // Highest priority to appear first
-  });
+  // const inviteDeadline = createDeadline(-28, 'urgent');
+  // 
+  // tasks.push({
+  //   id: "invite-household-members",
+  //   title: "Mede-verhuizers uitnodigen",
+  //   category: "Samenwerken",
+  //   description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+  //   ...inviteDeadline,
+  //   phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+  //   status: "todo",
+  //   icon: <Users className="w-4 h-4" />,
+  //   priority: 0, // Highest priority to appear first
+  // });
 
   // =====================================================
   // FASE 1 — Even landen (4-3 weken voor verhuizing)
@@ -827,21 +827,21 @@ export const generateTasksForBuyer = (movingInfo: MovingInfo, householdInfo?: Ho
   const tasks: Task[] = [];
 
   // =====================================================
-  // TAAK 0 — Mede-verhuizers uitnodigen (altijd eerste taak)
+  // TAAK 0 — Mede-verhuizers uitnodigen (tijdelijk gedeactiveerd)
   // =====================================================
-  const inviteDeadline = createDeadline(-28, 'urgent');
-  
-  tasks.push({
-    id: "invite-household-members",
-    title: "Mede-verhuizers uitnodigen",
-    category: "Samenwerken",
-    description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
-    ...inviteDeadline,
-    phase: "Fase 1 - Je nieuwe thuis is bevestigd",
-    status: "todo",
-    icon: <Users className="w-4 h-4" />,
-    priority: 0, // Highest priority to appear first
-  });
+  // const inviteDeadline = createDeadline(-28, 'urgent');
+  // 
+  // tasks.push({
+  //   id: "invite-household-members",
+  //   title: "Mede-verhuizers uitnodigen",
+  //   category: "Samenwerken",
+  //   description: "Nodig mede-verhuizers uit om samen de verhuizing te regelen. Zo kunnen jullie taken verdelen en chatten.",
+  //   ...inviteDeadline,
+  //   phase: "Fase 1 - Je nieuwe thuis is bevestigd",
+  //   status: "todo",
+  //   icon: <Users className="w-4 h-4" />,
+  //   priority: 0, // Highest priority to appear first
+  // });
 
   // =====================================================
   // FASE 1 — Even landen (4-3 weken voor verhuizing)
