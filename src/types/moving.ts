@@ -64,6 +64,20 @@ export type MovingInfo = {
   phone?: string;
   // Budget veld
   movingBudget?: number;
+  // KOOP-specifieke intake velden
+  hypotheekDoel?: string;
+  hypotheekWerkSituatie?: string;
+  hypotheekHeeftPartner?: string;
+  hypotheekKoopsom?: number;
+  notarisDienst?: string;
+  taxatieDoel?: string;
+  taxatieVoorkeursdatum?: string;
+  bouwkundigeKeuringVoorkeursdatum?: string;
+  opstalDakType?: string;
+  slotVeiligheidsniveau?: string;
+  slotAantalDeuren?: string;
+  slotMontage?: string;
+  verhuisliftLocatie?: string;
 };
 
 export type AppView = "onboarding" | "auth" | "dashboard" | "tasks" | "extras" | "settings" | "chat";

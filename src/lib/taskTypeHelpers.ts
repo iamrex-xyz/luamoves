@@ -347,26 +347,47 @@ export const hasAffiliateOptions = (task: Task): boolean => {
 };
 
 // Check if intake has been completed for a task
+// Uses the actual fields saved by each dialog, not the generic needs*Questions helpers
 export const isIntakeCompleted = (task: Task, movingInfo?: MovingInfo): boolean => {
   if (!movingInfo) return false;
-  if (isEnergyTask(task)) return !needsEnergyQuestions(movingInfo);
-  if (isInternetTask(task)) return !needsInternetQuestions(movingInfo);
-  if (isMovingTask(task)) return !needsMovingQuestions(movingInfo);
-  if (isBoxesTask(task)) return !needsBoxesQuestions(movingInfo);
-  if (isInsuranceTask(task)) return !needsInsuranceQuestions(movingInfo);
-  if (isLiabilityTask(task)) return !needsLiabilityQuestions(movingInfo);
-  if (isForwardingTask(task)) return !needsForwardingQuestions(movingInfo);
-  if (isVerhuisliftTask(task)) return !needsVerhuisliftQuestions(movingInfo);
-  if (isCleaningTask(task)) return !needsCleaningQuestions(movingInfo);
-  if (isSmokeDetectorTask(task)) return !needsSmokeDetectorQuestions(movingInfo);
-  if (isGardenTask(task)) return !needsGardenQuestions(movingInfo);
-  if (isRenovationTask(task)) return !needsRenovationQuestions(movingInfo);
-  if (isHypothekTask(task)) return !needsHypotheekQuestions(movingInfo);
-  if (isBouwkundigeKeuringTask(task)) return !needsBouwkundigeKeuringQuestions(movingInfo);
-  if (isNotarisTask(task)) return !needsNotarisQuestions(movingInfo);
-  if (isTaxatieTask(task)) return !needsTaxatieQuestions(movingInfo);
-  if (isOpstalTask(task)) return !needsOpstalQuestions(movingInfo);
-  if (isSlotTask(task)) return !needsSlotcilinderQuestions(movingInfo);
+  const info = movingInfo as any;
+  
+  // Energy: dialog saves energyCurrentSupplier + housingPropertyType
+  if (isEnergyTask(task)) return !!info.energyCurrentSupplier;
+  // Internet: dialog saves hasFiber + internetSpeedPreference + internetBundle
+  if (isInternetTask(task)) return !!info.internetSpeedPreference || !!info.internetBundle;
+  // Moving: dialog saves floorLevel + hasElevator + numberOfRooms + specialItems
+  if (isMovingTask(task)) return !!info.floorLevel && !!info.numberOfRooms;
+  // Boxes: dialog saves numberOfRooms + hasFragileItems
+  if (isBoxesTask(task)) return !!info.numberOfRooms && !!info.hasFragileItems;
+  // Insurance: dialog saves homeSizeM2 + insuranceValue
+  if (isInsuranceTask(task)) return !!info.homeSizeM2 && !!info.insuranceValue;
+  // Liability: dialog saves children + pets
+  if (isLiabilityTask(task)) return info.children !== undefined && info.children !== null && info.pets !== undefined && info.pets !== null;
+  // Forwarding: dialog saves forwardingStartDate + forwardingDuration + householdNames
+  if (isForwardingTask(task)) return !!info.forwardingStartDate && !!info.forwardingDuration;
+  // Verhuislift: dialog saves verhuisliftLocatie
+  if (isVerhuisliftTask(task)) return !!info.verhuisliftLocatie;
+  // Cleaning: dialog saves serviceType + homeSizeM2 + preferredServiceDate
+  if (isCleaningTask(task)) return !!info.serviceType && !!info.preferredServiceDate;
+  // SmokeDetector: dialog saves numberOfFloors + numberOfBedrooms
+  if (isSmokeDetectorTask(task)) return !!info.numberOfFloors && !!info.numberOfBedrooms;
+  // Garden: dialog saves gardenServiceType + gardenSize
+  if (isGardenTask(task)) return !!info.gardenServiceType;
+  // Renovation: dialog saves renovationBudget + renovationStartDate
+  if (isRenovationTask(task)) return !!info.renovationBudget && !!info.renovationStartDate;
+  // Hypotheek: dialog saves hypotheekDoel + hypotheekWerkSituatie
+  if (isHypothekTask(task)) return !!info.hypotheekDoel || !!info.hypotheekWerkSituatie;
+  // Bouwkundige keuring: dialog saves bouwkundigeKeuringVoorkeursdatum
+  if (isBouwkundigeKeuringTask(task)) return !!info.bouwkundigeKeuringVoorkeursdatum || !!info.bouwkundige_keuring_voorkeursdatum;
+  // Notaris: dialog saves notarisDienst
+  if (isNotarisTask(task)) return !!info.notarisDienst || !!info.notaris_dienst;
+  // Taxatie: dialog saves taxatieDoel
+  if (isTaxatieTask(task)) return !!info.taxatieDoel || !!info.taxatie_doel;
+  // Opstal: dialog saves opstalDakType
+  if (isOpstalTask(task)) return !!info.opstalDakType || !!info.opstal_dak_type;
+  // Slotcilinder: dialog saves slotVeiligheidsniveau + slotAantalDeuren
+  if (isSlotTask(task)) return !!info.slotVeiligheidsniveau || !!info.slot_veiligheidsniveau;
   return false;
 };
 
