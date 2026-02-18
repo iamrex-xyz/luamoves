@@ -52,6 +52,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
   const [inviteData, setInviteData] = useState<{ phone: string; name?: string; ownerUserId: string } | null>(null);
+  const [showSignupFromAuth, setShowSignupFromAuth] = useState(false);
   const { toast } = useToast();
 
   // Use guest storage hook
@@ -616,8 +617,20 @@ const Index = () => {
       <ErrorBoundary>
         <Auth 
           onComplete={handleAuthComplete} 
-          onSignUpRequest={() => setCurrentView("onboarding")}
+          onSignUpRequest={() => setShowSignupFromAuth(true)}
           onContinueAsGuest={() => setCurrentView("onboarding")}
+        />
+        <AccountCreationDialog
+          open={showSignupFromAuth}
+          onOpenChange={setShowSignupFromAuth}
+          onAccountCreated={() => {
+            setShowSignupFromAuth(false);
+          }}
+          onDefer={() => setShowSignupFromAuth(false)}
+          onLoginRequest={() => {
+            setShowSignupFromAuth(false);
+          }}
+          isHardBlock={false}
         />
       </ErrorBoundary>
     );
