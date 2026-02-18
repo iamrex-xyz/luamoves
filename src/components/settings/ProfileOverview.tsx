@@ -151,9 +151,10 @@ export const ProfileOverview = ({ movingInfo, onUpdate }: ProfileOverviewProps) 
     renovationStartDate: "",
   });
 
+  // Re-load profile when movingInfo changes (e.g. after dialog saves)
   useEffect(() => {
     loadProfile();
-  }, []);
+  }, [movingInfo]);
 
   const loadProfile = async () => {
     try {
