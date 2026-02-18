@@ -48,7 +48,8 @@ export function SmokeDetectorQuestionsDialog({
         setStep(1);
       }
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = () => {
     if (step === 1 && numberOfFloors) {

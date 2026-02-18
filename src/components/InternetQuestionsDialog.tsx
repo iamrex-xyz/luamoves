@@ -48,7 +48,8 @@ export const InternetQuestionsDialog = ({
       setWorksFromHome((movingInfo as any).worksFromHome || "");
       setCurrentStep("intro");
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = async () => {
     if (currentStep === "intro") {

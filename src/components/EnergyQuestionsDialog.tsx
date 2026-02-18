@@ -76,7 +76,7 @@ export const EnergyQuestionsDialog = ({
   const [estimatedElectricity, setEstimatedElectricity] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // Reset state when dialog opens
+  // Reset state only when dialog first opens (not on movingInfo changes mid-dialog)
   useEffect(() => {
     if (open) {
       setAddress(movingInfo.newAddress || "");
@@ -86,7 +86,8 @@ export const EnergyQuestionsDialog = ({
       setEstimatedElectricity("");
       setCurrentStep("intro");
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = async () => {
     if (currentStep === "intro") {

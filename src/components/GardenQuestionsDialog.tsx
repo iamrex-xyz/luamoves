@@ -59,7 +59,8 @@ export function GardenQuestionsDialog({
         setStep(1);
       }
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = async () => {
     if (step === 1) {
