@@ -51,7 +51,8 @@ export function CleaningQuestionsDialog({
       setShowConfirmation(false);
       setStep(1);
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = () => {
     if (step === 1 && housingType) {

@@ -69,7 +69,8 @@ export const HypotheekQuestionsDialog = ({
       setHypotheekDoel("");
       setCurrentStep("address");
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = async () => {
     if (currentStep === "address") {

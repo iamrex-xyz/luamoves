@@ -101,7 +101,8 @@ export const MovingQuestionsDialog = ({
       setMovingSize((movingInfo as any).movingSize || '');
       setStep('intro');
     }
-  }, [open, movingInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleNext = async () => {
     if (step === 'intro') {
