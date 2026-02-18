@@ -519,6 +519,7 @@ const Index = () => {
             onNavigate={setCurrentView}
             onTaskComplete={phoneAuthFlow.handleTaskComplete}
             onSignupClick={phoneAuthFlow.triggerPhoneDialog}
+            onUpdateMovingInfo={handleUpdateMovingInfo}
           />
         )}
         {currentView === "tasks" && movingInfo && (
