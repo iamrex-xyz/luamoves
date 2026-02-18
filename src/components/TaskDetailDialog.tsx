@@ -254,7 +254,7 @@ export const TaskDetailDialog = ({
                 />
               </div>
 
-              {/* Assigned To */}
+              {/* Assigned To - temporarily disabled
               <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-3">
                   <User className="w-5 h-5 text-primary" />
@@ -272,9 +272,7 @@ export const TaskDetailDialog = ({
                   currentAssignedTo={task.assignedTo}
                   currentAssignedEmail={localAssignedEmail}
                   onAssignmentChange={(assignedEmail) => {
-                    // Immediately update local state
                     setLocalAssignedEmail(assignedEmail);
-                    // Then update parent state
                     if (onTaskAssignment) {
                       onTaskAssignment(task.id, assignedEmail);
                     } else {
@@ -283,6 +281,7 @@ export const TaskDetailDialog = ({
                   }}
                 />
               </div>
+              */}
 
               {/* Category & Phase */}
               <div className="grid grid-cols-2 gap-3">
