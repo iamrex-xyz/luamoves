@@ -210,16 +210,6 @@ export const MovingQuestionsDialog = ({
             </p>
             <div className="w-full max-w-[280px] space-y-2">
               <Button 
-                onClick={() => {
-                  onCompleteTask?.();
-                  handleClose();
-                }}
-                className="w-full h-12 rounded-xl"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Taak afronden
-              </Button>
-              <Button 
                 variant="ghost"
                 onClick={handleClose}
                 className="w-full h-10 text-muted-foreground"

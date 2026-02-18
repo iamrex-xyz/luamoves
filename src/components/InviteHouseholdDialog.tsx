@@ -420,16 +420,6 @@ export const InviteHouseholdDialog = ({
                   Nog iemand uitnodigen
                 </Button>
                 <Button
-                  onClick={() => {
-                    onCompleteTask?.();
-                    handleClose();
-                  }}
-                  className="w-full h-11 rounded-xl"
-                >
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Taak afronden
-                </Button>
-                <Button
                   variant="ghost"
                   onClick={handleClose}
                   className="w-full h-9 text-muted-foreground"

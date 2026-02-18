@@ -144,17 +144,6 @@ export function GardenQuestionsDialog({
                 </Button>
               )}
               <Button 
-                variant={hasGarden ? "outline" : "default"}
-                onClick={() => {
-                  onCompleteTask?.();
-                  handleClose();
-                }}
-                className="w-full"
-              >
-                <Check className="w-4 h-4 mr-2" />
-                Taak afronden
-              </Button>
-              <Button 
                 variant="ghost"
                 onClick={handleClose}
                 className="w-full text-muted-foreground"

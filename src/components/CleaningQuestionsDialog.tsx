@@ -99,15 +99,6 @@ export function CleaningQuestionsDialog({
             </p>
             <div className="w-full space-y-2 mt-4">
               <Button 
-                onClick={() => {
-                  onCompleteTask?.();
-                  handleClose();
-                }}
-                className="w-full"
-              >
-                Taak afronden
-              </Button>
-              <Button 
                 variant="ghost"
                 onClick={handleClose}
                 className="w-full text-muted-foreground"
