@@ -49,8 +49,7 @@ const handler = async (req: Request): Promise<Response> => {
     for (const { user_id } of usersWithPrefs || []) {
       try {
         // Get user email
-        const { data: { users } } = await supabase.auth.admin.listUsers();
-        const user = users?.find(u => u.id === user_id);
+        const { data: { user } } = await supabase.auth.admin.getUserById(user_id);
         if (!user?.email) continue;
 
         // Get user's moving date

@@ -102,8 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
           .single();
 
         // Get user email from auth
-        const { data: { users }, error: authError } = await supabase.auth.admin.listUsers();
-        const user = users?.find(u => u.id === reminder.user_id);
+        const { data: { user }, error: authError } = await supabase.auth.admin.getUserById(reminder.user_id);
         
         if (!user?.email) {
           console.error(`No email found for user ${reminder.user_id}`);

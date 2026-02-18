@@ -1,5 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { crypto } from "https://deno.land/std@0.190.0/crypto/mod.ts";
+import { encodeHex } from "https://deno.land/std@0.190.0/encoding/hex.ts";
+
+const hashOTP = async (otp: string, phone: string): Promise<string> => {
+  const data = new TextEncoder().encode(otp + phone);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return encodeHex(new Uint8Array(hashBuffer));
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -62,8 +70,9 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("Verificatiecode is verlopen. Vraag een nieuwe aan.");
     }
 
-    // Verify code
-    if (otpRecord.code !== code) {
+    // Verify code (hash provided code and compare)
+    const hashedCode = await hashOTP(code, formattedPhone);
+    if (otpRecord.code !== hashedCode) {
       // Track attempts (optional - for rate limiting)
       const attempts = (otpRecord.attempts || 0) + 1;
       if (attempts >= 5) {
