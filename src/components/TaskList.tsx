@@ -428,6 +428,7 @@ export const TaskList = ({
                       <TaskListItem
                         key={task.id}
                         task={task}
+                        movingInfo={movingInfo}
                         isCompleting={completingTasks.has(task.id)}
                         isNewAssignment={isNewAssignment({
                           taskId: task.id,

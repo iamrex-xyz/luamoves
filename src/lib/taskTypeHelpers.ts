@@ -1,5 +1,5 @@
 import { Task } from "@/lib/taskGenerator";
-import { MovingInfo } from "@/pages/Index";
+import { MovingInfo } from "@/types/moving";
 
 // Task type detection helpers
 export const isEnergyTask = (task: Task): boolean => {
@@ -320,13 +320,34 @@ export const hasAffiliateOptions = (task: Task): boolean => {
   );
 };
 
+// Check if intake has been completed for a task
+export const isIntakeCompleted = (task: Task, movingInfo?: MovingInfo): boolean => {
+  if (!movingInfo) return false;
+  if (isEnergyTask(task)) return !needsEnergyQuestions(movingInfo);
+  if (isInternetTask(task)) return !needsInternetQuestions(movingInfo);
+  if (isMovingTask(task)) return !needsMovingQuestions(movingInfo);
+  if (isBoxesTask(task)) return !needsBoxesQuestions(movingInfo);
+  if (isInsuranceTask(task)) return !needsInsuranceQuestions(movingInfo);
+  if (isLiabilityTask(task)) return !needsLiabilityQuestions(movingInfo);
+  if (isForwardingTask(task)) return !needsForwardingQuestions(movingInfo);
+  if (isVerhuisliftTask(task)) return !needsVerhuisliftQuestions(movingInfo);
+  if (isCleaningTask(task)) return !needsCleaningQuestions(movingInfo);
+  if (isSmokeDetectorTask(task)) return !needsSmokeDetectorQuestions(movingInfo);
+  if (isGardenTask(task)) return !needsGardenQuestions(movingInfo);
+  if (isRenovationTask(task)) return !needsRenovationQuestions(movingInfo);
+  return false;
+};
+
 // Get custom button label for specific task types
-export const getTaskButtonLabel = (task: Task): string => {
+export const getTaskButtonLabel = (task: Task, movingInfo?: MovingInfo): string => {
   if (isMovingFeedbackTask(task)) {
     return "Feedback achterlaten";
   }
   if (isInviteHouseholdTask(task)) {
     return "Meteen uitnodigen";
+  }
+  if (isIntakeCompleted(task, movingInfo)) {
+    return "Lua regelt dit ✨";
   }
   return "Regel dit voor mij";
 };

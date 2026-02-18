@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
+import { MovingInfo } from "@/types/moving";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
 import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { TaskDocument } from "@/hooks/useTaskDocuments";
 
 type TaskListItemProps = {
   task: Task;
+  movingInfo?: MovingInfo;
   isCompleting: boolean;
   isNewAssignment?: boolean;
   taskDocuments?: TaskDocument[];
@@ -20,6 +22,7 @@ type TaskListItemProps = {
 
 export const TaskListItem = ({
   task,
+  movingInfo,
   isCompleting,
   isNewAssignment,
   taskDocuments = [],
@@ -211,7 +214,7 @@ export const TaskListItem = ({
                   className="flex items-center text-[12px] text-primary hover:text-primary/80 font-medium transition-colors"
                   onClick={(e) => onRegelenClick(e, task)}
                 >
-                  {getTaskButtonLabel(task)}
+                  {getTaskButtonLabel(task, movingInfo)}
                   <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
                 </button>
               )}

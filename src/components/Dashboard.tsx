@@ -260,9 +260,10 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
           <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 max-h-[calc(100vh-340px)] overflow-y-auto">
             <div className="space-y-2 p-4">
               {displayTasks.map((task) => (
-                <TaskListItem
+              <TaskListItem
                   key={task.id}
                   task={task}
+                  movingInfo={movingInfo}
                   isCompleting={completingTasks.has(task.id)}
                   isNewAssignment={isNewAssignment({
                     taskId: task.id,
