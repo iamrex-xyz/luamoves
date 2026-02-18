@@ -1,0 +1,82 @@
+
+-- Fix 1: Remove overly permissive household_members policy
+-- The verify-household-invite edge function uses service role key, bypassing RLS
+-- No direct client access to invite tokens is needed
+DROP POLICY IF EXISTS "Anyone can view by invite token" ON public.household_members;
+
+-- Fix 2: Recreate admin_profiles_view with SECURITY INVOKER instead of SECURITY DEFINER
+DROP VIEW IF EXISTS public.admin_profiles_view;
+
+CREATE VIEW public.admin_profiles_view
+WITH (security_invoker = true)
+AS
+SELECT
+  id,
+  user_id,
+  moving_date,
+  key_handover_date,
+  needs_contractor_help,
+  has_garden,
+  has_parking,
+  is_vve,
+  has_job,
+  adults,
+  children,
+  pets,
+  energy_estimated_gas,
+  energy_estimated_electricity,
+  forwarding_start_date,
+  preferred_service_date,
+  moving_budget,
+  renovation_start_date,
+  hypotheek_koopsom,
+  taxatie_voorkeursdatum,
+  bouwkundige_keuring_voorkeursdatum,
+  created_at,
+  updated_at,
+  garden_service_type,
+  renovation_budget,
+  hypotheek_werksituatie,
+  hypotheek_heeft_partner,
+  hypotheek_doel,
+  notaris_dienst,
+  taxatie_doel,
+  phone,
+  old_address,
+  new_address,
+  slot_aantal_deuren,
+  slot_veiligheidsniveau,
+  moving_type,
+  renovation_type,
+  slot_montage,
+  housing_property_type,
+  verhuislift_locatie,
+  opstal_dak_type,
+  current_housing_situation,
+  has_gas,
+  has_smart_meter,
+  glasvezel,
+  works_from_home,
+  building_access,
+  insurance_value,
+  building_year,
+  garden_size,
+  children_ages,
+  energy_current_supplier,
+  energy_connection_type,
+  has_fiber,
+  internet_speed_preference,
+  internet_bundle,
+  floor_level,
+  has_elevator,
+  number_of_rooms,
+  special_items,
+  has_fragile_items,
+  home_size_m2,
+  forwarding_duration,
+  household_names,
+  municipality,
+  service_type,
+  number_of_floors,
+  number_of_bedrooms
+FROM public.profiles;
