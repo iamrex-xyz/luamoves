@@ -360,6 +360,81 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, [loadUserProfile, searchParams, setSearchParams]);
 
+  // Save profile data for anonymous users directly to database
+  const syncAnonymousDataToProfile = async (anonId: string, info: MovingInfo) => {
+    try {
+      const capturedPhone = localStorage.getItem("lua_captured_phone") || info.phone || null;
+      
+      const { error } = await supabase
+        .from('profiles')
+        .insert({
+          user_id: crypto.randomUUID(),
+          anonymous_user_id: anonId,
+          old_address: info.oldAddress || null,
+          new_address: info.newAddress || null,
+          moving_date: info.movingDate || null,
+          key_handover_date: info.keyHandoverDate || null,
+          moving_type: info.type || null,
+          renovation_type: info.renovationType || "none",
+          needs_contractor_help: info.needsContractorHelp || false,
+          housing_property_type: info.propertyType || info.housingPropertyType || null,
+          has_garden: info.hasGarden || false,
+          has_parking: info.hasParking || false,
+          is_vve: info.isVve || false,
+          current_housing_situation: info.currentSituation || null,
+          has_job: info.hasJob !== false,
+          adults: info.adults || 1,
+          children: info.children || 0,
+          pets: info.pets || 0,
+          moving_budget: info.movingBudget || null,
+          phone: capturedPhone,
+          has_gas: info.hasGas || null,
+          has_smart_meter: info.hasSmartMeter || null,
+          glasvezel: info.glasvezel || null,
+          works_from_home: info.worksFromHome || null,
+          building_access: info.buildingAccess || null,
+          insurance_value: info.insuranceValue || null,
+          building_year: info.buildingYear || null,
+          garden_size: info.gardenSize || null,
+          children_ages: info.childrenAges || null,
+          energy_current_supplier: info.energyCurrentSupplier || null,
+          energy_connection_type: info.energyConnectionType || null,
+          has_fiber: info.hasFiber || null,
+          internet_speed_preference: info.internetSpeedPreference || null,
+          internet_bundle: info.internetBundle || null,
+          floor_level: info.floorLevel || null,
+          has_elevator: info.hasElevator || null,
+          number_of_rooms: info.numberOfRooms || null,
+          special_items: info.specialItems || [],
+          has_fragile_items: info.hasFragileItems || null,
+          home_size_m2: info.homeSizeM2 || null,
+          forwarding_start_date: info.forwardingStartDate || null,
+          forwarding_duration: info.forwardingDuration || null,
+          household_names: info.householdNames || [],
+          municipality: info.municipality || null,
+          service_type: info.serviceType || null,
+          preferred_service_date: info.preferredServiceDate || null,
+          number_of_floors: info.numberOfFloors || null,
+          number_of_bedrooms: info.numberOfBedrooms || null,
+          garden_service_type: info.gardenServiceType || null,
+          renovation_budget: info.renovationBudget || null,
+          renovation_start_date: info.renovationStartDate || null,
+        } as any);
+
+      if (error) {
+        console.error('[syncAnonymousDataToProfile] Error:', error);
+      } else {
+        console.log('[syncAnonymousDataToProfile] Successfully saved for anon:', anonId);
+        // Mark that we've synced this to DB so we don't duplicate
+        localStorage.setItem('lua_anon_profile_synced', 'true');
+      }
+    } catch (error) {
+      console.error('[syncAnonymousDataToProfile] Exception:', error);
+    }
+  };
+
+
+
   // Handlers
   const handleOnboardingComplete = async (info: MovingInfo) => {
     setMovingInfo(info);
@@ -369,6 +444,15 @@ const Index = () => {
     // If user is already logged in, sync to database immediately
     if (user) {
       await syncLocalDataToProfile(user.id, info);
+    } else {
+      // Save to database for anonymous users too (only once)
+      const alreadySynced = localStorage.getItem('lua_anon_profile_synced');
+      if (!alreadySynced) {
+        const anonId = phoneAuthFlow.anonymousUserId || localStorage.getItem("lua_anonymous_user_id");
+        if (anonId) {
+          await syncAnonymousDataToProfile(anonId, info);
+        }
+      }
     }
   };
 
@@ -404,6 +488,7 @@ const Index = () => {
             is_vve: updatedInfo.isVve || false,
             current_housing_situation: updatedInfo.currentSituation || null,
             has_job: updatedInfo.hasJob !== false,
+            adults: updatedInfo.adults || 1,
             children: updatedInfo.children || 0,
             pets: updatedInfo.pets || 0,
             moving_budget: updatedInfo.movingBudget || null,
