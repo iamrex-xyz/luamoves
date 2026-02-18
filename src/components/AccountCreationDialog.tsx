@@ -137,7 +137,7 @@ export const AccountCreationDialog = ({
   const canDismiss = !isHardBlock;
 
   return (
-    <MobileModal open={open} onOpenChange={() => {}}>
+    <MobileModal open={open} onOpenChange={(v) => { if (!v && canDismiss) handleLater(); }}>
       <MobileModalContent 
         className="max-h-[80vh]"
         showCloseButton={canDismiss}
