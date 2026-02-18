@@ -134,7 +134,7 @@ export const AccountCreationDialog = ({
     }
   };
 
-  const canDismiss = !isHardBlock && step !== "check_inbox";
+  const canDismiss = !isHardBlock;
 
   return (
     <MobileModal open={open} onOpenChange={() => {}}>
