@@ -26,6 +26,7 @@ import { toast } from "sonner";
 type AdminProfileCardProps = {
   profile: AdminProfile;
   onUpdate: (profile: AdminProfile) => void;
+  completedTasksCount?: number;
 };
 
 type FieldConfig = {
@@ -42,7 +43,7 @@ type DataSection = {
   hasData: boolean;
 };
 
-export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) => {
+export const AdminProfileCard = ({ profile, onUpdate, completedTasksCount = 0 }: AdminProfileCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [localProfile, setLocalProfile] = useState(profile);
 
@@ -266,9 +267,17 @@ export const AdminProfileCard = ({ profile, onUpdate }: AdminProfileCardProps) =
                   {formatDate(localProfile.moving_date)}
                 </span>
               )}
+              {localProfile.created_at && (
+                <span className="flex items-center gap-1 text-xs">
+                  📅 Aangemeld: {formatDate(localProfile.created_at)}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              ✅ {completedTasksCount} taken
+            </Badge>
             <Badge variant="secondary" className="text-xs">
               {filledFieldsCount} velden
             </Badge>
