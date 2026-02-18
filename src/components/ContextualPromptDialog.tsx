@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -52,9 +52,20 @@ export const ContextualPromptDialog = ({
   taskTitle,
   movingInfo,
 }: ContextualPromptDialogProps) => {
-  const [oldAddress, setOldAddress] = useState("");
-  const [movingType, setMovingType] = useState<"rent" | "buy" | "">("");
-  const [keyDate, setKeyDate] = useState<Date | undefined>(undefined);
+  const [oldAddress, setOldAddress] = useState(movingInfo?.oldAddress || "");
+  const [movingType, setMovingType] = useState<"rent" | "buy" | "">(movingInfo?.type || "");
+  const [keyDate, setKeyDate] = useState<Date | undefined>(
+    movingInfo?.keyHandoverDate ? new Date(movingInfo.keyHandoverDate) : undefined
+  );
+
+  // Prefill from movingInfo when dialog opens
+  useEffect(() => {
+    if (open) {
+      setOldAddress(movingInfo?.oldAddress || "");
+      setMovingType(movingInfo?.type || "");
+      setKeyDate(movingInfo?.keyHandoverDate ? new Date(movingInfo.keyHandoverDate) : undefined);
+    }
+  }, [open, movingInfo?.oldAddress, movingInfo?.type, movingInfo?.keyHandoverDate]);
 
   const config = promptConfig[promptType];
 
