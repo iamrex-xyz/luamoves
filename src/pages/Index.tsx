@@ -119,6 +119,20 @@ const Index = () => {
         renovationStartDate: (profile as any).renovation_start_date,
         housingPropertyType: (profile as any).housing_property_type,
         phone: (profile as any).phone,
+        // KOOP-specifieke intake velden
+        hypotheekDoel: (profile as any).hypotheek_doel,
+        hypotheekWerkSituatie: (profile as any).hypotheek_werksituatie,
+        hypotheekHeeftPartner: (profile as any).hypotheek_heeft_partner,
+        hypotheekKoopsom: (profile as any).hypotheek_koopsom,
+        notarisDienst: (profile as any).notaris_dienst,
+        taxatieDoel: (profile as any).taxatie_doel,
+        taxatieVoorkeursdatum: (profile as any).taxatie_voorkeursdatum,
+        bouwkundigeKeuringVoorkeursdatum: (profile as any).bouwkundige_keuring_voorkeursdatum,
+        opstalDakType: (profile as any).opstal_dak_type,
+        slotVeiligheidsniveau: (profile as any).slot_veiligheidsniveau,
+        slotAantalDeuren: (profile as any).slot_aantal_deuren,
+        slotMontage: (profile as any).slot_montage,
+        verhuisliftLocatie: (profile as any).verhuislift_locatie,
       };
       setMovingInfo(info);
       setCurrentView("dashboard");
