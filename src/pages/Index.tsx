@@ -157,7 +157,7 @@ const Index = () => {
       // Get captured phone from localStorage if not in info
       const capturedPhone = localStorage.getItem("lua_captured_phone") || info.phone || null;
       
-      await supabase
+      const { error: upsertError } = await supabase
         .from('profiles')
         .upsert(
           {
@@ -175,6 +175,7 @@ const Index = () => {
           is_vve: info.isVve || false,
           current_housing_situation: info.currentSituation || null,
           has_job: info.hasJob !== false,
+          adults: info.adults || 1,
           children: info.children || 0,
           pets: info.pets || 0,
           moving_budget: info.movingBudget || null,
@@ -214,7 +215,14 @@ const Index = () => {
           { onConflict: 'user_id' }
         );
 
-      // Clear local storage after sync
+      if (upsertError) {
+        console.error('Error syncing profile to database:', upsertError);
+        return;
+      }
+
+      console.log('[syncLocalDataToProfile] Successfully synced profile for user:', userId);
+
+      // Clear local storage after successful sync
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       localStorage.removeItem("lua_email_prompted");
       localStorage.removeItem("lua_signup_prompted");
@@ -335,11 +343,13 @@ const Index = () => {
           searchParams.delete("invite");
           setSearchParams(searchParams);
           
-          setTimeout(() => {
+          setTimeout(async () => {
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
-              syncLocalDataToProfile(session.user.id, JSON.parse(savedInfo));
+              await syncLocalDataToProfile(session.user.id, JSON.parse(savedInfo));
             }
+            // Always load profile after sync to ensure latest data
+            await loadUserProfile(session.user.id);
           }, 0);
         }
       }
@@ -351,10 +361,15 @@ const Index = () => {
   }, [loadUserProfile, searchParams, setSearchParams]);
 
   // Handlers
-  const handleOnboardingComplete = (info: MovingInfo) => {
+  const handleOnboardingComplete = async (info: MovingInfo) => {
     setMovingInfo(info);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(info));
     setCurrentView("dashboard");
+
+    // If user is already logged in, sync to database immediately
+    if (user) {
+      await syncLocalDataToProfile(user.id, info);
+    }
   };
 
   const handleAuthComplete = async (authenticatedUser: User) => {
