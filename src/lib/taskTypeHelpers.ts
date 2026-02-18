@@ -293,6 +293,32 @@ export const needsRenovationQuestions = (info: MovingInfo): boolean => {
          !(info as any).housingPropertyType;
 };
 
+export const needsHypotheekQuestions = (info: MovingInfo): boolean => {
+  const i = info as any;
+  return !i.hypotheek_doel && !i.hypotheek_werksituatie;
+};
+
+export const needsBouwkundigeKeuringQuestions = (info: MovingInfo): boolean => {
+  return !(info as any).bouwkundige_keuring_voorkeursdatum;
+};
+
+export const needsNotarisQuestions = (info: MovingInfo): boolean => {
+  return !(info as any).notaris_dienst;
+};
+
+export const needsTaxatieQuestions = (info: MovingInfo): boolean => {
+  return !(info as any).taxatie_doel;
+};
+
+export const needsOpstalQuestions = (info: MovingInfo): boolean => {
+  return !(info as any).opstal_dak_type;
+};
+
+export const needsSlotcilinderQuestions = (info: MovingInfo): boolean => {
+  const i = info as any;
+  return !i.slot_veiligheidsniveau && !i.slot_aantal_deuren;
+};
+
 // Check if a task has affiliate options (i.e., should show "Regelen" button)
 export const hasAffiliateOptions = (task: Task): boolean => {
   return (
@@ -335,6 +361,12 @@ export const isIntakeCompleted = (task: Task, movingInfo?: MovingInfo): boolean 
   if (isSmokeDetectorTask(task)) return !needsSmokeDetectorQuestions(movingInfo);
   if (isGardenTask(task)) return !needsGardenQuestions(movingInfo);
   if (isRenovationTask(task)) return !needsRenovationQuestions(movingInfo);
+  if (isHypothekTask(task)) return !needsHypotheekQuestions(movingInfo);
+  if (isBouwkundigeKeuringTask(task)) return !needsBouwkundigeKeuringQuestions(movingInfo);
+  if (isNotarisTask(task)) return !needsNotarisQuestions(movingInfo);
+  if (isTaxatieTask(task)) return !needsTaxatieQuestions(movingInfo);
+  if (isOpstalTask(task)) return !needsOpstalQuestions(movingInfo);
+  if (isSlotTask(task)) return !needsSlotcilinderQuestions(movingInfo);
   return false;
 };
 
