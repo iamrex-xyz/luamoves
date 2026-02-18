@@ -47,9 +47,10 @@ type DashboardProps = {
   onNavigate: (view: "dashboard" | "tasks" | "extras" | "settings" | "chat") => void;
   onTaskComplete?: (completedCount: number, totalTasks: number) => void;
   onSignupClick?: () => void;
+  onUpdateMovingInfo?: (data: Partial<MovingInfo>) => void;
 };
 
-export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClick }: DashboardProps) => {
+export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClick, onUpdateMovingInfo }: DashboardProps) => {
   const { tasks, isLoading, toggleTaskStatus, updateTaskAssignment, refreshTasks } = useTasks(movingInfo);
   const { isNewAssignment, markAssignmentSeen } = useAssignmentNotifications();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -67,7 +68,7 @@ export const Dashboard = ({ movingInfo, onNavigate, onTaskComplete, onSignupClic
     handleDialogRedirect,
     closeActiveDialog,
     handleCompleteCurrentTask,
-  } = useQuestionDialogs(movingInfo, undefined, undefined, toggleTaskStatus);
+  } = useQuestionDialogs(movingInfo, onUpdateMovingInfo, undefined, toggleTaskStatus);
 
   // Filter en sorteer taken voor de homepage
   const openTasks = useMemo(() => {
