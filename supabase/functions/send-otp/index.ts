@@ -1,4 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { crypto } from "https://deno.land/std@0.190.0/crypto/mod.ts";
+import { encodeHex } from "https://deno.land/std@0.190.0/encoding/hex.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,6 +17,12 @@ interface SendOTPRequest {
 
 const generateOTP = (): string => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+const hashOTP = async (otp: string, phone: string): Promise<string> => {
+  const data = new TextEncoder().encode(otp + phone);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return encodeHex(new Uint8Array(hashBuffer));
 };
 
 const formatPhoneE164 = (phone: string): string => {
@@ -89,12 +97,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
       const devOtp = "000000";
       console.log(`[send-otp][DEV] Using fixed OTP: ${devOtp} for ${formattedPhone}`);
       
-      // Store the fixed OTP instead of the random one
+      // Store the fixed OTP (hashed) instead of the random one
+      const hashedDevOtp = await hashOTP(devOtp, formattedPhone);
       const { error: otpError } = await supabase
         .from("otp_codes")
         .upsert({
           phone: formattedPhone,
-          code: devOtp,
+          code: hashedDevOtp,
           expires_at: expiresAt.toISOString(),
           anonymous_user_id: anonymousUserId || null,
           created_at: new Date().toISOString(),
@@ -181,12 +190,13 @@ Deno.serve(async (req: Request): Promise<Response> => {
       }
     }
 
-    // Store OTP in database
+    // Store OTP in database (hashed)
+    const hashedOtp = await hashOTP(otp, formattedPhone);
     const { error: otpError } = await supabase
       .from("otp_codes")
       .upsert({
         phone: formattedPhone,
-        code: otp,
+        code: hashedOtp,
         expires_at: expiresAt.toISOString(),
         anonymous_user_id: anonymousUserId || null,
         created_at: new Date().toISOString(),

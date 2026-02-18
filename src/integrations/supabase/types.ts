@@ -979,10 +979,6 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_otps: { Args: never; Returns: undefined }
-      get_assignee_email: {
-        Args: { assignee_email_fallback: string; assignee_user_id: string }
-        Returns: string
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
