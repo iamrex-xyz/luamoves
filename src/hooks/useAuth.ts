@@ -38,16 +38,16 @@ export const useAuth = () => {
                   localStorage.removeItem("lua_pending_email");
                 }
               });
-
-            // Sync to Bird CRM (fire and forget)
-            supabase.functions.invoke('sync-bird-contact', {
-              body: {
-                email: session.user.email,
-                phone: pendingPhone,
-                userId: session.user.id,
-              }
-            });
           }
+
+          // Sync to Bird CRM (fire and forget) — always sync on sign-in
+          supabase.functions.invoke('sync-bird-contact', {
+            body: {
+              email: session.user.email,
+              phone: pendingPhone || undefined,
+              userId: session.user.id,
+            }
+          });
         }
       }
     );
