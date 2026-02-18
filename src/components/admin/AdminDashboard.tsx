@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useAdminProfiles, AdminProfile } from "@/hooks/useAdminProfiles";
 import { AdminProfileCard } from "./AdminProfileCard";
+import { supabase } from "@/integrations/supabase/client";
 import { AdminLoginForm } from "./AdminLoginForm";
 import { AdminFeedbackSection } from "./AdminFeedbackSection";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,25 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
+  const [completedTaskCounts, setCompletedTaskCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchTaskCounts = async () => {
+      if (!isAdmin) return;
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('user_id, status')
+        .eq('status', 'done');
+      if (!error && data) {
+        const counts: Record<string, number> = {};
+        data.forEach((t) => {
+          counts[t.user_id] = (counts[t.user_id] || 0) + 1;
+        });
+        setCompletedTaskCounts(counts);
+      }
+    };
+    fetchTaskCounts();
+  }, [isAdmin, profiles]);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -173,6 +193,7 @@ export const AdminDashboard = ({ onBack }: AdminDashboardProps) => {
                     key={profile.id} 
                     profile={profile} 
                     onUpdate={handleUpdateProfile}
+                    completedTasksCount={completedTaskCounts[profile.user_id] || 0}
                   />
                 ))}
               </div>
