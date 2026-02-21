@@ -69,7 +69,7 @@ const Index = () => {
       .eq('user_id', userId)
       .single();
 
-    if (profile && profile.moving_date) {
+    if (profile && (profile.moving_date || profile.old_address || profile.new_address)) {
       const info: MovingInfo = {
         oldAddress: profile.old_address || '',
         newAddress: profile.new_address || '',
@@ -337,13 +337,14 @@ const Index = () => {
           return;
         }
 
-        if (session?.user && event === "SIGNED_IN") {
+        if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
           // Clear invite token after sign in
           setInviteToken(null);
           setInviteData(null);
           searchParams.delete("invite");
           setSearchParams(searchParams);
           
+          // Use setTimeout to avoid Supabase deadlock warning
           setTimeout(async () => {
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
