@@ -105,13 +105,15 @@ const handler = async (req: Request): Promise<Response> => {
       userId = existingProfile.user_id;
       console.log(`[verify-otp] Existing user found: ${userId}`);
 
-      // Merge anonymous data if provided
-      if (anonymousUserId) {
+      // Merge anonymous data if provided - validate against OTP record
+      if (anonymousUserId && otpRecord.anonymous_user_id === anonymousUserId) {
         console.log(`[verify-otp] Merging anonymous data from ${anonymousUserId}`);
         await supabase.rpc("merge_anonymous_to_user", {
           p_anonymous_user_id: anonymousUserId,
           p_user_id: userId,
         });
+      } else if (anonymousUserId) {
+        console.warn(`[verify-otp] Anonymous user ID mismatch - ignoring merge. Provided: ${anonymousUserId}, Expected: ${otpRecord.anonymous_user_id}`);
       }
     } else {
       // New user - create account
@@ -146,13 +148,15 @@ const handler = async (req: Request): Promise<Response> => {
           phone: formattedPhone,
         }, { onConflict: "user_id" });
 
-      // Merge anonymous data if provided
-      if (anonymousUserId) {
+      // Merge anonymous data if provided - validate against OTP record
+      if (anonymousUserId && otpRecord.anonymous_user_id === anonymousUserId) {
         console.log(`[verify-otp] Merging anonymous data for new user from ${anonymousUserId}`);
         await supabase.rpc("merge_anonymous_to_user", {
           p_anonymous_user_id: anonymousUserId,
           p_user_id: userId,
         });
+      } else if (anonymousUserId) {
+        console.warn(`[verify-otp] Anonymous user ID mismatch for new user - ignoring merge. Provided: ${anonymousUserId}, Expected: ${otpRecord.anonymous_user_id}`);
       }
     }
 
