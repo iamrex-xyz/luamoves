@@ -327,6 +327,18 @@ const Index = () => {
         return;
       }
 
+      // Check if URL hash contains magic link auth tokens (access_token, refresh_token)
+      // If so, Supabase will process them via onAuthStateChange — don't render UI yet
+      const currentHash = window.location.hash;
+      const hasMagicLinkTokens = currentHash.includes('access_token=') || currentHash.includes('refresh_token=') || currentHash.includes('type=recovery') || currentHash.includes('type=magiclink');
+      
+      if (hasMagicLinkTokens) {
+        console.log('[Auth] Magic link tokens detected in URL, waiting for session...');
+        // Don't set loading=false — let onAuthStateChange handle it
+        // Supabase client will automatically exchange the hash tokens for a session
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
