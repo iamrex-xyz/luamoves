@@ -144,10 +144,9 @@ const Index = () => {
         const parsed = JSON.parse(savedInfo);
         setMovingInfo(parsed);
         await syncLocalDataToProfile(userId, parsed);
-        setCurrentView("dashboard");
-      } else {
-        setCurrentView("onboarding");
       }
+      // Authenticated users always go to dashboard (even with empty profile)
+      setCurrentView("dashboard");
     }
     setLoading(false);
   }, []);
@@ -298,6 +297,36 @@ const Index = () => {
   // Initialize app
   useEffect(() => {
     const initializeApp = async () => {
+      // Check for expired/invalid magic link tokens in URL hash
+      const hash = window.location.hash;
+      if (hash.includes('error=') || hash.includes('error_code=')) {
+        const params = new URLSearchParams(hash.replace('#', ''));
+        const errorDescription = params.get('error_description');
+        const errorCode = params.get('error_code');
+        
+        // Clear the hash
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        
+        if (errorCode === 'otp_expired' || errorDescription?.includes('expired')) {
+          toast({
+            title: "Link verlopen",
+            description: "Deze inloglink is verlopen. Vraag een nieuwe link aan.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Inloglink ongeldig",
+            description: "Deze inloglink is niet meer geldig. Vraag een nieuwe aan.",
+            variant: "destructive",
+          });
+        }
+        
+        // Show auth screen so they can request a new link
+        setCurrentView("auth");
+        setLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
@@ -330,14 +359,18 @@ const Index = () => {
       (event, session) => {
         setUser(session?.user ?? null);
 
-        // If the session is cleared (logout), immediately return to onboarding.
-        if (event === "SIGNED_OUT" || !session?.user) {
+        // Only reset to onboarding on explicit sign-out
+        if (event === "SIGNED_OUT") {
           setMovingInfo(null);
           setCurrentView("onboarding");
+          setLoading(false);
           return;
         }
 
-        if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        // Skip events without a user (e.g. INITIAL_SESSION before hash is processed)
+        if (!session?.user) return;
+
+        if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
           // Clear invite token after sign in
           setInviteToken(null);
           setInviteData(null);
@@ -346,6 +379,21 @@ const Index = () => {
           
           // Use setTimeout to avoid Supabase deadlock warning
           setTimeout(async () => {
+            // Try to merge anonymous data first
+            const anonId = localStorage.getItem("lua_anonymous_user_id");
+            if (anonId) {
+              try {
+                await supabase.rpc('merge_anonymous_to_user', {
+                  p_anonymous_user_id: anonId,
+                  p_user_id: session.user.id,
+                });
+                localStorage.removeItem("lua_anonymous_user_id");
+                console.log('[Auth] Merged anonymous data for user:', session.user.id);
+              } catch (err) {
+                console.error('[Auth] Failed to merge anonymous data:', err);
+              }
+            }
+
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
               await syncLocalDataToProfile(session.user.id, JSON.parse(savedInfo));
@@ -360,7 +408,7 @@ const Index = () => {
     initializeApp();
 
     return () => subscription.unsubscribe();
-  }, [loadUserProfile, searchParams, setSearchParams]);
+  }, [loadUserProfile, searchParams, setSearchParams, toast]);
 
   // Save profile data for anonymous users directly to database
   const syncAnonymousDataToProfile = async (anonId: string, info: MovingInfo) => {
