@@ -9,9 +9,7 @@ import { Label } from "@/components/ui/label";
 import { 
   Loader2, 
   Mail,
-  Phone,
   ArrowRight,
-  Shield,
   CheckCircle2,
   ChevronRight,
 } from "lucide-react";
@@ -21,11 +19,10 @@ import { lovable } from "@/integrations/lovable/index";
 import { trackEvent } from "@/lib/analytics";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
-import { validatePhone, cleanPhone } from "@/lib/validation";
 
 const emailSchema = z.string().trim().email("Voer een geldig e-mailadres in");
 
-type Step = "phone" | "email" | "check_inbox";
+type Step = "main" | "email" | "check_inbox";
 
 type AccountCreationDialogProps = {
   open: boolean;
@@ -48,13 +45,18 @@ export const AccountCreationDialog = ({
 }: AccountCreationDialogProps) => {
   const { toast } = useToast();
   
-  const [step, setStep] = useState<Step>("phone");
-  const [phone, setPhone] = useState(capturedPhone);
-  const [phoneError, setPhoneError] = useState("");
+  const [step, setStep] = useState<Step>("main");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Save captured phone if provided
+  useEffect(() => {
+    if (capturedPhone) {
+      localStorage.setItem("lua_captured_phone", capturedPhone);
+    }
+  }, [capturedPhone]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -78,35 +80,14 @@ export const AccountCreationDialog = ({
   // Reset form when dialog opens
   useEffect(() => {
     if (open) {
-      // If phone already captured, skip to email step
-      if (capturedPhone) {
-        setPhone(capturedPhone);
-        setStep("email");
-      } else {
-        setPhone("");
-        setStep("phone");
-      }
+      setStep("main");
       setEmail("");
       setEmailError("");
-      setPhoneError("");
       trackEvent("account_creation_shown");
     }
-  }, [open, capturedPhone]);
+  }, [open]);
 
-  const isPhoneValid = phone.trim().length >= 10 && validatePhone(phone).isValid;
   const isEmailValid = useMemo(() => emailSchema.safeParse(email).success, [email]);
-
-  const handlePhoneNext = () => {
-    const result = validatePhone(phone);
-    if (!result.isValid) {
-      setPhoneError(result.error || "Ongeldig telefoonnummer");
-      return;
-    }
-    setPhoneError("");
-    // Save phone to localStorage for later use
-    localStorage.setItem("lua_captured_phone", cleanPhone(phone));
-    setStep("email");
-  };
 
   const handleCreateAccount = async () => {
     const emailResult = emailSchema.safeParse(email);
@@ -127,11 +108,7 @@ export const AccountCreationDialog = ({
 
       if (error) throw error;
 
-      // Save phone number for after magic link verification
-      const phoneToSave = cleanPhone(phone);
-      localStorage.setItem("lua_captured_phone", phoneToSave);
       localStorage.setItem("lua_pending_email", email.trim());
-
       trackEvent("account_creation_magic_link_sent");
       setStep("check_inbox");
 
@@ -168,27 +145,26 @@ export const AccountCreationDialog = ({
         onEscapeKeyDown={(e) => !canDismiss && e.preventDefault()}
       >
         <div className="px-5 py-4">
-          {/* Step 1: Phone */}
-          {step === "phone" && (
+          {/* Main screen — Google first, email as alternative */}
+          {step === "main" && (
             <>
-              <div className="text-center mb-4">
-                <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
-                  <Shield className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <h2 className="text-xl font-bold">Maak je account aan</h2>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Bewaar je voortgang en log overal in.
+              <div className="text-center mb-5">
+                <span className="text-2xl font-italiana text-foreground tracking-wide">LUA</span>
+                <h2 className="text-xl font-bold mt-2">Maak je account aan</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  In 5 seconden klaar. Bewaar je voortgang en log overal in.
                 </p>
               </div>
 
               <div className="space-y-3">
+                {/* Google SSO — primary CTA */}
                 <button
                   onClick={handleGoogleSignIn}
                   disabled={googleLoading}
-                  className="w-full flex items-center justify-between p-3 rounded-xl border-2 border-muted hover:border-primary hover:bg-primary-light/50 transition-all disabled:opacity-50"
+                  className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-primary bg-primary-light/30 hover:bg-primary-light/60 transition-all disabled:opacity-50"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-muted flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-xl bg-white border border-muted flex items-center justify-center">
                       <svg className="w-5 h-5" viewBox="0 0 24 24">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -197,61 +173,40 @@ export const AccountCreationDialog = ({
                       </svg>
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-sm text-foreground">
+                      <p className="font-semibold text-foreground">
                         {googleLoading ? "Even geduld..." : "Doorgaan met Google"}
                       </p>
-                      <p className="text-xs text-muted-foreground">Snel en veilig</p>
+                      <p className="text-xs text-muted-foreground">Snelste optie — één klik</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  <ChevronRight className="w-5 h-5 text-primary" />
                 </button>
 
-                <div className="relative flex items-center gap-3">
+                <div className="relative flex items-center gap-3 py-1">
                   <div className="flex-1 h-px bg-muted" />
-                  <span className="text-xs text-muted-foreground">of via e-mail</span>
+                  <span className="text-xs text-muted-foreground">of</span>
                   <div className="flex-1 h-px bg-muted" />
                 </div>
 
-                <div className="space-y-1">
-                  <Label htmlFor="account-phone" className="text-sm flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-muted-foreground" />
-                    Telefoonnummer
-                  </Label>
-                  <Input
-                    id="account-phone"
-                    type="tel"
-                    placeholder="06 12345678"
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                      if (phoneError) setPhoneError("");
-                    }}
-                    className={cn(
-                      "h-11 rounded-lg text-sm",
-                      phoneError && "border-destructive focus-visible:ring-destructive"
-                    )}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && isPhoneValid) {
-                        handlePhoneNext();
-                      }
-                    }}
-                  />
-                  {phoneError && (
-                    <p className="text-xs text-destructive">{phoneError}</p>
-                  )}
-                </div>
+                {/* Email magic link — secondary */}
+                <button
+                  onClick={() => setStep("email")}
+                  className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-muted hover:border-primary/50 hover:bg-primary-light/30 transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-semibold text-foreground">Aanmelden via e-mail</p>
+                      <p className="text-xs text-muted-foreground">We sturen een inloglink</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                </button>
               </div>
 
               <div className="mt-4 space-y-2">
-                <Button 
-                  onClick={handlePhoneNext}
-                  disabled={!isPhoneValid}
-                  className="w-full h-11 rounded-lg text-base font-semibold"
-                >
-                  Volgende
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-
                 {canDismiss && (
                   <Button 
                     variant="ghost" 
@@ -277,31 +232,20 @@ export const AccountCreationDialog = ({
             </>
           )}
 
-          {/* Step 2: Email */}
+          {/* Email step */}
           {step === "email" && (
             <>
               <div className="text-center mb-4">
                 <div className="mx-auto w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-2">
                   <Mail className="w-5 h-5 text-primary-foreground" />
                 </div>
-                <h2 className="text-xl font-bold">Bijna klaar!</h2>
+                <h2 className="text-xl font-bold">Aanmelden via e-mail</h2>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Voeg je e-mailadres toe om in te loggen.
+                  We sturen een inloglink. Geen wachtwoord nodig.
                 </p>
               </div>
 
               <div className="space-y-3">
-                {/* Phone (read-only) */}
-                <div className="space-y-1">
-                  <Label className="text-sm text-muted-foreground">Telefoonnummer</Label>
-                  <div className="h-11 px-3 rounded-lg bg-muted/50 border border-border/50 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-foreground">{phone}</span>
-                    <CheckCircle2 className="w-4 h-4 text-primary ml-auto" />
-                  </div>
-                </div>
-
-                {/* Email */}
                 <div className="space-y-1">
                   <Label htmlFor="account-email" className="text-sm flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-muted-foreground" />
@@ -317,9 +261,10 @@ export const AccountCreationDialog = ({
                       if (emailError) setEmailError("");
                     }}
                     className={cn(
-                      "h-11 rounded-lg text-sm",
+                      "h-12 rounded-xl text-base",
                       emailError && "border-destructive focus-visible:ring-destructive"
                     )}
+                    autoFocus
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && isEmailValid) {
                         handleCreateAccount();
@@ -336,16 +281,16 @@ export const AccountCreationDialog = ({
                 <Button 
                   onClick={handleCreateAccount}
                   disabled={!isEmailValid || isLoading}
-                  className="w-full h-11 rounded-lg text-base font-semibold"
+                  className="w-full h-12 rounded-xl text-base font-semibold"
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Even geduld...
+                      Link versturen...
                     </>
                   ) : (
                     <>
-                      Account aanmaken
+                      Stuur inloglink
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   )}
@@ -353,20 +298,16 @@ export const AccountCreationDialog = ({
 
                 <Button 
                   variant="ghost" 
-                  onClick={() => setStep("phone")}
+                  onClick={() => setStep("main")}
                   className="w-full h-9 rounded-lg text-sm text-muted-foreground"
                 >
                   Terug
                 </Button>
-
-                <p className="text-[11px] text-center text-muted-foreground pt-1">
-                  We sturen een inloglink naar je e-mail. Geen wachtwoord nodig.
-                </p>
               </div>
             </>
           )}
 
-          {/* Step 3: Check inbox */}
+          {/* Check inbox */}
           {step === "check_inbox" && (
             <div className="text-center py-4">
               <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-in zoom-in duration-300">
