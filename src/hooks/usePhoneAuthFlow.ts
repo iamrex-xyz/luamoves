@@ -27,13 +27,22 @@ export const usePhoneAuthFlow = (isLoggedIn: boolean) => {
   const [showPhoneOTP, setShowPhoneOTP] = useState(false);
   const [isPhoneOTPHardBlock, setIsPhoneOTPHardBlock] = useState(false);
 
+  // Auto-close dialog when user becomes logged in (e.g. after magic link in another tab)
+  useEffect(() => {
+    if (isLoggedIn && showPhoneOTP) {
+      setShowPhoneOTP(false);
+      setIsPhoneOTPHardBlock(false);
+      storage.setHasAccount(true);
+    }
+  }, [isLoggedIn, showPhoneOTP, storage]);
+
   // Check on mount if we need to show the dialog
   useEffect(() => {
     if (!isInitialized || isLoggedIn || storage.hasAccount()) return;
     
     const completedCount = storage.getCompletedTaskCount();
     
-    // Hard block after 5 tasks
+    // Hard block after max tasks
     if (completedCount >= storage.MAX_GUEST_TASKS) {
       setIsPhoneOTPHardBlock(true);
       setShowPhoneOTP(true);
