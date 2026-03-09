@@ -399,12 +399,18 @@ const Index = () => {
                   p_anonymous_user_id: anonId,
                   p_user_id: session.user.id,
                 });
-                localStorage.removeItem("lua_anonymous_user_id");
+              localStorage.removeItem("lua_anonymous_user_id");
+                // Clear the anonymous cookie
+                document.cookie = "lua_anon_id=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
                 console.log('[Auth] Merged anonymous data for user:', session.user.id);
               } catch (err) {
                 console.error('[Auth] Failed to merge anonymous data:', err);
               }
             }
+
+            // Set localStorage flags so usePhoneAuthFlow knows user has an account
+            localStorage.setItem("lua_has_account", "true");
+            localStorage.setItem("lua_guest_limit_reached", "false");
 
             const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedInfo) {
