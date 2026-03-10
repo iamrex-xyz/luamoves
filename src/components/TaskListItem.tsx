@@ -141,7 +141,7 @@ export const TaskListItem = ({
             {isCompleting ? (
               <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
             ) : isLuaHandling ? (
-              <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
