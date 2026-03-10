@@ -400,7 +400,7 @@ export const getTaskButtonLabel = (task: Task, movingInfo?: MovingInfo): string 
     return "Meteen uitnodigen";
   }
   if (isIntakeCompleted(task, movingInfo)) {
-    return "Lua regelt dit ✨";
+    return "Lua regelt dit";
   }
   return "Regel dit voor mij";
 };
