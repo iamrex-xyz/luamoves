@@ -123,40 +123,38 @@ export const TaskListItem = ({
         }}
       >
         {/* Fixed 2-row grid: title row + date row. Checkbox spans both. */}
-        <div className="grid grid-cols-[28px_1fr] grid-rows-[36px_20px] gap-x-3 gap-y-1">
-          {/* Checkbox column (spans both rows) */}
-          <button
-            type="button"
-            aria-label={
-              isLuaHandling
-                ? `"${task.title}" wordt door Lua geregeld`
-                : task.status === "done"
+        <div className={`grid ${isLuaHandling ? 'grid-cols-[1fr]' : 'grid-cols-[28px_1fr]'} grid-rows-[36px_20px] gap-x-3 gap-y-1`}>
+          {/* Checkbox column (spans both rows) - hidden for Lua handling tasks */}
+          {!isLuaHandling && (
+            <button
+              type="button"
+              aria-label={
+                task.status === "done"
                   ? `Markeer "${task.title}" als niet voltooid`
                   : `Markeer "${task.title}" als voltooid`
-            }
-            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={(e) => !isCompleting && !isLuaHandling && onCheckboxClick(e, task)}
-            disabled={isCompleting || isLuaHandling}
-          >
-            {isCompleting ? (
-              <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
-            ) : isLuaHandling ? (
-              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
-            ) : task.status === "done" ? (
-              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
-            ) : (
-              <Circle
-                className={`h-6 w-6 transition-colors ${
-                  isTaskOverdue
-                    ? "text-destructive/40 group-hover:text-destructive"
-                    : isDueToday
-                      ? "text-warning/40 group-hover:text-warning"
-                      : "text-muted-foreground/30 group-hover:text-primary/50"
-                }`}
-                aria-hidden="true"
-              />
-            )}
-          </button>
+              }
+              className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center"
+              onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
+              disabled={isCompleting}
+            >
+              {isCompleting ? (
+                <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
+              ) : task.status === "done" ? (
+                <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
+              ) : (
+                <Circle
+                  className={`h-6 w-6 transition-colors ${
+                    isTaskOverdue
+                      ? "text-destructive/40 group-hover:text-destructive"
+                      : isDueToday
+                        ? "text-warning/40 group-hover:text-warning"
+                        : "text-muted-foreground/30 group-hover:text-primary/50"
+                  }`}
+                  aria-hidden="true"
+                />
+              )}
+            </button>
+          )}
 
           {/* ROW 1: Title zone (36px fixed) */}
           <div className="h-[36px] overflow-hidden min-w-0 self-start">
