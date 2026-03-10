@@ -107,12 +107,12 @@ export const TaskListItem = ({
   return (
     <SwipeableTaskItem
       onSwipeComplete={() => onSwipeComplete(task.id)}
-      disabled={task.status === "done" || isCompleting}
+      disabled={task.status === "done" || isCompleting || isLuaHandling}
     >
       <div
         role="button"
         tabIndex={0}
-        aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
+        aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isLuaHandling ? ", Lua regelt dit" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
         className={`group relative px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
         onKeyDown={(e) => {
@@ -128,16 +128,20 @@ export const TaskListItem = ({
           <button
             type="button"
             aria-label={
-              task.status === "done"
-                ? `Markeer "${task.title}" als niet voltooid`
-                : `Markeer "${task.title}" als voltooid`
+              isLuaHandling
+                ? `"${task.title}" wordt door Lua geregeld`
+                : task.status === "done"
+                  ? `Markeer "${task.title}" als niet voltooid`
+                  : `Markeer "${task.title}" als voltooid`
             }
-            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center"
-            onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
-            disabled={isCompleting}
+            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={(e) => !isCompleting && !isLuaHandling && onCheckboxClick(e, task)}
+            disabled={isCompleting || isLuaHandling}
           >
             {isCompleting ? (
               <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
+            ) : isLuaHandling ? (
+              <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
