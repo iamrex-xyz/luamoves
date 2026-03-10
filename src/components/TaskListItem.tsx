@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/types/moving";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
-import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
-import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
+import { hasAffiliateOptions, getTaskButtonLabel, isIntakeCompleted } from "@/lib/taskTypeHelpers";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle, Sparkles } from "lucide-react";
 import { TaskDocument } from "@/hooks/useTaskDocuments";
 
 type TaskListItemProps = {
