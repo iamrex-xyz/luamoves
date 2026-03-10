@@ -115,6 +115,36 @@ export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, 
       </div>
 
       <div className="px-4 sm:px-6 space-y-6">
+        {/* Account Info Card */}
+        {user && (
+          <div className="rounded-2xl bg-card border-0 shadow-soft overflow-hidden p-4">
+            <div className="flex items-center gap-3">
+              {user.user_metadata?.avatar_url ? (
+                <img 
+                  src={user.user_metadata.avatar_url} 
+                  alt="Profielfoto" 
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <UserCircle className="w-7 h-7 text-primary" />
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                {user.user_metadata?.full_name && (
+                  <p className="font-semibold text-foreground truncate">{user.user_metadata.full_name}</p>
+                )}
+                {user.email && (
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Mail className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{user.email}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Profile Overview - All profile data in collapsible sections */}
         <ProfileOverview movingInfo={movingInfo} onUpdate={onUpdate} />
 
