@@ -2,8 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Task } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/types/moving";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
-import { hasAffiliateOptions, getTaskButtonLabel } from "@/lib/taskTypeHelpers";
-import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
+import { hasAffiliateOptions, getTaskButtonLabel, isIntakeCompleted } from "@/lib/taskTypeHelpers";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle, Sparkles } from "lucide-react";
 import { TaskDocument } from "@/hooks/useTaskDocuments";
 
 type TaskListItemProps = {
@@ -42,10 +42,14 @@ export const TaskListItem = ({
   const isDueToday = daysUntil === 0 && task.status !== "done";
   const isDueSoon = daysUntil === 1 && task.status !== "done";
 
+  // Check if Lua is handling this task
+  const isLuaHandling = isIntakeCompleted(task, movingInfo) && task.status !== "done";
+
   // Determine urgency level for styling
   const getUrgencyStyles = () => {
     if (isCompleting) return "bg-primary border-l-4 border-l-primary";
     if (task.status === "done") return "bg-secondary/30 border-l-4 border-l-transparent";
+    if (isLuaHandling) return "bg-primary/5 border border-primary/30 border-l-4 border-l-primary/50";
     if (isTaskOverdue) return "bg-destructive/8 border-l-4 border-l-destructive hover:bg-destructive/12";
     if (isDueToday) return "bg-warning/10 border-l-4 border-l-warning hover:bg-warning/15";
     if (isDueSoon) return "bg-primary/5 border-l-4 border-l-primary/50 hover:bg-primary/10";
@@ -103,12 +107,12 @@ export const TaskListItem = ({
   return (
     <SwipeableTaskItem
       onSwipeComplete={() => onSwipeComplete(task.id)}
-      disabled={task.status === "done" || isCompleting}
+      disabled={task.status === "done" || isCompleting || isLuaHandling}
     >
       <div
         role="button"
         tabIndex={0}
-        aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
+        aria-label={`${task.title}${task.status === "done" ? ", voltooid" : isLuaHandling ? ", Lua regelt dit" : isTaskOverdue ? ", verlopen" : isDueToday ? ", vandaag" : ""}`}
         className={`group relative px-3 py-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${getUrgencyStyles()}`}
         onClick={() => !isCompleting && onTaskClick(task)}
         onKeyDown={(e) => {
@@ -124,16 +128,20 @@ export const TaskListItem = ({
           <button
             type="button"
             aria-label={
-              task.status === "done"
-                ? `Markeer "${task.title}" als niet voltooid`
-                : `Markeer "${task.title}" als voltooid`
+              isLuaHandling
+                ? `"${task.title}" wordt door Lua geregeld`
+                : task.status === "done"
+                  ? `Markeer "${task.title}" als niet voltooid`
+                  : `Markeer "${task.title}" als voltooid`
             }
-            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center"
-            onClick={(e) => !isCompleting && onCheckboxClick(e, task)}
-            disabled={isCompleting}
+            className="row-span-2 cursor-pointer transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 rounded-full self-center justify-self-center disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={(e) => !isCompleting && !isLuaHandling && onCheckboxClick(e, task)}
+            disabled={isCompleting || isLuaHandling}
           >
             {isCompleting ? (
               <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
+            ) : isLuaHandling ? (
+              <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
