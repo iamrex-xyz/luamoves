@@ -55,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
               Er is een onverwachte fout opgetreden. Probeer het opnieuw of herlaad de pagina.
             </p>
 
-            {process.env.NODE_ENV === "development" && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <div className="mb-6 p-4 bg-muted rounded-xl text-left">
                 <p className="text-xs font-mono text-destructive break-all">
                   {this.state.error.message}
