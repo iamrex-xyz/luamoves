@@ -3,7 +3,7 @@ import { Task } from "@/lib/taskGenerator";
 import { MovingInfo } from "@/types/moving";
 import { SwipeableTaskItem } from "@/components/SwipeableTaskItem";
 import { hasAffiliateOptions, getTaskButtonLabel, isIntakeCompleted } from "@/lib/taskTypeHelpers";
-import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle, Sparkles } from "lucide-react";
+import { Clock, Circle, CheckCircle2, ChevronRight, AlertTriangle, FileText, UserCircle } from "lucide-react";
 import { TaskDocument } from "@/hooks/useTaskDocuments";
 
 type TaskListItemProps = {
@@ -141,7 +141,7 @@ export const TaskListItem = ({
             {isCompleting ? (
               <CheckCircle2 className="h-6 w-6 text-primary-foreground animate-scale-in" aria-hidden="true" />
             ) : isLuaHandling ? (
-              <Sparkles className="h-6 w-6 text-primary" aria-hidden="true" />
+              <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : task.status === "done" ? (
               <CheckCircle2 className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
