@@ -10,7 +10,8 @@ import { CollaboratorSettingsCard } from "@/components/settings/CollaboratorSett
 import { LuaLogo } from "@/components/LuaLogo";
 import { useToast } from "@/hooks/use-toast";
 import { useGuestStorage } from "@/hooks/useGuestStorage";
-import { LogOut, Settings as SettingsIcon, Phone as PhoneIcon } from "lucide-react";
+import { User } from "@supabase/supabase-js";
+import { LogOut, Settings as SettingsIcon, Phone as PhoneIcon, Mail, UserCircle } from "lucide-react";
 
 type SettingsProps = {
   movingInfo: MovingInfo;
@@ -19,9 +20,10 @@ type SettingsProps = {
   onUpdate: (info: MovingInfo) => void;
   isGuest?: boolean;
   onSignupClick?: () => void;
+  user?: User | null;
 };
 
-export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick }: SettingsProps) => {
+export const Settings = ({ movingInfo, onNavigate, onLogout, onUpdate, isGuest, onSignupClick, user }: SettingsProps) => {
   const [reminderSheetOpen, setReminderSheetOpen] = useState(false);
   const [resetClickCount, setResetClickCount] = useState(0);
   const { toast } = useToast();
