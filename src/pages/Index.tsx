@@ -743,6 +743,7 @@ const Index = () => {
             onUpdate={setMovingInfo}
             isGuest={!user}
             onSignupClick={phoneAuthFlow.triggerPhoneDialog}
+            user={user}
           />
         )}
         {currentView === "chat" && movingInfo && (

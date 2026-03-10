@@ -4,8 +4,8 @@ type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 export const useAutosave = (saveFunction: () => Promise<void>, debounceMs = 1000) => {
   const [status, setStatus] = useState<SaveStatus>("idle");
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const savedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const triggerSave = useCallback(() => {
     // Clear any existing timeout
