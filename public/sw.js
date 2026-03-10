@@ -48,11 +48,12 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (request.method !== 'GET') return;
 
-  // Skip API calls and Supabase requests - always fetch from network
+  // Skip API calls, Supabase requests, and OAuth redirects - always fetch from network
   if (url.pathname.startsWith('/functions/') || 
       url.hostname.includes('supabase') ||
       url.pathname.startsWith('/rest/') ||
-      url.pathname.startsWith('/auth/')) {
+      url.pathname.startsWith('/auth/') ||
+      url.pathname.startsWith('/~oauth')) {
     return;
   }
 
