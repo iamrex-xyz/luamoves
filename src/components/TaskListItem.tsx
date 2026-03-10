@@ -42,10 +42,14 @@ export const TaskListItem = ({
   const isDueToday = daysUntil === 0 && task.status !== "done";
   const isDueSoon = daysUntil === 1 && task.status !== "done";
 
+  // Check if Lua is handling this task
+  const isLuaHandling = isIntakeCompleted(task, movingInfo) && task.status !== "done";
+
   // Determine urgency level for styling
   const getUrgencyStyles = () => {
     if (isCompleting) return "bg-primary border-l-4 border-l-primary";
     if (task.status === "done") return "bg-secondary/30 border-l-4 border-l-transparent";
+    if (isLuaHandling) return "bg-primary/5 border border-primary/30 border-l-4 border-l-primary/50";
     if (isTaskOverdue) return "bg-destructive/8 border-l-4 border-l-destructive hover:bg-destructive/12";
     if (isDueToday) return "bg-warning/10 border-l-4 border-l-warning hover:bg-warning/15";
     if (isDueSoon) return "bg-primary/5 border-l-4 border-l-primary/50 hover:bg-primary/10";
