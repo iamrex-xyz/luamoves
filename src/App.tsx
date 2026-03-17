@@ -35,7 +35,7 @@ function App() {
           <ScreenReaderAnnouncer />
           
           <BrowserRouter>
-            <FeedbackButton />
+            {/* <FeedbackButton /> */}
             <Routes>
               <Route path="/" element={<Index />} />
               {/* Dutch SEO-friendly onboarding routes */}
