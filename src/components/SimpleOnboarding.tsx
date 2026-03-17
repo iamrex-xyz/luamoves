@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
 
 // WhatsApp/Telegram CTA URL — switch to WhatsApp URL for production
-const CHAT_CTA_URL = "https://t.me/lua_moves_bot"; // Production: "https://wa.me/31XXXXXXXXX?text=Hoi%20Lua!"
+const CHAT_CTA_URL = "https://t.me/Lua_verhuis_bot"; // Production: "https://wa.me/31XXXXXXXXX?text=Hoi%20Lua!"
 const CHAT_CTA_LABEL = "Start met Lua op WhatsApp";
 const CHAT_CTA_SUBLABEL = "Gratis en zonder gedoe geregeld";
 
