@@ -11,6 +11,7 @@ import { LandingPage } from "@/components/LandingPage";
 import UserDashboard from "./pages/UserDashboard";
 
 import { TaskDeals } from "./pages/TaskDeals";
+import UserDashboard from "./pages/UserDashboard";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -38,6 +39,7 @@ function App() {
             <FeedbackButton />
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/d/:token" element={<UserDashboard />} />
               <Route path="/d/:token" element={<UserDashboard />} />
               <Route path="/deals" element={<TaskDeals />} />
               <Route path="/admin" element={<Admin />} />

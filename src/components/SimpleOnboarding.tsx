@@ -308,7 +308,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white overflow-y-auto">
         {/* Hero Section - Above the fold */}
-        <div className="min-h-screen flex flex-col cursor-pointer" onClick={handleNext}>
+        <div className="min-h-screen flex flex-col">
           <div className="px-5 pt-5 pb-3 flex justify-between items-center">
             <LuaLogo size="md" />
             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onLogin(); }} className="text-sm text-muted-foreground hover:text-foreground">
