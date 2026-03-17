@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility";
 import { FeedbackButton } from "@/components/FeedbackButton";
-import Index from "./pages/Index";
+import { LandingPage } from "@/components/LandingPage";
+import UserDashboard from "./pages/UserDashboard";
 
 import { TaskDeals } from "./pages/TaskDeals";
 import Admin from "./pages/Admin";
@@ -36,10 +37,8 @@ function App() {
           <BrowserRouter>
             <FeedbackButton />
             <Routes>
-              <Route path="/" element={<Index />} />
-              {/* Dutch SEO-friendly onboarding routes */}
-              <Route path="/aanmelden" element={<Navigate to="/aanmelden/welkom" replace />} />
-              <Route path="/aanmelden/:stap" element={<Index />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/d/:token" element={<UserDashboard />} />
               <Route path="/deals" element={<TaskDeals />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
