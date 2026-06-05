@@ -73,7 +73,6 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Return only the necessary data for the specific invite
     const inviteData: InviteData = {
       phone: data.phone,
       name: data.name,
