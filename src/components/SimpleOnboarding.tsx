@@ -500,30 +500,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 </p>
               </div>
 
-              <div className="max-w-2xl mx-auto grid gap-4 sm:grid-cols-2 mb-12">
-                {[
-                  { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af", icon: Zap, color: "text-amber-500", bg: "bg-amber-500/10" },
-                  { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres", icon: Wifi, color: "text-sky-500", bg: "bg-sky-500/10" },
-                  { title: "Verhuisbedrijf", desc: "Vraag offertes aan bij betrouwbare verhuizers", icon: Truck, color: "text-primary", bg: "bg-primary/10" },
-                  { title: "Verzekeringen", desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan", icon: Shield, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                  { title: "Post doorsturen", desc: "Regel je postdoorstuurservice bij PostNL", icon: Mail, color: "text-rose-500", bg: "bg-rose-500/10" },
-                  { title: "Adreswijzigingen", desc: "Geef je nieuwe adres door aan alle instanties", icon: MapPin, color: "text-violet-500", bg: "bg-violet-500/10" },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="group flex items-start gap-3 p-4 bg-white border border-border/60 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30"
-                  >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", item.bg)}>
-                      <item.icon className={cn("w-5 h-5", item.color)} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
               <div className="flex items-center justify-center gap-3 md:gap-6">
                 <button
                   type="button"
@@ -534,8 +510,25 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div className="flex flex-col items-center gap-3 w-full max-w-[320px] md:max-w-[300px]">
-                  <span className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</span>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{exampleChats[exampleIndex].desc}</p>
+                  </div>
                   <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} />
+                  <div className="flex items-center gap-1.5">
+                    {exampleChats.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setExampleIndex(i)}
+                        aria-label={`Voorbeeld ${i + 1}`}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all",
+                          i === exampleIndex ? "w-6 bg-primary" : "w-1.5 bg-primary/30"
+                        )}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <button
                   type="button"
