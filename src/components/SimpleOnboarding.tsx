@@ -631,11 +631,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 Start wanneer jij wilt. Geen verplichtingen.
               </p>
               <Button
-                onClick={handleNext}
+                asChild
                 className="h-14 px-8 text-base rounded-2xl shadow-xl shadow-primary/25 hover:-translate-y-0.5 transition-transform mb-2"
               >
-                Start je verhuizing
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <a href="https://wa.me/31685303918" target="_blank" rel="noopener noreferrer">
+                  Start je verhuizing
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </a>
               </Button>
               <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
             </div>
