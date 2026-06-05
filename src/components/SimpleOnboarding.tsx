@@ -458,16 +458,19 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
             </div>
           </section>
 
-          {/* Section 3: Wat Lua voor je regelt */}
+          {/* Section 3: Wat Lua voor je regelt + chatvoorbeelden */}
           <section className="px-5 py-16">
-            <div className="max-w-2xl mx-auto">
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-center">
-                Wat Lua voor je regelt, gratis
-              </h2>
-              <p className="text-muted-foreground text-center mb-8">
-                Lua helpt je bij alle belangrijke verhuistaken en meer
-              </p>
-              <div className="grid gap-4 sm:grid-cols-2">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  Wat Lua voor je regelt, gratis
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto">
+                  Geen app, geen inloggen, geen ingewikkelde portalen. Je appt met Lua zoals met een vriend en Lua regelt het echte werk.
+                </p>
+              </div>
+
+              <div className="max-w-2xl mx-auto grid gap-4 sm:grid-cols-2 mb-12">
                 {[
                   { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af", icon: Zap, color: "text-amber-500", bg: "bg-amber-500/10" },
                   { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres", icon: Wifi, color: "text-sky-500", bg: "bg-sky-500/10" },
@@ -490,20 +493,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
 
-          {/* Section 3b: WhatsApp voorbeeldgesprekken */}
-          <section className="px-5 py-16">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                  Zo regelt Lua het, gewoon in je chat
-                </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto">
-                  Geen app, geen inloggen, geen ingewikkelde portalen. Je appt met Lua zoals met een vriend en Lua regelt het echte werk.
-                </p>
-              </div>
               <div className="flex items-center justify-center gap-3 md:gap-6">
                 <button
                   type="button"
@@ -515,7 +505,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 </button>
                 <div className="flex flex-col items-center gap-3 w-full max-w-[320px] md:max-w-[300px]">
                   <span className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</span>
-                  <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} animated />
+                  <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} />
                 </div>
                 <button
                   type="button"
@@ -528,6 +518,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
               </div>
             </div>
           </section>
+
 
           {/* Section: Video */}
           <section className="px-5 py-16">
