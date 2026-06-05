@@ -429,7 +429,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 Verhuizen is chaotisch: tientallen taken, onvoorspelbare deadlines, en veel om te onthouden.
                 Lua geeft je rust en overzicht, zodat jij minder hoeft na te denken.
               </p>
-              <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
             </div>
           </section>
 
