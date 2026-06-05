@@ -300,85 +300,35 @@ const Index = () => {
     const isDashboardRoute = location.pathname === "/dashboard";
 
     const initializeApp = async () => {
-      // Always show landing page on "/" or when ?landing=1 is present
-      if (isLandingRoute && !isDashboardRoute) {
-        setCurrentView("onboarding");
-        setLoading(false);
-        // Still hydrate session in background (don't change view)
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) setUser(session.user);
-        return;
+      // Auth disabled: auto sign-out any existing session
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession) {
+        await supabase.auth.signOut();
       }
+      setUser(null);
 
-      // Check for expired/invalid magic link tokens in URL hash
-      const hash = window.location.hash;
-      if (hash.includes('error=') || hash.includes('error_code=')) {
-        const params = new URLSearchParams(hash.replace('#', ''));
-        const errorDescription = params.get('error_description');
-        const errorCode = params.get('error_code');
-        
-        // Clear the hash
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        
-        if (errorCode === 'otp_expired' || errorDescription?.includes('expired')) {
-          toast({
-            title: "Link verlopen",
-            description: "Deze inloglink is verlopen. Vraag een nieuwe link aan.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Inloglink ongeldig",
-            description: "Deze inloglink is niet meer geldig. Vraag een nieuwe aan.",
-            variant: "destructive",
-          });
-        }
-        
-        // Show auth screen so they can request a new link
-        setCurrentView("auth");
-        setLoading(false);
-        return;
-      }
-
-      // Check if URL hash contains magic link auth tokens (access_token, refresh_token)
-      // If so, Supabase will process them via onAuthStateChange — don't render UI yet
-      const currentHash = window.location.hash;
-      const hasMagicLinkTokens = currentHash.includes('access_token=') || currentHash.includes('refresh_token=') || currentHash.includes('type=recovery') || currentHash.includes('type=magiclink');
-      
-      if (hasMagicLinkTokens) {
-        console.log('[Auth] Magic link tokens detected in URL, waiting for session...');
-        // Don't set loading=false — let onAuthStateChange handle it
-        // Supabase client will automatically exchange the hash tokens for a session
-        return;
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        setUser(session.user);
-        await loadUserProfile(session.user.id);
-        // Clear invite token if user is logged in
-        if (searchParams.get("invite")) {
-          searchParams.delete("invite");
-          setSearchParams(searchParams);
-        }
-        return;
-      }
-
-      // Guest mode - load from localStorage
+      // Load guest data from localStorage
       const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedInfo) {
         try {
           setMovingInfo(JSON.parse(savedInfo));
-          setCurrentView("dashboard");
         } catch {
-          setCurrentView("onboarding");
+          // ignore parse errors
         }
-      } else {
-        setCurrentView("onboarding");
       }
+
+      // /dashboard → straight to dashboard (guest mode)
+      if (isDashboardRoute) {
+        setCurrentView("dashboard");
+        setLoading(false);
+        return;
+      }
+
+      // / or ?landing=1 → landing page
+      setCurrentView("onboarding");
       setLoading(false);
     };
+
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
