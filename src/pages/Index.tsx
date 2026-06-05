@@ -431,6 +431,10 @@ const Index = () => {
             }
             // Always load profile after sync to ensure latest data
             await loadUserProfile(session.user.id);
+            // Route to dashboard URL if currently on landing
+            if (window.location.pathname === "/") {
+              navigate("/dashboard", { replace: true });
+            }
           }, 0);
         }
       }
