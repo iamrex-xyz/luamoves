@@ -391,11 +391,13 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
             {/* CTA group */}
             <div className="flex flex-col items-center gap-4 mt-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
               <Button
-                onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                asChild
                 className="h-14 px-8 text-base rounded-2xl shadow-xl shadow-primary/25 hover:-translate-y-0.5 transition-transform"
               >
-                Start je verhuizing
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <a href="https://wa.me/31685303918" target="_blank" rel="noopener noreferrer">
+                  Start je verhuizing
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </a>
               </Button>
               <div className="flex flex-col items-center gap-1">
                 <p className="text-[11px] text-muted-foreground/70 uppercase tracking-widest font-normal">Gratis · Geen verplichtingen</p>
