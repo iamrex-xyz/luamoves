@@ -406,7 +406,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
 
             {/* Mockup area - WhatsApp conversation */}
             <div className="relative w-full flex flex-col items-center mt-[86px]">
-              <WhatsAppChat messages={heroChat} animated className="animate-in fade-in slide-in-from-bottom-8 duration-700" />
+              <WhatsAppChat messages={heroChat} className="" />
 
               {/* Affordance */}
               <div className="mt-10 flex flex-col items-center gap-1.5 text-muted-foreground/50 animate-bounce">
