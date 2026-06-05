@@ -515,20 +515,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                     <p className="text-xs text-muted-foreground mt-1">{exampleChats[exampleIndex].desc}</p>
                   </div>
                   <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} />
-                  <div className="flex items-center gap-1.5">
-                    {exampleChats.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setExampleIndex(i)}
-                        aria-label={`Voorbeeld ${i + 1}`}
-                        className={cn(
-                          "h-1.5 rounded-full transition-all",
-                          i === exampleIndex ? "w-6 bg-primary" : "w-1.5 bg-primary/30"
-                        )}
-                      />
-                    ))}
-                  </div>
                 </div>
                 <button
                   type="button"
