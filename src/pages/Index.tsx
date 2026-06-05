@@ -297,6 +297,13 @@ const Index = () => {
   // Initialize app
   useEffect(() => {
     const initializeApp = async () => {
+      // Always show landing page when ?landing=1 is in URL (e.g. logo click)
+      if (searchParams.get("landing") === "1") {
+        setCurrentView("onboarding");
+        setLoading(false);
+        return;
+      }
+
       // Check for expired/invalid magic link tokens in URL hash
       const hash = window.location.hash;
       if (hash.includes('error=') || hash.includes('error_code=')) {
