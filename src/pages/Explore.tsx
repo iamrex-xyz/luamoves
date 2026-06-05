@@ -37,17 +37,6 @@ const Explore = () => {
             Eén chat in WhatsApp, en Lua neemt het zware werk over. Bekijk hieronder
             echte voorbeelden — van verhuislift tot adreswijziging.
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {luaExampleCategories.map((cat) => (
-              <a
-                key={cat.id}
-                href={`#${cat.id}`}
-                className="px-3 py-1.5 rounded-full text-sm bg-white border border-border hover:border-primary/40 hover:text-primary transition-colors"
-              >
-                {cat.title}
-              </a>
-            ))}
-          </div>
         </div>
       </section>
 
