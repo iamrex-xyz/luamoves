@@ -531,7 +531,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                   href="/voorbeelden"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold shadow-soft hover:bg-primary/90 transition-colors"
                 >
-                  Bekijk hier wat Lua voor je kan regelen
+                  Bekijk alle taken die Lua regelt
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
