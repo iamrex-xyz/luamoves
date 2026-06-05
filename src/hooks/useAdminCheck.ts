@@ -59,7 +59,9 @@ export const useAdminCheck = () => {
 
       const hasAdminRole = !!roleData;
 
-      console.log('[AdminCheck] User:', user.email, 'isAdminEmail:', isAdminEmail, 'isAdminDomain:', isAdminDomain, 'hasAdminRole:', hasAdminRole);
+      if (import.meta.env.DEV) {
+        console.log('[AdminCheck] isAdminDomain:', isAdminDomain, 'hasAdminRole:', hasAdminRole);
+      }
 
       setIsAdmin(isAdminEmail || isAdminDomain || hasAdminRole);
     } catch (error) {
@@ -74,7 +76,9 @@ export const useAdminCheck = () => {
   useEffect(() => {
     // Set up the auth state change listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[AdminCheck] Auth state changed:', event, session?.user?.email);
+      if (import.meta.env.DEV) {
+        console.log('[AdminCheck] Auth state changed:', event);
+      }
       
       // Re-check admin status on any auth state change
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {

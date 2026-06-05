@@ -12,7 +12,6 @@ interface VerifyInviteRequest {
 interface InviteData {
   phone: string;
   name: string | null;
-  owner_user_id: string;
   status: string;
 }
 
@@ -53,7 +52,7 @@ Deno.serve(async (req: Request) => {
     // Query specific invite by token - only returns the single matching record
     const { data, error } = await supabase
       .from("household_members")
-      .select("phone, name, owner_user_id, status")
+      .select("phone, name, status")
       .eq("invite_token", invite_token)
       .eq("status", "invited")
       .maybeSingle();
@@ -73,11 +72,10 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // Return only the necessary data for the specific invite
+    // Return only the necessary data for the specific invite (no owner_user_id leaked)
     const inviteData: InviteData = {
       phone: data.phone,
       name: data.name,
-      owner_user_id: data.owner_user_id,
       status: data.status,
     };
 
