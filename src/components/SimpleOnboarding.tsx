@@ -30,17 +30,28 @@ const heroChat: ChatMessage[] = [
   { from: "lua", text: "Geregeld ✅ Offertes liggen morgen klaar. Ik hou je hier op de hoogte en stuur op tijd een seintje voor elke deadline.", time: "09:41" },
 ];
 
-const exampleChats: { label: string; messages: ChatMessage[] }[] = [
+const exampleChats: { label: string; desc: string; messages: ChatMessage[] }[] = [
   {
-    label: "Energie & internet",
+    label: "Energie",
+    desc: "Vergelijk en sluit je nieuwe energiecontract af",
     messages: [
       { from: "lua", text: "Je oude energiecontract loopt af. Zal ik op je nieuwe adres een goede deal regelen?", time: "10:12" },
       { from: "user", text: "Doen 👍", time: "10:13" },
-      { from: "lua", text: "Geregeld ✅ Internet staat klaar op je nieuwe adres vanaf 12 juli.", time: "10:13" },
+      { from: "lua", text: "Geregeld ✅ Je nieuwe contract gaat in vanaf 12 juli.", time: "10:13" },
+    ],
+  },
+  {
+    label: "Internet",
+    desc: "Vind de beste provider voor jouw nieuwe adres",
+    messages: [
+      { from: "lua", text: "Wil je dat ik internet regel voor je nieuwe adres? Ik vergelijk de beste providers.", time: "11:02" },
+      { from: "user", text: "Graag!", time: "11:03" },
+      { from: "lua", text: "Top ✅ Internet staat klaar vanaf 12 juli, geen overlap met je oude abonnement.", time: "11:03" },
     ],
   },
   {
     label: "Verhuisbedrijf",
+    desc: "Vraag offertes aan bij betrouwbare verhuizers",
     messages: [
       { from: "user", text: "Kun je een verhuisbedrijf regelen voor de 12e?", time: "14:02" },
       { from: "lua", text: "Zeker! 3 betrouwbare verhuizers beschikbaar. Goedkoopste: €495 incl. inpakken.", time: "14:03" },
@@ -49,11 +60,30 @@ const exampleChats: { label: string; messages: ChatMessage[] }[] = [
     ],
   },
   {
-    label: "Adreswijziging",
+    label: "Verzekeringen",
+    desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan",
     messages: [
-      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en PostNL?", time: "16:30" },
+      { from: "lua", text: "Wil je dat ik je inboedelverzekering aanpas op je nieuwe adres?", time: "15:10" },
+      { from: "user", text: "Ja, en check ook even de aansprakelijkheid", time: "15:11" },
+      { from: "lua", text: "Allebei geregeld ✅ Je bent vanaf de verhuisdatum gedekt.", time: "15:12" },
+    ],
+  },
+  {
+    label: "Post doorsturen",
+    desc: "Regel je postdoorstuurservice bij PostNL",
+    messages: [
+      { from: "lua", text: "Zal ik je post 3 maanden laten doorsturen via PostNL?", time: "16:00" },
+      { from: "user", text: "Ja, doen", time: "16:01" },
+      { from: "lua", text: "Aangevraagd ✅ Vanaf 12 juli komt alles op je nieuwe adres binnen.", time: "16:01" },
+    ],
+  },
+  {
+    label: "Adreswijzigingen",
+    desc: "Geef je nieuwe adres door aan alle instanties",
+    messages: [
+      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en verzekeraar?", time: "16:30" },
       { from: "user", text: "Ja, allemaal graag", time: "16:31" },
-      { from: "lua", text: "Doorgegeven ✅ Je post wordt 3 maanden doorgestuurd.", time: "16:31" },
+      { from: "lua", text: "Doorgegeven ✅ Je hoeft er zelf niks meer aan te doen.", time: "16:31" },
     ],
   },
 ];
