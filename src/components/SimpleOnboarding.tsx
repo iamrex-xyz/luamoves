@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import lisaImg from "@/assets/testimonial-lisa.png";
+import videoStillWoman from "@/assets/video-still-woman.jpg";
+import markImg from "@/assets/testimonial-mark.png";
+import sophieImg from "@/assets/testimonial-sophie.png";
+import tomImg from "@/assets/testimonial-tom.png";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,19 +11,58 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight, ArrowLeft, ArrowDown, Zap, Wifi, Truck, Shield, Mail, MapPin, Play } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
+import { WhatsAppChat, type ChatMessage } from "@/components/WhatsAppChat";
 
+const heroChat: ChatMessage[] = [
+  { from: "lua", text: "Hoi Lisa! 👋 Ik ben Lua. Wanneer en waarheen ga je verhuizen?", time: "09:38" },
+  { from: "user", text: "12 juli, naar Amsterdam 🎉", time: "09:39" },
+  { from: "lua", text: "Gefeliciteerd! 🎉 Ik heb meteen je checklist klaargezet: 14 taken, netjes op volgorde. Drie ervan hebben een deadline deze maand.", time: "09:39" },
+  { from: "user", text: "Oef, waar moet ik beginnen?", time: "09:40" },
+  { from: "lua", text: "Geen stress, ik neem het zware werk over. Zal ik 3 offertes voor een verhuisbedrijf opvragen?", time: "09:40" },
+  { from: "user", text: "Ja, top!", time: "09:41" },
+  { from: "lua", text: "Geregeld ✅ Offertes liggen morgen klaar. Ik hou je hier op de hoogte en stuur op tijd een seintje voor elke deadline.", time: "09:41" },
+];
+
+const exampleChats: { label: string; messages: ChatMessage[] }[] = [
+  {
+    label: "Energie & internet",
+    messages: [
+      { from: "lua", text: "Je oude energiecontract loopt af. Zal ik op je nieuwe adres een goede deal regelen?", time: "10:12" },
+      { from: "user", text: "Doen 👍", time: "10:13" },
+      { from: "lua", text: "Geregeld ✅ Internet staat klaar op je nieuwe adres vanaf 12 juli.", time: "10:13" },
+    ],
+  },
+  {
+    label: "Verhuisbedrijf",
+    messages: [
+      { from: "user", text: "Kun je een verhuisbedrijf regelen voor de 12e?", time: "14:02" },
+      { from: "lua", text: "Zeker! 3 betrouwbare verhuizers beschikbaar. Goedkoopste: €495 incl. inpakken.", time: "14:03" },
+      { from: "user", text: "Boek die maar", time: "14:04" },
+      { from: "lua", text: "Geboekt ✅ Ze bellen je woensdag om alles af te stemmen.", time: "14:04" },
+    ],
+  },
+  {
+    label: "Adreswijziging",
+    messages: [
+      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en PostNL?", time: "16:30" },
+      { from: "user", text: "Ja, allemaal graag", time: "16:31" },
+      { from: "lua", text: "Doorgegeven ✅ Je post wordt 3 maanden doorgestuurd.", time: "16:31" },
+    ],
+  },
+];
 
 const testimonials = [
-  { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
-  { name: "Mark", location: "Rotterdam", text: "Eindelijk overzicht tijdens mijn verhuizing. Aanrader!" },
-  { name: "Sophie", location: "Utrecht", text: "Dankzij Lua vergat ik niks. Gratis en makkelijk." },
-  { name: "Tom", location: "Den Haag", text: "De checklist was precies wat ik nodig had." },
+  { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!", image: lisaImg },
+  { name: "Mark", location: "Rotterdam", text: "Eindelijk overzicht tijdens mijn verhuizing. Aanrader!", image: markImg },
+  { name: "Sophie", location: "Utrecht", text: "Dankzij Lua vergat ik niks. Gratis en makkelijk.", image: sophieImg },
+  { name: "Tom", location: "Den Haag", text: "De checklist was precies wat ik nodig had.", image: tomImg },
 ];
 
 const TestimonialCarousel = () => {
@@ -34,16 +78,26 @@ const TestimonialCarousel = () => {
   const testimonial = testimonials[currentIndex];
 
   return (
-    <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <section className="px-5 py-16">
       <div className="max-w-2xl mx-auto text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
-          Wat anderen zeggen
+          Waarom anderen enthousiast zijn
         </h2>
-        <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[140px] flex flex-col justify-center">
+        <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[140px] flex flex-col items-center justify-center">
           <p className="text-lg text-foreground mb-4 italic">"{testimonial.text}"</p>
-          <p className="text-sm text-muted-foreground">
-            — {testimonial.name}, {testimonial.location}
-          </p>
+          <div className="flex items-center gap-3">
+            <img
+              src={testimonial.image}
+              alt={testimonial.name}
+              className="w-10 h-10 rounded-full object-cover shrink-0"
+              loading="lazy"
+              width={40}
+              height={40}
+            />
+            <p className="text-sm text-muted-foreground">
+              {testimonial.name}, {testimonial.location}
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -94,6 +148,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [exampleIndex, setExampleIndex] = useState(0);
   const [taskStartIndex, setTaskStartIndex] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'checking' | 'sliding'>('idle');
   
@@ -301,122 +356,95 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
   // Step 1: Welcome screen
   if (step === 1) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-light via-primary-light/80 to-white overflow-y-auto">
+      <div className="min-h-screen bg-gradient-to-b from-primary-light via-white to-primary-light overflow-y-auto">
         {/* Hero Section - Above the fold */}
         <div className="min-h-screen flex flex-col cursor-pointer" onClick={handleNext}>
-          <div className="px-5 pt-5 pb-3 flex justify-between items-center">
+          <div className="px-5 pt-5 pb-8 flex justify-between items-center">
             <LuaLogo size="md" />
             <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onLogin(); }} className="text-sm text-muted-foreground hover:text-foreground">
               Inloggen
             </Button>
           </div>
-          <div className="flex-1 flex flex-col justify-center px-5 pb-8 max-w-2xl mx-auto w-full">
-            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <div className="space-y-3">
-                <h1 className="text-4xl md:text-6xl font-bold text-foreground leading-[1.1] tracking-tight">
-                  Jouw verhuizing,<br /><span className="text-primary">geregeld.</span>
-                </h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-md leading-relaxed">
-                  Lua is je slimme verhuisassistent. Jij focust op je nieuwe thuis, wij regelen de rest.
-                </p>
+
+          <div className="flex-1 flex flex-col items-center justify-center px-5 pb-10 max-w-3xl mx-auto w-full text-center">
+            {/* Social proof badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 animate-in fade-in slide-in-from-bottom-4 duration-500 mb-[25px]">
+              <div className="flex -space-x-1.5">
+                <img src="https://i.pravatar.cc/40?img=12" alt="Verhuizer" className="w-5 h-5 rounded-full object-cover border-2 border-primary-light" />
+                <img src="https://i.pravatar.cc/40?img=32" alt="Verhuizer" className="w-5 h-5 rounded-full object-cover border-2 border-primary-light" />
+                <img src="https://i.pravatar.cc/40?img=45" alt="Verhuizer" className="w-5 h-5 rounded-full object-cover border-2 border-primary-light" />
               </div>
-              <div className="relative h-52 md:h-56">
-                <div className="absolute top-5 left-3 right-3 h-full bg-white/60 rounded-2xl shadow-lg transform rotate-2" />
-                <div className="absolute top-2.5 left-1.5 right-1.5 h-full bg-white/80 rounded-2xl shadow-lg transform -rotate-1" />
-                <div className="absolute inset-0 bg-white rounded-2xl shadow-2xl shadow-primary/20 p-5 flex flex-col">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <p className="font-semibold text-sm text-foreground">Jouw taken voor vandaag</p>
-                  </div>
-                  <div className="relative overflow-hidden" style={{ height: '124px' }}>
-                    <div className="flex flex-col gap-2" style={{
-                      transition: animationPhase === 'sliding' ? 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
-                      transform: animationPhase === 'sliding' ? 'translateY(-44px)' : 'translateY(0)',
-                    }}>
-                      {[0, 1, 2, 3].map((offset) => {
-                        const taskIndex = (taskStartIndex + offset) % animatedTasks.length;
-                        const isFirst = offset === 0;
-                        const isChecked = isFirst && (animationPhase === 'checking' || animationPhase === 'sliding');
-                        let bgClass = 'bg-secondary/50';
-                        let iconClass = 'text-muted-foreground/30';
-                        let textClass = 'text-muted-foreground/70';
-                        if (isFirst && !isChecked) {
-                          bgClass = 'bg-primary-light';
-                          iconClass = 'text-primary';
-                          textClass = 'text-foreground font-medium';
-                        } else if (offset === 1) {
-                          bgClass = 'bg-secondary';
-                          iconClass = 'text-muted-foreground/40';
-                          textClass = 'text-muted-foreground';
-                        }
-                        return (
-                          <div key={`task-${taskIndex}-${offset}`} className={`flex items-center gap-3 py-2.5 px-3 rounded-xl shrink-0 ${isChecked ? 'bg-primary/10' : bgClass}`} style={{ height: '36px' }}>
-                            <div className="w-5 h-5 shrink-0 flex items-center justify-center" style={{ transition: 'transform 0.2s ease', transform: isChecked && animationPhase === 'checking' ? 'scale(1.15)' : 'scale(1)' }}>
-                              {isChecked ? <CheckCircle2 className="w-5 h-5 text-primary" /> : <Circle className={`w-5 h-5 ${iconClass}`} />}
-                            </div>
-                            <span className={`text-sm ${isChecked ? 'line-through text-primary/50' : textClass}`}>{animatedTasks[taskIndex]}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none" style={{ background: 'linear-gradient(to top, white 0%, transparent 100%)' }} />
-                  </div>
-                </div>
+              <span className="text-xs font-semibold text-primary uppercase tracking-wider">522 verhuizers deze maand</span>
+            </div>
+
+            {/* Headline */}
+            <div className="space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700">
+              <h1 className="text-5xl font-extrabold text-foreground leading-[1.1] tracking-tight md:text-6xl">
+                Jouw verhuizing,<br />
+                <span className="text-primary font-italiana italic font-semibold">geregeld.</span>
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed mb-[19px]">
+                Lua is je slimme AI verhuisassistent, volledig via WhatsApp.<br />Jij stuurt een berichtje, Lua regelt de rest.
+              </p>
+            </div>
+
+            {/* CTA group */}
+            <div className="flex flex-col items-center gap-4 mt-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <Button
+                onClick={(e) => { e.stopPropagation(); handleNext(); }}
+                className="h-14 px-8 text-base rounded-2xl shadow-xl shadow-primary/25 hover:-translate-y-0.5 transition-transform"
+              >
+                Start je verhuizing
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-[11px] text-muted-foreground/70 uppercase tracking-widest font-normal">Gratis · Geen verplichtingen</p>
+              </div>
+            </div>
+
+            {/* Mockup area - WhatsApp conversation */}
+            <div className="relative w-full flex flex-col items-center mt-[86px]">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 mb-5">
+                <span className="text-xs font-semibold text-[#0d8a4f] uppercase tracking-wider">Geen app · Makkelijk via WhatsApp</span>
+              </div>
+              <WhatsAppChat messages={heroChat} animated className="animate-in fade-in slide-in-from-bottom-8 duration-700" />
+
+              {/* Affordance */}
+              <div className="mt-10 flex flex-col items-center gap-1.5 text-muted-foreground/50 animate-bounce">
+                <span className="text-[11px] font-bold uppercase tracking-widest">Ontdek hoe het werkt</span>
+                <ArrowDown className="w-5 h-5" strokeWidth={2.5} />
               </div>
             </div>
           </div>
-
         </div>
-        {/* Floating Start Button (outside clickable area) */}
-        <Button
-          onClick={handleNext}
-          className="fixed bottom-6 right-6 z-50 h-14 px-6 rounded-full shadow-xl shadow-primary/30"
-        >
-          Start
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
 
         {/* Below the fold content - Click doesn't trigger navigation */}
         <div onClick={(e) => e.stopPropagation()}>
           {/* Section 1: Waarom Lua helpt */}
-          <section className="px-5 py-16 bg-white">
+          <section className="px-5 py-16">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
                 Waarom Lua helpt tijdens je verhuizing
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto mb-8">
-                Verhuizen is chaotisch: tientallen taken, onvoorspelbare deadlines, en veel om te onthouden. 
+                Verhuizen is chaotisch: tientallen taken, onvoorspelbare deadlines, en veel om te onthouden.
                 Lua geeft je rust en overzicht, zodat jij minder hoeft na te denken.
               </p>
-              <div className="flex flex-col items-center gap-2">
-                <Button 
-                  onClick={handleNext}
-                  size="sm"
-                  className="h-11 px-8 text-sm rounded-full bg-foreground text-background hover:bg-foreground/90 shadow-md"
-                >
-                  Start mijn verhuizing
-                  <svg className="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Button>
-                <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
-              </div>
+              <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
             </div>
           </section>
 
           {/* Section 2: Zo werkt Lua */}
-          <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+          <section className="px-5 py-16">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-10 text-center">
                 Zo werkt Lua
               </h2>
               <div className="grid gap-6">
                 {[
-                  { step: "1", title: "Start met je gepersonaliseerde verhuischecklist", desc: "Vul je verhuisdatum en adres in" },
-                  { step: "2", title: "Vul alleen in wat nodig is", desc: "We vragen alleen wat relevant is voor jou" },
-                  { step: "3", title: "Lua regelt of komt bij je terug", desc: "Wij doen het werk, jij houdt overzicht" },
+                  { step: "1", title: "Krijg direct je gepersonaliseerde verhuischecklist", desc: "Vul je verhuisdatum en adres in en zie meteen wat er geregeld moet worden" },
+                  { step: "2", title: "Beantwoord een paar simpele vragen", desc: "Geen overbodige formulieren, alleen wat écht relevant is voor jouw verhuizing" },
+                  { step: "3", title: "Lua regelt het werk voor je", desc: "Wij nemen de taken uit handen, jij houdt altijd het overzicht" },
                 ].map((item) => (
                   <div key={item.step} className="flex items-start gap-4 bg-white rounded-2xl p-5 shadow-sm">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shrink-0">
@@ -433,32 +461,32 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
           </section>
 
           {/* Section 3: Wat Lua voor je regelt */}
-          <section className="px-5 py-16 bg-white">
+          <section className="px-5 py-16">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-center">
-                Wat Lua gratis voor je regelt
+                Wat Lua voor je regelt, gratis
               </h2>
               <p className="text-muted-foreground text-center mb-8">
-                Lua helpt je bij alle belangrijke verhuistaken
+                Lua helpt je bij alle belangrijke verhuistaken en meer
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af" },
-                  { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres" },
-                  { title: "Verhuisbedrijf", desc: "Vraag offertes aan bij betrouwbare verhuizers" },
-                  { title: "Verzekeringen", desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan" },
-                  { title: "Post doorsturen", desc: "Regel je postdoorstuurservice bij PostNL" },
-                  { title: "Adreswijzigingen", desc: "Geef je nieuwe adres door aan alle instanties" },
+                  { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af", icon: Zap, color: "text-amber-500", bg: "bg-amber-500/10" },
+                  { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres", icon: Wifi, color: "text-sky-500", bg: "bg-sky-500/10" },
+                  { title: "Verhuisbedrijf", desc: "Vraag offertes aan bij betrouwbare verhuizers", icon: Truck, color: "text-primary", bg: "bg-primary/10" },
+                  { title: "Verzekeringen", desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan", icon: Shield, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                  { title: "Post doorsturen", desc: "Regel je postdoorstuurservice bij PostNL", icon: Mail, color: "text-rose-500", bg: "bg-rose-500/10" },
+                  { title: "Adreswijzigingen", desc: "Geef je nieuwe adres door aan alle instanties", icon: MapPin, color: "text-violet-500", bg: "bg-violet-500/10" },
                 ].map((item) => (
                   <div
                     key={item.title}
-                    className="flex items-start gap-3 p-4 bg-primary-light/50 rounded-xl"
+                    className="group flex items-start gap-3 p-4 bg-white border border-border/60 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Check className="w-4 h-4 text-primary" />
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", item.bg)}>
+                      <item.icon className={cn("w-5 h-5", item.color)} />
                     </div>
                     <div>
-                      <h3 className="font-medium text-foreground">{item.title}</h3>
+                      <h3 className="font-semibold text-foreground">{item.title}</h3>
                       <p className="text-sm text-muted-foreground">{item.desc}</p>
                     </div>
                   </div>
@@ -467,11 +495,132 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
             </div>
           </section>
 
+          {/* Section 3b: WhatsApp voorbeeldgesprekken */}
+          <section className="px-5 py-16">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-10">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 mb-4">
+                  <span className="text-xs font-semibold text-[#0d8a4f] uppercase tracking-wider">Eenvoudig via WhatsApp</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                  Zo regelt Lua het, gewoon in je chat
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed max-w-lg mx-auto">
+                  Geen app, geen inloggen, geen ingewikkelde portalen. Je appt met Lua zoals met een vriend en Lua regelt het echte werk.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-3 md:gap-6">
+                <button
+                  type="button"
+                  onClick={() => setExampleIndex((i) => (i - 1 + exampleChats.length) % exampleChats.length)}
+                  aria-label="Vorige voorbeeld"
+                  className="shrink-0 w-11 h-11 rounded-full bg-white border border-primary/20 text-primary flex items-center justify-center shadow-sm hover:bg-primary hover:text-white transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <div className="flex flex-col items-center gap-3 w-full max-w-[320px] md:max-w-[300px]">
+                  <span className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</span>
+                  <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} animated />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setExampleIndex((i) => (i + 1) % exampleChats.length)}
+                  aria-label="Volgende voorbeeld"
+                  className="shrink-0 w-11 h-11 rounded-full bg-white border border-primary/20 text-primary flex items-center justify-center shadow-sm hover:bg-primary hover:text-white transition-colors"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Video */}
+          <section className="px-5 py-16">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">
+                Een stressvrije verhuizing door Lua
+              </h2>
+              <div className="relative rounded-3xl overflow-hidden border-4 border-primary/40 shadow-xl group cursor-pointer">
+                <img
+                  src={videoStillWoman}
+                  alt="Bekijk hoe Lua je verhuizing regelt"
+                  loading="lazy"
+                  width={1280}
+                  height={768}
+                  className="w-full h-auto object-cover aspect-video"
+                />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="flex items-center gap-3 px-6 py-3 rounded-full bg-white shadow-lg text-foreground font-medium group-hover:scale-105 transition-transform">
+                    <Play className="w-5 h-5 text-primary fill-primary" />
+                    Bekijk: Lua in actie
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Section 4: Testimonials */}
           <TestimonialCarousel />
 
+          {/* Section 4b: FAQ */}
+          <section className="px-5 py-16">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3 text-center">
+                Veelgestelde vragen
+              </h2>
+              <p className="text-muted-foreground text-center mb-8">
+                Alles wat je wilt weten over Lua
+              </p>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="cost" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Is Lua gratis?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Ja, Lua is volledig gratis. We verdienen aan partnerdeals (bijv. energie en internet), zodat jij kunt verhuizen zonder extra kosten. Geen verplichtingen, geen verborgen kosten.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="privacy" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Hoe gaat Lua om met mijn gegevens?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Je privacy staat voorop. We delen je gegevens nooit met derden zonder toestemming en gebruiken ze niet om AI-modellen te trainen. Je verhuizing is tussen jou en Lua.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="app" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Heb ik een app nodig?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Nee. Je kunt Lua gebruiken via WhatsApp of de web-app — wat jij prettig vindt. Geen gedoe met downloads of inloggegevens.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="how" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Hoe werkt Lua precies?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Je deelt je verhuisdatum en adres, en Lua maakt een persoonlijke checklist. Voor elke taak vraagt Lua kort wat je nodig hebt — dan regelen wij offertes, contracten en afspraken. Jij houdt overzicht, Lua doet het werk.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="deadline" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Wat als mijn verhuisdatum verandert?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Geen probleem. Pas je verhuisdatum aan in je profiel en Lua herberekent automatisch alle deadlines en herinnert je opnieuw op de juiste momenten.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="quotes" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Hoe snel krijg ik offertes binnen?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Meestal binnen 24 uur. Voor drukke periodes kan het 2-3 werkdagen duren. Je krijgt altijd een berichtje van Lua zodra de offertes voor je klaarliggen.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="delete" className="border-b border-border/60 bg-white rounded-2xl px-5 mb-3 border">
+                  <AccordionTrigger className="text-sm font-semibold text-foreground py-4 text-left">Kan ik mijn account en gegevens verwijderen?</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                    Absoluut. Je kunt op elk moment je profiel en alle gegevens verwijderen. Geen vragen, geen gedoe — gewoon weg als je dat wilt.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </section>
+
           {/* Section 5: Tweede CTA */}
-          <section className="px-5 py-16 bg-white">
+          <section className="px-5 py-16">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                 Klaar om te verhuizen?
@@ -479,19 +628,14 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
               <p className="text-muted-foreground mb-6">
                 Start wanneer jij wilt. Geen verplichtingen.
               </p>
-              <div className="flex flex-col items-center gap-2">
-                <Button 
-                  onClick={handleNext}
-                  variant="ghost"
-                  className="text-muted-foreground hover:text-foreground underline underline-offset-4"
-                >
-                  Start mijn verhuizing
-                  <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Button>
-                <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
-              </div>
+              <Button
+                onClick={handleNext}
+                className="h-14 px-8 text-base rounded-2xl shadow-xl shadow-primary/25 hover:-translate-y-0.5 transition-transform mb-2"
+              >
+                Start je verhuizing
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+              <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
             </div>
           </section>
         </div>
