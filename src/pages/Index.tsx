@@ -309,9 +309,10 @@ const Index = () => {
 
       // Load guest data from localStorage
       const savedInfo = localStorage.getItem(LOCAL_STORAGE_KEY);
+      let info: MovingInfo | null = null;
       if (savedInfo) {
         try {
-          setMovingInfo(JSON.parse(savedInfo));
+          info = JSON.parse(savedInfo);
         } catch {
           // ignore parse errors
         }
@@ -319,15 +320,35 @@ const Index = () => {
 
       // /dashboard → straight to dashboard (guest mode)
       if (isDashboardRoute) {
+        if (!info) {
+          // Provide sensible defaults so Dashboard renders all tasks
+          const defaultDate = new Date();
+          defaultDate.setDate(defaultDate.getDate() + 42); // ~6 weeks out
+          info = {
+            oldAddress: "",
+            newAddress: "",
+            movingDate: defaultDate.toISOString().split("T")[0],
+            type: "rent",
+            renovationType: "none",
+            needsContractorHelp: false,
+            children: 0,
+            pets: 0,
+            hasJob: true,
+          } as MovingInfo;
+        }
+        setMovingInfo(info);
         setCurrentView("dashboard");
         setLoading(false);
         return;
       }
 
+      if (info) setMovingInfo(info);
+
       // / or ?landing=1 → landing page
       setCurrentView("onboarding");
       setLoading(false);
     };
+
 
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
