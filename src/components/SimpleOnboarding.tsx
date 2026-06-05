@@ -148,6 +148,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
   const [isLoadingAddress, setIsLoadingAddress] = useState(false);
   const [currentGeneratingStep, setCurrentGeneratingStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [exampleIndex, setExampleIndex] = useState(0);
   const [taskStartIndex, setTaskStartIndex] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<'idle' | 'checking' | 'sliding'>('idle');
   
