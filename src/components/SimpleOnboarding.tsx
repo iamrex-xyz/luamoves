@@ -497,9 +497,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
           <section className="px-5 py-16">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-10">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#25D366]/15 border border-[#25D366]/30 mb-4">
-                  <span className="text-xs font-semibold text-[#0d8a4f] uppercase tracking-wider">Eenvoudig via WhatsApp</span>
-                </div>
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
                   Zo regelt Lua het, gewoon in je chat
                 </h2>
