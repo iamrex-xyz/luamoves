@@ -1,6 +1,5 @@
-import { ListChecks, Home, Settings, FileText, MessageCircle } from "lucide-react";
+import { ListChecks, Home, Settings, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 type BottomNavProps = {
   currentView: "dashboard" | "tasks" | "extras" | "settings" | "chat";
@@ -8,12 +7,9 @@ type BottomNavProps = {
 };
 
 export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
-  const unreadCount = useUnreadMessages(currentView);
-  
   const navItems = [
     { id: "dashboard", label: "Home", icon: Home },
     { id: "tasks", label: "Taken", icon: ListChecks },
-    { id: "chat", label: "Chat", icon: MessageCircle },
     { id: "extras", label: "Docs", icon: FileText },
     { id: "settings", label: "Account", icon: Settings },
   ] as const;
@@ -29,14 +25,13 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
-            const showBadge = item.id === "chat" && unreadCount > 0;
             
             return (
               <button
                 key={item.id}
                 role="tab"
                 aria-selected={isActive}
-                aria-label={`${item.label}${showBadge ? `, ${unreadCount} ongelezen berichten` : ''}`}
+                aria-label={item.label}
                 onClick={() => onNavigate(item.id)}
                 className={cn(
                   "flex flex-col items-center justify-center gap-0.5 px-1.5 sm:px-2 py-1.5 rounded-xl transition-all min-w-[44px] sm:min-w-[50px] relative active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
@@ -47,14 +42,6 @@ export const BottomNav = ({ currentView, onNavigate }: BottomNavProps) => {
               >
                 <Icon className={cn("w-5 h-5", isActive && "stroke-[2.5]")} aria-hidden="true" />
                 <span className="text-[9px] sm:text-[10px] font-medium whitespace-nowrap">{item.label}</span>
-                {showBadge && (
-                  <span 
-                    className="absolute -top-0.5 right-0.5 bg-primary text-primary-foreground text-[8px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5"
-                    aria-hidden="true"
-                  >
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
               </button>
             );
           })}

@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility";
-import { FeedbackButton } from "@/components/FeedbackButton";
 import Index from "./pages/Index";
 
 import { TaskDeals } from "./pages/TaskDeals";
@@ -34,7 +33,6 @@ function App() {
           <ScreenReaderAnnouncer />
           
           <BrowserRouter>
-            <FeedbackButton />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Index />} />
