@@ -30,17 +30,28 @@ const heroChat: ChatMessage[] = [
   { from: "lua", text: "Geregeld ✅ Offertes liggen morgen klaar. Ik hou je hier op de hoogte en stuur op tijd een seintje voor elke deadline.", time: "09:41" },
 ];
 
-const exampleChats: { label: string; messages: ChatMessage[] }[] = [
+const exampleChats: { label: string; desc: string; messages: ChatMessage[] }[] = [
   {
-    label: "Energie & internet",
+    label: "Energie",
+    desc: "Vergelijk en sluit je nieuwe energiecontract af",
     messages: [
       { from: "lua", text: "Je oude energiecontract loopt af. Zal ik op je nieuwe adres een goede deal regelen?", time: "10:12" },
       { from: "user", text: "Doen 👍", time: "10:13" },
-      { from: "lua", text: "Geregeld ✅ Internet staat klaar op je nieuwe adres vanaf 12 juli.", time: "10:13" },
+      { from: "lua", text: "Geregeld ✅ Je nieuwe contract gaat in vanaf 12 juli.", time: "10:13" },
+    ],
+  },
+  {
+    label: "Internet",
+    desc: "Vind de beste provider voor jouw nieuwe adres",
+    messages: [
+      { from: "lua", text: "Wil je dat ik internet regel voor je nieuwe adres? Ik vergelijk de beste providers.", time: "11:02" },
+      { from: "user", text: "Graag!", time: "11:03" },
+      { from: "lua", text: "Top ✅ Internet staat klaar vanaf 12 juli, geen overlap met je oude abonnement.", time: "11:03" },
     ],
   },
   {
     label: "Verhuisbedrijf",
+    desc: "Vraag offertes aan bij betrouwbare verhuizers",
     messages: [
       { from: "user", text: "Kun je een verhuisbedrijf regelen voor de 12e?", time: "14:02" },
       { from: "lua", text: "Zeker! 3 betrouwbare verhuizers beschikbaar. Goedkoopste: €495 incl. inpakken.", time: "14:03" },
@@ -49,11 +60,30 @@ const exampleChats: { label: string; messages: ChatMessage[] }[] = [
     ],
   },
   {
-    label: "Adreswijziging",
+    label: "Verzekeringen",
+    desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan",
     messages: [
-      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en PostNL?", time: "16:30" },
+      { from: "lua", text: "Wil je dat ik je inboedelverzekering aanpas op je nieuwe adres?", time: "15:10" },
+      { from: "user", text: "Ja, en check ook even de aansprakelijkheid", time: "15:11" },
+      { from: "lua", text: "Allebei geregeld ✅ Je bent vanaf de verhuisdatum gedekt.", time: "15:12" },
+    ],
+  },
+  {
+    label: "Post doorsturen",
+    desc: "Regel je postdoorstuurservice bij PostNL",
+    messages: [
+      { from: "lua", text: "Zal ik je post 3 maanden laten doorsturen via PostNL?", time: "16:00" },
+      { from: "user", text: "Ja, doen", time: "16:01" },
+      { from: "lua", text: "Aangevraagd ✅ Vanaf 12 juli komt alles op je nieuwe adres binnen.", time: "16:01" },
+    ],
+  },
+  {
+    label: "Adreswijzigingen",
+    desc: "Geef je nieuwe adres door aan alle instanties",
+    messages: [
+      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en verzekeraar?", time: "16:30" },
       { from: "user", text: "Ja, allemaal graag", time: "16:31" },
-      { from: "lua", text: "Doorgegeven ✅ Je post wordt 3 maanden doorgestuurd.", time: "16:31" },
+      { from: "lua", text: "Doorgegeven ✅ Je hoeft er zelf niks meer aan te doen.", time: "16:31" },
     ],
   },
 ];
@@ -470,30 +500,6 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 </p>
               </div>
 
-              <div className="max-w-2xl mx-auto grid gap-4 sm:grid-cols-2 mb-12">
-                {[
-                  { title: "Energie", desc: "Vergelijk en sluit je nieuwe energiecontract af", icon: Zap, color: "text-amber-500", bg: "bg-amber-500/10" },
-                  { title: "Internet", desc: "Vind de beste provider voor jouw nieuwe adres", icon: Wifi, color: "text-sky-500", bg: "bg-sky-500/10" },
-                  { title: "Verhuisbedrijf", desc: "Vraag offertes aan bij betrouwbare verhuizers", icon: Truck, color: "text-primary", bg: "bg-primary/10" },
-                  { title: "Verzekeringen", desc: "Pas je inboedel- en aansprakelijkheidsverzekering aan", icon: Shield, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                  { title: "Post doorsturen", desc: "Regel je postdoorstuurservice bij PostNL", icon: Mail, color: "text-rose-500", bg: "bg-rose-500/10" },
-                  { title: "Adreswijzigingen", desc: "Geef je nieuwe adres door aan alle instanties", icon: MapPin, color: "text-violet-500", bg: "bg-violet-500/10" },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="group flex items-start gap-3 p-4 bg-white border border-border/60 rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-primary/30"
-                  >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110", item.bg)}>
-                      <item.icon className={cn("w-5 h-5", item.color)} />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
-                      <p className="text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
               <div className="flex items-center justify-center gap-3 md:gap-6">
                 <button
                   type="button"
@@ -504,8 +510,25 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div className="flex flex-col items-center gap-3 w-full max-w-[320px] md:max-w-[300px]">
-                  <span className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</span>
+                  <div className="text-center">
+                    <div className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{exampleChats[exampleIndex].desc}</p>
+                  </div>
                   <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} />
+                  <div className="flex items-center gap-1.5">
+                    {exampleChats.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setExampleIndex(i)}
+                        aria-label={`Voorbeeld ${i + 1}`}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all",
+                          i === exampleIndex ? "w-6 bg-primary" : "w-1.5 bg-primary/30"
+                        )}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <button
                   type="button"
