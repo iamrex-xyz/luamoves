@@ -394,7 +394,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 asChild
                 className="h-14 px-8 text-base rounded-2xl shadow-xl shadow-primary/25 hover:-translate-y-0.5 transition-transform"
               >
-                <a href="https://wa.me/31685303918" target="_blank" rel="noopener noreferrer">
+                <a href="https://wa.me/31685303918?text=Hoi%20Lua%2C%20ik%20ga%20verhuizen%21" target="_blank" rel="noopener noreferrer">
                   Start je verhuizing
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </a>
