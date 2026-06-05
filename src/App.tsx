@@ -9,6 +9,7 @@ import { SkipToContent, ScreenReaderAnnouncer } from "@/components/accessibility
 import Index from "./pages/Index";
 
 import { TaskDeals } from "./pages/TaskDeals";
+import Explore from "./pages/Explore";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ function App() {
               <Route path="/aanmelden" element={<Navigate to="/aanmelden/welkom" replace />} />
               <Route path="/aanmelden/:stap" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
+              <Route path="/voorbeelden" element={<Explore />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

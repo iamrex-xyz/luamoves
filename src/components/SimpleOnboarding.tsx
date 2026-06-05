@@ -525,6 +525,16 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
+
+              <div className="mt-10 flex justify-center">
+                <a
+                  href="/voorbeelden"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold shadow-soft hover:bg-primary/90 transition-colors"
+                >
+                  Bekijk hier wat Lua voor je kan regelen
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </section>
 
