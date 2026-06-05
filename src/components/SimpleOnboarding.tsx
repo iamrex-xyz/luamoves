@@ -511,7 +511,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
                 </button>
                 <div className="flex flex-col items-center gap-3 w-full max-w-[320px] md:max-w-[300px]">
                   <div className="text-center">
-                    <div className="text-sm font-semibold text-primary">{exampleChats[exampleIndex].label}</div>
+                    <div className="text-xl font-semibold text-primary">{exampleChats[exampleIndex].label}</div>
                     <p className="text-xs text-muted-foreground mt-1">{exampleChats[exampleIndex].desc}</p>
                   </div>
                   <WhatsAppChat key={exampleIndex} messages={exampleChats[exampleIndex].messages} />
