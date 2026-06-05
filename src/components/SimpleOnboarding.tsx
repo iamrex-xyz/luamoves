@@ -78,7 +78,7 @@ const TestimonialCarousel = () => {
   const testimonial = testimonials[currentIndex];
 
   return (
-    <section className="px-5 py-16">
+    <section className="px-5 py-[45px]">
       <div className="max-w-2xl mx-auto text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
           Waarom anderen enthousiast zijn
