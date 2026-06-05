@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import lisaImg from "@/assets/testimonial-lisa.png";
+import videoStillWoman from "@/assets/video-still-woman.jpg";
+import markImg from "@/assets/testimonial-mark.png";
+import sophieImg from "@/assets/testimonial-sophie.png";
+import tomImg from "@/assets/testimonial-tom.png";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,19 +11,58 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight } from "lucide-react";
+import { CalendarIcon, Check, Circle, CheckCircle2, Key, Home, HelpCircle, Building2, Trees, Car, Users, Dog, Baby, Briefcase, Minus, Plus, Phone, ArrowRight, ArrowLeft, ArrowDown, Zap, Wifi, Truck, Shield, Mail, MapPin, Play } from "lucide-react";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { format } from "date-fns";
 import { nl } from "date-fns/locale";
 import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
+import { WhatsAppChat, type ChatMessage } from "@/components/WhatsAppChat";
 
+const heroChat: ChatMessage[] = [
+  { from: "lua", text: "Hoi Lisa! 👋 Ik ben Lua. Wanneer en waarheen ga je verhuizen?", time: "09:38" },
+  { from: "user", text: "12 juli, naar Amsterdam 🎉", time: "09:39" },
+  { from: "lua", text: "Gefeliciteerd! 🎉 Ik heb meteen je checklist klaargezet: 14 taken, netjes op volgorde. Drie ervan hebben een deadline deze maand.", time: "09:39" },
+  { from: "user", text: "Oef, waar moet ik beginnen?", time: "09:40" },
+  { from: "lua", text: "Geen stress, ik neem het zware werk over. Zal ik 3 offertes voor een verhuisbedrijf opvragen?", time: "09:40" },
+  { from: "user", text: "Ja, top!", time: "09:41" },
+  { from: "lua", text: "Geregeld ✅ Offertes liggen morgen klaar. Ik hou je hier op de hoogte en stuur op tijd een seintje voor elke deadline.", time: "09:41" },
+];
+
+const exampleChats: { label: string; messages: ChatMessage[] }[] = [
+  {
+    label: "Energie & internet",
+    messages: [
+      { from: "lua", text: "Je oude energiecontract loopt af. Zal ik op je nieuwe adres een goede deal regelen?", time: "10:12" },
+      { from: "user", text: "Doen 👍", time: "10:13" },
+      { from: "lua", text: "Geregeld ✅ Internet staat klaar op je nieuwe adres vanaf 12 juli.", time: "10:13" },
+    ],
+  },
+  {
+    label: "Verhuisbedrijf",
+    messages: [
+      { from: "user", text: "Kun je een verhuisbedrijf regelen voor de 12e?", time: "14:02" },
+      { from: "lua", text: "Zeker! 3 betrouwbare verhuizers beschikbaar. Goedkoopste: €495 incl. inpakken.", time: "14:03" },
+      { from: "user", text: "Boek die maar", time: "14:04" },
+      { from: "lua", text: "Geboekt ✅ Ze bellen je woensdag om alles af te stemmen.", time: "14:04" },
+    ],
+  },
+  {
+    label: "Adreswijziging",
+    messages: [
+      { from: "lua", text: "Vergeet je adreswijziging niet. Zal ik 'm doorgeven aan gemeente, bank en PostNL?", time: "16:30" },
+      { from: "user", text: "Ja, allemaal graag", time: "16:31" },
+      { from: "lua", text: "Doorgegeven ✅ Je post wordt 3 maanden doorgestuurd.", time: "16:31" },
+    ],
+  },
+];
 
 const testimonials = [
-  { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!" },
-  { name: "Mark", location: "Rotterdam", text: "Eindelijk overzicht tijdens mijn verhuizing. Aanrader!" },
-  { name: "Sophie", location: "Utrecht", text: "Dankzij Lua vergat ik niks. Gratis en makkelijk." },
-  { name: "Tom", location: "Den Haag", text: "De checklist was precies wat ik nodig had." },
+  { name: "Lisa", location: "Amsterdam", text: "Lua hielp me alles op tijd te regelen. Super handig!", image: lisaImg },
+  { name: "Mark", location: "Rotterdam", text: "Eindelijk overzicht tijdens mijn verhuizing. Aanrader!", image: markImg },
+  { name: "Sophie", location: "Utrecht", text: "Dankzij Lua vergat ik niks. Gratis en makkelijk.", image: sophieImg },
+  { name: "Tom", location: "Den Haag", text: "De checklist was precies wat ik nodig had.", image: tomImg },
 ];
 
 const TestimonialCarousel = () => {
@@ -34,16 +78,26 @@ const TestimonialCarousel = () => {
   const testimonial = testimonials[currentIndex];
 
   return (
-    <section className="px-5 py-16 bg-gradient-to-br from-primary-light via-primary-light/80 to-white">
+    <section className="px-5 py-16">
       <div className="max-w-2xl mx-auto text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
-          Wat anderen zeggen
+          Waarom anderen enthousiast zijn
         </h2>
-        <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[140px] flex flex-col justify-center">
+        <div className="bg-white rounded-2xl p-6 shadow-sm min-h-[140px] flex flex-col items-center justify-center">
           <p className="text-lg text-foreground mb-4 italic">"{testimonial.text}"</p>
-          <p className="text-sm text-muted-foreground">
-            — {testimonial.name}, {testimonial.location}
-          </p>
+          <div className="flex items-center gap-3">
+            <img
+              src={testimonial.image}
+              alt={testimonial.name}
+              className="w-10 h-10 rounded-full object-cover shrink-0"
+              loading="lazy"
+              width={40}
+              height={40}
+            />
+            <p className="text-sm text-muted-foreground">
+              {testimonial.name}, {testimonial.location}
+            </p>
+          </div>
         </div>
       </div>
     </section>
