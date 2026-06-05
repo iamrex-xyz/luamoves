@@ -381,7 +381,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
             <div className="space-y-5 animate-in fade-in slide-in-from-bottom-6 duration-700">
               <h1 className="text-5xl font-extrabold text-foreground leading-[1.1] tracking-tight md:text-6xl">
                 Jouw verhuizing,<br />
-                <span className="text-primary font-italiana italic font-semibold">geregeld.</span>
+                <span className="text-primary italic font-extrabold">geregeld.</span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed mb-[19px]">
                 Lua is je slimme AI verhuisassistent, volledig via WhatsApp.<br />Jij stuurt een berichtje, Lua regelt de rest.
