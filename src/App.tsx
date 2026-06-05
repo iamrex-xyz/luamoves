@@ -37,6 +37,7 @@ function App() {
             <FeedbackButton />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Index />} />
               {/* Dutch SEO-friendly onboarding routes */}
               <Route path="/aanmelden" element={<Navigate to="/aanmelden/welkom" replace />} />
               <Route path="/aanmelden/:stap" element={<Index />} />

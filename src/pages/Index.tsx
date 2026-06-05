@@ -296,11 +296,17 @@ const Index = () => {
 
   // Initialize app
   useEffect(() => {
+    const isLandingRoute = location.pathname === "/" || searchParams.get("landing") === "1";
+    const isDashboardRoute = location.pathname === "/dashboard";
+
     const initializeApp = async () => {
-      // Always show landing page when ?landing=1 is in URL (e.g. logo click)
-      if (searchParams.get("landing") === "1") {
+      // Always show landing page on "/" or when ?landing=1 is present
+      if (isLandingRoute && !isDashboardRoute) {
         setCurrentView("onboarding");
         setLoading(false);
+        // Still hydrate session in background (don't change view)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) setUser(session.user);
         return;
       }
 
@@ -425,6 +431,10 @@ const Index = () => {
             }
             // Always load profile after sync to ensure latest data
             await loadUserProfile(session.user.id);
+            // Route to dashboard URL if currently on landing
+            if (window.location.pathname === "/") {
+              navigate("/dashboard", { replace: true });
+            }
           }, 0);
         }
       }
