@@ -13,7 +13,6 @@ const Explore = () => {
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 text-foreground">
             <LuaLogo className="w-8 h-8" />
-            <span className="font-italiana text-2xl leading-none">Lua</span>
           </Link>
           <Button variant="ghost" size="sm" asChild>
             <Link to="/">
