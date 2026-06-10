@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 
 import { TaskDeals } from "./pages/TaskDeals";
 import Explore from "./pages/Explore";
+import Tasklist from "./pages/Tasklist";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
