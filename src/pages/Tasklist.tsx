@@ -1,6 +1,8 @@
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
+import { SearchX, AlertTriangle, MessageCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { TaskListSkeleton } from "@/components/ui/skeletons";
 import { useTasklist } from "@/hooks/useTasklist";
 import { TasklistTaskItem } from "@/components/tasklist/TasklistTaskItem";
@@ -42,24 +44,57 @@ const Tasklist = () => {
         )}
 
         {state.status === "notFound" && (
-          <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 p-6 text-center">
-            <h1 className="text-lg font-semibold text-foreground mb-2">
-              Deze link is ongeldig of verlopen
+          <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 p-8 text-center flex flex-col items-center">
+            <div className="h-16 w-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <SearchX className="h-8 w-8" aria-hidden />
+            </div>
+            <h1 className="text-xl font-semibold text-foreground mb-2">
+              Checklist niet gevonden
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Vraag een nieuwe link aan via WhatsApp om je checklist te bekijken.
+            <p className="text-sm text-muted-foreground max-w-sm mb-6">
+              Deze link is ongeldig of verlopen. Vraag een nieuwe link aan via
+              WhatsApp en Lua zet je checklist meteen klaar.
             </p>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button
+                asChild
+                className="rounded-2xl"
+                style={{ backgroundColor: "#25D366" }}
+              >
+                <a
+                  href="https://wa.me/31000000000"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Open WhatsApp
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="rounded-2xl">
+                <Link to="/">Terug naar home</Link>
+              </Button>
+            </div>
           </div>
         )}
 
         {state.status === "error" && (
-          <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 p-6 text-center">
-            <h1 className="text-lg font-semibold text-foreground mb-2">
+          <div className="rounded-3xl bg-white shadow-lg shadow-primary/10 p-8 text-center flex flex-col items-center">
+            <div className="h-16 w-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4">
+              <AlertTriangle className="h-8 w-8" aria-hidden />
+            </div>
+            <h1 className="text-xl font-semibold text-foreground mb-2">
               Er ging iets mis
             </h1>
-            <p className="text-sm text-muted-foreground">
-              We konden je checklist niet laden. Probeer het later opnieuw.
+            <p className="text-sm text-muted-foreground max-w-sm mb-6">
+              We konden je checklist nu niet laden. Probeer het over een paar
+              minuten opnieuw.
             </p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="rounded-2xl"
+            >
+              Opnieuw proberen
+            </Button>
           </div>
         )}
 
