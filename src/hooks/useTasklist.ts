@@ -61,10 +61,9 @@ export function useTasklist(token: string | null) {
             tasks: phase.tasks.map((t) => {
               if (t.id !== taskId) return t;
               previousStatus = t.status;
-              return {
-                ...t,
-                status: t.status === "completed" ? "pending" : "completed",
-              };
+              const flipped: "pending" | "completed" =
+                t.status === "completed" ? "pending" : "completed";
+              return { ...t, status: flipped };
             }),
           })),
         };
