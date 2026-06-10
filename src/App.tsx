@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 
 import { TaskDeals } from "./pages/TaskDeals";
 import Explore from "./pages/Explore";
+import Tasklist from "./pages/Tasklist";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,7 @@ function App() {
               <Route path="/aanmelden/:stap" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
               <Route path="/voorbeelden" element={<Explore />} />
+              <Route path="/tasklist" element={<Tasklist />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
