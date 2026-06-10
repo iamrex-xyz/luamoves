@@ -43,6 +43,7 @@ function App() {
               <Route path="/aanmelden/:stap" element={<Index />} />
               <Route path="/deals" element={<TaskDeals />} />
               <Route path="/voorbeelden" element={<Explore />} />
+              <Route path="/tasklist" element={<Tasklist />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
