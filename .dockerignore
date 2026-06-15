@@ -1,0 +1,13 @@
+# Keep the build context small and deterministic. node_modules is reinstalled
+# via `npm ci`; dist is rebuilt. Local env files are excluded so they can't
+# leak into or override the image — the build args write .env.production.local.
+node_modules
+dist
+dist-ssr
+.git
+.env
+.env.local
+*.local
+Dockerfile
+.dockerignore
+*.log
