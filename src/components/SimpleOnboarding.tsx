@@ -389,13 +389,10 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
       <div className="min-h-screen bg-gradient-to-b from-primary-light via-white to-primary-light overflow-y-auto">
         {/* Hero Section - Above the fold */}
         {/* Tap-anywhere-to-start removed: onboarding now happens via WhatsApp,
-            so the landing is static. Real CTAs (WhatsApp link, Inloggen) still work. */}
+            so the landing is static. Real CTAs (WhatsApp link) still work. */}
         <div className="min-h-screen flex flex-col">
-          <div className="px-5 pt-5 pb-8 flex justify-between items-center">
+          <div className="px-5 pt-5 pb-8 flex items-center">
             <LuaLogo size="md" />
-            <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onLogin(); }} className="text-sm text-muted-foreground hover:text-foreground">
-              Inloggen
-            </Button>
           </div>
 
           <div className="flex-1 flex flex-col items-center justify-center px-5 pb-10 max-w-3xl mx-auto w-full text-center">
