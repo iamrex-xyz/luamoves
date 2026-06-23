@@ -2,7 +2,7 @@
 // Loads the checklist by token, exposes it as UiTask[], and toggles task status
 // optimistically against our backend (reverting on failure).
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchTasklist, updateTaskStatus, TasklistNotFoundError } from "./api";
 import { toUiTasks } from "./adapter";
 import type { TasklistResponse, UiTask } from "./types";
@@ -20,6 +20,14 @@ export type TasklistState =
 
 export function useTasklistData(token: string | null) {
   const [state, setState] = useState<TasklistState>({ status: "loading" });
+
+  // Mirror the latest committed state so toggleTask can read the current task
+  // status synchronously — never via a setState-updater side effect, whose
+  // timing React does not guarantee (it would intermittently skip the PATCH).
+  const stateRef = useRef<TasklistState>(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     if (!token) {
@@ -50,34 +58,35 @@ export function useTasklistData(token: string | null) {
     async (taskId: string) => {
       if (!token) return;
 
-      let prevStatus: UiTask["status"] | null = null;
-      const flip = (s: UiTask["status"]): UiTask["status"] =>
-        s === "done" ? "todo" : "done";
+      // Read the current status synchronously from the committed state.
+      const curr = stateRef.current;
+      if (curr.status !== "ready") return;
+      const task = curr.data.tasks.find((t) => t.id === taskId);
+      if (!task) return;
+
+      const prevStatus = task.status;
+      const nextStatus: UiTask["status"] = prevStatus === "done" ? "todo" : "done";
+      const apiStatus = nextStatus === "done" ? "completed" : "pending";
 
       // Optimistic update.
-      setState((curr) => {
-        if (curr.status !== "ready") return curr;
-        const tasks = curr.data.tasks.map((t) => {
-          if (t.id !== taskId) return t;
-          prevStatus = t.status;
-          return { ...t, status: flip(t.status) };
-        });
-        return { status: "ready", data: { ...curr.data, tasks } };
+      setState((s) => {
+        if (s.status !== "ready") return s;
+        const tasks = s.data.tasks.map((t) =>
+          t.id === taskId ? { ...t, status: nextStatus } : t,
+        );
+        return { status: "ready", data: { ...s.data, tasks } };
       });
-
-      if (!prevStatus) return;
-      const apiStatus = flip(prevStatus) === "done" ? "completed" : "pending";
 
       try {
         await updateTaskStatus(taskId, token, apiStatus);
       } catch (err) {
         // Revert on failure.
-        setState((curr) => {
-          if (curr.status !== "ready") return curr;
-          const tasks = curr.data.tasks.map((t) =>
-            t.id === taskId ? { ...t, status: prevStatus! } : t,
+        setState((s) => {
+          if (s.status !== "ready") return s;
+          const tasks = s.data.tasks.map((t) =>
+            t.id === taskId ? { ...t, status: prevStatus } : t,
           );
-          return { status: "ready", data: { ...curr.data, tasks } };
+          return { status: "ready", data: { ...s.data, tasks } };
         });
         throw err;
       }
