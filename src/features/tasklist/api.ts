@@ -29,7 +29,7 @@ function ensureBase(): string {
 export async function fetchTasklist(token: string): Promise<TasklistResponse> {
   const res = await fetch(
     `${ensureBase()}/api/tasklist/${encodeURIComponent(token)}`,
-    { method: "GET", headers: baseHeaders },
+    { method: "GET", headers: baseHeaders, cache: "no-store" },
   );
   if (res.status === 404) throw new TasklistNotFoundError();
   if (!res.ok) throw new Error(`Failed to load tasklist (${res.status})`);
@@ -45,6 +45,7 @@ export async function updateTaskStatus(
     method: "PATCH",
     headers: { ...baseHeaders, "Content-Type": "application/json" },
     body: JSON.stringify({ token, status }),
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`Failed to update task (${res.status})`);
 }
