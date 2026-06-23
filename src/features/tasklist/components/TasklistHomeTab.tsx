@@ -135,7 +135,11 @@ export const TasklistHomeTab = ({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-foreground">{Math.round(pct)}%</span>
+                  {/* translate="no": keep React in control of this text node — Google
+                      Translate otherwise replaces it and freezes the value mid-update. */}
+                  <span translate="no" className="text-sm font-bold text-foreground">
+                    {Math.round(pct)}%
+                  </span>
                 </div>
               </button>
             </div>
