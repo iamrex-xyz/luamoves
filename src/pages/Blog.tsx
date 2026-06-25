@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, BookOpen, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LuaLogo } from "@/components/LuaLogo";
 import { getAllBlogPosts, type BlogPost } from "@/lib/blog";
+import Footer from "@/components/Footer";
 
 const formatDate = (iso: string) => {
   if (!iso) return "";
@@ -130,6 +131,7 @@ const Blog = () => {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 };

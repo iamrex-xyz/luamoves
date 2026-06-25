@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Calendar, Clock, Link2, User } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { LuaLogo } from "@/components/LuaLogo";
 import { getBlogPostBySlug, type Source } from "@/lib/blog";
+import Footer from "@/components/Footer";
 
 const formatDate = (iso: string) => {
   if (!iso) return "";
@@ -163,6 +164,7 @@ const BlogPost = () => {
           </div>
         </div>
       </article>
+      <Footer />
     </div>
   );
 };

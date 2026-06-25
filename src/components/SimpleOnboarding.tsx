@@ -19,6 +19,7 @@ import { MovingInfo } from "@/pages/Index";
 import { cn } from "@/lib/utils";
 import { LuaLogo } from "@/components/LuaLogo";
 import { WhatsAppChat, type ChatMessage } from "@/components/WhatsAppChat";
+import Footer from "@/components/Footer";
 
 const heroChat: ChatMessage[] = [
   { from: "lua", text: "Hoi Lisa! 👋 Ik ben Lua. Wanneer en waarheen ga je verhuizen?", time: "09:38" },
@@ -644,6 +645,7 @@ export const SimpleOnboarding = ({ onComplete, onLogin, initialStep = 1, onStepC
               <p className="text-sm text-muted-foreground">Gratis en zonder gedoe geregeld</p>
             </div>
           </section>
+          <Footer />
         </div>
       </div>
     );
