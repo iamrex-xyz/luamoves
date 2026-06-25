@@ -12,6 +12,8 @@ import { TaskDeals } from "./pages/TaskDeals";
 import Explore from "./pages/Explore";
 import Tasklist from "./pages/Tasklist";
 import Admin from "./pages/Admin";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -45,6 +47,8 @@ function App() {
               <Route path="/voorbeelden" element={<Explore />} />
               <Route path="/tasklist" element={<Tasklist />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
