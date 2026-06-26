@@ -1,6 +1,6 @@
 {
-  "_comment": "GEO-optimized topic taxonomy for Lua. Topics are phrased as the questions people actually ask LLMs and search engines. Clustered into pillars for internal linking + topical authority. Pick topics within underserved pillars first to build coverage breadth.",
-  "_geo_note": "Question-shaped titles get extracted and cited by ChatGPT/Perplexity/Google AI Overviews far more than noun-phrase titles. Each topic below should become an H2 question with a direct 1-2 sentence answer immediately under it.",
+  "_comment": "GEO-optimized topic taxonomy for verhuizen in Nederland (expanded version). Topics are phrased as the questions people actually ask LLMs and search engines. Clustered into pillars for internal linking + topical authority. Expanded with many more topics per pillar + 4 new high-value pillars (utilities, work, renovation, storage). Prioritize new pillars and long-tail questions for quick wins in AI search / Google AI Overviews.",
+  "_geo_note": "Question-shaped titles get extracted and cited by ChatGPT/Perplexity/Google AI Overviews far more than noun-phrase titles. Each topic below should become an H2 question with a direct 1-2 sentence answer immediately under it. Use natural, conversational Dutch.",
   "published": [
     "voorbeeld-verhuischecklist",
     "wat-kost-een-verhuizing-gemiddeld-in-nederland",
@@ -26,7 +26,20 @@
         "wat doe je in de eerste week in je nieuwe huis",
         "hoe maak je een realistische verhuisplanning",
         "wat is de beste maand om te verhuizen in nederland",
-        "hoe lang duurt een gemiddelde verhuizing"
+        "hoe lang duurt een gemiddelde verhuizing",
+        "hoe maak je een verhuisplanning per maand en per week",
+        "wat is de beste app of tool voor een verhuischecklist",
+        "hoe plan je een verhuizing samen met een verbouwing",
+        "welke deadlines zijn cruciaal bij het plannen van je verhuizing",
+        "hoe reserveer je een parkeerplaats voor de verhuiswagen in de stad",
+        "wat doe je als je verhuisdatum door de verhuurder of koper verandert",
+        "hoe betrek je je partner of huisgenoten bij de verhuisplanning",
+        "wat zijn handige templates voor een verhuisplanning",
+        "hoe lang van tevoren moet je een verhuisbedrijf boeken in het hoogseizoen",
+        "wat regel je met de buren voor de verhuizing (geluid, parkeren)",
+        "hoe plan je de verhuizing als je ook je oude huis moet verkopen",
+        "hoe maak je een uur-per-uur planning voor de verhuisdag",
+        "wat zijn de stappen voor een internationale verhuizing planning"
       ]
     },
     "kosten_en_budget": {
@@ -41,7 +54,19 @@
         "waar vind je gratis of goedkope verhuisdozen",
         "wat kost een verhuislift huren",
         "krijg je een verhuisvergoeding van je werkgever",
-        "wat zijn verborgen kosten bij een verhuizing"
+        "wat zijn verborgen kosten bij een verhuizing",
+        "wat kost een verhuizing in grote steden zoals amsterdam of rotterdam",
+        "hoe bereken je de totale kosten van zelf verhuizen inclusief aanhanger en benzine",
+        "zijn er verhuispremies of tegemoetkomingen van de gemeente of werkgever",
+        "wat zijn de kosten voor het huren van verhuisdozen vs kopen",
+        "hoe bespaar je geld door spullen te verkopen voor de verhuizing",
+        "wat kost een verhuislift per dag en is het altijd nodig",
+        "welke verhuiskosten kun je als zzp'er of werknemer aftrekken",
+        "hoe voorkom je verrassingen met verborgen kosten zoals parkeervergunning of afval",
+        "wat is het prijsverschil verhuizen in zomer versus winter",
+        "hoe onderhandel je succesvol met een verhuisbedrijf over de offerte",
+        "wat kost het om je inboedel te laten taxeren voor verzekering",
+        "zijn er goedkope verhuisopties voor studenten of minima"
       ]
     },
     "verhuisbedrijf_en_logistiek": {
@@ -56,7 +81,19 @@
         "hoeveel fooi geef je verhuizers",
         "wat moet er in een verhuisofferte staan",
         "is verhuisverzekering nodig of zit het bij het bedrijf in",
-        "hoe boek je een verhuizing in het hoogseizoen"
+        "hoe boek je een verhuizing in het hoogseizoen",
+        "hoe vergelijk je offertes van verhuisbedrijven objectief",
+        "wat zijn de voordelen van een gecertificeerd verhuisbedrijf (keurmerk)",
+        "hoe regel je een verhuizing met een vrachtwagen die niet in de straat past",
+        "wat is een verhuiscoördinator en heb je die nodig",
+        "hoe ga je om met klachten over een verhuisbedrijf",
+        "wat is de gemiddelde wachttijd voor een verhuisbedrijf in het hoogseizoen",
+        "hoe boek je een verhuizing met meerdere stops (bijv. opslag)",
+        "wat moet je doen als het verhuisbedrijf te laat komt",
+        "hoe kies je tussen een lokale en landelijke verhuizer",
+        "zijn er verhuisbedrijven gespecialiseerd in senioren of expats",
+        "hoe regel je de betaling en borg bij een verhuisbedrijf",
+        "wat is een verhuiscontract en waar moet je op letten"
       ]
     },
     "inpakken_en_spullen": {
@@ -71,7 +108,20 @@
         "hoe label je verhuisdozen handig",
         "wat mag je weggooien voordat je verhuist",
         "hoe verhuis je je planten zonder dat ze doodgaan",
-        "hoe verhuis je elektronica en kabels overzichtelijk"
+        "hoe verhuis je elektronica en kabels overzichtelijk",
+        "hoe pak je een piano of vleugel veilig in en verhuis je die",
+        "wat is de beste manier om kleding in te pakken voor verhuizing",
+        "hoe verhuis je een aquarium of terrarium met vissen/dieren",
+        "hoe demonteer je ikea meubels zonder schade",
+        "wat zijn handige inpakmaterialen die je zelf kunt maken",
+        "hoe pak je breekbare spullen in zonder bubbeltjesplastic (duurzaam)",
+        "in welke volgorde pak je kamers in voor een soepele verhuizing",
+        "hoe label je dozen met kleuren of nummers voor het uitpakken",
+        "wat doe je met seizoensspullen of zelden gebruikte items",
+        "hoe verhuis je je boekencollectie zonder te zwaar te tillen",
+        "wat is een 'first night box' en wat stop je erin",
+        "hoe verhuis je je wijnkelder of drankvoorraad veilig",
+        "hoe pak je sportspullen en fitnessapparatuur in"
       ]
     },
     "administratie_en_adreswijziging": {
@@ -85,7 +135,19 @@
         "hoe werkt postnl doorsturen bij verhuizen",
         "wat verandert er aan je zorgverzekering bij een verhuizing",
         "welke abonnementen zeg je op of neem je mee bij verhuizen",
-        "wat moet je doen met je digid bij een verhuizing"
+        "wat moet je doen met je digid bij een verhuizing",
+        "hoe geef je adreswijziging door bij de kvk als zzp'er",
+        "wat verandert er met je toeslagen en uitkeringen bij een verhuizing",
+        "hoe regel je je inschrijving bij een nieuwe huisarts en apotheek",
+        "wat moet je doen met je rijbewijs en kenteken bij verhuizing",
+        "hoe werkt adreswijziging bij sociale media en online accounts",
+        "binnen hoeveel tijd moet je je auto verzekering aanpassen",
+        "hoe geef je wijziging door aan je pensioenfonds of werkgever",
+        "wat is het verschil tussen adreswijziging en verhuizing doorgeven",
+        "hoe regel je post doorsturen als je tijdelijk elders woont",
+        "wat doe je met je oude adres voor pakketbezorging (bol.com, etc.)",
+        "hoe update je je gegevens bij de bibliotheek of sportschool",
+        "wat is een 'melding verhuizing' bij de gemeente precies"
       ]
     },
     "huren_en_rechten": {
@@ -99,7 +161,19 @@
         "hoe werkt huur opzeggen bij een verhuizing",
         "wat is het verschil tussen tijdelijk en vast huurcontract bij opzeggen",
         "kun je een huurcontract overdragen aan iemand anders",
-        "wat zijn veelgemaakte fouten bij het opzeggen van huur"
+        "wat zijn veelgemaakte fouten bij het opzeggen van huur",
+        "wat zijn je rechten als huurder bij een gedwongen verhuizing",
+        "hoe zit het met huurverhoging na verhuizing of renovatie",
+        "wat is een 'huurteam' en wanneer schakel je die in",
+        "hoe bewijs je de staat van de woning bij oplevering (foto's, checklist)",
+        "wat als de verhuurder weigert de borg terug te betalen",
+        "kun je huurcontract opzeggen als je een nieuwe baan krijgt elders",
+        "wat zijn de regels voor onderhuur of tijdelijke verhuur bij verhuizing",
+        "hoe werkt de 'huurcommissie' bij geschillen over borg of oplevering",
+        "wat moet je regelen als je samenwoont en één van beiden verhuist",
+        "zijn er verschillen in opzegtermijn per provincie of stad",
+        "hoe verhuis je als je in een sociale huurwoning zit",
+        "wat is 'woningruil' en hoe werkt dat bij huur"
       ]
     },
     "kopen_en_woning": {
@@ -113,7 +187,20 @@
         "wat moet je controleren bij de sleuteloverdracht",
         "hoe belangrijk is het energielabel bij woningkeuze",
         "wat kost het om een huis bewoonbaar te maken",
-        "hoe stel je prioriteiten bij het inrichten van een nieuw huis"
+        "hoe stel je prioriteiten bij het inrichten van een nieuw huis",
+        "wat is een 'voorlopig koopcontract' en wat staat erin",
+        "hoe werkt de 'drie dagen bedenktijd' bij woningkoop",
+        "wat regel je met de notaris bij de overdracht",
+        "welke kosten komen er kijken bij de sleuteloverdracht (notariskosten, overdrachtsbelasting)",
+        "hoe doe je een bouwtechnische keuring voor een oud huis",
+        "wat is een 'energielabel' en waarom is het belangrijk bij koop",
+        "hoe meet je op voor nieuwe meubels en inrichting",
+        "wat zijn veelgemaakte fouten bij de oplevering van een nieuwbouwwoning",
+        "hoe regel je de overname van gordijnen, vloeren of apparatuur van de vorige eigenaar",
+        "wat is een 'woonvergunning' of 'omgevingsvergunning' bij verbouwing na koop",
+        "hoe kies je een goede makelaar voor je eerste koopwoning",
+        "wat doe je als er gebreken zijn na de overdracht",
+        "hoe financier je een verbouwing direct na de koop"
       ]
     },
     "verhuizen_met_gezin": {
@@ -128,7 +215,19 @@
         "hoe worden partners het eens over de inrichting na een verhuizing",
         "hoe verdeel je verhuistaken eerlijk in een gezin",
         "hoe houd je een verhuizing leuk voor kinderen",
-        "wat doe je met je huisdier op de verhuisdag zelf"
+        "wat doe je met je huisdier op de verhuisdag zelf",
+        "hoe verhuis je met een zwangere partner of pasgeboren baby",
+        "wat zijn goede manieren om tieners te betrekken bij de verhuizing",
+        "hoe help je kinderen met het afscheid nemen van vrienden en school",
+        "hoe verhuis je met een kind met speciale behoeften of autisme",
+        "wat regel je met de school bij verhuizing (inschrijving, dossieroverdracht)",
+        "hoe houd je huisdieren kalm op de verhuisdag (katten, honden, vogels)",
+        "hoe verdeel je taken eerlijk tussen partners bij een verhuizing",
+        "wat zijn leuke activiteiten om de verhuizing leuk te maken voor kids",
+        "hoe ga je om met emoties van kinderen na de verhuizing",
+        "wat is een 'verhuisfeestje' en hoe organiseer je dat",
+        "hoe verhuis je als co-ouder met kinderen die tussen twee huizen reizen",
+        "wat doe je met kinderopvang of naschoolse opvang bij verhuizing"
       ]
     },
     "specifieke_situaties": {
@@ -142,7 +241,19 @@
         "hoe verhuis je na een scheiding praktisch en kalm",
         "hoe verhuis je als student naar een kamer",
         "hoe verhuis je op afstand zonder zelf aanwezig te zijn",
-        "wat regel je bij een internationale verhuizing vanuit nederland"
+        "wat regel je bij een internationale verhuizing vanuit nederland",
+        "hoe verhuis je als expat naar nederland: eerste stappen en valkuilen",
+        "wat regel je bij een verhuizing vanuit nederland naar het buitenland (brexit, etc.)",
+        "hoe verhuis je na een overlijden in de familie (praktisch en emotioneel)",
+        "wat zijn de stappen bij verhuizen na een scheiding met kinderen",
+        "hoe verhuis je als student naar een andere stad (kamer vs studio)",
+        "wat is een 'seniorenverhuizing' en waar moet je op letten (kleiner wonen)",
+        "hoe verhuis je als je in een rolstoel zit of beperkte mobiliteit hebt",
+        "wat regel je bij een internationale verhuizing met container",
+        "hoe verhuis je als zzp'er met je bedrijf (kantoorspullen, administratie)",
+        "wat doe je bij een verhuizing door brand, wateroverlast of ontruiming",
+        "hoe verhuis je tijdelijk (tussenwoning) en later definitief",
+        "wat zijn de regels voor verhuizen met een caravan of boot"
       ]
     },
     "duurzaam_verhuizen": {
@@ -155,7 +266,18 @@
         "wat doe je met meubels die je niet meeneemt",
         "hoe kies je een milieuvriendelijk verhuisbedrijf",
         "hoe hergebruik je verpakkingsmateriaal bij verhuizen",
-        "is digitaal je verhuisadministratie regelen duurzamer"
+        "is digitaal je verhuisadministratie regelen duurzamer",
+        "hoe recycle je verpakkingsmateriaal na de verhuizing",
+        "wat zijn circulaire verhuisbedrijven of groene verhuizers",
+        "hoe doneer je meubels en spullen lokaal (kringloop, facebook groups)",
+        "is het duurzamer om spullen te verkopen via marktplaats of weg te geven",
+        "hoe verminder je je ecologische voetafdruk bij een verhuizing",
+        "wat doe je met oude elektronica en witgoed bij verhuizing",
+        "hoe kies je duurzame verhuisdozen (karton vs plastic)",
+        "is het beter om een elektrische verhuiswagen te kiezen",
+        "hoe hergebruik je oude dozen voor opslag of donatie",
+        "wat is 'minimaliseren' voor de verhuizing en hoe pak je dat aan",
+        "hoe compenseer je de co2 uitstoot van je verhuizing"
       ]
     },
     "welzijn_en_settelen": {
@@ -168,7 +290,106 @@
         "hoe ga je om met de emotionele kant van verhuizen",
         "hoe voorkom je een burn-out tijdens een drukke verhuizing",
         "hoe vind je je draai in een nieuwe buurt",
-        "waarom is verhuizen een van de meest stressvolle gebeurtenissen"
+        "waarom is verhuizen een van de meest stressvolle gebeurtenissen",
+        "hoe bouw je snel een sociaal netwerk op in je nieuwe buurt",
+        "wat zijn tekenen van verhuisstress en hoe herken je burn-out",
+        "hoe maak je je nieuwe huis 'jouw thuis' met persoonlijke spullen",
+        "hoe ga je om met heimwee of spijt na een verhuizing",
+        "wat helpt tegen eenzaamheid in een nieuwe omgeving",
+        "hoe plan je rustmomenten in tijdens een drukke verhuisperiode",
+        "wat is de 'verhuisdip' en hoe kom je erdoorheen",
+        "hoe introduceer je jezelf aan nieuwe buren (cadeautje, praatje)",
+        "hoe houd je je mentale gezondheid op peil met een verhuizing",
+        "wat zijn goede rituelen om afscheid te nemen van je oude huis",
+        "hoe betrek je kinderen bij het 'nieuw huis vieren'",
+        "wanneer is het tijd om professionele hulp te zoeken bij verhuisstress"
+      ]
+    },
+    "utilities_en_aansluitingen": {
+      "label": "Utilities, energie & aansluitingen",
+      "topics": [
+        "hoe sluit je internet tv en telefoon aan na een verhuizing",
+        "wat regel je met je energieleverancier bij verhuizen",
+        "hoe verander je van energieleverancier na een verhuizing",
+        "binnen hoeveel dagen moet je gas water en licht aanvragen",
+        "wat is een 'verhuisbericht' energieleverancier en hoe vul je dat in",
+        "hoe voorkom je dat je dubbele energierekening krijgt bij verhuizing",
+        "wat doe je met zonnepanelen of laadpaal bij verhuizing",
+        "hoe installeer je wifi en een mesh-systeem in een nieuw huis",
+        "welke providers zijn het beste voor een nieuw adres (vergelijking)",
+        "hoe regel je de aansluiting van een inductiekookplaat of warmtepomp",
+        "wat zijn de kosten voor het verplaatsen van een gasaansluiting of meter",
+        "hoe update je je gegevens bij de netbeheerder (liander, enexis etc.)",
+        "wat is een slimme meter en moet je die laten plaatsen bij verhuizing",
+        "hoe regel je afvalinzameling en container aanvragen in de nieuwe gemeente",
+        "hoe noteer je meterstanden bij verhuizing (oud en nieuw huis)",
+        "moet je je energiecontract meenemen of overstappen bij verhuizing",
+        "wat is de opzegtermijn energieleverancier bij verhuizing",
+        "hoe regel je wateraansluiting en wat is de vaste waterleverancier per regio",
+        "wat doe je als de nieuwe woning geen gasaansluiting heeft",
+        "hoe bestel je een nieuw internetcontract zodat het snel actief is",
+        "wat zijn de stappen voor gas water en elektra regelen bij verhuizing"
+      ]
+    },
+    "verhuizen_en_werk": {
+      "label": "Moving & work / career",
+      "topics": [
+        "hoe verhuis je naar een andere stad voor een nieuwe baan",
+        "wat regel je met je huidige werkgever bij een verhuizing",
+        "krijg je een verhuisvergoeding of reiskostenvergoeding bij verhuizing voor werk",
+        "hoe beïnvloedt verhuizen je woon-werkverkeer en reistijd",
+        "wat zijn de fiscale voordelen of aftrekposten bij verhuizen voor je werk",
+        "hoe verhuis je als zzp'er of freelancer met je bedrijf",
+        "wat moet je aanpassen op je cv en linkedin na een verhuizing",
+        "hoe werk je productief thuis tijdens de chaos van een verhuizing",
+        "wat als je verhuist en daarna je baan kwijtraakt",
+        "hoe kies je een woning die past bij je carrière en commute",
+        "hoe regel je een zakelijke verhuizing van je kantoor of werkruimte",
+        "wat zijn de regels voor een verhuisvergoeding in je cao of arbeidsovereenkomst",
+        "hoe plan je je verhuizing rond je werk (vakantiedagen, verlof)",
+        "wat verandert er aan je pensioenopbouw of arbeidsvoorwaarden bij verhuizing",
+        "hoe update je je zakelijke adres bij klanten en leveranciers",
+        "wat zijn de gevolgen voor je reiskostenvergoeding of thuiswerkregeling"
+      ]
+    },
+    "verhuizen_en_verbouwing": {
+      "label": "Moving & renovation / DIY",
+      "topics": [
+        "moet je eerst verbouwen of eerst verhuizen: wat is slimmer",
+        "hoe plan en coördineer je een verhuizing tijdens of rond een verbouwing",
+        "wat zijn de eerste klussen die je doet in een nieuw huis na verhuizing",
+        "hoe bewaar en bescherm je je spullen tijdens een verbouwing",
+        "wat doe je met bouwafval en puin bij een verbouwing + verhuizing",
+        "hoe kies je een aannemer die ook rekening houdt met je verhuizing",
+        "welke renovaties doe je beter vóór de verhuizing (vloer, keuken, badkamer)",
+        "hoe meet en plan je de inrichting tijdens een verbouwing",
+        "wat zijn de kosten en planning voor een verbouwing na koop",
+        "hoe voorkom je vertragingen die je verhuizing in de weg zitten",
+        "wat is een 'bewoonbaar maken' van een huis en wat komt daarbij kijken",
+        "hoe combineer je verhuizen met schilderen, vloer leggen en inrichten",
+        "wat zijn slimme doe-het-zelf klussen die je voor de verhuizing kunt doen",
+        "hoe plan je de volgorde: slopen - verbouwen - verhuizen - inrichten",
+        "wat regel je met de aannemer over toegang en opslag tijdens verbouwing"
+      ]
+    },
+    "verhuizen_en_opslag": {
+      "label": "Moving & temporary storage",
+      "topics": [
+        "wanneer is het slim om tijdelijke opslag te huren bij een verhuizing",
+        "wat kost self storage per maand in nederland (gemiddeld)",
+        "hoe kies je een veilige en droge opslagruimte",
+        "wat mag je wel en niet opslaan in een self storage unit",
+        "hoe verhuis je spullen in twee fases: opslag dan nieuw huis",
+        "zijn je spullen verzekerd in self storage en hoe regel je dat",
+        "wat zijn de alternatieven voor dure self storage (vrienden, garage, container)",
+        "hoe pack je spullen anders in als ze tijdelijk in opslag gaan",
+        "hoe lang kun je spullen maximaal in opslag laten staan",
+        "wat zijn verborgen kosten bij self storage (toegang, verzekering, contract)",
+        "hoe combineer je self storage met een verhuisbedrijf",
+        "wat doe je met seizoensspullen of meubels die je later wilt houden",
+        "is self storage een goede optie bij een verbouwing of vertraging",
+        "hoe kies je tussen korte termijn en lange termijn opslag",
+        "wat zijn de voor- en nadelen van container opslag vs indoor self storage"
       ]
     }
   }
