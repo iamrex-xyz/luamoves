@@ -9,8 +9,8 @@ This repository is the **frontend web app**: the PWA users interact with in the 
 ## Tech stack
 
 - **Frontend**: React + Vite + TypeScript + Tailwind CSS (mobile-first PWA)
-- **Backend**: Lovable Cloud (Supabase) — database, auth, edge functions, file storage
-- **AI**: Lovable AI Gateway (Gemini/GPT models) powers the in-app Lua AI chat
+- **Backend**: Supabase — database, auth, edge functions, file storage
+- **AI**: in-app Lua chat is served by the `lua-chat` Supabase edge function (Gemini 2.5 Flash)
 - **Native**: Capacitor wrapping for iOS/Android
 - **Deployment**: Vercel (SPA rewrites configured in `vercel.json`)
 
@@ -32,7 +32,7 @@ src/
 ├── data/, lib/, hooks/, types/
 
 public/                ← static assets, service worker
-supabase/              ← migrations + edge functions (Lovable Cloud backend)
+supabase/              ← migrations + edge functions (backend)
 docs/                  ← product overview & design system reference
 backend-reference/     ← the WhatsApp bot backend (separate codebase, zipped — see its own README)
 ```
