@@ -280,7 +280,8 @@ Copy the public URL it prints into `BIRD_WEBHOOK_URL` in your `.env`, and regist
 
 ## 9. Key concepts
 
-- **Behaviour spec (`src/prompts/`)** — six Markdown files define Lua's personality and rules. They are loaded once at boot, used as-is, and a SHA-256 **config version** is logged at startup and exposed on `/health`. Do not rewrite Lua's tone here; this is the client's source material.
+- **Behaviour spec (`src/prompts/`)** — six Markdown files (`SOUL.md`, `flow.md`, `instructions.md`, `knowledge.md`, `monetization.md`, `privacy.md`) define Lua's personality and rules. They are loaded once at boot, used as-is, and a SHA-256 **config version** is logged at startup and exposed on `/health`.
+- **Two copies, don't confuse them:** the same six filenames also exist under `requirement-docs/config-files/`. That copy is the client's original, **read-only** briefing — reference only, never loaded by the app. If you need to change the bot's actual behavior, edit the copy in `src/prompts/`, not `requirement-docs/`.
 - **Templates vs. AI** — anything that must be word-for-word exact lives in `src/templates/` and is rendered by code. Only free conversation comes from the AI.
 - **Plain text** — WhatsApp gets plain text only. All markdown/bold/bullets are stripped (`utils/plaintext.ts`) before sending.
 - **Idempotent webhook** — inbound messages are de-duplicated by `message_id` (Bird can retry the same message).
