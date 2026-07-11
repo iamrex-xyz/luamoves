@@ -95,3 +95,17 @@ Die vergelijking laat zien waarom de Nederlandse BRP zo'n centrale rol speelt: i
 ## Wat is het verschil met een adreswijziging doorgeven aan andere instanties?
 
 De melding verhuizing bij de gemeente ververst alleen de BRP. Je bank, zorgverzekeraar, energieleverancier, werkgever en abonnementen krijgen dit **niet automatisch** te horen. Voor die instanties moet je zelf, los van de gemeentelijke melding, je adres doorgeven. Zie de melding verhuizing dus als de eerste, wettelijk verplichte stap, niet als je volledige adreswijziging.
+
+## Veelgestelde vragen
+
+**Wat kost het om een verhuizing te melden bij de gemeente?**
+Niets. De melding verhuizing zelf is gratis. Alleen als je tegelijk een nieuw uittreksel of document aanvraagt, betaal je daarvoor de gebruikelijke leges.
+
+**Kan ik mijn verhuizing melden voordat ik daadwerkelijk verhuisd ben?**
+Ja, je mag de melding tot 4 weken van tevoren doorgeven. De gemeente verwerkt hem dan automatisch op de ingangsdatum die jij opgeeft.
+
+**Wat gebeurt er als ik vergeet mijn verhuizing te melden?**
+Je riskeert een boete tot €325 en je blijft officieel op je oude adres staan, wat problemen geeft met toeslagen, stemrecht en post van de overheid.
+
+**Moet ik mijn verhuizing ook apart melden bij mijn bank of verzekeraar?**
+Ja. De gemeente werkt alleen de Basisregistratie Personen bij. Banken, verzekeraars, de Belastingdienst en abonnementen moet je zelf op de hoogte brengen.

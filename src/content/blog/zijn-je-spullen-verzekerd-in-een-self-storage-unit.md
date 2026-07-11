@@ -69,3 +69,14 @@ Regel je de opslag via je verhuisbedrijf, bijvoorbeeld omdat je oude en nieuwe w
 ## Leg de staat van je spullen vast
 
 Maak voordat je spullen inslaat een korte inventarislijst met foto's van waardevolle of kwetsbare items. Dit kost je een kwartier, maar is onmisbaar als je later een schadeclaim moet indienen: het bewijst zowel wat je hebt opgeslagen als in welke staat het verkeerde. Verzekeraars in het buitenland, zoals in de Verenigde Staten, hanteren dezelfde logica: de dekking van een verhuisbedrijf stopt namelijk vaak zodra je spullen bij de opslaglocatie worden afgeleverd, waarna je zelf verantwoordelijk bent voor aanvullende dekking tijdens de opslagperiode.
+
+## Veelgestelde vragen
+
+**Dekt mijn inboedelverzekering automatisch mijn spullen in self storage?**
+Bij de meeste verzekeraars wel, maar vaak met een maximale opslagtermijn van 3 tot 6 maanden en een gedekt bedrag van 10 tot 20% van je verzekerde som.
+
+**Moet ik apart een verzekering afsluiten bij het self storage bedrijf?**
+Alleen als je inboedelverzekering geen dekking biedt of te beperkt is voor de waarde van je spullen. Sluit je toch los een verzekering af, check dan eerst of je niet dubbel verzekerd raakt.
+
+**Zijn sieraden en contant geld verzekerd in opslag?**
+Meestal niet, of alleen tot een laag maximumbedrag. Waardevolle spullen zoals sieraden, kunst of geld kun je beter apart verzekeren of thuis bewaren.

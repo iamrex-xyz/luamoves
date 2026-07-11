@@ -47,3 +47,14 @@ Sommige gemeenten bieden een ophaalservice voor particulieren, waarbij je gevuld
 - Vergelijk containerprijzen: een 10 m³ container kost gemiddeld rond de €511.
 - Check of je een vergunning nodig hebt voor een container op straat.
 - Verpak asbesthoudend materiaal dubbel en apart, en vraag bij twijfel een specialist om advies.
+
+## Veelgestelde vragen
+
+**Mag ik zelf bouwafval naar de milieustraat brengen?**
+Ja, als particulier mag je met een afvalpas gescheiden bouwafval brengen naar het afvalbrengstation van je gemeente. Bedrijven moeten een gecertificeerde afvalverwerker inschakelen.
+
+**Heb ik een vergunning nodig voor een puincontainer op straat?**
+Vaak wel. Informeer bij je gemeente of je een vergunning nodig hebt als je de container op de openbare weg of stoep wilt plaatsen in plaats van op eigen terrein.
+
+**Is asbest afvoeren gratis?**
+Bij veel gemeenten mag je klein verpakt asbest gratis inleveren bij het afvalbrengstation, mits dubbel verpakt volgens de regels. Asbest zelf verwijderen vereist meestal een vergunning.
