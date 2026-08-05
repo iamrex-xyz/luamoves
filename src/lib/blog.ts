@@ -40,6 +40,15 @@ function parseFrontmatter(raw: string): { data: Record<string, unknown>; content
   return { data, content: match[2] };
 }
 
+// Unquoted YAML dates (date: 2026-08-06) parse as Date objects, not strings.
+// String(dateObject) yields a timezone-dependent "Thu Aug 06 2026..." form that
+// breaks lexicographic date sorting, so normalize everything to YYYY-MM-DD first.
+function normalizeDate(value: unknown): string {
+  if (!value) return "";
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value);
+}
+
 function loadPosts(): BlogPost[] {
   const posts: BlogPost[] = [];
 
@@ -51,8 +60,8 @@ function loadPosts(): BlogPost[] {
       slug,
       title: (data.title as string) ?? slug,
       excerpt: (data.excerpt as string) ?? "",
-      date: String(data.date ?? ""),
-      dateModified: data.dateModified ? String(data.dateModified) : undefined,
+      date: normalizeDate(data.date),
+      dateModified: data.dateModified ? normalizeDate(data.dateModified) : undefined,
       author: data.author as string | undefined,
       format: data.format as string | undefined,
       pillar: data.pillar as string | undefined,
