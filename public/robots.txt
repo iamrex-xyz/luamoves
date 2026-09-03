@@ -1,3 +1,7 @@
+# Lua — www.lua.nl
+# The blog is deliberately open to search and generative engines.
+# /scripts is an internal tool and must stay out of both.
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,5 +16,83 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /scripts
+
+# --- Generative engines -------------------------------------------------
+# These are ALLOWED on the blog on purpose: being cited by ChatGPT,
+# Perplexity and AI Overviews is the point of the content. They are only
+# kept off /scripts. Do not turn these into blanket Disallows.
+
+User-agent: GPTBot
+Allow: /
+Disallow: /scripts
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /scripts
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /scripts
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /scripts
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /scripts
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /scripts
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /scripts
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /scripts
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /scripts
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /scripts
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /scripts
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /scripts
+
+User-agent: Bytespider
+Allow: /
+Disallow: /scripts
+
+User-agent: CCBot
+Allow: /
+Disallow: /scripts
+
+User-agent: cohere-ai
+Allow: /
+Disallow: /scripts
+
+User-agent: YouBot
+Allow: /
+Disallow: /scripts
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /scripts
+
+User-agent: MistralAI-User
+Allow: /
+Disallow: /scripts
 
 Sitemap: https://www.lua.nl/sitemap.xml
