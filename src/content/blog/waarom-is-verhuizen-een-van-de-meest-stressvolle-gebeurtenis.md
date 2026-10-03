@@ -4,7 +4,7 @@ excerpt: "Verhuizen scoort zelf maar 20 van de 100 punten op de stressschaal van
 date: 2026-10-03
 dateModified: 2026-10-03
 author: Lua Redactie
-format: middel
+format: lang
 pillar: "welzijn_en_settelen"
 heroImage: "/blog-images/_default-hero.webp"
 heroAlt: "Vrouw zit moe tussen opgestapelde verhuisdozen in een halflege woonkamer"
